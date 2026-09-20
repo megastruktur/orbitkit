@@ -1,0 +1,21 @@
+# Build artifacts
+node_modules/
+dist/
+target/
+src-tauri/target/
+.gen/
+.vite/
+
+# Tauri / Android generated
+src-tauri/gen/
+
+# Env & secrets — never commit
+.env
+.env.*
+*.keystore
+*.jks
+keystore.properties
+secrets/
+
+# Campaign working state (kept local; evidence copied into worktrees manually)
+plans/

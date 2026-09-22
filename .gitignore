@@ -1,14 +1,21 @@
 # Build artifacts
 node_modules/
 dist/
+**/dist/
 target/
-src-tauri/target/
+**/target/
 .gen/
+**/.gen/
 .vite/
+**/.vite/
+.svelte-kit/
+**/.svelte-kit/
 
 # Tauri / Android generated
 src-tauri/gen/*
 !src-tauri/gen/android/
+examples/starter/src-tauri/gen/*
+!examples/starter/src-tauri/gen/android/
 
 # Env & secrets — never commit
 .env

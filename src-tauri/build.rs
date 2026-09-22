@@ -30,6 +30,10 @@ const ALL_COMMANDS: &[&str] = &[
     "recorder_state",
     "recorderPostStandbyNotification",
     "recorder_post_standby_notification",
+    "recorderGetPersistedState",
+    "recorder_get_persisted_state",
+    "recorderRecoverState",
+    "recorder_recover_state",
 ];
 
 fn main() {

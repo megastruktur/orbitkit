@@ -146,12 +146,66 @@
       statusMessage = "Failed to post standby notification";
     }
   }
+
+  interface PersistedStateInfo {
+    state: string;
+    bytesRecorded: number;
+    spoolPath: string;
+    recoveryCount: number;
+    lastRecoveredAt: number;
+    isForeground: boolean;
+    processPid: number;
+    lastAction: string;
+    rawJson?: string;
+  }
+
+  let persistedState = $state<PersistedStateInfo | null>(null);
+  let jniActionCount = $state<number>(0);
+
+  async function queryPersistedState() {
+    try {
+      lastError = null;
+      statusMessage = "Querying C4 persistence file...";
+      const res = await invoke<PersistedStateInfo>("recorderGetPersistedState");
+      persistedState = res;
+      statusMessage = `C4 Persisted: ${res.state} | ${res.bytesRecorded}B | pid=${res.processPid} | recovCount=${res.recoveryCount}`;
+    } catch (err: any) {
+      lastError = String(err?.message || err);
+      statusMessage = "Query persisted state failed";
+    }
+  }
+
+  async function recoverStateManually() {
+    try {
+      lastError = null;
+      statusMessage = "Recovering C4 state...";
+      const res = await invoke<PersistedStateInfo>("recorderRecoverState");
+      persistedState = res;
+      statusMessage = `C4 Recovered: ${res.state} | ${res.bytesRecorded}B | recoveryCount=${res.recoveryCount}`;
+    } catch (err: any) {
+      lastError = String(err?.message || err);
+      statusMessage = "Recover state failed";
+    }
+  }
+
+  async function queryJniLog() {
+    try {
+      lastError = null;
+      statusMessage = "Querying JNI action log...";
+      const res = await invoke<any[]>("jni_get_action_log");
+      jniActionCount = res.length;
+      statusMessage = `JNI actions received in Rust: ${res.length}`;
+    } catch (err: any) {
+      lastError = String(err?.message || err);
+      statusMessage = "Query JNI log failed";
+    }
+  }
 </script>
 
 <main>
   <Mascot />
   <h1>orbitkit</h1>
-  <p>Mic-FGS Gates & Overlay Spike — Task T05</p>
+  <p>Survival & JNI Bridge under WebView Suspension — Task T06</p>
 
   <div class="controls-card">
     <div class="status-row">
@@ -198,6 +252,23 @@
       <button class="rec-standby" onclick={postStandbyNotificationS3b}>S3b: Standby Notif</button>
     </div>
 
+    <div class="section-title">C4 Persistence & JNI Bridge</div>
+    <div class="button-grid">
+      <button onclick={queryPersistedState}>Query State File</button>
+      <button onclick={recoverStateManually}>Recover State</button>
+      <button onclick={queryJniLog}>Query JNI ({jniActionCount})</button>
+    </div>
+
+    {#if persistedState}
+      <div class="status-subrow">
+        <span class="sublabel">Persisted:</span>
+        <span class="subval">{persistedState.state} ({persistedState.bytesRecorded}B, recov={persistedState.recoveryCount})</span>
+      </div>
+      <div class="status-subrow">
+        <span class="sublabel">Last Action:</span>
+        <span class="subval">{persistedState.lastAction}</span>
+      </div>
+    {/if}
     <div class="scenario-hints">
       <div class="hint"><strong>S1:</strong> Start FGS from visible Activity.</div>
       <div class="hint"><strong>S2:</strong> Background app; use overlay buttons to Pause/Resume/Stop.</div>

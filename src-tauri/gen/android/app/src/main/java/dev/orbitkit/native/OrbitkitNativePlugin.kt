@@ -290,6 +290,50 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
     }
 
+    @Command
+    fun recorderGetPersistedState(invoke: Invoke) {
+        try {
+            val jsonStr = OrbitkitStatePersistence.getStateJson(activity)
+            val stateObj = OrbitkitStatePersistence.getCurrentState()
+            val res = JSObject().apply {
+                put("state", stateObj.state)
+                put("bytesRecorded", stateObj.bytesRecorded)
+                put("spoolPath", stateObj.spoolPath)
+                put("updatedAt", stateObj.updatedAt)
+                put("lastAction", stateObj.lastAction)
+                put("recoveryCount", stateObj.recoveryCount)
+                put("lastRecoveredAt", stateObj.lastRecoveredAt)
+                put("isForeground", stateObj.isForeground)
+                put("processPid", stateObj.processPid)
+                put("rawJson", jsonStr)
+            }
+            invoke.resolve(res)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get persisted state", e)
+            invoke.reject("Failed to get persisted state: ${e.message}", "PERSISTENCE_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderRecoverState(invoke: Invoke) {
+        try {
+            val recovered = OrbitkitStatePersistence.recoverState(activity)
+            val res = JSObject().apply {
+                put("state", recovered.state)
+                put("bytesRecorded", recovered.bytesRecorded)
+                put("spoolPath", recovered.spoolPath)
+                put("recoveryCount", recovered.recoveryCount)
+                put("lastRecoveredAt", recovered.lastRecoveredAt)
+                put("processPid", recovered.processPid)
+                put("lastAction", recovered.lastAction)
+            }
+            invoke.resolve(res)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to recover state", e)
+            invoke.reject("Failed to recover state: ${e.message}", "RECOVERY_FAILED", e, null)
+        }
+    }
+
     override fun onDestroy(activity: AppCompatActivity) {
         super.onDestroy(activity)
         val view = overlayView
@@ -306,24 +350,32 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
 
     private fun handleAction(action: String) {
         Log.i(TAG, "Overlay action tapped: $action")
-        statusView?.text = "Last Action: $action"
+        statusView?.text = "Last Action: $action (JNI)"
+
+        // 1. Direct JNI invocation into Rust (executes even when Tauri WebView JS is suspended)
+        val jniResponse = OrbitkitJniBridge.dispatchNativeAction(action)
+        Log.i(TAG, "JNI bridge direct dispatch for '$action' returned: $jniResponse")
+
+        // 2. Record action transition in C4 persistence file
+        OrbitkitStatePersistence.recordAction(activity, action)
 
         val payload = JSObject().apply {
             put("action", action)
             put("timestamp", System.currentTimeMillis())
+            put("jniResult", jniResponse)
         }
 
-        // 1. Send via dedicated IPC channel to Rust
+        // 3. Send via dedicated IPC channel to Rust (if channel alive)
         actionChannel?.let { ch ->
             try {
                 ch.send(payload)
                 Log.i(TAG, "Action $action dispatched via actionChannel to Rust")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to send action via channel", e)
+                Log.d(TAG, "actionChannel not delivered (WebView may be suspended): ${e.message}")
             }
         }
 
-        // 2. Also emit via plugin event
+        // 4. Also emit via plugin event
         trigger("action", payload)
     }
 

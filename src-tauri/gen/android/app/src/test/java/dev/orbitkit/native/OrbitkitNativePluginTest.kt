@@ -76,7 +76,9 @@ class OrbitkitNativePluginTest {
             "recorderPause",
             "recorderResume",
             "recorderStop",
-            "recorderState"
+            "recorderState",
+            "recorderGetPersistedState",
+            "recorderRecoverState"
         )
 
         for (cmdName in requiredRecorderCommands) {

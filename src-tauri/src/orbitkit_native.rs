@@ -189,6 +189,44 @@ impl<R: Runtime> OrbitkitNative<R> {
             Ok(())
         }
     }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_get_persisted_state(&self) -> Result<serde_json::Value, String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<serde_json::Value>("recorderGetPersistedState", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            Ok(serde_json::json!({
+                "state": "IDLE",
+                "bytesRecorded": 0,
+                "spoolPath": "/tmp/recorder_spool.pcm",
+                "recoveryCount": 0,
+                "isForeground": false
+            }))
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_recover_state(&self) -> Result<serde_json::Value, String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<serde_json::Value>("recorderRecoverState", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            Ok(serde_json::json!({
+                "state": "IDLE",
+                "bytesRecorded": 0,
+                "recoveryCount": 1
+            }))
+        }
+    }
 }
 
 #[cfg(feature = "mic-recorder")]
@@ -364,6 +402,37 @@ pub async fn recorder_post_standby_notification_snake<R: Runtime>(
     app.orbitkit_native().recorder_post_standby_notification()
 }
 
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderGetPersistedState")]
+pub async fn recorder_get_persisted_state<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<serde_json::Value, String> {
+    app.orbitkit_native().recorder_get_persisted_state()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_get_persisted_state")]
+pub async fn recorder_get_persisted_state_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<serde_json::Value, String> {
+    app.orbitkit_native().recorder_get_persisted_state()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderRecoverState")]
+pub async fn recorder_recover_state<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<serde_json::Value, String> {
+    app.orbitkit_native().recorder_recover_state()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_recover_state")]
+pub async fn recorder_recover_state_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<serde_json::Value, String> {
+    app.orbitkit_native().recorder_recover_state()
+}
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     #[allow(unused_mut)]
     let mut builder = Builder::<R>::new("orbitkit-native")
@@ -408,6 +477,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             recorder_state_snake,
             recorder_post_standby_notification,
             recorder_post_standby_notification_snake,
+            recorder_get_persisted_state,
+            recorder_get_persisted_state_snake,
+            recorder_recover_state,
+            recorder_recover_state_snake,
         ]);
     }
 

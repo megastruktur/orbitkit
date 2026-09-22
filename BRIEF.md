@@ -1,86 +1,88 @@
-# okf_mic-fgs-gates
+# okf_survival-jni
 
-> Task brief for the OMP coding agent. Worktree display name: `okf-mic-fgs-gates`.
+> Task brief for the OMP coding agent. Worktree display name: `okf-survival-jni`.
 > You are the only writer in this worktree. Record honest facts; probe before you
-> trust any command; never invent command output. THIS TASK IS THE CAMPAIGN'S CRITICAL
-> SPIKE (RESEARCH.md §11 spikes 1–2): expect the possibility that documented
-> expectations FAIL on the device — that is a VALID campaign result, record it honestly.
+> trust any command; never invent command output.
 
 ## Goal
 
-Implement a minimal feature-gated mic recorder on top of T04's overlay and execute the
-RESEARCH.md §3.1 scenario matrix on the Z Flip 7: S1 (start from visible Activity),
-S2 (pause/resume/stop from overlay on an ALREADY-RUNNING FGS), S3 (cold mic-FGS start
-from overlay tap — documented expectation: REJECTED by while-in-use gate B), S3b
-(cold start from a live notification action — documented candidate for allowed).
-Deliver per-scenario verdicts with logcat proof. You are proving facts, not shipping
-a recorder product.
+Close the campaign: (a) prove the native action path overlay → Kotlin → JNI → Rust
+works while the main WebView is SUSPENDED (RESEARCH §7: JNI is the documented channel;
+background_throttling unsupported on Android — logic must not live in JS), and (b)
+characterize survival: screen lock, confirmed process death (force-stop / am kill),
+swipe-from-Recents (NOT proof of death — check actual process state), state
+persistence across each, and the realistic idle-launcher-without-mic lifecycle
+(RESEARCH §3.2: overlay lifecycle separate from mic-FGS; specialUse-approvability is
+OUT of scope — Play not targeted).
 
 ## Scope allowlist (explicit)
 
-- `src-tauri/gen/android/**` (recorder service Kotlin, manifest additions, notification channel)
-- `src-tauri/src/**` Rust: recorder command surface behind a cargo feature (e.g. `mic-recorder`)
-- `src-tauri/Cargo.toml` (feature gate), `src-tauri/capabilities/*.json` if needed
-- `src/**` minimal: debug buttons for S1 start / permission request (placeholder UI)
+- `src-tauri/gen/android/**` (JNI bridge Kotlin, service/overlay lifecycle tweaks, persistence)
+- `src-tauri/src/**` Rust (extern command surface for JNI path, state persistence)
+- `src-tauri/Cargo.toml` (only if the bridge needs a feature/crate addition)
+- `src/**` minimal (debug affordances only)
 - `BRIEF.md` (this brief, overwrite in worktree root)
-- `evidence/mic-fgs-gates/REPORT.md` + `scenarios/*.md` + raw logcat (committed)
+- `evidence/survival-jni/REPORT.md` + raw outputs (committed)
 
 Anything not listed is out of scope. No formatters with autofix.
 
 ## Non-goals
 
-- No survival/process-death/START_STICKY work (T06)
-- No JNI-under-suspended-WebView proof (T06; your overlay actuation may run with app foreground)
-- No audio quality/encoding work: capture to raw PCM spool file is enough (no codec)
-- No radial menu, no mascot, no UI polish; notification may be bare-bones
-- No Play-distribution thinking (FGS declarations for Play are OUT of campaign scope)
+- No new recorder features (T05 surface is frozen; consume as-is)
+- No START_STICKY redesign beyond recording OBSERVED behavior on this device (OEM kill policy characterization is limited to the Z Flip 7 — RESEARCH §11 spike 3 asked for ≥2 OEMs; one device is the campaign's declared limit, noted in REPORT)
+- No specialUse-FGS implementation (idle-launcher question is answered as: does the overlay live in-process without any FGS, and what happens on process death — documented facts only)
+- No lockscreen overlay work beyond recording whether the overlay remains visible when locked
 
 ## Dependencies
 
-- Requires T04 completed (reviewed + squash-integrated + post-merge smoke)
-- Exclusive resources: recorder service Kotlin files, manifest mic entries, notification channel id `orbitkit_recorder`
+- Requires T05 completed (reviewed + squash-integrated + post-merge smoke)
+- Exclusive resources: JNI bridge files, persistence module, lifecycle-related manifest/service tweaks
 
 ## Shared contracts (consume as-is; do not redesign)
 
-- C2 plugin contract unchanged; you ADD commands (do not redesign T04's): `recorderStartForeground`,
-  `recorderPause`, `recorderResume`, `recorderStop`, `recorderState`
-- C3 scenario labels exactly S1/S2/S3/S3b (definitions RESEARCH.md §3.1 rows 1/2/3/3b);
-  graceful fallback per row 4: RECORD_AUDIO not granted → typed error, no crash
-- C5: Z Flip 7 via adb; runtime permissions (RECORD_AUDIO) granted via
-  `adb shell pm grant dev.orbitkit.app android.permission.RECORD_AUDIO` before S-scenarios; record exact grant state in every scenario header
+- C2 plugin contract frozen; JNI path = Kotlin side calls Rust via JNI (documented Tauri channel for suspended WebView) — extend, don't reshape, T04/T05 command surface
+- C4 persistence contract (defining task — YOU implement): recorder/spool state file written on every state transition; on process restart, last known state is recoverable; evidence includes before/after file contents
+- C5: Z Flip 7 via adb; death is only ever claimed when CONFIRMED: `adb shell am force-stop` or `adb shell am kill` + observed process gone; swipe-from-Recents reports MUST include a process-liveness check (`pidof dev.orbitkit.app`) — no death claims from swipes
 
 ## Acceptance criteria
 
-1. Feature-gated build: without the `mic-recorder` feature the app builds and runs with recorder code compiled out (prove by building both variants — output excerpts)
-2. S1 VERIFIED on device: mic-FGS starts from visible Activity; foreground notification visible; audio captured to spool file (file size grows — evidence excerpt)
-3. S2 VERIFIED on device: with FGS live and app backgrounded, overlay taps pause/resume/stop the service — no new FGS start involved; logcat excerpts; PAUSE is internal (AudioRecord-level, no stopForeground churn — RESEARCH §3 NB)
-4. S3 executed on device with honest verdict: expected REJECT (SecurityException / ForegroundServiceStartNotAllowedException per RESEARCH §3.1 row 3 [D-по-умолчанию]); if it unexpectedly SUCCEEDS on this Android 16 build — that is an undocumented-behavior finding: record with full logcat, do not celebrate, do not rely on it in later tasks
-5. S3b executed on device with honest verdict: notification action cold start (documented candidate); record outcome with full logcat either way
-6. REPORT includes the scenario matrix table (per RESEARCH §3.1) filled with device results + OS build + commit SHA; every claim bound to logcat evidence
+1. JNI path proven with WebView suspended: trigger an overlay action while the main activity is backgrounded long enough for the WebView to suspend (or force the suspended state per Tauri docs); action reaches Rust (log receipt in Rust-side log) — logcat + Rust log excerpts bound to commit SHA
+2. Lock screen: with recorder active, lock device (adb or manual), unlock — recording survived; overlay visibility under lock RECORDED (either way, honest fact)
+3. Force-stop: process dead (pidof empty), app relaunched — state recovered from persistence (before/after evidence); overlay gone while dead and its restoration path documented (relaunch is the obvious path — RESEARCH §10.12)
+4. am kill / LMK-class death: same procedure as 3
+5. Swipe-from-Recents: check `pidof` — record ACTUAL liveness; characterize overlay + FGS state in the observed outcome (process may well survive — that is the expected nuance)
+6. REPORT table: scenario × observed behavior (overlay, FGS, state file, restoration path), all bound to evidence + OS build + commit SHA; explicit statement of the one-device limitation
 7. Everything committed; tree clean; worktree status `in-review` with comment
 
 ## Real runtime testing (actionable)
 
 | # | Scenario | Exact command / interaction | Expected observable outcome |
 |---|---|---|---|
-| 1 | S1 | launch app, tap start, `adb shell dumpsys activity services <pkg>` | FGS listed as foreground, mic type |
-| 2 | S2 | background app, tap overlay buttons, watch logcat + recorderState | state transitions pause/resume/stop without FGS restart |
-| 3 | S3 | background app, tap overlay START (cold), watch logcat | exception per gate B expectation OR undocumented success (both valid results) |
-| 4 | S3b | background app, tap notification action START, watch logcat | FGS starts (documented candidate) OR reject (evidence for owner) |
+| 1 | JNI under suspension | background app, tap overlay action, grep Rust-side receipt log | receipt logged from Rust (no JS involvement) |
+| 2 | Lock | `adb shell input keyevent KEYEVENT_POWER` style lock or manual | recording continues; overlay state recorded |
+| 3 | Force-stop | `adb shell am force-stop dev.orbitkit.app`; `pidof` | process gone; relaunch recovers state |
+| 4 | am kill | `adb shell am kill dev.orbitkit.app` (after backgrounding) | same as 3 |
+| 5 | Swipe | UI swipe + `pidof dev.orbitkit.app` | actual liveness recorded (expect alive) |
 
-Runtime environment: real device via adb, real mic (ambient sound is fine). Record commit SHA with each result. A green build proves nothing here — scenario evidence is the deliverable.
+Runtime environment: real device via adb. Record commit SHA with each result.
 
 ## Reporting and evidence
 
-- Evidence slot: `evidence/mic-fgs-gates/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design)
+- Evidence slot: `evidence/survival-jni/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design)
 - Report must include: per-scenario commands/results, commit SHA, device OS build, out-of-scope findings, explicit ready handoff statement when done
 - When committed and tree clean: set worktree status `in-review` with a comment. Do not merge, push, or delete anything.
 
 ## Stage checklist (mirrored in campaign TODO)
 
-- [x] develop
-- [x] runtime test-loop
+- [ ] develop
+- [ ] runtime test-loop
 - [ ] independent review-loop
 - [ ] squash integration / conflict handling
-- [ ] post-merge runtime smoke (coordinator: S1 quick re-run from campaign tip)
+- [ ] post-merge runtime smoke (coordinator)
 - [ ] evidence preserved + cleanup verified
+
+## Campaign-end inputs (coordinator, not you)
+
+Your REPORT feeds okf_PLAN.md campaign criteria: verdict on safe UX promises
+(overlay-controls-live-service OK; notification cold-start per S3b evidence; overlay
+cold-start only if S3 evidence says so) and the one-device limitation note.

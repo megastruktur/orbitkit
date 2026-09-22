@@ -1,3 +1,4 @@
+pub mod jni_bridge;
 pub mod orbitkit_native;
 
 pub use orbitkit_native::OrbitkitNativeExt;
@@ -31,6 +32,13 @@ pub fn run() {
             orbitkit_native::recorder_state_snake,
             orbitkit_native::recorder_post_standby_notification,
             orbitkit_native::recorder_post_standby_notification_snake,
+            orbitkit_native::recorder_get_persisted_state,
+            orbitkit_native::recorder_get_persisted_state_snake,
+            orbitkit_native::recorder_recover_state,
+            orbitkit_native::recorder_recover_state_snake,
+            jni_bridge::jni_get_action_log,
+            jni_bridge::jni_clear_action_log,
+            jni_bridge::jni_trigger_native_action,
         ]);
     }
 
@@ -45,6 +53,9 @@ pub fn run() {
             orbitkit_native::request_overlay_permission_snake,
             orbitkit_native::overlay_show_snake,
             orbitkit_native::overlay_hide_snake,
+            jni_bridge::jni_get_action_log,
+            jni_bridge::jni_clear_action_log,
+            jni_bridge::jni_trigger_native_action,
         ]);
     }
 

@@ -135,6 +135,9 @@ class OrbitkitRecorderService : Service() {
         super.onCreate()
         Log.i(TAG, "OrbitkitRecorderService onCreate")
         createNotificationChannel(this)
+        OrbitkitJniBridge.ensureLoaded()
+        val recovered = OrbitkitStatePersistence.recoverState(this)
+        Log.i(TAG, "[C4-PERSISTENCE] Service onCreate: recovered state=${recovered.state}, bytes=${recovered.bytesRecorded}, recoveryCount=${recovered.recoveryCount}")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -200,6 +203,15 @@ class OrbitkitRecorderService : Service() {
         } catch (e: Exception) {
             Log.e(TAG, "startForeground failed: ${e::class.java.simpleName}: ${e.message}", e)
             lastError = "startForeground failed: ${e.message}"
+            OrbitkitStatePersistence.recordTransition(
+                this,
+                State.STOPPED.name,
+                bytesRecorded.get(),
+                spoolPath,
+                "START_FAILED",
+                false,
+                lastError
+            )
             stopSelf()
             return
         }
@@ -243,7 +255,15 @@ class OrbitkitRecorderService : Service() {
             isPaused.set(false)
             stateRef.set(State.RECORDING)
             lastError = null
-
+            OrbitkitStatePersistence.recordTransition(
+                this,
+                State.RECORDING.name,
+                bytesRecorded.get(),
+                spoolPath,
+                "START_FOREGROUND",
+                true
+            )
+            OrbitkitJniBridge.dispatchNativeAction("REC_START")
             // 4. Start spooling thread
             recordingThread = Thread({
                 val buffer = ByteArray(bufferSize)
@@ -264,7 +284,18 @@ class OrbitkitRecorderService : Service() {
                         try {
                             fos.write(buffer, 0, read)
                             fos.flush()
-                            bytesRecorded.addAndGet(read.toLong())
+                            val total = bytesRecorded.addAndGet(read.toLong())
+                            // Persist audio byte growth periodically (every ~32KB)
+                            if (total % 32768L < read) {
+                                OrbitkitStatePersistence.recordTransition(
+                                    this@OrbitkitRecorderService,
+                                    State.RECORDING.name,
+                                    total,
+                                    spoolPath,
+                                    "RECORDING_PROGRESS",
+                                    true
+                                )
+                            }
                         } catch (e: Exception) {
                             Log.e(TAG, "Failed writing audio chunk to spool", e)
                             break
@@ -305,7 +336,15 @@ class OrbitkitRecorderService : Service() {
             audioRecord?.stop()
             stateRef.set(State.PAUSED)
             updateNotification("PAUSED")
-            Log.i(TAG, "OrbitkitRecorderService paused internally. AudioRecord stopped, FGS active without churn. Bytes so far: ${bytesRecorded.get()}")
+            OrbitkitStatePersistence.recordTransition(
+                this,
+                State.PAUSED.name,
+                bytesRecorded.get(),
+                spoolPath,
+                "PAUSE",
+                true
+            )
+            OrbitkitJniBridge.dispatchNativeAction("REC_PAUSE")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to pause AudioRecord", e)
             lastError = "Pause error: ${e.message}"
@@ -324,7 +363,15 @@ class OrbitkitRecorderService : Service() {
             isPaused.set(false)
             stateRef.set(State.RECORDING)
             updateNotification("RECORDING")
-            Log.i(TAG, "OrbitkitRecorderService resumed. AudioRecord restarted, FGS active. Current bytes: ${bytesRecorded.get()}")
+            OrbitkitStatePersistence.recordTransition(
+                this,
+                State.RECORDING.name,
+                bytesRecorded.get(),
+                spoolPath,
+                "RESUME",
+                true
+            )
+            OrbitkitJniBridge.dispatchNativeAction("REC_RESUME")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to resume AudioRecord", e)
             lastError = "Resume error: ${e.message}"
@@ -367,7 +414,15 @@ class OrbitkitRecorderService : Service() {
 
         stateRef.set(State.STOPPED)
         isForegroundActive.set(false)
-
+        OrbitkitStatePersistence.recordTransition(
+            this,
+            State.STOPPED.name,
+            bytesRecorded.get(),
+            spoolPath,
+            "STOP",
+            false
+        )
+        OrbitkitJniBridge.dispatchNativeAction("REC_STOP")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         } else {

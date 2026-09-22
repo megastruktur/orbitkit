@@ -1,0 +1,23 @@
+Component: Versions
+------------------------------------------------------------
+Application ID: dev.orbitkit.app
+Version Code: 1000
+Version Name: 0.1.0
+Gradle: 8.14.3
+Android Gradle Plugin (AGP): 8.11.0
+Kotlin (buildscript): 1.9.25
+Kotlin (daemon runtime): 2.0.21
+NDK: 27.3.13750724 (r27d)
+Compile SDK: 36
+Target SDK: 36
+Min SDK: 24
+Build-Tools: 35.0.0
+JDK: Temurin-17.0.20.1+1 (OpenJDK 17.0.20.1)
+Rustc: 1.98.0 (88d9e12ae 2026-08-18)
+Cargo: 1.98.0 (797e8a9bc 2026-08-05)
+Tauri Core: 2.11.6
+Tauri CLI: 2.11.5
+Tauri API: 2.11.1
+Svelte: 5.57.1
+Vite: 8.3.0
+Target Device (C5): Samsung Galaxy Z Flip 7 (SM-F766B / b7s), Android 16 (SDK 36), Build BP2A.250605.031.A3.F766BXXS2AYGD

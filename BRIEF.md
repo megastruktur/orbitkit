@@ -1,68 +1,72 @@
-# okf_scaffold-desktop
+# okf_scaffold-android
 
-> Task brief for the OMP coding agent. Worktree display name: `okf-scaffold-desktop`.
+> Task brief for the OMP coding agent. Worktree display name: `okf-scaffold-android`.
 > You are the only writer in this worktree. Record honest facts; probe before you
 > trust any command; never invent command output.
 
 ## Goal
 
-Minimal runnable OrbitKit shell skeleton: Tauri v2 + Svelte 5 + TypeScript with one
-placeholder mascot and the C1 repo layout. This is the shared chassis for the whole
-campaign (T03–T06 build on it). Desktop `tauri dev` is a smoke goal — if the Linux
-WebKitGTK runtime is missing in your context, deliver code-complete with declared
-limits instead of fighting system packages (see Runtime testing).
+Take the integrated campaign skeleton (C1 layout, T02 chassis) to a real device: run
+`tauri android init`, produce a debug APK, sideload it onto the Samsung Galaxy Z Flip 7,
+and prove it launches. This task produces the campaign's first on-device runtime proof.
 
 ## Scope allowlist (explicit)
 
-- `package.json`, `pnpm-lock.yaml` (or `package-lock.json` ONLY if pnpm is unavailable after probe — record which and why), `.gitignore` (append-only, do not remove existing entries), `index.html`
-- `vite.config.ts`, `svelte.config.js`, `tsconfig.json`
-- `src/**` (Svelte app: main window, placeholder mascot component)
-- `src-tauri/**` (tauri.conf.json, Cargo.toml, capabilities/, src/main.rs, src/lib.rs, build.rs, icons/)
+- `src-tauri/gen/android/**` (generated Android project — commit it; it is the modification surface for T04+)
+- `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` (minimal android-related additions)
+- `src-tauri/capabilities/*.json` if mobile capabilities require changes
 - `BRIEF.md` (this brief, overwrite in worktree root)
-- `evidence/scaffold-desktop/REPORT.md` + raw outputs (committed)
+- `evidence/scaffold-android/REPORT.md` + raw outputs (committed)
 
-Anything not listed is out of scope. No formatters with autofix; read-only lint only.
+Anything not listed is out of scope. No formatters with autofix.
 
 ## Non-goals
 
-- No Android anything (`tauri android init` is T03; do not create `src-tauri/gen/`)
-- No radial menu geometry, no detached popups, no plugin work, no mic/overlay code
-- No CI files, no signing config, no publishing
+- No overlay, no Kotlin plugin, no manifest permission additions (T04+)
+- No release signing, no keystores, no Play assets
+- No emulator; no wireless adb unless USB proves unusable (then record why)
 
 ## Dependencies
 
-- Requires: bootstrap commit `okf-c1` on `main` (integration lineage `okf-campaign`)
-- Exclusive resources: `package.json`, lockfile, `src/`, `src-tauri/**` (disjoint from T01 — parallel-safe)
-- Coordinate via coordinator only: pnpm/corepack enablement from T01 may land mid-task; if it lands, re-source and continue; if not, use the declared fallback
+- Requires T01 AND T02 completed (reviewed + squash-integrated + post-merge smoke)
+- Exclusive resources: `src-tauri/gen/android/**`, gradle wrapper files
+- Environment: consume T01's committed `evidence/env-probe/env.sh` (JAVA_HOME,
+  ANDROID_HOME, PATH); if the NDK was left uninstalled per T01 criterion 5, install
+  `ndk;27.<latest>` via the recorded sdkmanager path and record the exact version
+  (C5: version decision lands here)
 
 ## Shared contracts (consume as-is; do not redesign)
 
-- C1: layout `src/` (Svelte 5 + TS + Vite) + `src-tauri/`; app identifier `dev.orbitkit.app`; productName `orbitkit`
-- Placeholder mascot: one static Svelte component `src/lib/Mascot.svelte` (no logic), used by `src/App.svelte`
-- C2 is NOT in scope (no Kotlin plugin here) but your tauri.conf must not preclude it
+- C1 layout and identifier `dev.orbitkit.app` (do not change the appId)
+- C5 device: Z Flip 7 via adb; every device interaction must show in evidence with
+  timestamped logcat excerpts bound to commit SHA
+- Debug signing only (Tauri default debug keystore) — NEVER generate or commit keystores
 
 ## Acceptance criteria
 
-1. Repo builds per contract: `pnpm install` (or declared fallback) succeeds; `src-tauri` compiles (`cargo check` VERIFIED output)
-2. App skeleton complete: identifier/productName per C1; Mascot.svelte renders in the main window
-3. Runtime smoke — EITHER `pnpm tauri dev` (or equivalent verified command) shows the window (screenshot/exit-code evidence, then terminate it), OR WebKitGTK is absent in your context: then `REPORT.md` states code-complete + `cargo check` green + the exact missing system library, and desktop runtime proof is explicitly deferred (declared limit, not a failure claim)
-4. Tauri version pinned (exact version in Cargo.toml/tauri.conf recorded in REPORT.md)
+1. `pnpm tauri android init` (or the verified equivalent) completed; generated
+   `src-tauri/gen/android/` committed; `applicationId` = `dev.orbitkit.app`
+2. Debug APK built (verified gradle/bundle output excerpt recorded)
+3. APK installed on Z Flip 7 (`adb install -r` VERIFIED) and the app LAUNCHES on device:
+   logcat excerpt showing the app process starting + `adb shell dumpsys window` or
+   screencap showing the OrbitKit window rendered (mascot placeholder visible)
+4. Report records: device model + Android build number (C5), exact versions
+   (gradle, AGP, NDK, target SDK), commit SHA; all raw outputs under `evidence/scaffold-android/raw/`
 5. Everything committed; tree clean; worktree status `in-review` with comment
 
 ## Real runtime testing (actionable)
 
 | # | Scenario | Exact command / interaction | Expected observable outcome |
 |---|---|---|---|
-| 1 | Dependency install | verified package-manager command from your probe | lockfile created, no errors |
-| 2 | Native compile | `cargo check` in src-tauri (or `cargo build`) | compiles; output excerpt recorded |
-| 3 | Desktop runtime (best-effort per capability) | verified `tauri dev` variant | window visible (evidence) OR declared-limit report per criterion 3 |
+| 1 | Android init | verified tauri android init command | gen/android project created, builds |
+| 2 | Debug build | verified gradle/tauri build command | APK artifact path recorded |
+| 3 | Install + launch | `adb install -r <apk>`; `adb shell monkey -p dev.orbitkit.app 1` or tap icon; `adb logcat` filtered | app process starts; window rendered on device (screencap) |
 
-Runtime environment: real host shell; record commit SHA with every result; a green
-`cargo check` does NOT equal desktop runtime proof.
+Runtime environment: real device via adb (production path, no mocks). Record build/source identity (commit SHA) with each result.
 
 ## Reporting and evidence
 
-- Evidence slot: `evidence/scaffold-desktop/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design; coordinator archives to `okf_evidence/` at campaign end)
+- Evidence slot: `evidence/scaffold-android/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design)
 - Report must include: commands/results per scenario, commit SHA, out-of-scope findings, explicit ready handoff statement when done
 - When committed and tree clean: set worktree status `in-review` with a comment. Do not merge, push, or delete anything.
 
@@ -72,5 +76,5 @@ Runtime environment: real host shell; record commit SHA with every result; a gre
 - [ ] runtime test-loop
 - [ ] independent review-loop
 - [ ] squash integration / conflict handling
-- [ ] post-merge runtime smoke (coordinator)
+- [ ] post-merge runtime smoke (coordinator: reinstall APK from the campaign tip and launch)
 - [ ] evidence preserved + cleanup verified

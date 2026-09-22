@@ -1,0 +1,6 @@
+$ tauri android init --ci
+        Info Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+Generating Android Studio project...
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri" relative to "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/orbitkit" is "../../../"
+victory: Project generated successfully!
+    Make cool apps! 🌻 🐕 🎉

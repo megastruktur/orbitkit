@@ -1,0 +1,5 @@
+644  /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/arm/debug/app-arm-debug.apk  113.5M
+644  /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/arm64/debug/app-arm64-debug.apk  126.8M
+644  /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk  465.0M
+644  /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/x86/debug/app-x86-debug.apk  118.4M
+644  /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-x86_64-debug.apk  126.7M

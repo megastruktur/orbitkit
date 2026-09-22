@@ -1,0 +1,18 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+total 56
+drwxr-xr-x 1 megastruktur megastruktur   304 Sep 22 22:09 .
+drwxr-xr-x 1 megastruktur megastruktur   174 Sep 22 22:09 ..
+-rw-r--r-- 1 megastruktur megastruktur   450 Sep 22 22:09 Mascot.svelte
+-rw-r--r-- 1 megastruktur megastruktur   293 Sep 22 22:09 Mascot.svelte.d.ts
+-rw-r--r-- 1 megastruktur megastruktur   740 Sep 22 22:09 RadialMenu.svelte
+-rw-r--r-- 1 megastruktur megastruktur   315 Sep 22 22:09 RadialMenu.svelte.d.ts
+-rw-r--r-- 1 megastruktur megastruktur  1081 Sep 22 22:09 bridge.d.ts
+-rw-r--r-- 1 megastruktur megastruktur  1015 Sep 22 22:09 bridge.js
+-rw-r--r-- 1 megastruktur megastruktur  1818 Sep 22 22:09 config.d.ts
+-rw-r--r-- 1 megastruktur megastruktur 10178 Sep 22 22:09 config.js
+-rw-r--r-- 1 megastruktur megastruktur   197 Sep 22 22:09 geometry.d.ts
+-rw-r--r-- 1 megastruktur megastruktur   529 Sep 22 22:09 geometry.js
+-rw-r--r-- 1 megastruktur megastruktur   268 Sep 22 22:09 index.d.ts
+-rw-r--r-- 1 megastruktur megastruktur   217 Sep 22 22:09 index.js
+EXIT_CODE: 0

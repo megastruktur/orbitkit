@@ -1,0 +1,11 @@
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-ui-config/packages/orbitkit
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  22:08:57
+   Duration  451ms (environment 88%, transform 8%, import 2%, tests 1%, worker 1%)
+
+EXIT_CODE: 0

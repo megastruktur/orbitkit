@@ -1,0 +1,85 @@
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='ACT_A' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"ACT_A","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='REC_START' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"REC_START","reason":"Native library not loaded in JVM"}
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=131072 action=START_FOREGROUND pid=4001 file=/tmp/orbitkit_survival_test_12266797182308963998/recorder_state.json (296 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=131072 lastPid=4001
+[OrbitkitPersistence] [C4-PERSISTENCE-RECOVERY] Successfully recovered state! priorState=RECORDING -> recoveredState=STOPPED, bytesRecorded=131072, priorPid=4001 -> newPid=5002, recoveryCount=1
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=STOPPED bytes=131072 action=RECOVERED_AFTER_PROCESS_DEATH (priorState=RECORDING, priorPid=4001) pid=5002 file=/tmp/orbitkit_survival_test_12266797182308963998/recorder_state.json (358 bytes)
+[OrbitkitPersistence] WARN: [C4-PERSISTENCE-WARN] Corrupted state file content in recorder_state.json: syntax invalid or missing 'state'
+[OrbitkitPersistence] WARN: [C4-PERSISTENCE-WARN] Corrupted state file content in recorder_state.json: syntax invalid or missing 'state'
+[OrbitkitPersistence] WARN: [C4-PERSISTENCE-CORRUPT] Existing state file was corrupted; backing up to .corrupt and initializing fresh state
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=IDLE bytes=0 action=RECOVERED_AFTER_CORRUPTION pid=7777 file=/tmp/orbitkit_survival_test_12689816925184581743/recorder_state.json (331 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=IDLE bytes=0 lastPid=7777
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='ACT_A' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"ACT_A","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='ACT_A' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"ACT_A","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='ACT_B' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"ACT_B","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='ACT_C' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"ACT_C","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='REC_START' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"REC_START","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='REC_PAUSE' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"REC_PAUSE","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='REC_RESUME' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"REC_RESUME","reason":"Native library not loaded in JVM"}
+[OrbitkitJniBridge] WARN: orbitkit_lib not loaded via System.loadLibrary: no orbitkit_lib in java.library.path: /opt/orca/squashfs-root/usr/lib:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversalDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testDebug/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/testUniversal/jniLibs:/home/megastruktur/orca/workspaces/orbitkit/okf-survival-jni/src-tauri/gen/android/app/src/test/jniLibs
+[OrbitkitJniBridge] WARN: [JNI-FALLBACK] action='REC_STOP' (UnsatisfiedLinkError) -> {"status":"MOCK_JNI","action":"REC_STOP","reason":"Native library not loaded in JVM"}
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=16384 action=START_FOREGROUND pid=0 file=/tmp/orbitkit_survival_test_12925242677463105243/recorder_state.json (273 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=16384 lastPid=0
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=16384 action=OVERLAY_ACTION_ACT_A pid=0 file=/tmp/orbitkit_survival_test_12925242677463105243/recorder_state.json (277 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=16384 lastPid=0
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=PAUSED bytes=65536 action=PAUSE pid=6001 file=/tmp/orbitkit_survival_test_622094788832707487/recorder_state.json (281 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=PAUSED bytes=65536 lastPid=6001
+[OrbitkitPersistence] [C4-PERSISTENCE-RECOVERY] Successfully recovered state! priorState=PAUSED -> recoveredState=STOPPED, bytesRecorded=65536, priorPid=6001 -> newPid=7002, recoveryCount=1
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=STOPPED bytes=65536 action=RECOVERED_AFTER_PROCESS_DEATH (priorState=PAUSED, priorPid=6001) pid=7002 file=/tmp/orbitkit_survival_test_622094788832707487/recorder_state.json (354 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=65536 action=START_FOREGROUND pid=9999 file=/tmp/orbitkit_survival_test_17014003435844086342/recorder_state.json (317 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=65536 lastPid=9999
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=49152 action=START_FOREGROUND pid=1001 file=/tmp/orbitkit_survival_test_16727419223234019209/recorder_state.json (317 bytes)
+=== C4 Persistence Contract: Host Execution Evidence ===
+EXECUTION_ENVIRONMENT: Host JVM unit test harness (on-device execution deferred: device disconnected)
+TESTED_CLASS: dev.orbitkit.native.OrbitkitStatePersistence
+STATE_FILE_PATH: /tmp/orbitkit_survival_test_16727419223234019209/recorder_state.json
+--- BEGIN REAL BEFORE JSON ---
+{
+  "state": "RECORDING",
+  "bytesRecorded": 49152,
+  "spoolPath": "/tmp/orbitkit_survival_test_16727419223234019209/recorder_spool.pcm",
+  "updatedAt": 1727000200000,
+  "lastAction": "START_FOREGROUND",
+  "recoveryCount": 0,
+  "lastRecoveredAt": 0,
+  "isForeground": true,
+  "processPid": 1001,
+  "lastError": null
+}
+--- END REAL BEFORE JSON ---
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=49152 lastPid=1001
+[OrbitkitPersistence] [C4-PERSISTENCE-RECOVERY] Successfully recovered state! priorState=RECORDING -> recoveredState=STOPPED, bytesRecorded=49152, priorPid=1001 -> newPid=2002, recoveryCount=1
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=STOPPED bytes=49152 action=RECOVERED_AFTER_PROCESS_DEATH (priorState=RECORDING, priorPid=1001) pid=2002 file=/tmp/orbitkit_survival_test_16727419223234019209/recorder_state.json (379 bytes)
+--- BEGIN REAL AFTER JSON ---
+{
+  "state": "STOPPED",
+  "bytesRecorded": 49152,
+  "spoolPath": "/tmp/orbitkit_survival_test_16727419223234019209/recorder_spool.pcm",
+  "updatedAt": 1727000200000,
+  "lastAction": "RECOVERED_AFTER_PROCESS_DEATH (priorState=RECORDING, priorPid=1001)",
+  "recoveryCount": 1,
+  "lastRecoveredAt": 1790095638494,
+  "isForeground": false,
+  "processPid": 2002,
+  "lastError": null
+}
+--- END REAL AFTER JSON ---
+RECOVERY_SUMMARY: priorState=RECORDING -> recoveredState=STOPPED, bytesRecorded=49152, recoveryCount=1, newPid=2002
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=49152 action=START_FOREGROUND pid=1001 file=/tmp/orbitkit_survival_test_13211117528327736902/recorder_state.json (317 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=49152 lastPid=1001
+[OrbitkitPersistence] [C4-PERSISTENCE-RECOVERY] Successfully recovered state! priorState=RECORDING -> recoveredState=STOPPED, bytesRecorded=49152, priorPid=1001 -> newPid=2002, recoveryCount=1
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=STOPPED bytes=49152 action=RECOVERED_AFTER_PROCESS_DEATH (priorState=RECORDING, priorPid=1001) pid=2002 file=/tmp/orbitkit_survival_test_13211117528327736902/recorder_state.json (379 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=98304 action=REC_START pid=8001 file=/tmp/orbitkit_survival_test_10307120372054465872/recorder_state.json (288 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=98304 lastPid=8001
+[OrbitkitPersistence] [C4-PERSISTENCE-SAVE] state=RECORDING bytes=81920 action=SCREEN_LOCK_SIMULATED pid=3003 file=/tmp/orbitkit_survival_test_8633752286192993376/recorder_state.json (309 bytes)
+[OrbitkitPersistence] [C4-PERSISTENCE-LOAD] Loaded state from recorder_state.json: state=RECORDING bytes=81920 lastPid=3003

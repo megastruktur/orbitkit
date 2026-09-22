@@ -1,0 +1,22 @@
+[package]
+name = "orbitkit"
+version = "0.1.0"
+description = "OrbitKit shell skeleton (Tauri v2)"
+edition = "2021"
+
+[lib]
+name = "orbitkit_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+default = []
+mic-recorder = []
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.6", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+log = "0.4"
+jni = { version = "0.21", default-features = false }

@@ -1,0 +1,8 @@
+classes.dex: found 1 symbols -> ['ACT_A']
+classes2.dex: found 0 symbols -> []
+classes3.dex: found 0 symbols -> []
+classes4.dex: found 0 symbols -> []
+classes5.dex: found 0 symbols -> []
+classes6.dex: found 12 symbols -> ['dev/orbitkit/native', 'OrbitkitNativePlugin', 'isOverlayPermissionGranted', 'requestOverlayPermission', 'overlayShow', 'overlayHide', 'ACT_A', 'ACT_B', 'ACT_C', 'SYSTEM_ALERT_WINDOW', 'FLAG_LAYOUT_IN_SCREEN', 'TYPE_APPLICATION_OVERLAY']
+classes7.dex: found 0 symbols -> []
+classes8.dex: found 0 symbols -> []

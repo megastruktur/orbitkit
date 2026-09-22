@@ -7,7 +7,8 @@ src-tauri/target/
 .vite/
 
 # Tauri / Android generated
-src-tauri/gen/
+src-tauri/gen/*
+!src-tauri/gen/android/
 
 # Env & secrets — never commit
 .env

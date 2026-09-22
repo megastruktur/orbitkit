@@ -1,0 +1,18 @@
+/home/megastruktur/.cargo/bin/rustc
+rustc 1.98.0 (88d9e12ae 2026-08-18)
+/home/megastruktur/.cargo/bin/cargo
+cargo 1.98.0 (797e8a9bc 2026-08-05)
+/home/megastruktur/.cargo/bin/rustup
+rustup 1.29.0 (28d1352db 2026-03-05)
+info: This is the version for the rustup toolchain manager, not the rustc compiler.
+info: the currently active `rustc` version is `rustc 1.98.0 (88d9e12ae 2026-08-18)`
+/home/megastruktur/.local/bin/node
+v22.22.3
+/home/megastruktur/.local/bin/npm
+10.9.8
+/home/megastruktur/.npm-global/bin/pnpm
+12.4.1
+/usr/bin/corepack
+0.34.6
+/home/megastruktur/.local/bin/pkg-config
+3.0.6

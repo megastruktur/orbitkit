@@ -1,0 +1,45 @@
+$ pkg-config --libs webkit2gtk-4.1
+-L/hu/lib -lwebkit2gtk-4.1 -lgtk-3 -lgdk-3 -lpangocairo-1.0 -lcairo-gobject -lgdk_pixbuf-2.0 -latk-1.0 -lpango-1.0 -lcairo -lharfbuzz -lsoup-3.0 -lgio-2.0 -lgmodule-2.0 -pthread -lz -ljavascriptcoregtk-4.1 -lgobject-2.0 -lglib-2.0
+$ pkg-config --variable=pcfiledir webkit2gtk-4.1
+/hu/lib64/pkgconfig
+$ find /usr /opt -name "libwebkit2gtk*"
+0 for 'libwebkit2gtk*'
+(none found)
+$ find /usr /opt /etc -name "webkit2gtk*.pc"
+0 for 'webkit2gtk*.pc'
+(none found)
+$ ldconfig -p | grep -i webkit
+(no output)
+$ head -15 ~/.local/bin/pkg-config
+#!/bin/sh
+# Host pkgconf via its own loader (host shell sandbox can't exec /usr/bin directly).
+HOST_ROOT="/usr"
+run() {
+  docker run --rm -i \
+    -v /usr:/hu:ro \
+    -e PKG_CONFIG_LIBDIR=/hu/lib64/pkgconfig:/hu/share/pkgconfig \
+    -e PKG_CONFIG_SYSROOT_DIR=/hu \
+    -e PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 \
+    -e PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 \
+    gcc:14 /hu/lib64/ld-linux-x86-64.so.2 --library-path /hu/lib64 /hu/bin/pkgconf --define-prefix "$@"
+}
+run "$@"
+$ ls /hu
+/usr/bin/ls: cannot access '/hu': No such file or directory
+
+=== Discriminator run (2026-09-20, corrects the attribution above) ===
+$ docker run --rm -v /usr:/hu:ro gcc:14 sh -c "ls -la /hu/lib64/pkgconfig/webkit2gtk-4.1.pc; ls -la /hu/lib/libwebkit2gtk-4.1.so*; ls /usr/lib/x86_64-linux-gnu/ | grep -ci webkit; /hu/bin/pkgconf --version"
+=pc=
+-rw-r--r-- 1 root root 331 Aug 19 13:06 /hu/lib64/pkgconfig/webkit2gtk-4.1.pc
+=libs=
+lrwxrwxrwx 1 root root       22 Aug 19 13:06 /hu/lib/libwebkit2gtk-4.1.so -> libwebkit2gtk-4.1.so.0
+lrwxrwxrwx 1 root root       28 Aug 19 13:06 /hu/lib/libwebkit2gtk-4.1.so.0 -> libwebkit2gtk-4.1.so.0.21.10
+-rwxr-xr-x 1 root root 93397920 Aug 19 13:06 /hu/lib/libwebkit2gtk-4.1.so.0.21.10
+=container webkit count=
+0
+$ ls /usr/lib | wc -l   (sandbox stub view)
+34
+$ ls /usr/lib64
+total 4
+drwxr-xr-x 1 root root 40 Aug 24 00:00 .
+drwxr-xr-x 1 root root 10 Aug 24 00:00 ..

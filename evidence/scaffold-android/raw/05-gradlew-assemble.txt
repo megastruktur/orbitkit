@@ -1,0 +1,89 @@
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preArm64DebugBuild UP-TO-DATE
+> Task :app:mergeArm64DebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateArm64DebugBuildConfig
+> Task :tauri-android:preBuild UP-TO-DATE
+> Task :tauri-android:preDebugBuild UP-TO-DATE
+> Task :tauri-android:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkArm64DebugAarMetadata
+> Task :app:generateArm64DebugResValues
+> Task :tauri-android:generateDebugResValues UP-TO-DATE
+> Task :tauri-android:generateDebugResources UP-TO-DATE
+> Task :tauri-android:packageDebugResources UP-TO-DATE
+> Task :app:mapArm64DebugSourceSetPaths
+> Task :app:generateArm64DebugResources
+> Task :app:packageArm64DebugResources
+> Task :app:createArm64DebugCompatibleScreenManifests
+> Task :app:extractDeepLinksArm64Debug
+> Task :tauri-android:extractDeepLinksDebug UP-TO-DATE
+> Task :app:parseArm64DebugLocalResources
+> Task :tauri-android:processDebugManifest UP-TO-DATE
+> Task :app:processArm64DebugMainManifest
+> Task :app:processArm64DebugManifest
+> Task :tauri-android:compileDebugLibraryResources UP-TO-DATE
+> Task :tauri-android:parseDebugLocalResources UP-TO-DATE
+> Task :tauri-android:generateDebugRFile UP-TO-DATE
+> Task :tauri-android:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:generateDebugBuildConfig UP-TO-DATE
+> Task :app:mergeArm64DebugResources
+> Task :tauri-android:compileDebugKotlin UP-TO-DATE
+> Task :tauri-android:javaPreCompileDebug UP-TO-DATE
+> Task :tauri-android:compileDebugJavaWithJavac UP-TO-DATE
+> Task :tauri-android:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompileArm64Debug
+> Task :app:mergeArm64DebugShaders
+> Task :app:compileArm64DebugShaders NO-SOURCE
+> Task :app:generateArm64DebugAssets UP-TO-DATE
+> Task :tauri-android:mergeDebugShaders UP-TO-DATE
+> Task :tauri-android:compileDebugShaders NO-SOURCE
+> Task :tauri-android:generateDebugAssets UP-TO-DATE
+> Task :tauri-android:mergeDebugAssets UP-TO-DATE
+> Task :app:mergeArm64DebugAssets
+> Task :app:compressArm64DebugAssets
+> Task :tauri-android:processDebugJavaRes UP-TO-DATE
+> Task :app:desugarArm64DebugFileDependencies
+> Task :tauri-android:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:checkArm64DebugDuplicateClasses
+
+> Task :app:rustBuildArm64Debug FAILED
+$ tauri android android-studio-script --target aarch64
+
+thread '<unnamed>' (2191620) panicked at crates/tauri-cli/src/mobile/mod.rs:403:6:
+failed to read CLI options: Context("failed to build WebSocket client", Io(Os { code: 111, kind: ConnectionRefused, message: "Connection refused" }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Aborted (core dumped)
+[ELIFECYCLE] Command failed with exit code 134.
+
+> Task :app:processArm64DebugManifestForPackage
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:rustBuildArm64Debug'.
+> Process 'command 'pnpm'' finished with non-zero exit value 134
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2s
+44 actionable tasks: 22 executed, 22 up-to-date

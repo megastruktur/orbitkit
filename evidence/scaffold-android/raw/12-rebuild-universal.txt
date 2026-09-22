@@ -1,0 +1,91 @@
+$ tauri android build --debug --apk
+        Info Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 113 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.39 kB │ gzip: 0.26 kB
+dist/assets/index-DSDys2RL.css   0.26 kB │ gzip: 0.20 kB
+dist/assets/index-ByP1rV-h.js   23.58 kB │ gzip: 9.65 kB
+
+✓ built in 114ms
+[1m[92m   Compiling[0m orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.82s
+        Info symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/liborbitkit_lib.so" points to "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so"
+        Info symlink at "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a/liborbitkit_lib.so" points to "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so"
+        Info symlink at "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/x86/liborbitkit_lib.so" points to "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so"
+        Info symlink at "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/x86_64/liborbitkit_lib.so" points to "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so"
+$ tauri android android-studio-script --target aarch64
+        Info connection; remote_addr=127.0.0.1:59312 conn_id=0
+[1m[32m        Info[0m Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.13s
+[1m[32m        Info[0m symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:59328 conn_id=1
+$ tauri android android-studio-script --target armv7
+[1m[32m        Info[0m Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+[1m[92m   Compiling[0m orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri)
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.94s
+[1m[32m        Info[0m symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/armv7-linux-androideabi/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+$ tauri android android-studio-script --target i686
+        Info connection; remote_addr=127.0.0.1:59334 conn_id=2
+[1m[32m        Info[0m Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+[1m[92m   Compiling[0m orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri)
+w: file:///home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 1.00s
+[1m[32m        Info[0m symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/x86"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/i686-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:59342 conn_id=3
+$ tauri android android-studio-script --target x86_64
+[1m[32m        Info[0m Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+[1m[92m   Compiling[0m orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.78s
+[1m[32m        Info[0m symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/target/x86_64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+    Finished 1 APK at:
+        /home/megastruktur/orca/workspaces/orbitkit/okf-scaffold-android/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+

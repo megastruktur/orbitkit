@@ -1,0 +1,67 @@
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitJniBridge;'
+  Access flags      : 0x0011 (PUBLIC FINAL)
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+    #0              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : 'INSTANCE'
+      type          : 'Ldev/orbitkit/native/OrbitkitJniBridge;'
+      access        : 0x0019 (PUBLIC STATIC FINAL)
+      value         : null
+    #1              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : 'TAG'
+      type          : 'Ljava/lang/String;'
+      access        : 0x001a (PRIVATE STATIC FINAL)
+      value         : "OrbitkitJniBridge"
+    #2              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : 'isLibraryLoaded'
+      type          : 'Z'
+      access        : 0x004a (PRIVATE STATIC VOLATILE)
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : '<clinit>'
+      type          : '()V'
+      access        : 0x10008 (STATIC CONSTRUCTOR)
+      code          -
+      registers     : 1
+      ins           : 0
+      outs          : 1
+      insns size    : 14 16-bit code units
+002ee8:                                        |[002ee8] dev.orbitkit.native.OrbitkitJniBridge.<clinit>:()V
+002ef8: 2200 3500                              |0000: new-instance v0, Ldev/orbitkit/native/OrbitkitJniBridge; // type@0035
+002efc: 7010 7e00 0000                         |0002: invoke-direct {v0}, Ldev/orbitkit/native/OrbitkitJniBridge;.<init>:()V // method@007e
+002f02: 6900 0700                              |0005: sput-object v0, Ldev/orbitkit/native/OrbitkitJniBridge;.INSTANCE:Ldev/orbitkit/native/OrbitkitJniBridge; // field@0007
+002f06: 0000                                   |0007: nop // spacer
+002f08: 6200 0700                              |0008: sget-object v0, Ldev/orbitkit/native/OrbitkitJniBridge;.INSTANCE:Ldev/orbitkit/native/OrbitkitJniBridge; // field@0007
+002f0c: 6e10 8000 0000                         |000a: invoke-virtual {v0}, Ldev/orbitkit/native/OrbitkitJniBridge;.ensureLoaded:()Z // method@0080
+002f12: 0e00                                   |000d: return-void
+      catches       : (none)
+      positions     :
+        0x0007 line=21
+        0x0008 line=22
+        0x000d line=23
+      locals        :
+
+    #1              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : '<init>'
+      type          : '()V'
+      access        : 0x10002 (PRIVATE CONSTRUCTOR)
+      code          -
+      registers     : 1
+      ins           : 1
+      outs          : 1
+      insns size    : 4 16-bit code units
+002f14:                                        |[002f14] dev.orbitkit.native.OrbitkitJniBridge.<init>:()V
+002f24: 7010 5701 0000                         |0000: invoke-direct {v0}, Ljava/lang/Object;.<init>:()V // method@0157
+002f2a: 0e00                                   |0003: return-void
+      catches       : (none)
+      positions     :
+        0x0000 line=5
+      locals        :
+        0x0000 - 0x0004 reg=0 this Ldev/orbitkit/native/OrbitkitJniBridge;
+
+    #2              : (in Ldev/orbitkit/native/OrbitkitJniBridge;)
+      name          : 'getActionCount'
+      type          : '()J'
+EXIT=0

@@ -1,0 +1,4 @@
+2.52.6
+gtk+-3.0 = 3.24.52
+libsoup-3.0 = 3.6.6
+javascriptcoregtk-4.1 = 2.52.6

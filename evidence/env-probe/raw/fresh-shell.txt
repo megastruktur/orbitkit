@@ -1,0 +1,12 @@
+JAVA_HOME=/home/megastruktur/Android/jdk-17.0.20.1+1
+ANDROID_HOME=/home/megastruktur/Android/Sdk
+openjdk version "17.0.20.1" 2026-08-18
+19.0
+
+Android Debug Bridge version 1.0.41
+Version 37.0.1-15733141
+Installed as /home/megastruktur/Android/Sdk/platform-tools/adb
+Running on Linux 7.2.0-1-cachyos (x86_64)
+List of devices attached
+R5CY70FPFSM            device usb:3-1 product:b7sxxx model:SM_F766B device:b7s transport_id:3
+

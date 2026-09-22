@@ -1,0 +1,1 @@
+ls: cannot access '/home/megastruktur/Android/Sdk/ndk': No such file or directory

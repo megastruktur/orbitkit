@@ -1,0 +1,6 @@
+Installed packages:
+  Path                 | Version | Description                | Location            
+  -------              | ------- | -------                    | -------             
+  platform-tools       | 37.0.1  | Android SDK Platform-Tools | platform-tools      
+  platforms;android-36 | 2       | Android SDK Platform 36    | platforms/android-36
+

@@ -1,5 +1,7 @@
 package dev.orbitkit.native
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -163,6 +165,128 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 Log.e(TAG, "Error removing overlay view", e)
                 invoke.reject("Failed to hide overlay: ${e.message}", "OVERLAY_HIDE_FAILED", e, null)
             }
+        }
+    }
+
+    @Command
+    fun recorderStartForeground(invoke: Invoke) {
+        Log.i(TAG, "recorderStartForeground called")
+        val hasPermission = activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        if (!hasPermission) {
+            Log.w(TAG, "recorderStartForeground rejected: RECORD_AUDIO permission not granted")
+            val errData = JSObject().apply {
+                put("error", "PERMISSION_DENIED")
+                put("message", "RECORD_AUDIO permission not granted")
+                put("permission", "android.permission.RECORD_AUDIO")
+            }
+            invoke.reject("RECORD_AUDIO permission not granted", "PERMISSION_DENIED", null, errData)
+            return
+        }
+
+        try {
+            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
+                action = OrbitkitRecorderService.ACTION_START_FOREGROUND
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activity.startForegroundService(intent)
+            } else {
+                activity.startService(intent)
+            }
+            Log.i(TAG, "startForegroundService dispatched from Activity")
+            val res = JSObject().apply {
+                put("state", "STARTING")
+                put("spoolPath", OrbitkitRecorderService.getSpoolFile(activity).absolutePath)
+                put("channel", OrbitkitRecorderService.CHANNEL_ID)
+            }
+            invoke.resolve(res)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start recorder foreground service", e)
+            invoke.reject("Failed to start recorder: ${e.message}", "START_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderPause(invoke: Invoke) {
+        Log.i(TAG, "recorderPause called")
+        try {
+            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
+                action = OrbitkitRecorderService.ACTION_PAUSE
+            }
+            activity.startService(intent)
+            invoke.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to pause recorder", e)
+            invoke.reject("Failed to pause recorder: ${e.message}", "PAUSE_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderResume(invoke: Invoke) {
+        Log.i(TAG, "recorderResume called")
+        try {
+            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
+                action = OrbitkitRecorderService.ACTION_RESUME
+            }
+            activity.startService(intent)
+            invoke.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to resume recorder", e)
+            invoke.reject("Failed to resume recorder: ${e.message}", "RESUME_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderStop(invoke: Invoke) {
+        Log.i(TAG, "recorderStop called")
+        try {
+            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
+                action = OrbitkitRecorderService.ACTION_STOP
+            }
+            activity.startService(intent)
+            invoke.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop recorder", e)
+            invoke.reject("Failed to stop recorder: ${e.message}", "STOP_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderState(invoke: Invoke) {
+        Log.i(TAG, "recorderState called")
+        try {
+            val state = OrbitkitRecorderService.getState().name
+            val spool = OrbitkitRecorderService.getSpoolFile(activity)
+            val bytes = if (OrbitkitRecorderService.isForegroundActive.get()) {
+                OrbitkitRecorderService.bytesRecorded.get()
+            } else if (spool.exists()) {
+                spool.length()
+            } else {
+                0L
+            }
+            val isFg = OrbitkitRecorderService.isForegroundActive.get()
+
+            val res = JSObject().apply {
+                put("state", state)
+                put("spoolPath", spool.absolutePath)
+                put("bytesRecorded", bytes)
+                put("isForeground", isFg)
+            }
+            invoke.resolve(res)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read recorder state", e)
+            invoke.reject("Failed to get recorder state: ${e.message}", "STATE_FAILED", e, null)
+        }
+    }
+
+    @Command
+    fun recorderPostStandbyNotification(invoke: Invoke) {
+        Log.i(TAG, "recorderPostStandbyNotification called")
+        try {
+            OrbitkitRecorderService.postStandbyNotification(activity)
+            invoke.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to post standby notification", e)
+            invoke.reject("Failed to post standby notification: ${e.message}", "STANDBY_FAILED", e, null)
         }
     }
 
@@ -337,6 +461,116 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             buttonsRow.addView(btn, btnParams)
         }
         container.addView(buttonsRow)
+
+        // Recorder Controls Row (for S2 & S3 testing from overlay)
+        val recRow = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            val rowParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = dpToPx(ctx, 6f)
+            }
+            layoutParams = rowParams
+        }
+
+        val recActions = listOf(
+            Triple("START", "#DC2626") {
+                // S3: Cold mic-FGS start from overlay tap!
+                try {
+                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
+                        action = OrbitkitRecorderService.ACTION_START_FOREGROUND
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ctx.startForegroundService(intent)
+                    } else {
+                        ctx.startService(intent)
+                    }
+                    Log.i(TAG, "Overlay START clicked -> startForegroundService dispatched")
+                    statusView?.text = "Overlay: START sent"
+                } catch (e: Exception) {
+                    Log.e(TAG, "Overlay START failed: ${e::class.java.simpleName}: ${e.message}", e)
+                    statusView?.text = "ERR: ${e::class.java.simpleName}"
+                }
+                handleAction("REC_START")
+            },
+            Triple("PAUSE", "#CA8A04") {
+                // S2: Pause from overlay
+                try {
+                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
+                        action = OrbitkitRecorderService.ACTION_PAUSE
+                    }
+                    ctx.startService(intent)
+                    Log.i(TAG, "Overlay PAUSE clicked -> dispatched")
+                    statusView?.text = "Overlay: PAUSE sent"
+                } catch (e: Exception) {
+                    Log.e(TAG, "Overlay PAUSE failed: ${e.message}", e)
+                }
+                handleAction("REC_PAUSE")
+            },
+            Triple("RESUME", "#16A34A") {
+                // S2: Resume from overlay
+                try {
+                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
+                        action = OrbitkitRecorderService.ACTION_RESUME
+                    }
+                    ctx.startService(intent)
+                    Log.i(TAG, "Overlay RESUME clicked -> dispatched")
+                    statusView?.text = "Overlay: RESUME sent"
+                } catch (e: Exception) {
+                    Log.e(TAG, "Overlay RESUME failed: ${e.message}", e)
+                }
+                handleAction("REC_RESUME")
+            },
+            Triple("STOP", "#475569") {
+                // S2: Stop from overlay
+                try {
+                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
+                        action = OrbitkitRecorderService.ACTION_STOP
+                    }
+                    ctx.startService(intent)
+                    Log.i(TAG, "Overlay STOP clicked -> dispatched")
+                    statusView?.text = "Overlay: STOP sent"
+                } catch (e: Exception) {
+                    Log.e(TAG, "Overlay STOP failed: ${e.message}", e)
+                }
+                handleAction("REC_STOP")
+            }
+        )
+
+        for ((recName, recColor, recClick) in recActions) {
+            val btn = Button(ctx).apply {
+                text = recName
+                setTextColor(Color.WHITE)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setPadding(dpToPx(ctx, 8f), dpToPx(ctx, 6f), dpToPx(ctx, 8f), dpToPx(ctx, 6f))
+                isAllCaps = false
+                minHeight = dpToPx(ctx, 36f)
+                minWidth = dpToPx(ctx, 54f)
+
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = dpToPx(ctx, 6f).toFloat()
+                    setColor(Color.parseColor(recColor))
+                }
+
+                setOnClickListener {
+                    recClick()
+                }
+            }
+
+            val btnParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                leftMargin = dpToPx(ctx, 3f)
+                rightMargin = dpToPx(ctx, 3f)
+            }
+            recRow.addView(btn, btnParams)
+        }
+        container.addView(recRow)
 
         // Status / Feedback label
         val status = TextView(ctx).apply {

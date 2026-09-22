@@ -95,6 +95,110 @@ impl<R: Runtime> OrbitkitNative<R> {
             Ok(())
         }
     }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_start_foreground(&self) -> Result<(), String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<()>("recorderStartForeground", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            eprintln!("[orbitkit-native] Desktop recorderStartForeground invoked (mock)");
+            Ok(())
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_pause(&self) -> Result<(), String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<()>("recorderPause", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            eprintln!("[orbitkit-native] Desktop recorderPause invoked (mock)");
+            Ok(())
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_resume(&self) -> Result<(), String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<()>("recorderResume", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            eprintln!("[orbitkit-native] Desktop recorderResume invoked (mock)");
+            Ok(())
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_stop(&self) -> Result<(), String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<()>("recorderStop", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            eprintln!("[orbitkit-native] Desktop recorderStop invoked (mock)");
+            Ok(())
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_state(&self) -> Result<RecorderStateResponse, String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<RecorderStateResponse>("recorderState", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            Ok(RecorderStateResponse {
+                state: "IDLE".into(),
+                spool_path: "/tmp/orbitkit_recorder_spool.pcm".into(),
+                bytes_recorded: 0,
+                is_foreground: false,
+            })
+        }
+    }
+
+    #[cfg(feature = "mic-recorder")]
+    pub fn recorder_post_standby_notification(&self) -> Result<(), String> {
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin::<()>("recorderPostStandbyNotification", ())
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            eprintln!("[orbitkit-native] Desktop recorderPostStandbyNotification invoked (mock)");
+            Ok(())
+        }
+    }
+}
+
+#[cfg(feature = "mic-recorder")]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecorderStateResponse {
+    pub state: String,
+    pub spool_path: String,
+    pub bytes_recorded: u64,
+    pub is_foreground: bool,
 }
 
 pub trait OrbitkitNativeExt<R: Runtime> {
@@ -163,8 +267,106 @@ pub async fn overlay_hide_snake<R: Runtime>(
     app.orbitkit_native().overlay_hide()
 }
 
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderStartForeground")]
+pub async fn recorder_start_foreground<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_start_foreground()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderPause")]
+pub async fn recorder_pause<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_pause()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderResume")]
+pub async fn recorder_resume<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_resume()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderStop")]
+pub async fn recorder_stop<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_stop()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderState")]
+pub async fn recorder_state<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<RecorderStateResponse, String> {
+    app.orbitkit_native().recorder_state()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_start_foreground")]
+pub async fn recorder_start_foreground_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_start_foreground()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_pause")]
+pub async fn recorder_pause_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_pause()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_resume")]
+pub async fn recorder_resume_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_resume()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_stop")]
+pub async fn recorder_stop_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_stop()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_state")]
+pub async fn recorder_state_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<RecorderStateResponse, String> {
+    app.orbitkit_native().recorder_state()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorderPostStandbyNotification")]
+pub async fn recorder_post_standby_notification<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_post_standby_notification()
+}
+
+#[cfg(feature = "mic-recorder")]
+#[tauri::command(rename = "recorder_post_standby_notification")]
+pub async fn recorder_post_standby_notification_snake<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<(), String> {
+    app.orbitkit_native().recorder_post_standby_notification()
+}
+
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::<R>::new("orbitkit-native")
+    #[allow(unused_mut)]
+    let mut builder = Builder::<R>::new("orbitkit-native")
         .setup(|app, _api| {
             #[cfg(target_os = "android")]
             {
@@ -181,8 +383,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 });
             }
             Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![
+        });
+
+    #[cfg(feature = "mic-recorder")]
+    {
+        builder = builder.invoke_handler(tauri::generate_handler![
             is_overlay_permission_granted,
             request_overlay_permission,
             overlay_show,
@@ -191,8 +396,36 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             request_overlay_permission_snake,
             overlay_show_snake,
             overlay_hide_snake,
-        ])
-        .build()
+            recorder_start_foreground,
+            recorder_pause,
+            recorder_resume,
+            recorder_stop,
+            recorder_state,
+            recorder_start_foreground_snake,
+            recorder_pause_snake,
+            recorder_resume_snake,
+            recorder_stop_snake,
+            recorder_state_snake,
+            recorder_post_standby_notification,
+            recorder_post_standby_notification_snake,
+        ]);
+    }
+
+    #[cfg(not(feature = "mic-recorder"))]
+    {
+        builder = builder.invoke_handler(tauri::generate_handler![
+            is_overlay_permission_granted,
+            request_overlay_permission,
+            overlay_show,
+            overlay_hide,
+            is_overlay_permission_granted_snake,
+            request_overlay_permission_snake,
+            overlay_show_snake,
+            overlay_hide_snake,
+        ]);
+    }
+
+    builder.build()
 }
 
 #[cfg(test)]

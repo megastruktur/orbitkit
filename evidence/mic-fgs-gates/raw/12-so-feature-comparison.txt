@@ -1,0 +1,11 @@
+Without feature: lib/arm64-v8a/liborbitkit_lib.so: size=126647776 bytes
+  recorderStartForeground: False
+  recorder_start_foreground: False
+  recorderState: False
+  overlayShow: True
+
+With feature (mic-recorder): lib/arm64-v8a/liborbitkit_lib.so: size=127328064 bytes
+  recorderStartForeground: True
+  recorder_start_foreground: True
+  recorderState: True
+  overlayShow: True

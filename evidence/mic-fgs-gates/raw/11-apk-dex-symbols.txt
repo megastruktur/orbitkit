@@ -1,0 +1,36 @@
+=== DEX Symbol & Class Inspection ===
+APK: src-tauri/gen/android/app/build/outputs/apk/arm64/debug/app-arm64-debug.apk
+
+[classes6.dex] Classes found (15):
+  Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda0;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda1;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda2;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda3;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$dragListener$1;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$recActions$1;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$recActions$2;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$recActions$3;
+  Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$recActions$4;
+  Ldev/orbitkit/native/OrbitkitNativePlugin;
+  Ldev/orbitkit/native/OrbitkitRecorderService$$ExternalSyntheticLambda0;
+  Ldev/orbitkit/native/OrbitkitRecorderService$Companion;
+  Ldev/orbitkit/native/OrbitkitRecorderService$State;
+  Ldev/orbitkit/native/OrbitkitRecorderService;
+  Ldev/orbitkit/native/OverlayShowArgs;
+
+[classes6.dex] Target symbols found (15/15):
+  recorderStartForeground
+  recorderPause
+  recorderResume
+  recorderStop
+  recorderState
+  recorderPostStandbyNotification
+  overlayShow
+  overlayHide
+  requestOverlayPermission
+  isOverlayPermissionGranted
+  orbitkit_recorder
+  ACTION_START_FOREGROUND
+  ACTION_PAUSE
+  ACTION_RESUME
+  ACTION_STOP

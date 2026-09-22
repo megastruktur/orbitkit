@@ -1,0 +1,18 @@
+<!-- Placeholder mascot: one static component, no logic.
+     Replaced by the real mascot runtime in a later campaign task. -->
+<div class="mascot" role="img" aria-label="OrbitKit placeholder mascot">
+  <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="80" cy="80" r="56" fill="#4f7cff" />
+    <ellipse cx="80" cy="80" rx="70" ry="22" fill="none" stroke="#9db4ff" stroke-width="4" transform="rotate(-20 80 80)" />
+    <circle cx="60" cy="68" r="10" fill="#ffffff" />
+    <circle cx="100" cy="68" r="10" fill="#ffffff" />
+    <circle cx="62" cy="70" r="4" fill="#10141a" />
+    <circle cx="102" cy="70" r="4" fill="#10141a" />
+  </svg>
+</div>
+
+<style>
+  .mascot {
+    display: block;
+  }
+</style>

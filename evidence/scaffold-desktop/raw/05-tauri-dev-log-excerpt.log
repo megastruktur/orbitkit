@@ -1,0 +1,22 @@
+Source: hub-managed process `okf-tauri-dev` (`pnpm tauri dev`, env DISPLAY=:99),
+cwd = this worktree. Vite dev server became ready ("ready in" matched), then the
+first full debug build of the app binary failed at the LINK step. Process was
+stopped via hub stop; stop reported `exited exit=1`.
+
+Decisive excerpt of the build log (argv elided where marked; everything else verbatim):
+
+    Building [=======================> ] 426/428: orbitkit                                            error: linking with `cc` failed: exit status: 1
+      |
+      = note:  "cc" <full linker argv elided here; it included "-lwebkit2gtk-4.1" and "-L" "/hu/lib" and libs -gtk-3 -gdk-3 -lsoup-3.0 -ljavascriptcoregtk-4.1 -lglib-2.0 ...>
+      = note: some arguments are omitted. use `--verbose` to show all linker arguments
+      = note: warning: unable to open library directory '/hu/lib': FileNotFound
+              error: unable to find dynamic system library 'webkit2gtk-4.1' using strategy 'no_fallback'. searched paths:
+                src-tauri/target/debug/deps/rustcsrI7de/raw-dylibs/libwebkit2gtk-4.1.so
+                /home/megastruktur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libwebkit2gtk-4.1.so
+
+    Building [=======================> ] 426/428: orbitkit                                            error: could not compile `orbitkit` (lib) due to 1 previous error
+
+Interpretation (see REPORT.md): pkg-config metadata reaches the build through a docker
+shim whose library directory /hu/lib exists only inside the shim container; the
+sandbox-side linker has no filesystem path to the host's WebKitGTK libraries, so
+`-lwebkit2gtk-4.1` cannot resolve. Cargo compilation (check, no linking) succeeds.

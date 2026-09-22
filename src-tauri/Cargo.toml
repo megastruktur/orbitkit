@@ -1,0 +1,15 @@
+[package]
+name = "orbitkit"
+version = "0.1.0"
+description = "OrbitKit shell skeleton (Tauri v2)"
+edition = "2021"
+
+[lib]
+name = "orbitkit_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.6", features = [] }

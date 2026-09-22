@@ -4,6 +4,7 @@ dist/
 **/dist/
 target/
 **/target/
+target-linux/
 .gen/
 **/.gen/
 .vite/

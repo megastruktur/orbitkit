@@ -1,0 +1,22 @@
+=== Evidence: run-screenshot outside REPO_ROOT (under $HOME) ===
+Command: scripts/linux-desktop.sh run-screenshot . /home/megastruktur/tmp/oks-t01-r2-home.png 15
+Launching screenshot container for /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build (output: /home/megastruktur/tmp/oks-t01-r2-home.png, wait: 15s)...
+--> Launching /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/debug/orbitkit in Xvfb :77...
+--> Waiting 15 seconds for app to render...
+--> Capturing screenshot to /home/megastruktur/tmp/oks-t01-r2-home.png...
+--> Dumping window list to /home/megastruktur/tmp/oks-t01-r2-home.windows.txt...
+=== Run-screenshot successful ===
+App was alive at screenshot time.
+Screenshot: /home/megastruktur/tmp/oks-t01-r2-home.png
+Windows list: /home/megastruktur/tmp/oks-t01-r2-home.windows.txt
+App log: /home/megastruktur/tmp/oks-t01-r2-home.log
+EXIT_CODE=0
+
+=== Host file verification ===
+-rw-r--r-- 1 megastruktur megastruktur 49162 Sep 22 21:47 /home/megastruktur/tmp/oks-t01-r2-home.png
+-rw-r--r-- 1 megastruktur megastruktur   204 Sep 22 21:47 /home/megastruktur/tmp/oks-t01-r2-home.png.log
+-rw-r--r-- 1 megastruktur megastruktur    36 Sep 22 21:47 /home/megastruktur/tmp/oks-t01-r2-home.png.windows.txt
+LS_EXIT_CODE=0
+
+=== Windows txt content ===
+0x00400003  0 c3bfac1319a4 orbitkit

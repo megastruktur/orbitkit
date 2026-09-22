@@ -1,0 +1,2 @@
+-rw-r--r-- 1 megastruktur megastruktur 128M Sep 22 15:09 src-tauri/gen/android/app/build/outputs/apk/arm64/debug/app-arm64-debug.apk
+-rw-r--r-- 1 megastruktur megastruktur 128M Sep 22 15:09 src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk

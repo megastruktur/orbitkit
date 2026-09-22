@@ -1,0 +1,2 @@
+    Checking orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okf-overlay-native/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s

@@ -1,80 +1,81 @@
-# okf_scaffold-android
+# okf_overlay-native
 
-> Task brief for the OMP coding agent. Worktree display name: `okf-scaffold-android`.
+> Task brief for the OMP coding agent. Worktree display name: `okf-overlay-native`.
 > You are the only writer in this worktree. Record honest facts; probe before you
 > trust any command; never invent command output.
 
 ## Goal
 
-Take the integrated campaign skeleton (C1 layout, T02 chassis) to a real device: run
-`tauri android init`, produce a debug APK, sideload it onto the Samsung Galaxy Z Flip 7,
-and prove it launches. This task produces the campaign's first on-device runtime proof.
+The campaign's core native layer: a Kotlin Tauri plugin `orbitkit-native` that (a)
+walks the user through SYSTEM_ALERT_WINDOW permission (special app access), (b) shows
+a small native draggable overlay window (TYPE_APPLICATION_OVERLAY) with action
+buttons, visible ABOVE other apps. NO microphone work here (T05). This task ends with
+the overlay visibly floating over a foreign app on the Z Flip 7.
 
 ## Scope allowlist (explicit)
 
-- `src-tauri/gen/android/**` (generated Android project — commit it; it is the modification surface for T04+)
-- `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` (minimal android-related additions)
-- `src-tauri/capabilities/*.json` if mobile capabilities require changes
+- `src-tauri/gen/android/**` (Kotlin sources, AndroidManifest.xml, generated plugin scaffolding)
+- `src-tauri/**` Rust side: plugin registration (`src-tauri/src/**`), `Cargo.toml`
+- `src/**` minimal frontend: one debug button to trigger `requestOverlayPermission` and `overlayShow` (may be removed by later tasks)
 - `BRIEF.md` (this brief, overwrite in worktree root)
-- `evidence/scaffold-android/REPORT.md` + raw outputs (committed)
+- `evidence/overlay-native/REPORT.md` + raw outputs (committed)
 
 Anything not listed is out of scope. No formatters with autofix.
 
 ## Non-goals
 
-- No overlay, no Kotlin plugin, no manifest permission additions (T04+)
-- No release signing, no keystores, no Play assets
-- No emulator; no wireless adb unless USB proves unusable (then record why)
+- No microphone, no FGS, no RECORD_AUDIO, no notification actions (T05)
+- No JNI-under-suspension proof (T06 — here the path only needs to exist and actuate while app is foreground)
+- No radial menu geometry, no mascot animation, no detached popups
+- No Play-distribution assets, no signing changes
 
 ## Dependencies
 
-- Requires T01 AND T02 completed (reviewed + squash-integrated + post-merge smoke)
-- Exclusive resources: `src-tauri/gen/android/**`, gradle wrapper files
-- Environment: consume T01's committed `evidence/env-probe/env.sh` (JAVA_HOME,
-  ANDROID_HOME, PATH); if the NDK was left uninstalled per T01 criterion 5, install
-  `ndk;27.<latest>` via the recorded sdkmanager path and record the exact version
-  (C5: version decision lands here)
+- Requires T03 completed (reviewed + squash-integrated + post-merge smoke)
+- Exclusive resources: `src-tauri/gen/android/**` Kotlin/manifest surface, plugin registration files
 
 ## Shared contracts (consume as-is; do not redesign)
 
-- C1 layout and identifier `dev.orbitkit.app` (do not change the appId)
-- C5 device: Z Flip 7 via adb; every device interaction must show in evidence with
-  timestamped logcat excerpts bound to commit SHA
-- Debug signing only (Tauri default debug keystore) — NEVER generate or commit keystores
+- C2 (defining task — YOU implement this contract, later tasks consume it):
+  - Plugin name `orbitkit-native`, Kotlin package `dev.orbitkit.native`
+  - Commands: `overlayShow`, `overlayHide`, `requestOverlayPermission`, `isOverlayPermissionGranted`
+  - Overlay = native Kotlin view added via WindowManager with
+    `TYPE_APPLICATION_OVERLAY` + `FLAG_LAYOUT_IN_SCREEN`; draggable; contains 3 action buttons
+    (for now they emit placeholder actions `ACT_A`/`ACT_B`/`ACT_C`)
+  - Actions travel overlay-view → plugin → Rust via plugin event/IPC channel (no JS involvement in the overlay path)
+- C5: Z Flip 7 via adb; SAW is granted by user through Settings (special app access screen) —
+  the task may open `Settings.ACTION_MANAGE_OVERLAY_PERMISSION` but the actual grant tap is a USER action; if permission is not granted, record and stop gracefully (do not loop, do not use adb to click through Settings on the owner's behalf more than once)
 
 ## Acceptance criteria
 
-1. `pnpm tauri android init` (or the verified equivalent) completed; generated
-   `src-tauri/gen/android/` committed; `applicationId` = `dev.orbitkit.app`
-2. Debug APK built (verified gradle/bundle output excerpt recorded)
-3. APK installed on Z Flip 7 (`adb install -r` VERIFIED) and the app LAUNCHES on device:
-   logcat excerpt showing the app process starting + `adb shell dumpsys window` or
-   screencap showing the OrbitKit window rendered (mascot placeholder visible)
-4. Report records: device model + Android build number (C5), exact versions
-   (gradle, AGP, NDK, target SDK), commit SHA; all raw outputs under `evidence/scaffold-android/raw/`
-5. Everything committed; tree clean; worktree status `in-review` with comment
+1. Plugin implements all four C2 commands; `overlayShow` fails gracefully with a typed error when SAW is not granted (no crash)
+2. On device: after user grants SAW once, `overlayShow` renders the overlay; evidence = device screenshot showing the overlay ON TOP of a foreign app (open e.g. Settings or a browser under it) + logcat excerpt; bound to commit SHA
+3. Overlay drag works; buttons tap (placeholder action visible in logcat/Rust-side log)
+4. `overlayHide` removes it cleanly; no window leak (verify via `adb shell dumpsys window` excerpt)
+5. Manifest documents the minimum: `SYSTEM_ALERT_WINDOW` only — no mic/FGS permissions sneak in (review criterion)
+6. Everything committed; tree clean; worktree status `in-review` with comment
 
 ## Real runtime testing (actionable)
 
 | # | Scenario | Exact command / interaction | Expected observable outcome |
 |---|---|---|---|
-| 1 | Android init | verified tauri android init command | gen/android project created, builds |
-| 2 | Debug build | verified gradle/tauri build command | APK artifact path recorded |
-| 3 | Install + launch | `adb install -r <apk>`; `adb shell monkey -p dev.orbitkit.app 1` or tap icon; `adb logcat` filtered | app process starts; window rendered on device (screencap) |
+| 1 | Permission flow | tap in-app button → Settings opens → (user grants) → `isOverlayPermissionGranted` → true | no crash; state flips to granted |
+| 2 | Overlay over foreign app | `overlayShow`, then bring another app to front | screenshot: overlay floats above foreign app; drag + button taps log |
+| 3 | Hide | `overlayHide` + dumpsys | overlay gone, no leaked windows |
 
-Runtime environment: real device via adb (production path, no mocks). Record build/source identity (commit SHA) with each result.
+Runtime environment: real device via adb (production path). Record commit SHA with each result.
 
 ## Reporting and evidence
 
-- Evidence slot: `evidence/scaffold-android/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design)
+- Evidence slot: `evidence/overlay-native/` (in-repo, COMMITTED — not under plans/; plans/ is gitignored by design)
 - Report must include: commands/results per scenario, commit SHA, out-of-scope findings, explicit ready handoff statement when done
 - When committed and tree clean: set worktree status `in-review` with a comment. Do not merge, push, or delete anything.
 
 ## Stage checklist (mirrored in campaign TODO)
 
-- [ ] develop
-- [ ] runtime test-loop
+- [x] develop
+- [x] runtime test-loop
 - [ ] independent review-loop
 - [ ] squash integration / conflict handling
-- [ ] post-merge runtime smoke (coordinator: reinstall APK from the campaign tip and launch)
+- [ ] post-merge runtime smoke (coordinator: rebuild from campaign tip, overlay smoke)
 - [ ] evidence preserved + cleanup verified

@@ -302,6 +302,7 @@ pub struct OrbitKitConfig {
 }
 
 #[cfg(test)]
+#[allow(clippy::field_reassign_with_default)] // test fixtures build a default MenuConfig and override a few fields for readability
 mod tests {
     use super::*;
 

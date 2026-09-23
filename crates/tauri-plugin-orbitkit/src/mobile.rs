@@ -11,13 +11,17 @@ use crate::{OverlayPermissionResponse, ShowOverlayMascotArgs};
 const PLUGIN_IDENTIFIER: &str = "dev.orbitkit.native";
 
 pub fn init<R: Runtime, C: DeserializeOwned>(
-    _app: &AppHandle<R>,
+    app: &AppHandle<R>,
     api: PluginApi<R, C>,
     config: OrbitKitConfig,
 ) -> Result<Orbitkit<R>> {
     #[cfg(target_os = "android")]
     {
         let handle = api.register_android_plugin(PLUGIN_IDENTIFIER, "OrbitkitNativePlugin")?;
+        let app_handle = app.clone();
+        crate::jni_bridge::register_event_emitter(move |event, payload| {
+            let _ = app_handle.emit(event, payload);
+        });
         Ok(Orbitkit {
             handle,
             _config: config,
@@ -25,7 +29,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     }
     #[cfg(not(target_os = "android"))]
     {
-        let _ = (api, config);
+        let _ = (app, api, config);
         Err(Error::unsupported("mobile is only supported on android"))
     }
 }
@@ -71,11 +75,22 @@ impl<R: Runtime> Orbitkit<R> {
 
     pub fn show_overlay(
         &self,
-        _menu: Option<MenuConfig>,
-        _mascot: Option<ShowOverlayMascotArgs>,
+        menu: Option<MenuConfig>,
+        mascot: Option<ShowOverlayMascotArgs>,
     ) -> Result<()> {
+        let menu_config = menu.unwrap_or_else(|| self._config.menu.clone());
+        if menu_config.items.is_empty() || menu_config.items.len() > 12 {
+            return Err(Error::invalid_config(format!(
+                "menu items count must be between 1 and 12 (got {})",
+                menu_config.items.len()
+            )));
+        }
+        let payload = serde_json::json!({
+            "menu": menu_config,
+            "mascot": mascot,
+        });
         self.handle
-            .run_mobile_plugin::<()>("overlayShow", ())
+            .run_mobile_plugin::<()>("overlayShow", payload)
             .map_err(Into::into)
     }
 
@@ -94,9 +109,11 @@ impl<R: Runtime> Orbitkit<R> {
     }
 
     pub fn set_mascot_state(&self, state: String) -> Result<()> {
-        let payload = serde_json::json!({ "state": state });
+        let payload = serde_json::json!({ "state": state.clone() });
         let _ = self.handle.app().emit("orbitkit://mascot-state", payload);
-        Ok(())
+        self.handle
+            .run_mobile_plugin::<()>("setMascotState", serde_json::json!({ "state": state }))
+            .map_err(Into::into)
     }
 
     pub fn emit_menu_action(&self, id: String) -> Result<()> {

@@ -17,10 +17,14 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.ViewConfiguration
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONObject
+import kotlin.math.abs
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -44,8 +48,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
     private var actionChannel: Channel? = null
-    private var statusView: TextView? = null
-
+    private var mascotView: TextView? = null
+    private var currentMascotState: String = STATE_IDLE
     companion object {
         const val RECORDER_SERVICE_CLASS = "dev.orbitkit.native.OrbitkitRecorderService"
         const val PERSISTENCE_CLASS = "dev.orbitkit.native.OrbitkitStatePersistence"
@@ -55,6 +59,27 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         const val ACTION_RESUME = "dev.orbitkit.native.action.RESUME"
         const val ACTION_STOP = "dev.orbitkit.native.action.STOP"
         const val ACTION_POST_STANDBY = "dev.orbitkit.native.action.POST_STANDBY"
+
+        const val STATE_IDLE = "idle"
+        const val STATE_ACTIVE = "active"
+        const val STATE_BUSY = "busy"
+        const val STATE_ATTENTION = "attention"
+
+        const val COLOR_IDLE = 0xFF3B82F6.toInt()      // bright blue (#3B82F6)
+        const val COLOR_ACTIVE = 0xFF10B981.toInt()    // bright emerald green (#10B981)
+        const val COLOR_BUSY = 0xFFF59E0B.toInt()      // bright amber (#F59E0B)
+        const val COLOR_ATTENTION = 0xFFEF4444.toInt() // bright red (#EF4444)
+
+        @JvmStatic
+        fun getMascotTint(state: String?): Int {
+            return when (state?.lowercase()?.trim()) {
+                STATE_ACTIVE -> COLOR_ACTIVE
+                STATE_BUSY -> COLOR_BUSY
+                STATE_ATTENTION -> COLOR_ATTENTION
+                STATE_IDLE -> COLOR_IDLE
+                else -> COLOR_IDLE
+            }
+        }
     }
 
     @Command
@@ -115,16 +140,37 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             Log.d(TAG, "No channel argument in overlayShow args: ${e.message}")
         }
 
+        val overlayConfig = try {
+            val raw = invoke.getRawArgs()
+            if (raw.isNullOrEmpty() || raw == "{}" || raw == "null") {
+                throw IllegalArgumentException("Missing menu configuration: items must have 1..12 items")
+            }
+            val parsed = MenuConfigParser.parse(raw)
+            parsed.menu
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Invalid menu configuration for overlayShow", e)
+            invoke.reject("Invalid menu configuration: ${e.message}", "INVALID_CONFIG", e, null)
+            return
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse overlayShow args", e)
+            invoke.reject("Invalid config: ${e.message}", "INVALID_CONFIG", e, null)
+            return
+        }
+
         activity.runOnUiThread {
             try {
-                if (overlayView != null) {
-                    Log.i(TAG, "overlayView already visible, keeping current view")
-                    invoke.resolve()
-                    return@runOnUiThread
-                }
-
                 val wm = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 windowManager = wm
+
+                overlayView?.let { oldView ->
+                    try {
+                        wm.removeView(oldView)
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Error removing prior overlayView", e)
+                    }
+                    overlayView = null
+                    mascotView = null
+                }
 
                 val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -133,9 +179,14 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                     WindowManager.LayoutParams.TYPE_PHONE
                 }
 
+                val radiusPx = dpToPx(activity, overlayConfig.radius.toFloat())
+                val itemSizePx = dpToPx(activity, overlayConfig.itemSize.toFloat())
+                val halfExtent = radiusPx + itemSizePx + dpToPx(activity, 16f)
+                val containerSize = halfExtent * 2
+
                 val params = WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    containerSize,
+                    containerSize,
                     layoutType,
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT
@@ -145,15 +196,15 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                     y = dpToPx(activity, 80f)
                 }
 
-                val view = buildOverlayView(params, wm)
+                val view = buildOverlayView(params, wm, overlayConfig)
                 wm.addView(view, params)
                 overlayView = view
 
-                Log.i(TAG, "Overlay view added to WindowManager (TYPE_APPLICATION_OVERLAY, FLAG_LAYOUT_IN_SCREEN)")
+                Log.i(TAG, "Overlay view added to WindowManager (items=${overlayConfig.items.size}, radius=$radiusPx)")
                 invoke.resolve()
             } catch (e: Exception) {
                 Log.e(TAG, "Error displaying overlay view", e)
-                invoke.reject("Failed to show overlay: ${e.message}", "OVERLAY_SHOW_FAILED", e, null)
+                invoke.reject("Failed to show overlay: ${e.message}", "UNSUPPORTED", e, null)
             }
         }
     }
@@ -168,6 +219,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 if (view != null && wm != null) {
                     wm.removeView(view)
                     overlayView = null
+                    mascotView = null
                     Log.i(TAG, "Overlay view removed cleanly from WindowManager")
                 } else {
                     Log.i(TAG, "overlayHide: no active overlay view (no-op)")
@@ -175,9 +227,42 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 invoke.resolve()
             } catch (e: Exception) {
                 Log.e(TAG, "Error removing overlay view", e)
-                invoke.reject("Failed to hide overlay: ${e.message}", "OVERLAY_HIDE_FAILED", e, null)
+                invoke.reject("Failed to hide overlay: ${e.message}", "UNSUPPORTED", e, null)
             }
         }
+    }
+
+    @Command
+    fun setMascotState(invoke: Invoke) {
+        val state = try {
+            val raw = invoke.getRawArgs()
+            if (raw.isNotEmpty() && raw != "null" && raw != "{}") {
+                val obj = JSONObject(raw)
+                obj.optString("state", STATE_IDLE)
+            } else {
+                STATE_IDLE
+            }
+        } catch (_: Exception) {
+            STATE_IDLE
+        }
+
+        currentMascotState = state
+        activity.runOnUiThread {
+            applyMascotStateTint(state)
+            invoke.resolve()
+        }
+    }
+
+    private fun applyMascotStateTint(state: String) {
+        val mascot = mascotView ?: return
+        val ctx = activity
+        val tint = getMascotTint(state)
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(tint)
+            setStroke(dpToPx(ctx, 2f), Color.WHITE)
+        }
+        mascot.background = bg
     }
 
     @Command
@@ -390,268 +475,243 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 Log.w(TAG, "Error cleaning up overlay view in onDestroy", e)
             }
             overlayView = null
+            mascotView = null
         }
     }
 
-    private fun handleAction(action: String) {
-        Log.i(TAG, "Overlay action tapped: $action")
-        statusView?.text = "Last Action: $action (JNI)"
+    private fun handleAction(action: String, disabled: Boolean = false) {
+        Log.i(TAG, "Overlay action tapped: $action (disabled=$disabled)")
+        OverlayActionDispatcher.handleAction(
+            id = action,
+            disabled = disabled,
+            jniDispatch = { act ->
+                val jniResponse = OrbitkitJniBridge.dispatchNativeAction(act)
+                Log.i(TAG, "JNI bridge direct dispatch for '$act' returned: $jniResponse")
+                jniResponse
+            },
+            recordAction = { act ->
+                try {
+                    val clazz = Class.forName(PERSISTENCE_CLASS)
+                    val method = clazz.getMethod("recordAction", Context::class.java, String::class.java)
+                    method.invoke(null, activity, act)
+                } catch (_: Throwable) {
+                }
+            }
+        )
 
-        val jniResponse = OrbitkitJniBridge.dispatchNativeAction(action)
-        Log.i(TAG, "JNI bridge direct dispatch for '$action' returned: $jniResponse")
-
-        try {
-            val clazz = Class.forName(PERSISTENCE_CLASS)
-            val method = clazz.getMethod("recordAction", Context::class.java, String::class.java)
-            method.invoke(null, activity, action)
-        } catch (_: Throwable) {
-        }
-
-        val payload = JSObject().apply {
-            put("id", action)
-            put("action", action)
-            put("source", "overlay")
-            put("timestamp", System.currentTimeMillis())
-            put("jniResult", jniResponse)
-        }
-
+        // If a Tauri plugin channel was passed in overlayShow args, send to channel
         actionChannel?.let { ch ->
             try {
+                val payload = JSObject().apply {
+                    put("id", action)
+                    put("source", "overlay")
+                }
                 ch.send(payload)
-                Log.i(TAG, "Action $action dispatched via actionChannel to Rust")
             } catch (e: Exception) {
-                Log.d(TAG, "actionChannel not delivered (WebView may be suspended): ${e.message}")
+                Log.d(TAG, "Error sending to actionChannel: ${e.message}")
             }
         }
-
-        trigger("action", payload)
-        trigger("orbitkit://menu-action", payload)
     }
 
-    private fun buildOverlayView(params: WindowManager.LayoutParams, wm: WindowManager): View {
+    private fun buildOverlayView(
+        params: WindowManager.LayoutParams,
+        wm: WindowManager,
+        menuConfig: NativeMenuConfig
+    ): View {
         val ctx = activity
+        val radiusPx = dpToPx(ctx, menuConfig.radius.toFloat())
+        val itemSizePx = dpToPx(ctx, menuConfig.itemSize.toFloat())
+        val mascotSizePx = dpToPx(ctx, 56f)
 
-        val container = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dpToPx(ctx, 14f), dpToPx(ctx, 10f), dpToPx(ctx, 14f), dpToPx(ctx, 12f))
+        val halfExtent = radiusPx + itemSizePx + dpToPx(ctx, 16f)
+        val containerSize = halfExtent * 2
+        val centerX = halfExtent.toDouble()
+        val centerY = halfExtent.toDouble()
+
+        var isMenuExpanded = true
+        var bubbleCenterX = params.x + halfExtent.toDouble()
+        var bubbleCenterY = params.y + halfExtent.toDouble()
+        val container = FrameLayout(ctx).apply {
             isClickable = false
             isFocusable = false
+        }
 
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dpToPx(ctx, 16f).toFloat()
-                setColor(Color.parseColor("#1B212C"))
-                setStroke(dpToPx(ctx, 2f), Color.parseColor("#3B82F6"))
+        // 1. Mascot bubble at center
+        val mascot = TextView(ctx).apply {
+            text = "🪐"
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+            contentDescription = "OrbitKit Mascot"
+
+            val bg = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(getMascotTint(currentMascotState))
+                setStroke(dpToPx(ctx, 2f), Color.WHITE)
             }
+            background = bg
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                elevation = dpToPx(ctx, 10f).toFloat()
+                elevation = dpToPx(ctx, 8f).toFloat()
             }
         }
+        mascotView = mascot
 
-        val header = TextView(ctx).apply {
-            text = "✥ OrbitKit Native [Drag] ✥"
-            setTextColor(Color.parseColor("#94A3B8"))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-            gravity = Gravity.CENTER
-            setPadding(dpToPx(ctx, 8f), dpToPx(ctx, 4f), dpToPx(ctx, 8f), dpToPx(ctx, 6f))
-            isClickable = true
-            isFocusable = false
-
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dpToPx(ctx, 8f).toFloat()
-                setColor(Color.parseColor("#0F172A"))
-            }
+        val mascotLp = FrameLayout.LayoutParams(mascotSizePx, mascotSizePx).apply {
+            leftMargin = (centerX - mascotSizePx / 2.0).toInt()
+            topMargin = (centerY - mascotSizePx / 2.0).toInt()
         }
-        container.addView(header, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ))
 
-        var initialX = 0
-        var initialY = 0
+        // Drag listener on mascot bubble keeping bubble center anchored
         var initialTouchX = 0f
         var initialTouchY = 0f
+        var initialBubbleCenterX = 0.0
+        var initialBubbleCenterY = 0.0
+        var isDragging = false
+        val touchSlop = ViewConfiguration.get(ctx).scaledTouchSlop
 
-        val dragListener = object : View.OnTouchListener {
+        mascot.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        initialX = params.x
-                        initialY = params.y
                         initialTouchX = event.rawX
                         initialTouchY = event.rawY
+                        initialBubbleCenterX = bubbleCenterX
+                        initialBubbleCenterY = bubbleCenterY
+                        isDragging = false
                         return true
                     }
                     MotionEvent.ACTION_MOVE -> {
-                        val dx = (event.rawX - initialTouchX).toInt()
-                        val dy = (event.rawY - initialTouchY).toInt()
-                        params.x = initialX + dx
-                        params.y = initialY + dy
-                        try {
-                            wm.updateViewLayout(container, params)
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Error updating overlay layout during drag", e)
+                        val dx = event.rawX - initialTouchX
+                        val dy = event.rawY - initialTouchY
+                        if (!isDragging && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
+                            isDragging = true
+                        }
+                        if (isDragging) {
+                            bubbleCenterX = initialBubbleCenterX + dx
+                            bubbleCenterY = initialBubbleCenterY + dy
+                            if (isMenuExpanded) {
+                                params.x = (bubbleCenterX - halfExtent).toInt()
+                                params.y = (bubbleCenterY - halfExtent).toInt()
+                            } else {
+                                params.x = (bubbleCenterX - mascotSizePx / 2.0).toInt()
+                                params.y = (bubbleCenterY - mascotSizePx / 2.0).toInt()
+                            }
+                            try {
+                                wm.updateViewLayout(container, params)
+                            } catch (e: Exception) {
+                                Log.w(TAG, "Error updating overlay layout during drag", e)
+                            }
                         }
                         return true
                     }
                     MotionEvent.ACTION_UP -> {
-                        v.performClick()
+                        if (!isDragging) {
+                            v.performClick()
+                        }
                         return true
                     }
                 }
                 return false
             }
-        }
-        header.setOnTouchListener(dragListener)
-        container.setOnTouchListener(dragListener)
+        })
+        val itemViews = ArrayList<View>()
 
-        val buttonsRow = LinearLayout(ctx).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            val rowParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dpToPx(ctx, 10f)
-            }
-            layoutParams = rowParams
-        }
+        // Mascot click toggles menu: when collapsed, window sizes to mascotSizePx so touches pass through;
+        // when expanded, window sizes to containerSize with items visible. Bubble stays anchored at bubbleCenter.
+        mascot.setOnClickListener {
+            isMenuExpanded = !isMenuExpanded
+            Log.i(TAG, "Mascot bubble tapped, toggling menu: expanded=$isMenuExpanded")
+            if (isMenuExpanded) {
+                params.width = containerSize
+                params.height = containerSize
+                params.x = (bubbleCenterX - halfExtent).toInt()
+                params.y = (bubbleCenterY - halfExtent).toInt()
 
-        val actions = listOf(
-            Triple("ACT_A", "#2563EB", "#1D4ED8"),
-            Triple("ACT_B", "#059669", "#047857"),
-            Triple("ACT_C", "#D97706", "#B45309")
-        )
+                mascotLp.leftMargin = (halfExtent - mascotSizePx / 2.0).toInt()
+                mascotLp.topMargin = (halfExtent - mascotSizePx / 2.0).toInt()
+                mascot.layoutParams = mascotLp
 
-        for ((actionName, bgColor, _) in actions) {
-            val btn = Button(ctx).apply {
-                text = actionName
-                setTextColor(Color.WHITE)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setPadding(dpToPx(ctx, 14f), dpToPx(ctx, 8f), dpToPx(ctx, 14f), dpToPx(ctx, 8f))
-                isAllCaps = false
-                minHeight = dpToPx(ctx, 40f)
-
-                background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(ctx, 8f).toFloat()
-                    setColor(Color.parseColor(bgColor))
+                for (v in itemViews) {
+                    v.visibility = View.VISIBLE
+                }
+            } else {
+                for (v in itemViews) {
+                    v.visibility = View.GONE
                 }
 
-                setOnClickListener {
-                    handleAction(actionName)
-                }
-            }
+                params.width = mascotSizePx
+                params.height = mascotSizePx
+                params.x = (bubbleCenterX - mascotSizePx / 2.0).toInt()
+                params.y = (bubbleCenterY - mascotSizePx / 2.0).toInt()
 
-            val btnParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                leftMargin = dpToPx(ctx, 4f)
-                rightMargin = dpToPx(ctx, 4f)
+                mascotLp.leftMargin = 0
+                mascotLp.topMargin = 0
+                mascot.layoutParams = mascotLp
             }
-            buttonsRow.addView(btn, btnParams)
-        }
-        container.addView(buttonsRow)
-
-        val recRow = LinearLayout(ctx).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            val rowParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dpToPx(ctx, 6f)
-            }
-            layoutParams = rowParams
-        }
-
-        fun sendRecorderServiceIntent(action: String) {
             try {
-                val intent = Intent().setClassName(ctx, RECORDER_SERVICE_CLASS).apply {
-                    this.action = action
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && action == ACTION_START_FOREGROUND) {
-                    ctx.startForegroundService(intent)
-                } else {
-                    ctx.startService(intent)
-                }
+                wm.updateViewLayout(container, params)
             } catch (e: Exception) {
-                Log.e(TAG, "sendRecorderServiceIntent failed for $action: ${e.message}", e)
+                Log.w(TAG, "Error updating overlay layout on toggle", e)
             }
         }
+        // 2. Radial menu items around mascot bubble
+        val items = menuConfig.items
+        if (items.isNotEmpty()) {
+            val positions = RadialLayout.positions(
+                items.size,
+                radiusPx.toDouble(),
+                menuConfig.startAngle,
+                menuConfig.endAngle
+            )
 
-        val recActions = listOf(
-            Triple("START", "#DC2626") {
-                sendRecorderServiceIntent(ACTION_START_FOREGROUND)
-                handleAction("REC_START")
-            },
-            Triple("PAUSE", "#CA8A04") {
-                sendRecorderServiceIntent(ACTION_PAUSE)
-                handleAction("REC_PAUSE")
-            },
-            Triple("RESUME", "#16A34A") {
-                sendRecorderServiceIntent(ACTION_RESUME)
-                handleAction("REC_RESUME")
-            },
-            Triple("STOP", "#475569") {
-                sendRecorderServiceIntent(ACTION_STOP)
-                handleAction("REC_STOP")
-            }
-        )
+            for (i in items.indices) {
+                val item = items[i]
+                val pos = positions[i]
 
-        for ((recName, recColor, recClick) in recActions) {
-            val btn = Button(ctx).apply {
-                text = recName
-                setTextColor(Color.WHITE)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setPadding(dpToPx(ctx, 8f), dpToPx(ctx, 6f), dpToPx(ctx, 8f), dpToPx(ctx, 6f))
-                isAllCaps = false
-                minHeight = dpToPx(ctx, 36f)
-                minWidth = dpToPx(ctx, 54f)
+                val itemView = TextView(ctx).apply {
+                    contentDescription = item.label
+                    gravity = Gravity.CENTER
+                    text = item.icon ?: item.label
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
 
-                background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(ctx, 6f).toFloat()
-                    setColor(Color.parseColor(recColor))
+                    if (item.disabled) {
+                        isEnabled = false
+                        alpha = 0.5f
+                        setTextColor(Color.parseColor("#9CA3AF"))
+                        background = GradientDrawable().apply {
+                            shape = GradientDrawable.OVAL
+                            setColor(Color.parseColor("#4B5563"))
+                        }
+                    } else {
+                        isEnabled = true
+                        alpha = 1.0f
+                        setTextColor(Color.WHITE)
+                        background = GradientDrawable().apply {
+                            shape = GradientDrawable.OVAL
+                            setColor(Color.parseColor("#1E293B"))
+                            setStroke(dpToPx(ctx, 2f), Color.parseColor("#38BDF8"))
+                        }
+                        setOnClickListener {
+                            handleAction(item.id, item.disabled)
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            elevation = dpToPx(ctx, 6f).toFloat()
+                        }
+                    }
                 }
 
-                setOnClickListener {
-                    recClick()
+                val itemLp = FrameLayout.LayoutParams(itemSizePx, itemSizePx).apply {
+                    leftMargin = (centerX + pos.x - itemSizePx / 2.0).toInt()
+                    topMargin = (centerY + pos.y - itemSizePx / 2.0).toInt()
                 }
+                itemViews.add(itemView)
+                container.addView(itemView, itemLp)
             }
-
-            val btnParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                leftMargin = dpToPx(ctx, 3f)
-                rightMargin = dpToPx(ctx, 3f)
-            }
-            recRow.addView(btn, btnParams)
         }
-        container.addView(recRow)
 
-        val status = TextView(ctx).apply {
-            text = "Status: Floating active"
-            setTextColor(Color.parseColor("#64748B"))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
-            gravity = Gravity.CENTER
-            val statusParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dpToPx(ctx, 6f)
-            }
-            layoutParams = statusParams
-        }
-        statusView = status
-        container.addView(status)
+        // Add mascot after items so it sits on top in center
+        container.addView(mascot, mascotLp)
 
         return container
     }

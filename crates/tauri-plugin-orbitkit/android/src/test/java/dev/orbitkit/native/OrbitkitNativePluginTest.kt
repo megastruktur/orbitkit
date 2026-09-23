@@ -46,7 +46,8 @@ class OrbitkitNativePluginTest {
             "isOverlayPermissionGranted",
             "requestOverlayPermission",
             "overlayShow",
-            "overlayHide"
+            "overlayHide",
+            "setMascotState"
         )
 
         for (cmdName in requiredCommands) {
@@ -108,5 +109,36 @@ class OrbitkitNativePluginTest {
         val res = OrbitkitJniBridge.dispatchNativeAction("TEST_ACTION")
         assertNotNull("dispatchNativeAction must return non-null result", res)
         assertTrue("Result must contain action name", res.contains("TEST_ACTION"))
+    }
+
+    @Test
+    fun testMascotStatePaletteTints() {
+        val idleTint = OrbitkitNativePlugin.getMascotTint("idle")
+        val activeTint = OrbitkitNativePlugin.getMascotTint("active")
+        val busyTint = OrbitkitNativePlugin.getMascotTint("busy")
+        val attentionTint = OrbitkitNativePlugin.getMascotTint("attention")
+
+        // All 4 palette colors must be distinct
+        val tints = setOf(idleTint, activeTint, busyTint, attentionTint)
+        assertEquals("All 4 mascot palette tints must be unique", 4, tints.size)
+
+        // Case-insensitivity and whitespace trimming
+        assertEquals(activeTint, OrbitkitNativePlugin.getMascotTint("ACTIVE"))
+        assertEquals(busyTint, OrbitkitNativePlugin.getMascotTint(" busy "))
+        assertEquals(attentionTint, OrbitkitNativePlugin.getMascotTint("Attention"))
+
+        // Fallback for null or unknown state defaults to idle tint
+        assertEquals(idleTint, OrbitkitNativePlugin.getMascotTint(null))
+        assertEquals(idleTint, OrbitkitNativePlugin.getMascotTint("unknown_state"))
+    }
+
+    @Test
+    fun testJniBridgeMultipleDispatchesAndActions() {
+        val actions = listOf("menu_action_1", "menu_action_2", "menu_action_3")
+        for (act in actions) {
+            val res = OrbitkitJniBridge.dispatchNativeAction(act)
+            assertNotNull(res)
+            assertTrue("Dispatch response must contain action: $act", res.contains(act))
+        }
     }
 }

@@ -1,0 +1,89 @@
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+
+> Task :buildSrc:compileKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/buildSrc/src/main/java/dev/orbitkit/app/kotlin/BuildTask.kt:53:17 'exec(Action<in ExecSpec!>): ExecResult' is deprecated. Deprecated in Java
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :tauri-android:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:preBuild UP-TO-DATE
+> Task :tauri-android:preDebugBuild UP-TO-DATE
+> Task :tauri-android:generateDebugBuildConfig
+> Task :tauri-android:generateDebugResValues
+> Task :tauri-android:generateDebugResources
+> Task :tauri-android:packageDebugResources
+> Task :tauri-android:javaPreCompileDebug
+> Task :tauri-android:parseDebugLocalResources
+> Task :tauri-plugin-orbitkit:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-plugin-orbitkit:preBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preDebugBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugResValues
+> Task :tauri-plugin-orbitkit:generateDebugResources
+> Task :tauri-android:generateDebugRFile
+> Task :tauri-plugin-orbitkit:packageDebugResources
+> Task :tauri-plugin-orbitkit:preDebugUnitTestBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:javaPreCompileDebug
+> Task :tauri-plugin-orbitkit:parseDebugLocalResources
+> Task :tauri-plugin-orbitkit:javaPreCompileDebugUnitTest
+> Task :tauri-plugin-orbitkit:generateDebugRFile
+> Task :tauri-plugin-orbitkit:generateDebugUnitTestStubRFile
+
+> Task :tauri-android:compileDebugKotlin
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+
+> Task :tauri-android:compileDebugJavaWithJavac
+> Task :tauri-android:bundleLibRuntimeToJarDebug
+> Task :tauri-android:processDebugJavaRes
+> Task :tauri-android:bundleLibCompileToJarDebug
+
+> Task :tauri-plugin-orbitkit:compileDebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OverlayActionDispatcher.kt:42:9 Parameter 'jniDispatch' is never used
+
+> Task :tauri-plugin-orbitkit:compileDebugJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:bundleLibRuntimeToJarDebug
+> Task :tauri-plugin-orbitkit:bundleLibCompileToJarDebug
+> Task :tauri-plugin-orbitkit:processDebugJavaRes
+
+> Task :tauri-plugin-orbitkit:compileDebugUnitTestKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/crates/tauri-plugin-orbitkit/android/src/test/java/dev/orbitkit/native/OverlayActionDispatcherTest.kt:76:29 Parameter 'id' is never used, could be renamed to _
+
+> Task :tauri-plugin-orbitkit:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:processDebugUnitTestJavaRes
+
+> Task :tauri-plugin-orbitkit:testDebugUnitTest FAILED
+
+OverlayActionDispatcherTest > testHandleActionWithInjectableEmitter FAILED
+    java.lang.AssertionError at OverlayActionDispatcherTest.kt:87
+
+OverlayActionDispatcherTest > testHandleActionCallsJniDispatchOnceWithExactId FAILED
+    java.lang.AssertionError at OverlayActionDispatcherTest.kt:41
+
+37 tests completed, 2 failed
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':tauri-plugin-orbitkit:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/crates/tauri-plugin-orbitkit/android/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2s
+33 actionable tasks: 33 executed
+EXIT_CODE=1

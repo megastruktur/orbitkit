@@ -1,0 +1,102 @@
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+
+> Task :buildSrc:compileKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/buildSrc/src/main/java/dev/orbitkit/app/kotlin/BuildTask.kt:53:17 'exec(Action<in ExecSpec!>): ExecResult' is deprecated. Deprecated in Java
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preUniversalDebugBuild UP-TO-DATE
+> Task :app:generateUniversalDebugBuildConfig
+> Task :tauri-android:preBuild UP-TO-DATE
+> Task :tauri-android:preDebugBuild UP-TO-DATE
+> Task :tauri-android:writeDebugAarMetadata
+> Task :tauri-plugin-orbitkit:preBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preDebugBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:writeDebugAarMetadata
+> Task :app:generateUniversalDebugResValues
+> Task :tauri-android:generateDebugResValues
+> Task :app:checkUniversalDebugAarMetadata
+> Task :tauri-android:generateDebugResources
+> Task :tauri-android:packageDebugResources
+> Task :tauri-plugin-orbitkit:generateDebugResValues
+> Task :tauri-plugin-orbitkit:generateDebugResources
+> Task :tauri-plugin-orbitkit:packageDebugResources
+> Task :app:mapUniversalDebugSourceSetPaths
+> Task :app:generateUniversalDebugResources
+> Task :app:packageUniversalDebugResources
+> Task :app:createUniversalDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksUniversalDebug
+> Task :app:parseUniversalDebugLocalResources
+> Task :tauri-android:extractDeepLinksDebug
+> Task :tauri-plugin-orbitkit:extractDeepLinksDebug
+> Task :tauri-android:processDebugManifest
+> Task :tauri-plugin-orbitkit:processDebugManifest
+> Task :tauri-android:compileDebugLibraryResources
+> Task :app:processUniversalDebugMainManifest
+> Task :app:processUniversalDebugManifest
+> Task :tauri-android:parseDebugLocalResources
+> Task :tauri-plugin-orbitkit:compileDebugLibraryResources
+> Task :tauri-android:generateDebugRFile
+> Task :tauri-android:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:generateDebugBuildConfig
+> Task :tauri-plugin-orbitkit:parseDebugLocalResources
+> Task :tauri-plugin-orbitkit:generateDebugRFile
+> Task :tauri-plugin-orbitkit:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:javaPreCompileDebug
+> Task :tauri-plugin-orbitkit:javaPreCompileDebug
+> Task :app:preUniversalDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileUniversalDebug
+> Task :app:javaPreCompileUniversalDebugUnitTest
+> Task :app:processUniversalDebugManifestForPackage
+> Task :app:mergeUniversalDebugResources
+> Task :app:processUniversalDebugResources
+
+> Task :tauri-android:compileDebugKotlin
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+
+> Task :tauri-android:compileDebugJavaWithJavac
+> Task :tauri-android:bundleLibCompileToJarDebug
+> Task :tauri-android:bundleLibRuntimeToJarDebug
+> Task :tauri-android:processDebugJavaRes
+> Task :tauri-plugin-orbitkit:compileDebugKotlin
+> Task :tauri-plugin-orbitkit:compileDebugJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:bundleLibCompileToJarDebug
+> Task :tauri-plugin-orbitkit:bundleLibRuntimeToJarDebug
+> Task :tauri-plugin-orbitkit:processDebugJavaRes
+
+> Task :app:compileUniversalDebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileUniversalDebugJavaWithJavac
+> Task :app:processUniversalDebugJavaRes
+> Task :app:bundleUniversalDebugClassesToRuntimeJar
+> Task :app:bundleUniversalDebugClassesToCompileJar
+> Task :app:compileUniversalDebugUnitTestKotlin
+> Task :app:compileUniversalDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processUniversalDebugUnitTestJavaRes
+> Task :app:testUniversalDebugUnitTest
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-android-overlay/examples/starter/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 4s
+61 actionable tasks: 61 executed
+EXIT_CODE=0

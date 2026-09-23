@@ -54,11 +54,45 @@ pub struct MenuAction {
 }
 
 type MenuActionCallback = Box<dyn Fn(&MenuAction) + Send + Sync + 'static>;
+type EventEmitterCallback = Box<dyn Fn(&str, &serde_json::Value) + Send + Sync + 'static>;
+
+pub const MENU_ACTION_EVENT: &str = "orbitkit://menu-action";
 
 static RECEIPT_COUNTER: AtomicU64 = AtomicU64::new(1);
 static ACTION_LOG: Mutex<Vec<JniActionRecord>> = Mutex::new(Vec::new());
 static MENU_ACTION_HANDLERS: Mutex<Vec<Arc<MenuActionCallback>>> = Mutex::new(Vec::new());
+static EVENT_EMITTER: Mutex<Option<EventEmitterCallback>> = Mutex::new(None);
 
+pub fn register_event_emitter<F: Fn(&str, &serde_json::Value) + Send + Sync + 'static>(emitter: F) {
+    if let Ok(mut guard) = EVENT_EMITTER.lock() {
+        *guard = Some(Box::new(emitter));
+    }
+}
+
+pub fn clear_event_emitter() {
+    if let Ok(mut guard) = EVENT_EMITTER.lock() {
+        *guard = None;
+    }
+}
+
+/// Pure function building the menu action event payload.
+pub fn build_menu_action_payload(id: &str, source: &str) -> serde_json::Value {
+    serde_json::json!({
+        "id": id,
+        "source": source,
+    })
+}
+
+/// Pure / extracted dispatch function emitting overlay action event to registered emitter.
+pub fn emit_overlay_menu_action(id: &str) -> serde_json::Value {
+    let payload = build_menu_action_payload(id, "overlay");
+    if let Ok(guard) = EVENT_EMITTER.lock() {
+        if let Some(emitter) = guard.as_ref() {
+            emitter(MENU_ACTION_EVENT, &payload);
+        }
+    }
+    payload
+}
 fn current_timestamp_millis() -> u64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -112,6 +146,9 @@ pub fn process_native_action(action: &str) -> String {
         source: "overlay".to_string(),
     };
     notify_menu_action(&menu_action);
+
+    // Emit global event for webview listeners (@tauri-apps/api/event listen("orbitkit://menu-action"))
+    emit_overlay_menu_action(action);
 
     serde_json::to_string(&record).unwrap_or_else(|_| "{\"status\":\"OK\"}".to_string())
 }
@@ -239,5 +276,82 @@ mod tests {
 
         let with_null = to_safe_cstring("tag\0with\0null");
         assert_eq!(with_null.as_bytes(), b"tagwithnull");
+    }
+
+    #[test]
+    fn test_build_menu_action_payload() {
+        let payload = build_menu_action_payload("action_test_1", "overlay");
+        assert_eq!(payload["id"], "action_test_1");
+        assert_eq!(payload["source"], "overlay");
+    }
+
+    #[test]
+    fn test_emit_overlay_menu_action_calls_registered_emitter() {
+        let _guard = TEST_MUTEX.lock().unwrap();
+        clear_event_emitter();
+
+        let call_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let captured_event = Arc::new(Mutex::new(String::new()));
+        let captured_payload = Arc::new(Mutex::new(serde_json::Value::Null));
+
+        let c_count = call_count.clone();
+        let c_event = captured_event.clone();
+        let c_payload = captured_payload.clone();
+
+        register_event_emitter(move |event, payload| {
+            c_count.fetch_add(1, Ordering::SeqCst);
+            *c_event.lock().unwrap() = event.to_string();
+            *c_payload.lock().unwrap() = payload.clone();
+        });
+
+        let payload = emit_overlay_menu_action("my_action");
+        assert_eq!(call_count.load(Ordering::SeqCst), 1);
+        assert_eq!(*captured_event.lock().unwrap(), "orbitkit://menu-action");
+        assert_eq!(captured_payload.lock().unwrap()["id"], "my_action");
+        assert_eq!(captured_payload.lock().unwrap()["source"], "overlay");
+        assert_eq!(payload["id"], "my_action");
+        assert_eq!(payload["source"], "overlay");
+
+        clear_event_emitter();
+    }
+
+    #[test]
+    fn test_process_native_action_emits_overlay_event_and_notifies_handler() {
+        let _guard = TEST_MUTEX.lock().unwrap();
+        clear_jni_action_log();
+        clear_event_emitter();
+
+        let jni_called = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let jni_captured_id = Arc::new(Mutex::new(String::new()));
+        let j_called = jni_called.clone();
+        let j_id = jni_captured_id.clone();
+
+        register_menu_action_handler(move |action| {
+            j_called.fetch_add(1, Ordering::SeqCst);
+            *j_id.lock().unwrap() = action.id.clone();
+        });
+
+        let emitter_called = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let emitter_payload = Arc::new(Mutex::new(serde_json::Value::Null));
+        let e_called = emitter_called.clone();
+        let e_payload = emitter_payload.clone();
+
+        register_event_emitter(move |_event, payload| {
+            e_called.fetch_add(1, Ordering::SeqCst);
+            *e_payload.lock().unwrap() = payload.clone();
+        });
+
+        let json = process_native_action("overlay_btn_clicked");
+        assert!(json.contains("\"action\":\"overlay_btn_clicked\""));
+
+        assert_eq!(jni_called.load(Ordering::SeqCst), 1);
+        assert_eq!(*jni_captured_id.lock().unwrap(), "overlay_btn_clicked");
+
+        assert_eq!(emitter_called.load(Ordering::SeqCst), 1);
+        assert_eq!(emitter_payload.lock().unwrap()["id"], "overlay_btn_clicked");
+        assert_eq!(emitter_payload.lock().unwrap()["source"], "overlay");
+
+        clear_jni_action_log();
+        clear_event_emitter();
     }
 }

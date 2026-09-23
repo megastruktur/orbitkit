@@ -453,12 +453,13 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         val itemViews = ArrayList<View>()
         val items = menuConfig.items
+        val resolvedAngles = RadialLayout.resolveMenuAngles(menuConfig)
         val positions = if (items.isNotEmpty()) {
             RadialLayout.positions(
                 items.size,
                 radiusPx.toDouble(),
-                menuConfig.startAngle,
-                menuConfig.endAngle
+                resolvedAngles.startAngle,
+                resolvedAngles.endAngle
             )
         } else {
             emptyList()

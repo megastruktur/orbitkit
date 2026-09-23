@@ -277,4 +277,124 @@ class MenuConfigParserTest {
         val configGarbage = MenuConfigParser.parse(garbageJson)
         assertEquals("spawn", configGarbage.menu.animation)
     }
+
+    @Test
+    fun testParseValidArcLayoutAndConfig() {
+        val json = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "arc",
+                "arc": {
+                    "position": "bottom",
+                    "span": 120.0
+                }
+            }
+        """.trimIndent()
+        val config = MenuConfigParser.parse(json)
+        assertEquals("arc", config.menu.layout)
+        assertNotNull(config.menu.arc)
+        assertEquals("bottom", config.menu.arc?.position)
+        assertEquals(120.0, config.menu.arc?.span ?: 0.0, DELTA)
+    }
+
+    @Test
+    fun testParseArcWithDefaultPositionAndSpan() {
+        // arc object empty -> position defaults to "top", span to 180.0
+        val jsonEmptyArc = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "arc",
+                "arc": {}
+            }
+        """.trimIndent()
+        val configEmptyArc = MenuConfigParser.parse(jsonEmptyArc)
+        assertEquals("arc", configEmptyArc.menu.layout)
+        assertNotNull(configEmptyArc.menu.arc)
+        assertEquals("top", configEmptyArc.menu.arc?.position)
+        assertEquals(180.0, configEmptyArc.menu.arc?.span ?: 0.0, DELTA)
+
+        // layout: "arc" with no arc field -> arc is null
+        val jsonNoArc = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "arc"
+            }
+        """.trimIndent()
+        val configNoArc = MenuConfigParser.parse(jsonNoArc)
+        assertEquals("arc", configNoArc.menu.layout)
+        assertNull(configNoArc.menu.arc)
+    }
+
+    @Test
+    fun testParseUnknownLayoutFallsBackToOrbit() {
+        for (invalidLayout in listOf("spiral", "unknown", "circle", "ARC_TOP", "")) {
+            val json = """
+                {
+                    "items": [{ "id": "act1", "label": "Act 1" }],
+                    "layout": "$invalidLayout"
+                }
+            """.trimIndent()
+            val config = MenuConfigParser.parse(json)
+            assertEquals("orbit", config.menu.layout)
+        }
+    }
+
+    @Test
+    fun testParseInvalidArcPositionFallsBackToTop() {
+        for (invalidPos in listOf("diagonal", "north", "center", "invalid", "")) {
+            val json = """
+                {
+                    "items": [{ "id": "act1", "label": "Act 1" }],
+                    "layout": "arc",
+                    "arc": { "position": "$invalidPos", "span": 180.0 }
+                }
+            """.trimIndent()
+            val config = MenuConfigParser.parse(json)
+            assertNotNull(config.menu.arc)
+            assertEquals("top", config.menu.arc?.position)
+        }
+    }
+
+    @Test
+    fun testParseInvalidArcSpanFallsBackTo180() {
+        // Span < 30 -> 180.0
+        val jsonTooSmall = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "arc",
+                "arc": { "position": "left", "span": 20.0 }
+            }
+        """.trimIndent()
+        val configSmall = MenuConfigParser.parse(jsonTooSmall)
+        assertNotNull(configSmall.menu.arc)
+        assertEquals(180.0, configSmall.menu.arc?.span ?: 0.0, DELTA)
+
+        // Span > 300 -> 180.0
+        val jsonTooLarge = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "arc",
+                "arc": { "position": "right", "span": 350.0 }
+            }
+        """.trimIndent()
+        val configLarge = MenuConfigParser.parse(jsonTooLarge)
+        assertNotNull(configLarge.menu.arc)
+        assertEquals(180.0, configLarge.menu.arc?.span ?: 0.0, DELTA)
+    }
+
+    @Test
+    fun testParseOrbitWithArcAllowed() {
+        val json = """
+            {
+                "items": [{ "id": "act1", "label": "Act 1" }],
+                "layout": "orbit",
+                "arc": { "position": "bottom", "span": 90.0 }
+            }
+        """.trimIndent()
+        val config = MenuConfigParser.parse(json)
+        assertEquals("orbit", config.menu.layout)
+        assertNotNull(config.menu.arc)
+        assertEquals("bottom", config.menu.arc?.position)
+        assertEquals(90.0, config.menu.arc?.span ?: 0.0, DELTA)
+    }
 }

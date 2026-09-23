@@ -1,5 +1,8 @@
 package dev.orbitkit.native
 
+import java.io.File
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -215,5 +218,146 @@ class RadialLayoutTest {
         assertEquals(1, tieNegCoord.size)
         assertEquals(-0.12, tieNegCoord[0].x, DELTA)
         assertEquals(0.0, tieNegCoord[0].y, DELTA)
+    }
+
+    private fun loadArcVectorsJson(): String {
+        val candidates = listOf(
+            File("../../../packages/orbitkit/src/arc-vectors.json"),
+            File("../../../../../packages/orbitkit/src/arc-vectors.json"),
+            File("packages/orbitkit/src/arc-vectors.json")
+        )
+        for (c in candidates) {
+            if (c.exists()) return c.readText(Charsets.UTF_8)
+        }
+        var dir: File? = File(System.getProperty("user.dir") ?: ".")
+        while (dir != null) {
+            val candidate = File(dir, "packages/orbitkit/src/arc-vectors.json")
+            if (candidate.exists()) return candidate.readText(Charsets.UTF_8)
+            dir = dir.parentFile
+        }
+        throw IllegalStateException("Unable to locate packages/orbitkit/src/arc-vectors.json from user.dir=${System.getProperty("user.dir")}")
+    }
+
+    @Test
+    fun testResolveMenuAnglesAndPositionsFromCanonicalArcVectors() {
+        val jsonText = loadArcVectorsJson()
+        val vectors = JSONArray(jsonText)
+        assertTrue("Canonical vectors must not be empty", vectors.length() > 0)
+
+        for (i in 0 until vectors.length()) {
+            val v = vectors.getJSONObject(i)
+            val layout = if (v.has("layout") && !v.isNull("layout")) v.getString("layout") else null
+            val arcObj = if (v.has("arc") && !v.isNull("arc")) v.getJSONObject("arc") else null
+            val position = if (arcObj != null && arcObj.has("position") && !arcObj.isNull("position")) {
+                arcObj.getString("position")
+            } else null
+            val span = if (arcObj != null && arcObj.has("span") && !arcObj.isNull("span")) {
+                arcObj.getDouble("span")
+            } else null
+            val startAngle = if (v.has("startAngle") && !v.isNull("startAngle")) v.getDouble("startAngle") else null
+            val endAngle = if (v.has("endAngle") && !v.isNull("endAngle")) v.getDouble("endAngle") else null
+
+            val expectedStart = v.getDouble("startAngle")
+            val expectedEnd = v.getDouble("endAngle")
+            val n = v.getInt("n")
+            val expectedPositions = v.getJSONArray("positions")
+
+            val resolved = RadialLayout.resolveMenuAngles(
+                layout = layout,
+                position = position,
+                span = span,
+                startAngle = startAngle,
+                endAngle = endAngle
+            )
+
+            assertEquals("Vector $i startAngle mismatch", expectedStart, resolved.startAngle, 0.01)
+            assertEquals("Vector $i endAngle mismatch", expectedEnd, resolved.endAngle, 0.01)
+
+            val computedPositions = RadialLayout.positions(n, 96.0, resolved.startAngle, resolved.endAngle)
+            assertEquals("Vector $i positions count mismatch", expectedPositions.length(), computedPositions.size)
+
+            for (j in 0 until expectedPositions.length()) {
+                val expPos = expectedPositions.getJSONObject(j)
+                val expX = expPos.getDouble("x")
+                val expY = expPos.getDouble("y")
+                val expAngle = expPos.getDouble("angle")
+                val actPos = computedPositions[j]
+
+                assertEquals("Vector $i item $j x mismatch", expX, actPos.x, 0.01)
+                assertEquals("Vector $i item $j y mismatch", expY, actPos.y, 0.01)
+                assertEquals("Vector $i item $j angle mismatch", expAngle, actPos.angle, 0.01)
+            }
+        }
+    }
+
+    @Test
+    fun testResolveMenuAnglesFourPositionsDefaultSpan() {
+        // top: centre -90, span 180 -> -180..0
+        val top = RadialLayout.resolveMenuAngles(layout = "arc", position = "top")
+        assertEquals(-180.0, top.startAngle, DELTA)
+        assertEquals(0.0, top.endAngle, DELTA)
+
+        // right: centre 0, span 180 -> -90..90
+        val right = RadialLayout.resolveMenuAngles(layout = "arc", position = "right")
+        assertEquals(-90.0, right.startAngle, DELTA)
+        assertEquals(90.0, right.endAngle, DELTA)
+
+        // bottom: centre 90, span 180 -> 0..180
+        val bottom = RadialLayout.resolveMenuAngles(layout = "arc", position = "bottom")
+        assertEquals(0.0, bottom.startAngle, DELTA)
+        assertEquals(180.0, bottom.endAngle, DELTA)
+
+        // left: centre 180, span 180 -> 90..270
+        val left = RadialLayout.resolveMenuAngles(layout = "arc", position = "left")
+        assertEquals(90.0, left.startAngle, DELTA)
+        assertEquals(270.0, left.endAngle, DELTA)
+    }
+
+    @Test
+    fun testResolveMenuAnglesCustomSpans() {
+        // top: centre -90, span 120 -> -150..-30
+        val top120 = RadialLayout.resolveMenuAngles(layout = "arc", position = "top", span = 120.0)
+        assertEquals(-150.0, top120.startAngle, DELTA)
+        assertEquals(-30.0, top120.endAngle, DELTA)
+
+        // right: centre 0, span 90 -> -45..45
+        val right90 = RadialLayout.resolveMenuAngles(layout = "arc", position = "right", span = 90.0)
+        assertEquals(-45.0, right90.startAngle, DELTA)
+        assertEquals(45.0, right90.endAngle, DELTA)
+
+        // bottom: centre 90, span 60 -> 60..120
+        val bottom60 = RadialLayout.resolveMenuAngles(layout = "arc", position = "bottom", span = 60.0)
+        assertEquals(60.0, bottom60.startAngle, DELTA)
+        assertEquals(120.0, bottom60.endAngle, DELTA)
+    }
+
+    @Test
+    fun testResolveMenuAnglesOrbitDefaultsAndOverrides() {
+        // layout: "orbit", defaults to -90..270
+        val orbitDef = RadialLayout.resolveMenuAngles(layout = "orbit")
+        assertEquals(-90.0, orbitDef.startAngle, DELTA)
+        assertEquals(270.0, orbitDef.endAngle, DELTA)
+
+        // layout: "orbit", custom startAngle/endAngle
+        val orbitCustom = RadialLayout.resolveMenuAngles(layout = "orbit", startAngle = 0.0, endAngle = 180.0)
+        assertEquals(0.0, orbitCustom.startAngle, DELTA)
+        assertEquals(180.0, orbitCustom.endAngle, DELTA)
+
+        // layout: "orbit" ignores arc position/span
+        val orbitWithArc = RadialLayout.resolveMenuAngles(layout = "orbit", position = "bottom", span = 90.0)
+        assertEquals(-90.0, orbitWithArc.startAngle, DELTA)
+        assertEquals(270.0, orbitWithArc.endAngle, DELTA)
+    }
+
+    @Test
+    fun testResolveMenuAnglesNativeMenuConfigOverload() {
+        val config = NativeMenuConfig(
+            items = listOf(NativeMenuItem(id = "item1", label = "One")),
+            layout = "arc",
+            arc = NativeArcConfig(position = "bottom", span = 180.0)
+        )
+        val resolved = RadialLayout.resolveMenuAngles(config)
+        assertEquals(0.0, resolved.startAngle, DELTA)
+        assertEquals(180.0, resolved.endAngle, DELTA)
     }
 }

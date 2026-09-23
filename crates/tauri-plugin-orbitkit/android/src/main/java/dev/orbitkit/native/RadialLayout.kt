@@ -18,6 +18,17 @@ data class ItemPosition(
 )
 
 /**
+ * Resolved start and end angles for radial menu items.
+ * startAngle: start angle in degrees (0 = right, clockwise screen y down)
+ * endAngle: end angle in degrees
+ */
+data class ResolvedMenuAngles(
+    val startAngle: Double,
+    val endAngle: Double
+)
+
+
+/**
  * Pure geometry helper computing radial layout coordinates and angles.
  * Mirrors K3 geometry semantics (layoutItems in @orbitkit/ui geometry.ts).
  */
@@ -102,4 +113,61 @@ object RadialLayout {
     @JvmStatic
     fun positions(n: Int, radiusPx: Float, startDeg: Float, endDeg: Float): List<ItemPosition> =
         positions(n, radiusPx.toDouble(), startDeg.toDouble(), endDeg.toDouble())
+
+    /**
+     * Resolves start and end angles for radial menu items based on layout configuration.
+     * Mirrors K2-A1 amendment and resolveMenuAngles in @orbitkit/ui geometry.ts.
+     *
+     * Angles use K3 geometry: 0 = right, clockwise, screen y points down.
+     * Centre angles: top -90, right 0, bottom 90, left 180.
+     * For layout "arc":
+     *   startAngle = centre - span / 2
+     *   endAngle = centre + span / 2
+     * Defaults:
+     *   position: "top" (-90)
+     *   span: 180
+     *
+     * For layout "orbit" (or default):
+     *   startAngle = startAngle ?: -90.0
+     *   endAngle = endAngle ?: 270.0
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun resolveMenuAngles(
+        layout: String? = null,
+        position: String? = null,
+        span: Double? = null,
+        startAngle: Double? = null,
+        endAngle: Double? = null
+    ): ResolvedMenuAngles {
+        if (layout == "arc") {
+            val pos = position ?: "top"
+            val s = span ?: 180.0
+            val centre = when (pos) {
+                "top" -> -90.0
+                "right" -> 0.0
+                "bottom" -> 90.0
+                "left" -> 180.0
+                else -> -90.0
+            }
+            return ResolvedMenuAngles(
+                startAngle = round2(centre - s / 2.0),
+                endAngle = round2(centre + s / 2.0)
+            )
+        }
+        return ResolvedMenuAngles(
+            startAngle = startAngle ?: -90.0,
+            endAngle = endAngle ?: 270.0
+        )
+    }
+
+    @JvmStatic
+    fun resolveMenuAngles(menu: NativeMenuConfig): ResolvedMenuAngles =
+        resolveMenuAngles(
+            layout = menu.layout,
+            position = menu.arc?.position,
+            span = menu.arc?.span,
+            startAngle = menu.startAngle,
+            endAngle = menu.endAngle
+        )
 }

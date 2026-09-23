@@ -16,6 +16,22 @@ data class NativeMenuItem(
 )
 
 /**
+ * Configuration for arc-style radial menu layout.
+ */
+data class NativeArcConfig(
+    val position: String = DEFAULT_POSITION,
+    val span: Double = DEFAULT_SPAN
+) {
+    companion object {
+        const val DEFAULT_POSITION = "top"
+        const val DEFAULT_SPAN = 180.0
+        const val MIN_SPAN = 30.0
+        const val MAX_SPAN = 300.0
+        val VALID_POSITIONS = setOf("top", "bottom", "left", "right")
+    }
+}
+
+/**
  * Complete radial menu configuration parsed from K2 config.
  */
 data class NativeMenuConfig(
@@ -25,7 +41,9 @@ data class NativeMenuConfig(
     val endAngle: Double = DEFAULT_END_ANGLE,
     val itemSize: Double = DEFAULT_ITEM_SIZE,
     val trigger: String = DEFAULT_TRIGGER,
-    val animation: String = DEFAULT_ANIMATION
+    val animation: String = DEFAULT_ANIMATION,
+    val layout: String = DEFAULT_LAYOUT,
+    val arc: NativeArcConfig? = null
 ) {
     companion object {
         const val DEFAULT_RADIUS = 96.0
@@ -34,12 +52,15 @@ data class NativeMenuConfig(
         const val DEFAULT_ITEM_SIZE = 44.0
         const val DEFAULT_TRIGGER = "click"
         const val DEFAULT_ANIMATION = "spawn"
+        const val DEFAULT_LAYOUT = "orbit"
+        val VALID_LAYOUTS = setOf("orbit", "arc")
         val ID_PATTERN: Pattern = Pattern.compile("^[a-z0-9][a-z0-9_-]{0,31}$")
         fun isValidId(id: String): Boolean {
             return ID_PATTERN.matcher(id).matches()
         }
     }
 }
+
 
 /**
  * Mascot bubble arguments for overlay display.
@@ -198,6 +219,53 @@ object MenuConfigParser {
         } else {
             NativeMenuConfig.DEFAULT_ANIMATION
         }
+        val layout = if (obj.has("layout") && !obj.isNull("layout")) {
+            val raw = obj.optString("layout", NativeMenuConfig.DEFAULT_LAYOUT).trim().lowercase()
+            if (NativeMenuConfig.VALID_LAYOUTS.contains(raw)) {
+                raw
+            } else {
+                logW("Unknown or invalid layout '$raw', falling back to '${NativeMenuConfig.DEFAULT_LAYOUT}'")
+                NativeMenuConfig.DEFAULT_LAYOUT
+            }
+        } else {
+            NativeMenuConfig.DEFAULT_LAYOUT
+        }
+
+        val arc = if (obj.has("arc") && !obj.isNull("arc")) {
+            val arcObj = obj.optJSONObject("arc")
+            if (arcObj != null) {
+                val rawPosition = if (arcObj.has("position") && !arcObj.isNull("position")) {
+                    arcObj.optString("position", NativeArcConfig.DEFAULT_POSITION).trim().lowercase()
+                } else {
+                    NativeArcConfig.DEFAULT_POSITION
+                }
+                val position = if (NativeArcConfig.VALID_POSITIONS.contains(rawPosition)) {
+                    rawPosition
+                } else {
+                    logW("Unknown or invalid arc.position '$rawPosition', falling back to '${NativeArcConfig.DEFAULT_POSITION}'")
+                    NativeArcConfig.DEFAULT_POSITION
+                }
+
+                val rawSpan = if (arcObj.has("span") && !arcObj.isNull("span")) {
+                    arcObj.optDouble("span", NativeArcConfig.DEFAULT_SPAN)
+                } else {
+                    NativeArcConfig.DEFAULT_SPAN
+                }
+                val span = if (rawSpan.isNaN() || rawSpan < NativeArcConfig.MIN_SPAN || rawSpan > NativeArcConfig.MAX_SPAN) {
+                    logW("Invalid arc.span $rawSpan (must be between ${NativeArcConfig.MIN_SPAN} and ${NativeArcConfig.MAX_SPAN}), falling back to ${NativeArcConfig.DEFAULT_SPAN}")
+                    NativeArcConfig.DEFAULT_SPAN
+                } else {
+                    rawSpan
+                }
+                NativeArcConfig(position = position, span = span)
+            } else {
+                logW("Invalid arc configuration (not a JSON object), falling back to default")
+                NativeArcConfig()
+            }
+        } else {
+            null
+        }
+
         return NativeMenuConfig(
             items = items,
             radius = radius,
@@ -205,7 +273,9 @@ object MenuConfigParser {
             endAngle = endAngle,
             itemSize = itemSize,
             trigger = trigger,
-            animation = animation
+            animation = animation,
+            layout = layout,
+            arc = arc
         )
     }
 }

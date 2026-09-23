@@ -1,0 +1,7 @@
+classes4.dex: NativeArcConfig
+classes4.dex: ResolvedMenuAngles
+classes4.dex: resolveMenuAngles
+classes4.dex: MenuConfigParser
+classes4.dex: RadialLayout
+classes4.dex: OrbitkitNativePlugin
+EXIT_CODE=0

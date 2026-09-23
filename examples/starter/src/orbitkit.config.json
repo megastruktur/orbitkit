@@ -1,0 +1,53 @@
+{
+  "mascot": {
+    "kind": "svg",
+    "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#4f7cff\" /><ellipse cx=\"80\" cy=\"80\" rx=\"70\" ry=\"22\" fill=\"none\" stroke=\"#9db4ff\" stroke-width=\"4\" transform=\"rotate(-20 80 80)\" /><circle cx=\"60\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"100\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"62\" cy=\"70\" r=\"4\" fill=\"#10141a\" /><circle cx=\"102\" cy=\"70\" r=\"4\" fill=\"#10141a\" /></svg>",
+    "size": 96,
+    "initialState": "idle",
+    "states": {
+      "idle": {
+        "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#4f7cff\" /><ellipse cx=\"80\" cy=\"80\" rx=\"70\" ry=\"22\" fill=\"none\" stroke=\"#9db4ff\" stroke-width=\"4\" transform=\"rotate(-20 80 80)\" /><circle cx=\"60\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"100\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"62\" cy=\"70\" r=\"4\" fill=\"#10141a\" /><circle cx=\"102\" cy=\"70\" r=\"4\" fill=\"#10141a\" /></svg>"
+      },
+      "busy": {
+        "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#f59e0b\" /><ellipse cx=\"80\" cy=\"80\" rx=\"70\" ry=\"22\" fill=\"none\" stroke=\"#fcd34d\" stroke-width=\"4\" transform=\"rotate(-20 80 80)\" /><circle cx=\"60\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"100\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"62\" cy=\"70\" r=\"4\" fill=\"#10141a\" /><circle cx=\"102\" cy=\"70\" r=\"4\" fill=\"#10141a\" /></svg>"
+      }
+    }
+  },
+  "menu": {
+    "items": [
+      { "id": "notes", "label": "Notes" },
+      { "id": "timer", "label": "Timer" },
+      { "id": "settings", "label": "Settings" },
+      { "id": "about", "label": "About" },
+      { "id": "quit", "label": "Quit" }
+    ],
+    "radius": 96,
+    "startAngle": -90,
+    "endAngle": 270,
+    "itemSize": 44,
+    "trigger": "click"
+  },
+  "windows": {
+    "mascotWindow": {
+      "transparent": true,
+      "alwaysOnTop": true,
+      "decorations": false
+    },
+    "popups": [
+      {
+        "id": "notes",
+        "url": "index.html?popup=notes",
+        "title": "Notes",
+        "width": 320,
+        "height": 420
+      },
+      {
+        "id": "settings",
+        "url": "index.html?popup=settings",
+        "title": "Settings",
+        "width": 360,
+        "height": 300
+      }
+    ]
+  }
+}

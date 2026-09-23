@@ -1,26 +1,6 @@
-import { defineConfig, validateConfig } from "@orbitkit/ui";
+import { defineConfig, validateConfig, type OrbitKitConfig } from "@orbitkit/ui";
+import rawConfig from "./orbitkit.config.json";
 
-export const config = defineConfig({
-  mascot: {
-    kind: "svg",
-    src: "<svg viewBox='0 0 96 96'></svg>",
-    size: 96,
-    initialState: "idle",
-  },
-  menu: {
-    items: [
-      { id: "chat", label: "Chat" },
-      { id: "settings", label: "Settings" },
-    ],
-    radius: 96,
-    startAngle: -90,
-    endAngle: 270,
-    itemSize: 44,
-    trigger: "click",
-  },
-  windows: {
-    popups: [],
-  },
-});
-
+export const config: OrbitKitConfig = defineConfig(rawConfig as OrbitKitConfig);
 export const validation = validateConfig(config);
+export default config;

@@ -18,6 +18,7 @@ Commands:
   build <app-dir>                              Build the Linux desktop Tauri app in container
   run-screenshot <app-dir> <out.png> [sec=15]  Run app under Xvfb :77, take screenshot, dump windows & log
   exec <app-dir> -- <cmd...>                   Run arbitrary command with Xvfb and app running ($APP_PID exported)
+  run-scenario <app-dir> <script-path>         Run automated scenario script against running app
 EOF
   exit 1
 }
@@ -25,31 +26,36 @@ EOF
 find_binary() {
   local app_dir="$1"
   local target_debug="$app_dir/src-tauri/target-linux/debug"
+  local bin_name=""
 
-  # 1. Standard name check
-  if [ -f "$target_debug/orbitkit" ] && [ -x "$target_debug/orbitkit" ]; then
-    echo "$target_debug/orbitkit"
-    return 0
-  fi
-
-  # 2. Package name check from Cargo.toml
+  # 1. Deterministic resolution from Cargo.toml ([[bin]] or [package].name)
   if [ -f "$app_dir/src-tauri/Cargo.toml" ]; then
-    local pkg_name
-    pkg_name=$(grep -E '^\s*name\s*=' "$app_dir/src-tauri/Cargo.toml" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
-    if [ -n "$pkg_name" ] && [ -f "$target_debug/$pkg_name" ] && [ -x "$target_debug/$pkg_name" ]; then
-      echo "$target_debug/$pkg_name"
-      return 0
+    local bin_section_name
+    bin_section_name=$(sed -n '/\[\[bin\]\]/,/\[/p' "$app_dir/src-tauri/Cargo.toml" | grep -E '^\s*name\s*=' | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+    if [ -n "$bin_section_name" ]; then
+      bin_name="$bin_section_name"
+    else
+      local pkg_name
+      pkg_name=$(grep -E '^\s*name\s*=' "$app_dir/src-tauri/Cargo.toml" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+      if [ -n "$pkg_name" ]; then
+        bin_name="$pkg_name"
+      fi
     fi
   fi
 
-  # 3. Executable file scan in target-linux/debug
-  if [ -d "$target_debug" ]; then
-    local candidate
-    candidate=$(find "$target_debug" -maxdepth 1 -type f -executable ! -name "*.d" ! -name "build-script-*" | head -n 1)
-    if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-      echo "$candidate"
-      return 0
+  # 2. Check mainBinaryName in tauri.conf.json if set
+  if [ -z "$bin_name" ] && [ -f "$app_dir/src-tauri/tauri.conf.json" ]; then
+    local tauri_bin
+    tauri_bin=$(grep -E '"mainBinaryName"\s*:' "$app_dir/src-tauri/tauri.conf.json" | head -n1 | sed -E 's/.*"mainBinaryName"\s*:\s*"([^"]+)".*/\1/' || true)
+    if [ -n "$tauri_bin" ]; then
+      bin_name="$tauri_bin"
     fi
+  fi
+
+  # Deterministic check
+  if [ -n "$bin_name" ] && [ -f "$target_debug/$bin_name" ] && [ -x "$target_debug/$bin_name" ]; then
+    echo "$target_debug/$bin_name"
+    return 0
   fi
 
   return 1
@@ -125,6 +131,10 @@ container_build() {
   echo "=== Running in-container build for: $app_dir ==="
   echo "Repository root: $REPO_ROOT"
 
+  local build_start_marker
+  build_start_marker=$(mktemp)
+  touch "$build_start_marker"
+
   cd "$REPO_ROOT"
   echo "--> Installing dependencies at repo root..."
   pnpm install --frozen-lockfile --store-dir /pnpm-store
@@ -137,10 +147,17 @@ container_build() {
 
   local bin_path
   if bin_path=$(find_binary "$app_dir"); then
+    if [ "$bin_path" -ot "$build_start_marker" ]; then
+      echo "Error: Resolved binary '$bin_path' is older than build start ($build_start_marker)" >&2
+      rm -f "$build_start_marker"
+      exit 1
+    fi
+    rm -f "$build_start_marker"
     echo "=== Build successful ==="
     echo "Binary: $bin_path"
     file "$bin_path"
   else
+    rm -f "$build_start_marker"
     echo "Error: Build finished but could not locate binary in $CARGO_TARGET_DIR/debug" >&2
     exit 1
   fi
@@ -312,6 +329,77 @@ container_exec() {
 
   exit "$cmd_exit"
 }
+container_run_scenario() {
+  local app_dir="$1"
+  local scenario_script="$2"
+
+  local bin_path
+  if ! bin_path=$(find_binary "$app_dir"); then
+    echo "Error: Binary not found in '$app_dir/src-tauri/target-linux/debug/'. Run 'build' first." >&2
+    exit 1
+  fi
+
+  if [ ! -f "$scenario_script" ]; then
+    echo "Error: Scenario script not found at '$scenario_script'" >&2
+    exit 1
+  fi
+
+  rm -f /tmp/.X77-lock /tmp/.X11-unix/X77 2>/dev/null || true
+
+  trap cleanup EXIT
+
+  export DISPLAY=:77
+  Xvfb :77 -screen 0 1280x800x24 -ac &
+  CLEANUP_XVFB_PID=$!
+
+  local xvfb_ready=0
+  for _ in $(seq 1 50); do
+    if xdpyinfo -display :77 >/dev/null 2>&1; then
+      xvfb_ready=1
+      break
+    fi
+    sleep 0.1
+  done
+  if [ "$xvfb_ready" -ne 1 ]; then
+    echo "Error: Xvfb failed to start on display :77" >&2
+    exit 1
+  fi
+
+  if command -v dbus-launch >/dev/null 2>&1; then
+    eval "$(dbus-launch --sh-syntax)"
+    CLEANUP_DBUS_PID="${DBUS_SESSION_BUS_PID:-}"
+  fi
+
+  openbox >/dev/null 2>&1 &
+  CLEANUP_WM_PID=$!
+  sleep 0.5
+  export WEBKIT_DISABLE_COMPOSITING_MODE=1
+  export WEBKIT_DISABLE_DMABUF_RENDERER=1
+  export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
+  export LIBGL_ALWAYS_SOFTWARE=1
+  export GDK_BACKEND=x11
+
+  cd "$app_dir"
+  local exec_log_dir="$app_dir/src-tauri/target-linux"
+  mkdir -p "$exec_log_dir"
+  local exec_log="$exec_log_dir/scenario-app.log"
+  echo "--> Application log: $exec_log"
+  "$bin_path" > "$exec_log" 2>&1 &
+  APP_PID=$!
+  export APP_PID
+  CLEANUP_APP_PID=$!
+
+  sleep 2
+
+  local cmd_exit=0
+  set +e
+  bash "$scenario_script"
+  cmd_exit=$?
+  set -e
+
+  exit "$cmd_exit"
+}
+
 
 # ==============================================================================
 # HOST-SIDE IMPLEMENTATION
@@ -509,6 +597,37 @@ host_exec() {
     "$IMAGE_NAME" \
     "$SCRIPT_PATH" exec "$abs_app_dir" -- "$@"
 }
+host_run_scenario() {
+  local app_dir_arg="$1"
+  local scenario_script_arg="$2"
+  validate_app_dir "$app_dir_arg"
+  local abs_app_dir
+  abs_app_dir="$(cd "$app_dir_arg" && pwd -P)"
+  local abs_scenario_script
+  abs_scenario_script="$(realpath "$scenario_script_arg")"
+
+  ensure_image
+
+  echo "Launching scenario container for $abs_app_dir..."
+  collect_orbitkit_env_args
+
+  docker run --rm \
+    --user 1000:1000 \
+    --shm-size=512m \
+    -v "$REPO_ROOT:$REPO_ROOT" \
+    -v "$CARGO_VOLUME:/cargo-cache" \
+    -v "$PNPM_VOLUME:/pnpm-store" \
+    -e HOME=/home/builder \
+    -e CARGO_HOME=/cargo-cache \
+    -e PNPM_HOME=/pnpm-store \
+    -e PNPM_STORE_DIR=/pnpm-store \
+    -e ORBITKIT_IN_CONTAINER=1 \
+    "${ORBITKIT_DOCKER_ENVS[@]}" \
+    -w "$REPO_ROOT" \
+    "$IMAGE_NAME" \
+    "$SCRIPT_PATH" run-scenario "$abs_app_dir" "$abs_scenario_script"
+}
+
 
 # ==============================================================================
 # ENTRYPOINT DISPATCH
@@ -537,6 +656,10 @@ if is_in_container; then
       shift 2
       container_exec "$app" "$@"
       ;;
+    run-scenario)
+      if [ "$#" -lt 2 ]; then usage; fi
+      container_run_scenario "$1" "$2"
+      ;;
     *)
       echo "Unknown in-container command: $CMD" >&2
       usage
@@ -558,6 +681,10 @@ else
     exec)
       if [ "$#" -lt 2 ]; then usage; fi
       host_exec "$@"
+      ;;
+    run-scenario)
+      if [ "$#" -lt 2 ]; then usage; fi
+      host_run_scenario "$1" "$2"
       ;;
     *)
       echo "Unknown command: $CMD" >&2

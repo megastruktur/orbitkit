@@ -1,0 +1,13 @@
+=== Planting stale executable 'orbitkit' with older mtime ===
+-rwxr-xr-x 1 megastruktur megastruktur 199785040 Jan  1  2020 examples/starter/src-tauri/target-linux/debug/orbitkit
+-rwxr-xr-x 2 megastruktur megastruktur 199785040 Sep 23 13:51 examples/starter/src-tauri/target-linux/debug/starter
+=== Running container exec with stale orbitkit present ===
+Launching exec container for /home/megastruktur/orca/workspaces/orbitkit/oks-starter-example/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/oks-starter-example/examples/starter/src-tauri/target-linux/exec-app.log
+Inspecting running process command line:
+    PID COMMAND         COMMAND
+     54 starter         /home/megastruktur/orca/workspaces/orbitkit/oks-starter-example/examples/starter/src-tauri/target-linux/debug/starter
+Running binary from /proc/54/exe: /home/megastruktur/orca/workspaces/orbitkit/oks-starter-example/examples/starter/src-tauri/target-linux/debug/starter
+VERIFIED: Running binary is starter, NOT stale orbitkit!
+Cleaning up planted stale orbitkit...
+EXIT_CODE=0

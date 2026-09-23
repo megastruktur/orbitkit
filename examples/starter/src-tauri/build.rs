@@ -11,9 +11,9 @@ fn main() {
   ]
 }
 "#;
-        let _ = std::fs::write(cap_path, json);
+        std::fs::write(cap_path, json).expect("Failed to write capabilities/recorder.json");
     } else if cap_path.exists() {
-        let _ = std::fs::remove_file(cap_path);
+        std::fs::remove_file(cap_path).expect("Failed to remove capabilities/recorder.json");
     }
     println!("cargo:rerun-if-env-changed=CARGO_FEATURE_RECORDER");
     tauri_build::build();

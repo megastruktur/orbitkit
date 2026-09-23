@@ -3,10 +3,12 @@ import MainView from "./views/MainView.svelte";
 import MascotView from "./views/MascotView.svelte";
 import NotesPopup from "./views/NotesPopup.svelte";
 import SettingsPopup from "./views/SettingsPopup.svelte";
+import UnknownPopup from "./views/UnknownPopup.svelte";
 
 const params = new URLSearchParams(window.location.search);
 
-let ActiveView: Component = MainView;
+let ActiveView: Component<any> = MainView;
+let viewProps: Record<string, any> = {};
 
 if (params.get("orbitkit") === "mascot") {
   ActiveView = MascotView;
@@ -17,12 +19,14 @@ if (params.get("orbitkit") === "mascot") {
   } else if (popupId === "settings") {
     ActiveView = SettingsPopup;
   } else {
-    ActiveView = NotesPopup;
+    ActiveView = UnknownPopup;
+    viewProps = { id: popupId ?? "" };
   }
 }
 
 const app = mount(ActiveView, {
   target: document.getElementById("app")!,
+  props: viewProps,
 });
 
 export default app;

@@ -98,7 +98,7 @@ When an Android device or emulator is connected via ADB:
    adb shell am start -n dev.orbitkit.app/dev.orbitkit.app.MainActivity
    ```
 5. **Display Floating Mascot Overlay**:
-   Tap the **Show Overlay** button in the app or dispatch via native intent:
+   Tap the **Show Overlay** button in the app.
    The floating mascot bubble will appear on top of other applications.
 6. **Interact with Radial Menu**:
    - Tap the mascot bubble: radial menu items (`notes`, `timer`, `settings`, `about`, `quit`) expand.

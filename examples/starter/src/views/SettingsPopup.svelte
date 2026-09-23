@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { setMascotState, onMascotState } from "@orbitkit/ui";
+  import config from "../orbitkit.config";
 
   let currentState = $state<string>("idle");
   let statusText = $state<string>("Ready");
 
-  const availableStates = ["idle", "busy", "active", "attention"];
+  const configuredStates = Object.keys(config.mascot.states ?? {});
+  const availableStates = configuredStates.length > 0 ? configuredStates : ["idle"];
 
   async function changeState(newState: string) {
     try {

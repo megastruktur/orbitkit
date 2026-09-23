@@ -108,3 +108,9 @@ scripts/linux-desktop.sh build examples/starter
 - [Extension Guide](docs/extensions.md) — Writing modular extensions (audio recorder reference).
 - [Development & CI Guide](docs/development.md) — Workspace scripts, dev-only env hooks, and CI workflows.
 - [Changelog](CHANGELOG.md) — Release notes and version history.
+
+---
+
+## License
+
+TBD — no license has been chosen yet (owner decision pending).

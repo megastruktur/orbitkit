@@ -156,11 +156,9 @@ To build the Android APK or run unit tests from the workspace:
 # Build debug APK for arm64
 pnpm --filter starter tauri android build --debug --target aarch64 --apk
 
-# Run unit tests for core native Android plugin
-cd crates/tauri-plugin-orbitkit/android
-./gradlew testDebugUnitTest
-
-# Run starter Android app unit tests (including JNI survival tests)
+# Run Android unit tests (the plugin library modules are included in the starter's Gradle project)
 cd examples/starter/src-tauri/gen/android
-./gradlew testUniversalDebugUnitTest
+./gradlew :tauri-plugin-orbitkit:testDebugUnitTest   # core native plugin
+./gradlew :app:testUniversalDebugUnitTest            # starter app (JNI survival tests)
+./gradlew test                                       # everything, as CI runs it
 ```

@@ -121,6 +121,24 @@ class OrbitkitRecorderService : Service() {
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             nm?.cancel(STANDBY_NOTIFICATION_ID)
         }
+
+        fun dispatchJni(action: String) {
+            try {
+                val clazz = Class.forName("dev.orbitkit.native.OrbitkitJniBridge")
+                val method = clazz.getMethod("dispatchNativeAction", String::class.java)
+                method.invoke(null, action)
+            } catch (_: Throwable) {
+            }
+        }
+
+        fun ensureJniLoaded() {
+            try {
+                val clazz = Class.forName("dev.orbitkit.native.OrbitkitJniBridge")
+                val method = clazz.getMethod("ensureLoaded")
+                method.invoke(null)
+            } catch (_: Throwable) {
+            }
+        }
     }
 
     private var audioRecord: AudioRecord? = null
@@ -135,7 +153,7 @@ class OrbitkitRecorderService : Service() {
         super.onCreate()
         Log.i(TAG, "OrbitkitRecorderService onCreate")
         createNotificationChannel(this)
-        OrbitkitJniBridge.ensureLoaded()
+        ensureJniLoaded()
         val recovered = OrbitkitStatePersistence.recoverState(this)
         Log.i(TAG, "[C4-PERSISTENCE] Service onCreate: recovered state=${recovered.state}, bytes=${recovered.bytesRecorded}, recoveryCount=${recovered.recoveryCount}")
     }
@@ -263,7 +281,7 @@ class OrbitkitRecorderService : Service() {
                 "START_FOREGROUND",
                 true
             )
-            OrbitkitJniBridge.dispatchNativeAction("REC_START")
+            dispatchJni("REC_START")
             // 4. Start spooling thread
             recordingThread = Thread({
                 val buffer = ByteArray(bufferSize)
@@ -344,7 +362,7 @@ class OrbitkitRecorderService : Service() {
                 "PAUSE",
                 true
             )
-            OrbitkitJniBridge.dispatchNativeAction("REC_PAUSE")
+            dispatchJni("REC_PAUSE")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to pause AudioRecord", e)
             lastError = "Pause error: ${e.message}"
@@ -371,7 +389,7 @@ class OrbitkitRecorderService : Service() {
                 "RESUME",
                 true
             )
-            OrbitkitJniBridge.dispatchNativeAction("REC_RESUME")
+            dispatchJni("REC_RESUME")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to resume AudioRecord", e)
             lastError = "Resume error: ${e.message}"
@@ -422,7 +440,7 @@ class OrbitkitRecorderService : Service() {
             "STOP",
             false
         )
-        OrbitkitJniBridge.dispatchNativeAction("REC_STOP")
+        dispatchJni("REC_STOP")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         } else {

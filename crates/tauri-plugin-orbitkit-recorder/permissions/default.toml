@@ -1,0 +1,13 @@
+"$schema" = "schemas/schema.json"
+[default]
+description = "Default permissions for OrbitKit Recorder plugin"
+permissions = [
+    "allow-start-foreground",
+    "allow-pause",
+    "allow-resume",
+    "allow-stop",
+    "allow-state",
+    "allow-post-standby-notification",
+    "allow-get-persisted-state",
+    "allow-recover-state",
+]

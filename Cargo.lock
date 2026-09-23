@@ -2884,6 +2884,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-orbitkit",
+ "tauri-plugin-orbitkit-recorder",
 ]
 
 [[package]]
@@ -3180,6 +3181,19 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-orbitkit"
+version = "0.1.0"
+dependencies = [
+ "jni",
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "tauri-plugin-orbitkit-recorder"
 version = "0.1.0"
 dependencies = [
  "jni",

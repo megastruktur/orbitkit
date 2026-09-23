@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import Mascot from "./lib/Mascot.svelte";
 
@@ -18,6 +19,25 @@
   let recBytesRecorded = $state<number>(0);
   let recIsForeground = $state<boolean>(false);
 
+  let hasRecorderPlugin = $state<boolean>(false);
+
+  async function checkRecorderPlugin() {
+    try {
+      const res = await invoke<RecorderState>("plugin:orbitkit-recorder|state");
+      hasRecorderPlugin = true;
+      recState = res.state;
+      recSpoolPath = res.spoolPath;
+      recBytesRecorded = res.bytesRecorded;
+      recIsForeground = res.isForeground;
+    } catch {
+      hasRecorderPlugin = false;
+    }
+  }
+
+  onMount(() => {
+    checkPermission();
+    checkRecorderPlugin();
+  });
   async function checkPermission() {
     try {
       lastError = null;
@@ -71,7 +91,7 @@
   async function pollState() {
     try {
       lastError = null;
-      const res = await invoke<RecorderState>("recorderState");
+      const res = await invoke<RecorderState>("plugin:orbitkit-recorder|state");
       recState = res.state;
       recSpoolPath = res.spoolPath;
       recBytesRecorded = res.bytesRecorded;
@@ -87,7 +107,7 @@
     try {
       lastError = null;
       statusMessage = "Starting mic-FGS from visible Activity (S1)...";
-      await invoke("recorderStartForeground");
+      await invoke("plugin:orbitkit-recorder|start_foreground");
       statusMessage = "recorderStartForeground invoked successfully";
       await pollState();
     } catch (err: any) {
@@ -100,7 +120,7 @@
     try {
       lastError = null;
       statusMessage = "Pausing recorder (internal AudioRecord stop)...";
-      await invoke("recorderPause");
+      await invoke("plugin:orbitkit-recorder|pause");
       statusMessage = "recorderPause invoked";
       await pollState();
     } catch (err: any) {
@@ -113,7 +133,7 @@
     try {
       lastError = null;
       statusMessage = "Resuming recorder (AudioRecord start)...";
-      await invoke("recorderResume");
+      await invoke("plugin:orbitkit-recorder|resume");
       statusMessage = "recorderResume invoked";
       await pollState();
     } catch (err: any) {
@@ -126,7 +146,7 @@
     try {
       lastError = null;
       statusMessage = "Stopping recorder and FGS...";
-      await invoke("recorderStop");
+      await invoke("plugin:orbitkit-recorder|stop");
       statusMessage = "recorderStop invoked";
       await pollState();
     } catch (err: any) {
@@ -139,7 +159,7 @@
     try {
       lastError = null;
       statusMessage = "Posting standby notification for S3b candidate test...";
-      await invoke("recorderPostStandbyNotification");
+      await invoke("plugin:orbitkit-recorder|post_standby_notification");
       statusMessage = "S3b standby notification posted. Background app & tap START in notification.";
     } catch (err: any) {
       lastError = String(err?.message || err);
@@ -166,7 +186,7 @@
     try {
       lastError = null;
       statusMessage = "Querying C4 persistence file...";
-      const res = await invoke<PersistedStateInfo>("recorderGetPersistedState");
+      const res = await invoke<PersistedStateInfo>("plugin:orbitkit-recorder|get_persisted_state");
       persistedState = res;
       statusMessage = `C4 Persisted: ${res.state} | ${res.bytesRecorded}B | pid=${res.processPid} | recovCount=${res.recoveryCount}`;
     } catch (err: any) {
@@ -179,7 +199,7 @@
     try {
       lastError = null;
       statusMessage = "Recovering C4 state...";
-      const res = await invoke<PersistedStateInfo>("recorderRecoverState");
+      const res = await invoke<PersistedStateInfo>("plugin:orbitkit-recorder|recover_state");
       persistedState = res;
       statusMessage = `C4 Recovered: ${res.state} | ${res.bytesRecorded}B | recoveryCount=${res.recoveryCount}`;
     } catch (err: any) {
@@ -215,23 +235,25 @@
       </span>
     </div>
 
-    <div class="status-row">
-      <span class="label">Recorder State:</span>
-      <span class="badge" class:granted={recState === "RECORDING"} class:paused={recState === "PAUSED"} class:denied={recState === "STOPPED" || recState === "IDLE"}>
-        {recState} {recIsForeground ? "(FGS)" : ""}
-      </span>
-    </div>
-
-    <div class="status-subrow">
-      <span class="sublabel">Bytes Spooled:</span>
-      <span class="subval">{recBytesRecorded.toLocaleString()} B</span>
-    </div>
-
-    {#if recSpoolPath}
-      <div class="status-subrow">
-        <span class="sublabel">Spool File:</span>
-        <span class="subval path">{recSpoolPath}</span>
+    {#if hasRecorderPlugin}
+      <div class="status-row">
+        <span class="label">Recorder State:</span>
+        <span class="badge" class:granted={recState === "RECORDING"} class:paused={recState === "PAUSED"} class:denied={recState === "STOPPED" || recState === "IDLE"}>
+          {recState} {recIsForeground ? "(FGS)" : ""}
+        </span>
       </div>
+
+      <div class="status-subrow">
+        <span class="sublabel">Bytes Spooled:</span>
+        <span class="subval">{recBytesRecorded.toLocaleString()} B</span>
+      </div>
+
+      {#if recSpoolPath}
+        <div class="status-subrow">
+          <span class="sublabel">Spool File:</span>
+          <span class="subval path">{recSpoolPath}</span>
+        </div>
+      {/if}
     {/if}
 
     <div class="section-title">Overlay Controls</div>
@@ -242,38 +264,44 @@
       <button class="secondary" onclick={hideOverlay}>overlayHide</button>
     </div>
 
-    <div class="section-title">Mic-FGS Scenario Actions</div>
-    <div class="button-grid">
-      <button class="rec-start" onclick={startRecordingS1}>S1: Start FGS</button>
-      <button onclick={pollState}>Poll State</button>
-      <button class="rec-pause" onclick={pauseRecording}>S2: Pause</button>
-      <button class="rec-resume" onclick={resumeRecording}>S2: Resume</button>
-      <button class="rec-stop" onclick={stopRecording}>S2: Stop</button>
-      <button class="rec-standby" onclick={postStandbyNotificationS3b}>S3b: Standby Notif</button>
-    </div>
-
-    <div class="section-title">C4 Persistence & JNI Bridge</div>
-    <div class="button-grid">
-      <button onclick={queryPersistedState}>Query State File</button>
-      <button onclick={recoverStateManually}>Recover State</button>
-      <button onclick={queryJniLog}>Query JNI ({jniActionCount})</button>
-    </div>
-
-    {#if persistedState}
-      <div class="status-subrow">
-        <span class="sublabel">Persisted:</span>
-        <span class="subval">{persistedState.state} ({persistedState.bytesRecorded}B, recov={persistedState.recoveryCount})</span>
+    {#if hasRecorderPlugin}
+      <div class="section-title">Mic-FGS Scenario Actions</div>
+      <div class="button-grid">
+        <button class="rec-start" onclick={startRecordingS1}>S1: Start FGS</button>
+        <button onclick={pollState}>Poll State</button>
+        <button class="rec-pause" onclick={pauseRecording}>S2: Pause</button>
+        <button class="rec-resume" onclick={resumeRecording}>S2: Resume</button>
+        <button class="rec-stop" onclick={stopRecording}>S2: Stop</button>
+        <button class="rec-standby" onclick={postStandbyNotificationS3b}>S3b: Standby Notif</button>
       </div>
-      <div class="status-subrow">
-        <span class="sublabel">Last Action:</span>
-        <span class="subval">{persistedState.lastAction}</span>
+
+      <div class="section-title">C4 Persistence</div>
+      <div class="button-grid">
+        <button onclick={queryPersistedState}>Query State File</button>
+        <button onclick={recoverStateManually}>Recover State</button>
+      </div>
+
+      {#if persistedState}
+        <div class="status-subrow">
+          <span class="sublabel">Persisted:</span>
+          <span class="subval">{persistedState.state} ({persistedState.bytesRecorded}B, recov={persistedState.recoveryCount})</span>
+        </div>
+        <div class="status-subrow">
+          <span class="sublabel">Last Action:</span>
+          <span class="subval">{persistedState.lastAction}</span>
+        </div>
+      {/if}
+      <div class="scenario-hints">
+        <div class="hint"><strong>S1:</strong> Start FGS from visible Activity.</div>
+        <div class="hint"><strong>S2:</strong> Background app; use overlay buttons to Pause/Resume/Stop.</div>
+        <div class="hint"><strong>S3:</strong> Background app; tap START on overlay (cold start gate).</div>
+        <div class="hint"><strong>S3b:</strong> Tap Standby Notif; background app; tap START in notification.</div>
       </div>
     {/if}
-    <div class="scenario-hints">
-      <div class="hint"><strong>S1:</strong> Start FGS from visible Activity.</div>
-      <div class="hint"><strong>S2:</strong> Background app; use overlay buttons to Pause/Resume/Stop.</div>
-      <div class="hint"><strong>S3:</strong> Background app; tap START on overlay (cold start gate).</div>
-      <div class="hint"><strong>S3b:</strong> Tap Standby Notif; background app; tap START in notification.</div>
+
+    <div class="section-title">JNI Bridge</div>
+    <div class="button-grid">
+      <button onclick={queryJniLog}>Query JNI ({jniActionCount})</button>
     </div>
 
     <div class="status-box">

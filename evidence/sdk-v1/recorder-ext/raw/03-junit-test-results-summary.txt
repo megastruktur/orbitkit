@@ -1,0 +1,12 @@
+=== Android JUnit Test Results Summary ===
+[tauri-plugin-orbitkit-recorder] dev.orbitkit.native.OrbitkitRecorderPersistenceTest: tests=13, failures=0, errors=0, skipped=0
+[tauri-plugin-orbitkit (NativePlugin)] dev.orbitkit.native.OrbitkitNativePluginTest: tests=9, failures=0, errors=0, skipped=0
+[tauri-plugin-orbitkit (MenuParser)] dev.orbitkit.native.MenuConfigParserTest: tests=10, failures=0, errors=0, skipped=0
+[tauri-plugin-orbitkit (ActionDispatcher)] dev.orbitkit.native.OverlayActionDispatcherTest: tests=6, failures=0, errors=0, skipped=0
+[tauri-plugin-orbitkit (RadialLayout)] dev.orbitkit.native.RadialLayoutTest: tests=11, failures=0, errors=0, skipped=0
+[starter app (SurvivalJni)] dev.orbitkit.native.OrbitkitSurvivalJniTest: tests=4, failures=0, errors=0, skipped=0
+------------------------------------------
+TOTAL: tests=53, failures=0, errors=0, skipped=0
+Baseline comparison: 13 tests in recorder module + 9 core native plugin tests = 22 tests (matching spike 22/22 baseline)
+Full workspace suite: 53 tests passed, 0 failures, 0 errors, 0 skipped
+EXIT_CODE=0

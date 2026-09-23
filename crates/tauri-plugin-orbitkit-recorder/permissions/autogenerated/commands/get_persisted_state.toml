@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-persisted-state"
+description = "Enables the get_persisted_state command without any pre-configured scope."
+commands.allow = ["get_persisted_state"]
+
+[[permission]]
+identifier = "deny-get-persisted-state"
+description = "Denies the get_persisted_state command without any pre-configured scope."
+commands.deny = ["get_persisted_state"]

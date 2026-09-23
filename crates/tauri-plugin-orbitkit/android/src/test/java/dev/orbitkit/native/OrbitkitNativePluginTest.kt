@@ -66,27 +66,6 @@ class OrbitkitNativePluginTest {
         assertNotNull("OverlayShowArgs must be annotated @InvokeArg", annotation)
     }
 
-    @Test
-    fun testC2RecorderCommandsPresentAndAnnotated() {
-        val clazz = OrbitkitNativePlugin::class.java
-        val requiredRecorderCommands = listOf(
-            "recorderStartForeground",
-            "recorderPause",
-            "recorderResume",
-            "recorderStop",
-            "recorderState",
-            "recorderGetPersistedState",
-            "recorderRecoverState"
-        )
-
-        for (cmdName in requiredRecorderCommands) {
-            val method = clazz.getMethod(cmdName, Invoke::class.java)
-            assertNotNull("Method $cmdName(Invoke) must exist on OrbitkitNativePlugin", method)
-            assertTrue("Method $cmdName must be public", Modifier.isPublic(method.modifiers))
-            val cmdAnnotation = method.getAnnotation(Command::class.java)
-            assertNotNull("Method $cmdName must be annotated with @Command", cmdAnnotation)
-        }
-    }
 
     @Test
     fun testJniBridgeClassAndMethodsReflection() {

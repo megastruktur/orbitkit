@@ -1,0 +1,11 @@
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-radial-menu/packages/orbitkit
+
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  06:35:49
+   Duration  891ms (environment 61%, transform 23%, tests 9%, import 7%)
+
+EXIT_CODE=0

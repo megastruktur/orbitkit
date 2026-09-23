@@ -1,0 +1,90 @@
+=== ORBITKIT API CROSSCHECK (CODE-ONLY ROOTS) ===
+Searching for 80 documented symbols across 95 code files (0 markdown files)...
+
+[FOUND] Mascot -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/MenuConfigParser.kt:43
+[FOUND] RadialMenu -> examples/starter/src/views/MascotView.svelte:5
+[FOUND] layoutItems -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/RadialLayout.kt:22
+[FOUND] ItemPosition -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/RadialLayout.kt:14
+[FOUND] defineConfig -> examples/starter/src/orbitkit.config.ts:1
+[FOUND] validateConfig -> examples/starter/src/orbitkit.config.ts:1
+[FOUND] withDefaults -> packages/orbitkit/src/config.test.ts:5
+[FOUND] MENU_ITEM_ID_REGEX -> packages/orbitkit/src/config.ts:73
+[FOUND] isTauri -> packages/orbitkit/src/bridge.test.ts:7
+[FOUND] normalizeError -> packages/orbitkit/src/bridge.test.ts:8
+[FOUND] overlayPermission -> examples/starter/src/views/MainView.svelte:7
+[FOUND] requestOverlayPermission -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:80
+[FOUND] showOverlay -> examples/starter/src/views/MainView.svelte:5
+[FOUND] hideOverlay -> examples/starter/src/views/MainView.svelte:6
+[FOUND] openPopup -> packages/orbitkit/src/bridge.test.ts:11
+[FOUND] closePopup -> packages/orbitkit/src/bridge.test.ts:4
+[FOUND] setMascotState -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:223
+[FOUND] emitMenuAction -> examples/starter/src/views/MascotView.svelte:6
+[FOUND] onMenuAction -> examples/starter/src/views/MainView.svelte:9
+[FOUND] onMascotState -> examples/starter/src/views/MascotView.svelte:7
+[FOUND] OrbitKitError -> packages/orbitkit/src/bridge.test.ts:12
+[FOUND] OrbitKitErrorCode -> packages/orbitkit/src/bridge.ts:5
+[FOUND] ShowOverlayOptions -> packages/orbitkit/src/bridge.ts:115
+[FOUND] OrbitKitConfig -> crates/tauri-plugin-orbitkit/src/config.rs:188
+[FOUND] MascotConfig -> crates/tauri-plugin-orbitkit/src/config.rs:60
+[FOUND] MenuConfig -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/MenuConfigParser.kt:21
+[FOUND] WindowsConfig -> crates/tauri-plugin-orbitkit/src/config.rs:179
+[FOUND] PopupConfig -> crates/tauri-plugin-orbitkit/src/config.rs:153
+[FOUND] MenuItem -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/MenuConfigParser.kt:11
+[FOUND] ValidationResult -> packages/orbitkit/src/config.ts:113
+[FOUND] init -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:262
+[FOUND] OrbitkitExt -> crates/tauri-plugin-orbitkit/src/commands.rs:4
+[FOUND] on_menu_action -> crates/tauri-plugin-orbitkit/src/lib.rs:43
+[FOUND] orbitkit -> crates/tauri-plugin-orbitkit-recorder/Cargo.toml:2
+[FOUND] MenuAction -> crates/tauri-plugin-orbitkit/android/src/test/java/dev/orbitkit/native/OverlayActionDispatcherTest.kt:12
+[FOUND] JniActionRecord -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:41
+[FOUND] register_menu_action_handler -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:108
+[FOUND] get_jni_action_log -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:166
+[FOUND] calculate_overlay_size -> crates/tauri-plugin-orbitkit/src/desktop.rs:9
+[FOUND] calculate_overlay_position -> crates/tauri-plugin-orbitkit/src/desktop.rs:35
+[FOUND] resolve_mascot_window -> crates/tauri-plugin-orbitkit/src/desktop.rs:70
+[FOUND] lookup_popup -> crates/tauri-plugin-orbitkit/src/desktop.rs:48
+[FOUND] MonitorBounds -> crates/tauri-plugin-orbitkit/src/desktop.rs:19
+[FOUND] ResolvedMascotWindow -> crates/tauri-plugin-orbitkit/src/desktop.rs:58
+[FOUND] ErrorCode -> crates/tauri-plugin-orbitkit-recorder/src/error.rs:7
+[FOUND] overlay_permission -> crates/tauri-plugin-orbitkit/build.rs:2
+[FOUND] request_overlay_permission -> crates/tauri-plugin-orbitkit/build.rs:3
+[FOUND] show_overlay -> crates/tauri-plugin-orbitkit/build.rs:4
+[FOUND] hide_overlay -> crates/tauri-plugin-orbitkit/build.rs:5
+[FOUND] open_popup -> crates/tauri-plugin-orbitkit/build.rs:6
+[FOUND] close_popup -> crates/tauri-plugin-orbitkit/build.rs:7
+[FOUND] set_mascot_state -> crates/tauri-plugin-orbitkit/build.rs:8
+[FOUND] emit_menu_action -> crates/tauri-plugin-orbitkit/build.rs:9
+[FOUND] orbitkit://menu-action -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OverlayActionDispatcher.kt:61
+[FOUND] orbitkit://mascot-state -> crates/tauri-plugin-orbitkit/src/desktop.rs:294
+[FOUND] permission_denied -> crates/tauri-plugin-orbitkit-recorder/src/error.rs:35
+[FOUND] unsupported -> crates/tauri-plugin-orbitkit-recorder/src/error.rs:39
+[FOUND] not_found -> crates/tauri-plugin-orbitkit/src/desktop.rs:55
+[FOUND] invalid_config -> crates/tauri-plugin-orbitkit/src/desktop.rs:264
+[FOUND] OrbitkitNativePlugin -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:40
+[FOUND] OrbitkitJniBridge -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:127
+[FOUND] onNativeAction -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:52
+[FOUND] Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:52
+[FOUND] TYPE_APPLICATION_OVERLAY -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:163
+[FOUND] SYSTEM_ALERT_WINDOW -> crates/tauri-plugin-orbitkit/android/src/main/AndroidManifest.xml:3
+[FOUND] OrbitkitRecorderExt -> crates/tauri-plugin-orbitkit-recorder/src/commands.rs:3
+[FOUND] OrbitkitRecorderService -> crates/tauri-plugin-orbitkit-recorder/android/src/main/AndroidManifest.xml:10
+[FOUND] OrbitkitStatePersistence -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:157
+[FOUND] start_foreground -> crates/tauri-plugin-orbitkit-recorder/build.rs:2
+[FOUND] pause -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:348
+[FOUND] resume -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:375
+[FOUND] stop -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:203
+[FOUND] state -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:51
+[FOUND] post_standby_notification -> crates/tauri-plugin-orbitkit-recorder/build.rs:7
+[FOUND] get_persisted_state -> crates/tauri-plugin-orbitkit-recorder/build.rs:8
+[FOUND] recover_state -> crates/tauri-plugin-orbitkit-recorder/build.rs:9
+[FOUND] RecorderStateResponse -> crates/tauri-plugin-orbitkit-recorder/src/commands.rs:3
+[FOUND] ORBITKIT_SELFTEST -> crates/tauri-plugin-orbitkit/src/desktop.rs:96
+[FOUND] ORBITKIT_SELFTEST_CONFIG -> crates/tauri-plugin-orbitkit/src/desktop.rs:112
+[FOUND] linux-desktop.sh -> scripts/linux-desktop.sh:2
+
+=== SUMMARY ===
+Total symbols checked: 80
+Found: 80
+Missing: 0
+Result: PASS (0 missing symbols)
+exit_code=0

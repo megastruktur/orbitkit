@@ -1,0 +1,90 @@
+=== ORBITKIT API CROSSCHECK (CODE-ONLY ROOTS) ===
+Searching for 80 documented symbols across 96 code files (0 markdown files)...
+
+[FOUND] Mascot -> packages/orbitkit/src/Mascot.svelte:2
+[FOUND] RadialMenu -> packages/orbitkit/src/RadialMenu.test.ts:3
+[FOUND] layoutItems -> packages/orbitkit/src/RadialMenu.svelte:3
+[FOUND] ItemPosition -> packages/orbitkit/src/geometry.ts:1
+[FOUND] defineConfig -> packages/orbitkit/src/config.test.ts:3
+[FOUND] validateConfig -> packages/orbitkit/src/config.test.ts:4
+[FOUND] withDefaults -> packages/orbitkit/src/config.test.ts:5
+[FOUND] MENU_ITEM_ID_REGEX -> packages/orbitkit/src/config.ts:73
+[FOUND] isTauri -> packages/orbitkit/src/bridge.test.ts:7
+[FOUND] normalizeError -> packages/orbitkit/src/bridge.test.ts:8
+[FOUND] overlayPermission -> packages/orbitkit/src/bridge.test.ts:13
+[FOUND] requestOverlayPermission -> packages/orbitkit/src/bridge.test.ts:14
+[FOUND] showOverlay -> packages/orbitkit/src/bridge.test.ts:16
+[FOUND] hideOverlay -> packages/orbitkit/src/bridge.test.ts:6
+[FOUND] openPopup -> packages/orbitkit/src/bridge.test.ts:11
+[FOUND] closePopup -> packages/orbitkit/src/bridge.test.ts:4
+[FOUND] setMascotState -> packages/orbitkit/src/bridge.test.ts:15
+[FOUND] emitMenuAction -> packages/orbitkit/src/bridge.test.ts:5
+[FOUND] onMenuAction -> packages/orbitkit/src/bridge.test.ts:10
+[FOUND] onMascotState -> packages/orbitkit/src/bridge.test.ts:9
+[FOUND] OrbitKitError -> packages/orbitkit/src/bridge.test.ts:12
+[FOUND] OrbitKitErrorCode -> packages/orbitkit/src/bridge.ts:5
+[FOUND] ShowOverlayOptions -> packages/orbitkit/src/bridge.ts:115
+[FOUND] OrbitKitConfig -> packages/orbitkit/src/config.test.ts:7
+[FOUND] MascotConfig -> packages/orbitkit/src/Mascot.svelte:2
+[FOUND] MenuConfig -> packages/orbitkit/src/RadialMenu.svelte:2
+[FOUND] WindowsConfig -> packages/orbitkit/src/config.ts:48
+[FOUND] PopupConfig -> packages/orbitkit/src/config.ts:38
+[FOUND] MenuItem -> packages/orbitkit/src/config.ts:22
+[FOUND] ValidationResult -> packages/orbitkit/src/config.ts:113
+[FOUND] init -> packages/orbitkit/src/Mascot.svelte:27
+[FOUND] OrbitkitExt -> crates/tauri-plugin-orbitkit/src/commands.rs:4
+[FOUND] on_menu_action -> crates/tauri-plugin-orbitkit/src/lib.rs:43
+[FOUND] orbitkit -> packages/orbitkit/src/Mascot.svelte:78
+[FOUND] MenuAction -> packages/orbitkit/src/bridge.test.ts:5
+[FOUND] JniActionRecord -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:41
+[FOUND] register_menu_action_handler -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:108
+[FOUND] get_jni_action_log -> crates/tauri-plugin-orbitkit/src/jni_bridge.rs:166
+[FOUND] calculate_overlay_size -> crates/tauri-plugin-orbitkit/src/desktop.rs:9
+[FOUND] calculate_overlay_position -> crates/tauri-plugin-orbitkit/src/desktop.rs:35
+[FOUND] resolve_mascot_window -> crates/tauri-plugin-orbitkit/src/desktop.rs:70
+[FOUND] lookup_popup -> crates/tauri-plugin-orbitkit/src/desktop.rs:48
+[FOUND] MonitorBounds -> crates/tauri-plugin-orbitkit/src/desktop.rs:19
+[FOUND] ResolvedMascotWindow -> crates/tauri-plugin-orbitkit/src/desktop.rs:58
+[FOUND] ErrorCode -> packages/orbitkit/src/bridge.ts:5
+[FOUND] overlay_permission -> packages/orbitkit/src/bridge.test.ts:76
+[FOUND] request_overlay_permission -> packages/orbitkit/src/bridge.test.ts:136
+[FOUND] show_overlay -> packages/orbitkit/src/bridge.test.ts:147
+[FOUND] hide_overlay -> packages/orbitkit/src/bridge.test.ts:169
+[FOUND] open_popup -> packages/orbitkit/src/bridge.test.ts:180
+[FOUND] close_popup -> packages/orbitkit/src/bridge.test.ts:195
+[FOUND] set_mascot_state -> packages/orbitkit/src/bridge.test.ts:210
+[FOUND] emit_menu_action -> packages/orbitkit/src/bridge.test.ts:225
+[FOUND] orbitkit://menu-action -> packages/orbitkit/src/bridge.test.ts:250
+[FOUND] orbitkit://mascot-state -> packages/orbitkit/src/bridge.test.ts:299
+[FOUND] permission_denied -> packages/orbitkit/src/bridge.test.ts:357
+[FOUND] unsupported -> packages/orbitkit/src/bridge.test.ts:421
+[FOUND] not_found -> packages/orbitkit/src/bridge.test.ts:378
+[FOUND] invalid_config -> packages/orbitkit/src/bridge.test.ts:399
+[FOUND] OrbitkitNativePlugin -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:40
+[FOUND] OrbitkitJniBridge -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:5
+[FOUND] onNativeAction -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:52
+[FOUND] Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:52
+[FOUND] TYPE_APPLICATION_OVERLAY -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:163
+[FOUND] SYSTEM_ALERT_WINDOW -> crates/tauri-plugin-orbitkit/android/src/main/AndroidManifest.xml:3
+[FOUND] OrbitkitRecorderExt -> crates/tauri-plugin-orbitkit-recorder/src/commands.rs:3
+[FOUND] OrbitkitRecorderService -> crates/tauri-plugin-orbitkit-recorder/android/src/main/AndroidManifest.xml:10
+[FOUND] OrbitkitStatePersistence -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:157
+[FOUND] start_foreground -> crates/tauri-plugin-orbitkit-recorder/build.rs:2
+[FOUND] pause -> crates/tauri-plugin-orbitkit/android/src/test/java/dev/orbitkit/native/MenuConfigParserTest.kt:51
+[FOUND] resume -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:375
+[FOUND] stop -> packages/orbitkit/src/RadialMenu.svelte:70
+[FOUND] state -> packages/orbitkit/src/Mascot.svelte:8
+[FOUND] post_standby_notification -> crates/tauri-plugin-orbitkit-recorder/build.rs:7
+[FOUND] get_persisted_state -> crates/tauri-plugin-orbitkit-recorder/build.rs:8
+[FOUND] recover_state -> crates/tauri-plugin-orbitkit-recorder/build.rs:9
+[FOUND] RecorderStateResponse -> crates/tauri-plugin-orbitkit-recorder/src/commands.rs:3
+[FOUND] ORBITKIT_SELFTEST -> crates/tauri-plugin-orbitkit/src/desktop.rs:96
+[FOUND] ORBITKIT_SELFTEST_CONFIG -> crates/tauri-plugin-orbitkit/src/desktop.rs:112
+[FOUND] linux-desktop.sh -> scripts/linux-desktop.sh:2
+
+=== SUMMARY ===
+Total symbols checked: 80
+Found: 80
+Missing: 0
+Result: PASS (0 missing symbols)
+exit_code=0

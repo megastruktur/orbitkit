@@ -120,3 +120,27 @@ Recorder extension crate's own manifest carries mic + FGS perms. Desktop capabil
 - Device: Z Flip 7 via adb, MAY be absent. Probe `adb devices -l` at test time; if absent, write the
   on-device runbook + mark those scenarios DEFERRED (never claimed passed). If present, run them.
 - Evidence: `evidence/sdk-v1/<task>/` in-repo, committed (REPORT.md + raw/). Commit before handoff.
+
+## Amendments (Settled during sdk-v1 execution)
+
+The following amendments were ratified across the campaign gates without altering the frozen text above:
+
+1. **K1-A1 — TypeScript Toolchain Versioning:**
+   `packages/orbitkit` specifies `typescript: 6.0.3` in `devDependencies` and root `pnpm-workspace.yaml` declares `packageExtensions` providing `peerDependencies` `typescript: "*"` for `@sveltejs/package` packaging compatibility. `examples/starter` uses TypeScript `7.0.2`.
+
+2. **K3-A1 — Additional Barrel Export (`ItemPosition`):**
+   The public `@orbitkit/ui` barrel (`packages/orbitkit/src/index.ts`) exports `type { ItemPosition } from "./geometry.js"`. This exposes `{ x: number, y: number, angle: number }` for consumers calculating custom radial menu layouts.
+
+3. **K3-A2 — Vitest Test Environment Resolution:**
+   `packages/orbitkit/vitest.config.ts` configures `resolve: { conditions: ["browser"] }`, allowing Svelte 5 browser-runtime components to mount directly in test runners without mock shims.
+
+4. **K3-A3 — Mascot SVG Security Sandbox:**
+   Inline SVG strings are strictly encoded into data URLs (`data:image/svg+xml;charset=utf-8,...`) and rendered solely through HTML `<img>` elements (`packages/orbitkit/src/mascot/svg.ts`). Direct inline SVG injection and `{@html}` rendering are forbidden to prevent script execution, DOM clobbering, and mutation cross-site scripting (mXSS).
+
+5. **K4 — Strict Error Code Union & Unknown Rejections:**
+   The plugin error union is strictly limited to four typed codes:
+   `"permission_denied" | "unsupported" | "not_found" | "invalid_config"`.
+   Any platform rejections or unknown mobile error codes map deterministically to `"unsupported"`.
+
+6. **K4 — Internal Menu Action Dispatch (`emit_menu_action`):**
+   `emit_menu_action` (`{ id: string }`) is registered as a first-class plugin command (`plugin:orbitkit|emit_menu_action`) to allow frontend webviews to dispatch menu actions through the same unified pipeline as native overlay clicks.

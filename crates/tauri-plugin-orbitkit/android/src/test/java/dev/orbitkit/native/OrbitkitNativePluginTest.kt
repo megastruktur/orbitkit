@@ -28,17 +28,14 @@ class OrbitkitNativePluginTest {
     fun testTauriPluginAnnotation() {
         val clazz = OrbitkitNativePlugin::class.java
         val annotation = clazz.getAnnotation(TauriPlugin::class.java)
-        assertNotNull(
-            "OrbitkitNativePlugin must be annotated with @TauriPlugin",
-            annotation
-        )
+        assertNotNull("OrbitkitNativePlugin must be annotated with @TauriPlugin", annotation)
     }
 
     @Test
     fun testActivityConstructor() {
         val clazz = OrbitkitNativePlugin::class.java
         val ctor = clazz.getConstructor(Activity::class.java)
-        assertNotNull("OrbitkitNativePlugin must have public Activity constructor", ctor)
+        assertNotNull("OrbitkitNativePlugin must have public (Activity) constructor", ctor)
         assertTrue("Constructor must be public", Modifier.isPublic(ctor.modifiers))
     }
 
@@ -65,7 +62,7 @@ class OrbitkitNativePluginTest {
     fun testOverlayShowArgsHasInvokeArg() {
         val clazz = OverlayShowArgs::class.java
         val annotation = clazz.getAnnotation(InvokeArg::class.java)
-        assertNotNull("OverlayShowArgs must be annotated with @InvokeArg", annotation)
+        assertNotNull("OverlayShowArgs must be annotated @InvokeArg", annotation)
     }
 
     @Test
@@ -91,26 +88,25 @@ class OrbitkitNativePluginTest {
     }
 
     @Test
-    fun testRecorderServiceHierarchyAndConstants() {
-        val clazz = OrbitkitRecorderService::class.java
-        assertTrue(
-            "OrbitkitRecorderService must extend android.app.Service",
-            android.app.Service::class.java.isAssignableFrom(clazz)
-        )
+    fun testJniBridgeClassAndMethodsReflection() {
+        val clazz = OrbitkitJniBridge::class.java
+        assertEquals("dev.orbitkit.native.OrbitkitJniBridge", clazz.name)
 
-        assertEquals("orbitkit_recorder", OrbitkitRecorderService.CHANNEL_ID)
-        assertEquals("dev.orbitkit.native.action.START_FOREGROUND", OrbitkitRecorderService.ACTION_START_FOREGROUND)
-        assertEquals("dev.orbitkit.native.action.PAUSE", OrbitkitRecorderService.ACTION_PAUSE)
-        assertEquals("dev.orbitkit.native.action.RESUME", OrbitkitRecorderService.ACTION_RESUME)
-        assertEquals("dev.orbitkit.native.action.STOP", OrbitkitRecorderService.ACTION_STOP)
+        val onNativeActionMethod = clazz.getMethod("onNativeAction", String::class.java)
+        assertNotNull("onNativeAction(String) must exist", onNativeActionMethod)
+        assertTrue(Modifier.isPublic(onNativeActionMethod.modifiers))
+
+        val getCountMethod = clazz.getMethod("getActionCount")
+        assertNotNull("getActionCount() must exist", getCountMethod)
+
+        val getLogJsonMethod = clazz.getMethod("getActionLogJson")
+        assertNotNull("getActionLogJson() must exist", getLogJsonMethod)
     }
 
     @Test
-    fun testRecorderStateEnum() {
-        val states = OrbitkitRecorderService.State.values().map { it.name }
-        assertTrue(states.contains("IDLE"))
-        assertTrue(states.contains("RECORDING"))
-        assertTrue(states.contains("PAUSED"))
-        assertTrue(states.contains("STOPPED"))
+    fun testJniBridgeDispatchFallbackDoesNotCrash() {
+        val res = OrbitkitJniBridge.dispatchNativeAction("TEST_ACTION")
+        assertNotNull("dispatchNativeAction must return non-null result", res)
+        assertTrue("Result must contain action name", res.contains("TEST_ACTION"))
     }
 }

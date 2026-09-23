@@ -28,6 +28,9 @@ import app.tauri.plugin.Channel
 import app.tauri.plugin.Invoke
 import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
+import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 @InvokeArg
 class OverlayShowArgs {
@@ -42,6 +45,17 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private var overlayView: View? = null
     private var actionChannel: Channel? = null
     private var statusView: TextView? = null
+
+    companion object {
+        const val RECORDER_SERVICE_CLASS = "dev.orbitkit.native.OrbitkitRecorderService"
+        const val PERSISTENCE_CLASS = "dev.orbitkit.native.OrbitkitStatePersistence"
+
+        const val ACTION_START_FOREGROUND = "dev.orbitkit.native.action.START_FOREGROUND"
+        const val ACTION_PAUSE = "dev.orbitkit.native.action.PAUSE"
+        const val ACTION_RESUME = "dev.orbitkit.native.action.RESUME"
+        const val ACTION_STOP = "dev.orbitkit.native.action.STOP"
+        const val ACTION_POST_STANDBY = "dev.orbitkit.native.action.POST_STANDBY"
+    }
 
     @Command
     fun isOverlayPermissionGranted(invoke: Invoke) {
@@ -81,7 +95,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun overlayShow(invoke: Invoke) {
         Log.i(TAG, "overlayShow called")
 
-        // 1. Verify SYSTEM_ALERT_WINDOW permission
         if (!Settings.canDrawOverlays(activity)) {
             Log.w(TAG, "overlayShow rejected: SYSTEM_ALERT_WINDOW permission not granted")
             val errData = JSObject().apply {
@@ -92,7 +105,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             return
         }
 
-        // 2. Parse optional channel argument from payload
         try {
             val args = invoke.parseArgs(OverlayShowArgs::class.java)
             if (args.channel != null) {
@@ -184,8 +196,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
 
         try {
-            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
-                action = OrbitkitRecorderService.ACTION_START_FOREGROUND
+            val intent = Intent().setClassName(activity, RECORDER_SERVICE_CLASS).apply {
+                action = ACTION_START_FOREGROUND
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 activity.startForegroundService(intent)
@@ -193,10 +205,18 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 activity.startService(intent)
             }
             Log.i(TAG, "startForegroundService dispatched from Activity")
+            val spoolPath = try {
+                val clazz = Class.forName(RECORDER_SERVICE_CLASS)
+                val getSpool = clazz.getMethod("getSpoolFile", Context::class.java)
+                val file = getSpool.invoke(null, activity) as File
+                file.absolutePath
+            } catch (_: Throwable) {
+                ""
+            }
             val res = JSObject().apply {
                 put("state", "STARTING")
-                put("spoolPath", OrbitkitRecorderService.getSpoolFile(activity).absolutePath)
-                put("channel", OrbitkitRecorderService.CHANNEL_ID)
+                put("spoolPath", spoolPath)
+                put("channel", "orbitkit_recorder")
             }
             invoke.resolve(res)
         } catch (e: Exception) {
@@ -209,8 +229,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun recorderPause(invoke: Invoke) {
         Log.i(TAG, "recorderPause called")
         try {
-            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
-                action = OrbitkitRecorderService.ACTION_PAUSE
+            val intent = Intent().setClassName(activity, RECORDER_SERVICE_CLASS).apply {
+                action = ACTION_PAUSE
             }
             activity.startService(intent)
             invoke.resolve()
@@ -224,8 +244,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun recorderResume(invoke: Invoke) {
         Log.i(TAG, "recorderResume called")
         try {
-            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
-                action = OrbitkitRecorderService.ACTION_RESUME
+            val intent = Intent().setClassName(activity, RECORDER_SERVICE_CLASS).apply {
+                action = ACTION_RESUME
             }
             activity.startService(intent)
             invoke.resolve()
@@ -239,8 +259,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun recorderStop(invoke: Invoke) {
         Log.i(TAG, "recorderStop called")
         try {
-            val intent = Intent(activity, OrbitkitRecorderService::class.java).apply {
-                action = OrbitkitRecorderService.ACTION_STOP
+            val intent = Intent().setClassName(activity, RECORDER_SERVICE_CLASS).apply {
+                action = ACTION_STOP
             }
             activity.startService(intent)
             invoke.resolve()
@@ -254,20 +274,33 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun recorderState(invoke: Invoke) {
         Log.i(TAG, "recorderState called")
         try {
-            val state = OrbitkitRecorderService.getState().name
-            val spool = OrbitkitRecorderService.getSpoolFile(activity)
-            val bytes = if (OrbitkitRecorderService.isForegroundActive.get()) {
-                OrbitkitRecorderService.bytesRecorded.get()
-            } else if (spool.exists()) {
-                spool.length()
-            } else {
-                0L
+            var state = "IDLE"
+            var bytes = 0L
+            var isFg = false
+            var spoolPath = ""
+            try {
+                val clazz = Class.forName(RECORDER_SERVICE_CLASS)
+                val getStateMethod = clazz.getMethod("getState")
+                val stateEnum = getStateMethod.invoke(null)
+                state = stateEnum?.toString() ?: "IDLE"
+
+                val getSpoolMethod = clazz.getMethod("getSpoolFile", Context::class.java)
+                val spool = getSpoolMethod.invoke(null, activity) as File
+                spoolPath = spool.absolutePath
+
+                val isFgField = clazz.getField("isForegroundActive")
+                val isFgRef = isFgField.get(null) as AtomicBoolean
+                isFg = isFgRef.get()
+
+                val bytesField = clazz.getField("bytesRecorded")
+                val bytesRef = bytesField.get(null) as AtomicLong
+                bytes = if (isFg) bytesRef.get() else if (spool.exists()) spool.length() else 0L
+            } catch (_: Throwable) {
             }
-            val isFg = OrbitkitRecorderService.isForegroundActive.get()
 
             val res = JSObject().apply {
                 put("state", state)
-                put("spoolPath", spool.absolutePath)
+                put("spoolPath", spoolPath)
                 put("bytesRecorded", bytes)
                 put("isForeground", isFg)
             }
@@ -282,7 +315,9 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     fun recorderPostStandbyNotification(invoke: Invoke) {
         Log.i(TAG, "recorderPostStandbyNotification called")
         try {
-            OrbitkitRecorderService.postStandbyNotification(activity)
+            val clazz = Class.forName(RECORDER_SERVICE_CLASS)
+            val method = clazz.getMethod("postStandbyNotification", Context::class.java)
+            method.invoke(null, activity)
             invoke.resolve()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to post standby notification", e)
@@ -293,18 +328,24 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     @Command
     fun recorderGetPersistedState(invoke: Invoke) {
         try {
-            val jsonStr = OrbitkitStatePersistence.getStateJson(activity)
-            val stateObj = OrbitkitStatePersistence.getCurrentState()
+            val clazz = Class.forName(PERSISTENCE_CLASS)
+            val jsonMethod = clazz.getMethod("getStateJson", Context::class.java)
+            val jsonStr = jsonMethod.invoke(null, activity) as String
+
+            val currentMethod = clazz.getMethod("getCurrentState")
+            val stateObj = currentMethod.invoke(null)
+
+            val stateClass = stateObj.javaClass
             val res = JSObject().apply {
-                put("state", stateObj.state)
-                put("bytesRecorded", stateObj.bytesRecorded)
-                put("spoolPath", stateObj.spoolPath)
-                put("updatedAt", stateObj.updatedAt)
-                put("lastAction", stateObj.lastAction)
-                put("recoveryCount", stateObj.recoveryCount)
-                put("lastRecoveredAt", stateObj.lastRecoveredAt)
-                put("isForeground", stateObj.isForeground)
-                put("processPid", stateObj.processPid)
+                put("state", stateClass.getMethod("getState").invoke(stateObj))
+                put("bytesRecorded", stateClass.getMethod("getBytesRecorded").invoke(stateObj))
+                put("spoolPath", stateClass.getMethod("getSpoolPath").invoke(stateObj))
+                put("updatedAt", stateClass.getMethod("getUpdatedAt").invoke(stateObj))
+                put("lastAction", stateClass.getMethod("getLastAction").invoke(stateObj))
+                put("recoveryCount", stateClass.getMethod("getRecoveryCount").invoke(stateObj))
+                put("lastRecoveredAt", stateClass.getMethod("getLastRecoveredAt").invoke(stateObj))
+                put("isForeground", stateClass.getMethod("isForeground").invoke(stateObj))
+                put("processPid", stateClass.getMethod("getProcessPid").invoke(stateObj))
                 put("rawJson", jsonStr)
             }
             invoke.resolve(res)
@@ -317,15 +358,19 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     @Command
     fun recorderRecoverState(invoke: Invoke) {
         try {
-            val recovered = OrbitkitStatePersistence.recoverState(activity)
+            val clazz = Class.forName(PERSISTENCE_CLASS)
+            val recoverMethod = clazz.getMethod("recoverState", Context::class.java)
+            val recovered = recoverMethod.invoke(null, activity)
+
+            val stateClass = recovered.javaClass
             val res = JSObject().apply {
-                put("state", recovered.state)
-                put("bytesRecorded", recovered.bytesRecorded)
-                put("spoolPath", recovered.spoolPath)
-                put("recoveryCount", recovered.recoveryCount)
-                put("lastRecoveredAt", recovered.lastRecoveredAt)
-                put("processPid", recovered.processPid)
-                put("lastAction", recovered.lastAction)
+                put("state", stateClass.getMethod("getState").invoke(recovered))
+                put("bytesRecorded", stateClass.getMethod("getBytesRecorded").invoke(recovered))
+                put("spoolPath", stateClass.getMethod("getSpoolPath").invoke(recovered))
+                put("recoveryCount", stateClass.getMethod("getRecoveryCount").invoke(recovered))
+                put("lastRecoveredAt", stateClass.getMethod("getLastRecoveredAt").invoke(recovered))
+                put("processPid", stateClass.getMethod("getProcessPid").invoke(recovered))
+                put("lastAction", stateClass.getMethod("getLastAction").invoke(recovered))
             }
             invoke.resolve(res)
         } catch (e: Exception) {
@@ -352,20 +397,24 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         Log.i(TAG, "Overlay action tapped: $action")
         statusView?.text = "Last Action: $action (JNI)"
 
-        // 1. Direct JNI invocation into Rust (executes even when Tauri WebView JS is suspended)
         val jniResponse = OrbitkitJniBridge.dispatchNativeAction(action)
         Log.i(TAG, "JNI bridge direct dispatch for '$action' returned: $jniResponse")
 
-        // 2. Record action transition in C4 persistence file
-        OrbitkitStatePersistence.recordAction(activity, action)
+        try {
+            val clazz = Class.forName(PERSISTENCE_CLASS)
+            val method = clazz.getMethod("recordAction", Context::class.java, String::class.java)
+            method.invoke(null, activity, action)
+        } catch (_: Throwable) {
+        }
 
         val payload = JSObject().apply {
+            put("id", action)
             put("action", action)
+            put("source", "overlay")
             put("timestamp", System.currentTimeMillis())
             put("jniResult", jniResponse)
         }
 
-        // 3. Send via dedicated IPC channel to Rust (if channel alive)
         actionChannel?.let { ch ->
             try {
                 ch.send(payload)
@@ -375,14 +424,13 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             }
         }
 
-        // 4. Also emit via plugin event
         trigger("action", payload)
+        trigger("orbitkit://menu-action", payload)
     }
 
     private fun buildOverlayView(params: WindowManager.LayoutParams, wm: WindowManager): View {
         val ctx = activity
 
-        // Main Container
         val container = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dpToPx(ctx, 14f), dpToPx(ctx, 10f), dpToPx(ctx, 14f), dpToPx(ctx, 12f))
@@ -401,7 +449,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             }
         }
 
-        // Header / Drag Handle
         val header = TextView(ctx).apply {
             text = "✥ OrbitKit Native [Drag] ✥"
             setTextColor(Color.parseColor("#94A3B8"))
@@ -423,13 +470,12 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             LinearLayout.LayoutParams.WRAP_CONTENT
         ))
 
-        // Drag Listener on Header and Container
-        val dragListener = object : View.OnTouchListener {
-            private var initialX = 0
-            private var initialY = 0
-            private var initialTouchX = 0f
-            private var initialTouchY = 0f
+        var initialX = 0
+        var initialY = 0
+        var initialTouchX = 0f
+        var initialTouchY = 0f
 
+        val dragListener = object : View.OnTouchListener {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -462,7 +508,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         header.setOnTouchListener(dragListener)
         container.setOnTouchListener(dragListener)
 
-        // Buttons Row
         val buttonsRow = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -487,10 +532,9 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 setTextColor(Color.WHITE)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setPadding(dpToPx(ctx, 12f), dpToPx(ctx, 8f), dpToPx(ctx, 12f), dpToPx(ctx, 8f))
+                setPadding(dpToPx(ctx, 14f), dpToPx(ctx, 8f), dpToPx(ctx, 14f), dpToPx(ctx, 8f))
                 isAllCaps = false
-                minHeight = dpToPx(ctx, 42f)
-                minWidth = dpToPx(ctx, 72f)
+                minHeight = dpToPx(ctx, 40f)
 
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.RECTANGLE
@@ -514,7 +558,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         container.addView(buttonsRow)
 
-        // Recorder Controls Row (for S2 & S3 testing from overlay)
         val recRow = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -527,66 +570,36 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             layoutParams = rowParams
         }
 
+        fun sendRecorderServiceIntent(action: String) {
+            try {
+                val intent = Intent().setClassName(ctx, RECORDER_SERVICE_CLASS).apply {
+                    this.action = action
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && action == ACTION_START_FOREGROUND) {
+                    ctx.startForegroundService(intent)
+                } else {
+                    ctx.startService(intent)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "sendRecorderServiceIntent failed for $action: ${e.message}", e)
+            }
+        }
+
         val recActions = listOf(
             Triple("START", "#DC2626") {
-                // S3: Cold mic-FGS start from overlay tap!
-                try {
-                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
-                        action = OrbitkitRecorderService.ACTION_START_FOREGROUND
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        ctx.startForegroundService(intent)
-                    } else {
-                        ctx.startService(intent)
-                    }
-                    Log.i(TAG, "Overlay START clicked -> startForegroundService dispatched")
-                    statusView?.text = "Overlay: START sent"
-                } catch (e: Exception) {
-                    Log.e(TAG, "Overlay START failed: ${e::class.java.simpleName}: ${e.message}", e)
-                    statusView?.text = "ERR: ${e::class.java.simpleName}"
-                }
+                sendRecorderServiceIntent(ACTION_START_FOREGROUND)
                 handleAction("REC_START")
             },
             Triple("PAUSE", "#CA8A04") {
-                // S2: Pause from overlay
-                try {
-                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
-                        action = OrbitkitRecorderService.ACTION_PAUSE
-                    }
-                    ctx.startService(intent)
-                    Log.i(TAG, "Overlay PAUSE clicked -> dispatched")
-                    statusView?.text = "Overlay: PAUSE sent"
-                } catch (e: Exception) {
-                    Log.e(TAG, "Overlay PAUSE failed: ${e.message}", e)
-                }
+                sendRecorderServiceIntent(ACTION_PAUSE)
                 handleAction("REC_PAUSE")
             },
             Triple("RESUME", "#16A34A") {
-                // S2: Resume from overlay
-                try {
-                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
-                        action = OrbitkitRecorderService.ACTION_RESUME
-                    }
-                    ctx.startService(intent)
-                    Log.i(TAG, "Overlay RESUME clicked -> dispatched")
-                    statusView?.text = "Overlay: RESUME sent"
-                } catch (e: Exception) {
-                    Log.e(TAG, "Overlay RESUME failed: ${e.message}", e)
-                }
+                sendRecorderServiceIntent(ACTION_RESUME)
                 handleAction("REC_RESUME")
             },
             Triple("STOP", "#475569") {
-                // S2: Stop from overlay
-                try {
-                    val intent = Intent(ctx, OrbitkitRecorderService::class.java).apply {
-                        action = OrbitkitRecorderService.ACTION_STOP
-                    }
-                    ctx.startService(intent)
-                    Log.i(TAG, "Overlay STOP clicked -> dispatched")
-                    statusView?.text = "Overlay: STOP sent"
-                } catch (e: Exception) {
-                    Log.e(TAG, "Overlay STOP failed: ${e.message}", e)
-                }
+                sendRecorderServiceIntent(ACTION_STOP)
                 handleAction("REC_STOP")
             }
         )
@@ -624,7 +637,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         container.addView(recRow)
 
-        // Status / Feedback label
         val status = TextView(ctx).apply {
             text = "Status: Floating active"
             setTextColor(Color.parseColor("#64748B"))

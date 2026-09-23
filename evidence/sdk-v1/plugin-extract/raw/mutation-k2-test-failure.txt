@@ -1,0 +1,32 @@
+=== MUTATION TEST PROOF ===
+Command: docker run --rm -u 1000 -v $PWD:$PWD -w $PWD orbitkit-linux-desktop:1 cargo test -p tauri-plugin-orbitkit --lib config
+Mutation applied: Removed all #[serde(rename_all = "camelCase")] attributes from crates/tauri-plugin-orbitkit/src/config.rs
+
+Output:
+   Compiling tauri-plugin-orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-plugin-extract/crates/tauri-plugin-orbitkit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.14s
+     Running unittests src/lib.rs (target/debug/deps/tauri_plugin_orbitkit-62cee086359a0b30)
+
+running 3 tests
+test config::tests::test_menu_item_id_validation ... ok
+test config::tests::test_k2_minimal_config_defaults ... ok
+test config::tests::test_k2_config_serde_roundtrip ... FAILED
+
+failures:
+
+---- config::tests::test_k2_config_serde_roundtrip stdout ----
+
+thread 'config::tests::test_k2_config_serde_roundtrip' (137) panicked at crates/tauri-plugin-orbitkit/src/config.rs:261:9:
+assertion `left == right` failed
+  left: None
+ right: Some(32)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    config::tests::test_k2_config_serde_roundtrip
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p tauri-plugin-orbitkit --lib`
+EXIT_CODE=101

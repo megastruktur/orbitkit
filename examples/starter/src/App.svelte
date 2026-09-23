@@ -22,9 +22,9 @@
     try {
       lastError = null;
       statusMessage = "Checking overlay permission...";
-      const res = await invoke<boolean>("isOverlayPermissionGranted");
-      permissionGranted = res;
-      statusMessage = `Overlay permission: ${res ? "GRANTED" : "NOT GRANTED"}`;
+      const res = await invoke<{ granted: boolean }>("plugin:orbitkit|overlay_permission");
+      permissionGranted = res.granted;
+      statusMessage = `Overlay permission: ${res.granted ? "GRANTED" : "NOT GRANTED"}`;
     } catch (err: any) {
       lastError = String(err?.message || err);
       statusMessage = "Error checking overlay permission";
@@ -35,7 +35,7 @@
     try {
       lastError = null;
       statusMessage = "Opening overlay permission settings...";
-      await invoke("requestOverlayPermission");
+      await invoke("plugin:orbitkit|request_overlay_permission");
       statusMessage = "Settings intent dispatched";
     } catch (err: any) {
       lastError = String(err?.message || err);
@@ -47,7 +47,7 @@
     try {
       lastError = null;
       statusMessage = "Showing native overlay...";
-      await invoke("overlayShow");
+      await invoke("plugin:orbitkit|show_overlay");
       statusMessage = "Overlay displayed successfully";
     } catch (err: any) {
       lastError = String(err?.message || err);
@@ -59,7 +59,7 @@
     try {
       lastError = null;
       statusMessage = "Hiding native overlay...";
-      await invoke("overlayHide");
+      await invoke("plugin:orbitkit|hide_overlay");
       statusMessage = "Overlay hidden";
     } catch (err: any) {
       lastError = String(err?.message || err);

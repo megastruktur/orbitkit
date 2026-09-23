@@ -1,6 +1,6 @@
+use std::ffi::{CStr, CString};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "android")]
@@ -13,18 +13,23 @@ extern "C" {
     ) -> std::os::raw::c_int;
 }
 
-/// Log directly to Android logcat from Rust native code.
-/// This guarantees log entries appear in `adb logcat` even when the WebView is suspended.
+pub fn log_fmt() -> &'static CStr {
+    c"%s"
+}
+
+pub fn to_safe_cstring(s: &str) -> CString {
+    let sanitized: Vec<u8> = s.bytes().filter(|&b| b != 0).collect();
+    CString::new(sanitized).expect("sanitized bytes contain no null bytes")
+}
+
 pub fn log_android_info(tag: &str, message: &str) {
     #[cfg(target_os = "android")]
     {
-        use std::ffi::CString;
-        if let (Ok(c_tag), Ok(c_fmt)) = (CString::new(tag), CString::new("%s\0")) {
-            if let Ok(c_msg) = CString::new(message) {
-                unsafe {
-                    __android_log_print(4 /* ANDROID_LOG_INFO */, c_tag.as_ptr(), c_fmt.as_ptr(), c_msg.as_ptr());
-                }
-            }
+        let c_tag = to_safe_cstring(tag);
+        let c_msg = to_safe_cstring(message);
+        let c_fmt = log_fmt();
+        unsafe {
+            __android_log_print(4 /* ANDROID_LOG_INFO */, c_tag.as_ptr(), c_fmt.as_ptr(), c_msg.as_ptr());
         }
     }
     eprintln!("[{}] {}", tag, message);
@@ -41,22 +46,49 @@ pub struct JniActionRecord {
     pub webview_suspended: bool,
 }
 
-static RECEIPT_COUNTER: AtomicU64 = AtomicU64::new(1);
-static ACTION_LOG: Mutex<Vec<JniActionRecord>> = Mutex::new(Vec::new());
-
-fn current_timestamp_millis() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis() as u64
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuAction {
+    pub id: String,
+    pub source: String,
 }
 
-/// Core logic processing native action from Kotlin JNI bridge.
-/// Receives action string, records it, logs to logcat and Rust log,
-/// and returns JSON string acknowledgment.
+type MenuActionCallback = Box<dyn Fn(&MenuAction) + Send + Sync + 'static>;
+
+static RECEIPT_COUNTER: AtomicU64 = AtomicU64::new(1);
+static ACTION_LOG: Mutex<Vec<JniActionRecord>> = Mutex::new(Vec::new());
+static MENU_ACTION_HANDLERS: Mutex<Vec<Arc<MenuActionCallback>>> = Mutex::new(Vec::new());
+
+fn current_timestamp_millis() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+pub fn register_menu_action_handler<F: Fn(&MenuAction) + Send + Sync + 'static>(handler: F) {
+    if let Ok(mut handlers) = MENU_ACTION_HANDLERS.lock() {
+        handlers.push(Arc::new(Box::new(handler)));
+    }
+}
+
+pub fn notify_menu_action(action: &MenuAction) {
+    let handlers = {
+        if let Ok(guard) = MENU_ACTION_HANDLERS.lock() {
+            guard.clone()
+        } else {
+            Vec::new()
+        }
+    };
+    for handler in handlers {
+        handler(action);
+    }
+}
+
 pub fn process_native_action(action: &str) -> String {
     let receipt_id = RECEIPT_COUNTER.fetch_add(1, Ordering::SeqCst);
     let now = current_timestamp_millis();
+
     let record = JniActionRecord {
         receipt_id,
         action: action.to_string(),
@@ -75,24 +107,24 @@ pub fn process_native_action(action: &str) -> String {
         log.push(record.clone());
     }
 
+    let menu_action = MenuAction {
+        id: action.to_string(),
+        source: "overlay".to_string(),
+    };
+    notify_menu_action(&menu_action);
+
     serde_json::to_string(&record).unwrap_or_else(|_| "{\"status\":\"OK\"}".to_string())
 }
 
-/// Retrieve all recorded JNI actions (used for verification & test inspection).
 pub fn get_jni_action_log() -> Vec<JniActionRecord> {
     ACTION_LOG.lock().map(|l| l.clone()).unwrap_or_default()
 }
 
-/// Clear recorded JNI actions.
 pub fn clear_jni_action_log() {
     if let Ok(mut log) = ACTION_LOG.lock() {
         log.clear();
     }
 }
-
-// ---------------------------------------------------------------------------
-// JNI Export Functions (called from dev.orbitkit.native.OrbitkitJniBridge)
-// ---------------------------------------------------------------------------
 
 #[no_mangle]
 pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction(
@@ -119,7 +151,6 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction
     }
 }
 
-/// Fallback export if Kotlin companion object dispatch is invoked.
 #[no_mangle]
 pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_00024Companion_onNativeAction(
     env: jni::JNIEnv,
@@ -129,17 +160,14 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_00024Companion
     Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction(env, class, action)
 }
 
-/// JNI helper to query Rust-side action count.
 #[no_mangle]
 pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_getActionCount(
     _env: jni::JNIEnv,
     _class: jni::objects::JClass,
 ) -> jni::sys::jlong {
-    let count = ACTION_LOG.lock().map(|l| l.len() as i64).unwrap_or(0);
-    count
+    ACTION_LOG.lock().map(|l| l.len() as i64).unwrap_or(0)
 }
 
-/// JNI helper to retrieve entire action log as JSON.
 #[no_mangle]
 pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_getActionLogJson(
     env: jni::JNIEnv,
@@ -153,58 +181,63 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_getActionLogJs
     }
 }
 
-// ---------------------------------------------------------------------------
-// Tauri Commands (for IPC frontend inspection and debug affordances)
-// ---------------------------------------------------------------------------
-
-#[tauri::command]
-pub fn jni_get_action_log() -> Vec<JniActionRecord> {
-    get_jni_action_log()
-}
-
-#[tauri::command]
-pub fn jni_clear_action_log() {
-    clear_jni_action_log();
-}
-
-#[tauri::command]
-pub fn jni_trigger_native_action(action: String) -> String {
-    process_native_action(&action)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    static TEST_MUTEX: Mutex<()> = Mutex::new(());
+
     #[test]
     fn test_process_native_action_records_and_returns_json() {
+        let _guard = TEST_MUTEX.lock().unwrap();
         clear_jni_action_log();
         let res1 = process_native_action("ACT_A");
         let parsed: JniActionRecord = serde_json::from_str(&res1).expect("valid json record");
         assert_eq!(parsed.action, "ACT_A");
         assert!(parsed.receipt_id >= 1);
         assert!(parsed.webview_suspended);
+        assert_eq!(parsed.rust_tag, "Rust_JNI_Bridge");
+        assert!(parsed.timestamp_millis > 0);
 
         let res2 = process_native_action("ACT_B");
         let parsed2: JniActionRecord = serde_json::from_str(&res2).expect("valid json record");
         assert_eq!(parsed2.action, "ACT_B");
         assert_eq!(parsed2.receipt_id, parsed.receipt_id + 1);
+        assert!(parsed2.webview_suspended);
+        assert_eq!(parsed2.rust_tag, "Rust_JNI_Bridge");
 
         let history = get_jni_action_log();
         assert_eq!(history.len(), 2);
         assert_eq!(history[0].action, "ACT_A");
         assert_eq!(history[1].action, "ACT_B");
+        clear_jni_action_log();
     }
 
     #[test]
     fn test_recorder_actions_through_jni() {
+        let _guard = TEST_MUTEX.lock().unwrap();
         clear_jni_action_log();
         for act in ["REC_START", "REC_PAUSE", "REC_RESUME", "REC_STOP"] {
             let res = process_native_action(act);
             let parsed: JniActionRecord = serde_json::from_str(&res).expect("valid json");
             assert_eq!(parsed.action, act);
+            assert!(parsed.webview_suspended);
+            assert_eq!(parsed.rust_tag, "Rust_JNI_Bridge");
         }
         let history = get_jni_action_log();
         assert_eq!(history.len(), 4);
+        clear_jni_action_log();
+    }
+
+    #[test]
+    fn test_log_fmt_and_safe_cstring() {
+        assert_eq!(log_fmt().to_bytes(), b"%s");
+        assert_eq!(log_fmt().to_bytes_with_nul(), b"%s\0");
+
+        let normal_tag = to_safe_cstring("OrbitkitJni");
+        assert_eq!(normal_tag.as_bytes(), b"OrbitkitJni");
+
+        let with_null = to_safe_cstring("tag\0with\0null");
+        assert_eq!(with_null.as_bytes(), b"tagwithnull");
     }
 }

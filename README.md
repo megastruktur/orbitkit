@@ -113,4 +113,4 @@ scripts/linux-desktop.sh build examples/starter
 
 ## License
 
-TBD — no license has been chosen yet (owner decision pending).
+[MIT](LICENSE) © 2026 Piotr Varaksin

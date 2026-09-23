@@ -3,6 +3,7 @@ name = "tauri-plugin-orbitkit"
 version = "0.1.0"
 authors = ["OrbitKit Team"]
 edition = "2021"
+license = "MIT"
 description = "OrbitKit Tauri plugin for floating overlay, mascot, and menus"
 links = "tauri-plugin-orbitkit"
 

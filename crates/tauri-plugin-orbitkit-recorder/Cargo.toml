@@ -3,6 +3,7 @@ name = "tauri-plugin-orbitkit-recorder"
 version = "0.1.0"
 authors = ["OrbitKit Team"]
 edition = "2021"
+license = "MIT"
 description = "OrbitKit Tauri plugin for background microphone recording and persistence"
 links = "tauri-plugin-orbitkit-recorder"
 

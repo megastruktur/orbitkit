@@ -1,3 +1,5 @@
+import { resolveMenuAngles } from "./geometry.js";
+
 // K2 typed config schema and helpers
 
 export type MascotStateName = "idle" | "active" | "busy" | "attention" | string;
@@ -26,6 +28,15 @@ export interface MenuItem {
   disabled?: boolean;
 }
 
+export type MenuLayout = "orbit" | "arc";
+export type MenuArcPosition = "top" | "bottom" | "left" | "right";
+export type MenuAnimation = "spawn" | "none";
+
+export interface MenuArcConfig {
+  position?: MenuArcPosition;
+  span?: number;
+}
+
 export interface MenuConfig {
   items: MenuItem[];
   radius: number;
@@ -33,6 +44,9 @@ export interface MenuConfig {
   endAngle: number;
   itemSize?: number;
   trigger?: "click" | "hover";
+  layout?: MenuLayout;
+  arc?: MenuArcConfig;
+  animation?: MenuAnimation;
 }
 
 export interface PopupConfig {
@@ -91,13 +105,39 @@ export function withDefaults(c: DeepPartial<OrbitKitConfig>): OrbitKitConfig {
     ...(mascotInput?.states !== undefined ? { states: mascotInput.states as MascotConfig["states"] } : {}),
   };
 
+  const layout = menuInput?.layout ?? "orbit";
+  let startAngle = menuInput?.startAngle ?? -90;
+  let endAngle = menuInput?.endAngle ?? 270;
+  let arc: MenuArcConfig | undefined = undefined;
+
+  if (menuInput?.arc !== undefined) {
+    arc = {
+      position: (menuInput.arc.position as MenuArcPosition) ?? "top",
+      span: menuInput.arc.span ?? 180,
+    };
+  } else if (layout === "arc") {
+    arc = {
+      position: "top",
+      span: 180,
+    };
+  }
+
+  if (layout === "arc") {
+    const resolved = resolveMenuAngles({ layout: "arc", arc });
+    startAngle = resolved.startAngle;
+    endAngle = resolved.endAngle;
+  }
+
   const menu: MenuConfig = {
     items: menuInput?.items ? (menuInput.items as MenuItem[]).map((item) => ({ ...item })) : [],
     radius: menuInput?.radius ?? 96,
-    startAngle: menuInput?.startAngle ?? -90,
-    endAngle: menuInput?.endAngle ?? 270,
+    startAngle,
+    endAngle,
     itemSize: menuInput?.itemSize ?? 44,
     trigger: menuInput?.trigger ?? "click",
+    animation: (menuInput?.animation as MenuAnimation) ?? "spawn",
+    ...(menuInput?.layout !== undefined ? { layout: menuInput.layout as MenuConfig["layout"] } : {}),
+    ...(arc !== undefined ? { arc } : {}),
   };
 
   const windows: WindowsConfig = {
@@ -232,6 +272,37 @@ export function validateConfig(c: unknown): ValidationResult {
 
     if (menu.trigger !== undefined && menu.trigger !== "click" && menu.trigger !== "hover") {
       errors.push("menu.trigger: must be 'click' or 'hover'");
+    }
+
+    if (menu.layout !== undefined && menu.layout !== "orbit" && menu.layout !== "arc") {
+      errors.push("menu.layout: must be 'orbit' or 'arc'");
+    }
+
+    if (menu.arc !== undefined) {
+      if (typeof menu.arc !== "object" || menu.arc === null || Array.isArray(menu.arc)) {
+        errors.push("menu.arc: must be an object");
+      } else {
+        const arc = menu.arc as Record<string, unknown>;
+        if (
+          arc.position !== undefined &&
+          arc.position !== "top" &&
+          arc.position !== "bottom" &&
+          arc.position !== "left" &&
+          arc.position !== "right"
+        ) {
+          errors.push("menu.arc.position: must be 'top', 'bottom', 'left', or 'right'");
+        }
+        if (
+          arc.span !== undefined &&
+          (typeof arc.span !== "number" || Number.isNaN(arc.span) || arc.span < 30 || arc.span > 300)
+        ) {
+          errors.push("menu.arc.span: must be between 30 and 300");
+        }
+      }
+    }
+
+    if (menu.animation !== undefined && menu.animation !== "spawn" && menu.animation !== "none") {
+      errors.push("menu.animation: must be one of spawn, none");
     }
   }
 

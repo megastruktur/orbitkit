@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+#### Frontend (`@orbitkit/ui`)
+- **Menu Layout ("orbit" | "arc") (Contract Amendment K2-A1)**:
+  - Added optional `layout?: "orbit" | "arc"` and `arc?: { position?: "top" | "bottom" | "left" | "right", span?: number }` to `MenuConfig`.
+  - Added pure `resolveMenuAngles` helper exported from `@orbitkit/ui` (`./geometry.js`) resolving angles based on mascot side and arc span.
+  - Updated `<RadialMenu />` to automatically position items using resolved angles when `layout: "arc"`.
+  - Added runtime validation in `validateConfig` checking `menu.layout`, `menu.arc.position`, and `menu.arc.span` (30..300).
+  - Added optional `animation?: "spawn" | "none"` to `MenuConfig` with `"none"` disabling menu transitions.
+  - Canonical angle vectors codified in `arc-vectors.json`.
+
+#### Plugin (`tauri-plugin-orbitkit`)
+- **Config Mirror & Angle Resolution (Contract Amendment K2-A1)**:
+  - Mirrored `layout` and `arc` fields in `MenuConfig` with camelCase serde serialization.
+  - Implemented `resolve_menu_angles` resolving start and end angles identical to frontend geometry.
+  - Added `animation` field with `"spawn"` default and validation.
+  - Added `validate()` on `MenuConfig` and `OrbitKitConfig` enforcing layout, position, span, and animation constraints.
+  - Unit tests validating against canonical `arc-vectors.json`.
+
 ## [0.1.0] - 2026-09-23
 
 Initial release of the OrbitKit SDK.

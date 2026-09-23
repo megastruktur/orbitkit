@@ -29,6 +29,10 @@ fn default_menu_trigger() -> MenuTrigger {
     MenuTrigger::Click
 }
 
+fn default_menu_animation() -> Option<String> {
+    Some("spawn".to_string())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum MascotKind {
@@ -119,6 +123,15 @@ impl MenuItem {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuArcConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub span: Option<f64>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuConfig {
@@ -133,6 +146,12 @@ pub struct MenuConfig {
     pub item_size: f64,
     #[serde(default = "default_menu_trigger")]
     pub trigger: MenuTrigger,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub layout: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub arc: Option<MenuArcConfig>,
+    #[serde(default = "default_menu_animation", skip_serializing_if = "Option::is_none")]
+    pub animation: Option<String>,
 }
 
 impl Default for MenuConfig {
@@ -144,7 +163,98 @@ impl Default for MenuConfig {
             end_angle: default_end_angle(),
             item_size: default_item_size(),
             trigger: default_menu_trigger(),
+            layout: None,
+            arc: None,
+            animation: default_menu_animation(),
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolvedMenuAngles {
+    pub start_angle: f64,
+    pub end_angle: f64,
+}
+
+impl ResolvedMenuAngles {
+    pub fn tuple(&self) -> (f64, f64) {
+        (self.start_angle, self.end_angle)
+    }
+}
+
+pub fn resolve_menu_angles(menu: &MenuConfig) -> ResolvedMenuAngles {
+    if menu.layout.as_deref() == Some("arc") {
+        let position = menu
+            .arc
+            .as_ref()
+            .and_then(|a| a.position.as_deref())
+            .unwrap_or("top");
+        let span = menu
+            .arc
+            .as_ref()
+            .and_then(|a| a.span)
+            .unwrap_or(180.0);
+
+        let centre = match position {
+            "top" => -90.0,
+            "right" => 0.0,
+            "bottom" => 90.0,
+            "left" => 180.0,
+            _ => -90.0,
+        };
+
+        ResolvedMenuAngles {
+            start_angle: centre - span / 2.0,
+            end_angle: centre + span / 2.0,
+        }
+    } else {
+        ResolvedMenuAngles {
+            start_angle: menu.start_angle,
+            end_angle: menu.end_angle,
+        }
+    }
+}
+
+impl MenuConfig {
+    pub fn validate(&self) -> Result<(), Vec<String>> {
+        let mut errors = Vec::new();
+
+        if let Some(layout) = &self.layout {
+            if layout != "orbit" && layout != "arc" {
+                errors.push("menu.layout: must be 'orbit' or 'arc'".to_string());
+            }
+        }
+        if let Some(arc) = &self.arc {
+            if let Some(position) = &arc.position {
+                if position != "top" && position != "bottom" && position != "left" && position != "right" {
+                    errors.push("menu.arc.position: must be 'top', 'bottom', 'left', or 'right'".to_string());
+                }
+            }
+            if let Some(span) = arc.span {
+                if span.is_nan() || span < 30.0 || span > 300.0 {
+                    errors.push("menu.arc.span: must be between 30 and 300".to_string());
+                }
+            }
+        }
+
+        if let Some(animation) = &self.animation {
+            if animation != "spawn" && animation != "none" {
+                errors.push("menu.animation: must be one of spawn, none".to_string());
+            }
+        }
+
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
+    }
+}
+
+impl OrbitKitConfig {
+    pub fn validate(&self) -> Result<(), Vec<String>> {
+        self.menu.validate()
     }
 }
 
@@ -367,5 +477,201 @@ mod tests {
 
         assert_eq!(min_parsed.windows.mascot_window, None);
         assert!(min_parsed.windows.popups.is_empty());
+    }
+
+    #[derive(Debug, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct CanonicalVector {
+        layout: String,
+        arc: Option<MenuArcConfig>,
+        start_angle: f64,
+        end_angle: f64,
+    }
+
+    #[test]
+    fn test_canonical_vectors_against_arc_vectors_json() {
+        let vectors_json = include_str!("../../../packages/orbitkit/src/arc-vectors.json");
+        let vectors: Vec<CanonicalVector> =
+            serde_json::from_str(vectors_json).expect("deserialize arc-vectors.json");
+
+        assert!(vectors.len() >= 6, "must have at least 6 canonical vectors");
+
+        for v in vectors {
+            let mut menu = MenuConfig::default();
+            menu.layout = Some(v.layout.clone());
+            menu.arc = v.arc;
+            if v.layout == "orbit" {
+                menu.start_angle = v.start_angle;
+                menu.end_angle = v.end_angle;
+            }
+            let resolved = resolve_menu_angles(&menu);
+            assert_eq!(resolved.start_angle, v.start_angle);
+            assert_eq!(resolved.end_angle, v.end_angle);
+        }
+    }
+
+    #[test]
+    fn test_resolve_menu_angles_positions_and_defaults() {
+        // 1. arc top default span
+        let mut m_top = MenuConfig::default();
+        m_top.layout = Some("arc".into());
+        m_top.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(180.0),
+        });
+        assert_eq!(resolve_menu_angles(&m_top), ResolvedMenuAngles { start_angle: -180.0, end_angle: 0.0 });
+
+        // 2. arc bottom default span
+        let mut m_bot = MenuConfig::default();
+        m_bot.layout = Some("arc".into());
+        m_bot.arc = Some(MenuArcConfig {
+            position: Some("bottom".into()),
+            span: Some(180.0),
+        });
+        assert_eq!(resolve_menu_angles(&m_bot), ResolvedMenuAngles { start_angle: 0.0, end_angle: 180.0 });
+
+        // 3. arc left default span
+        let mut m_left = MenuConfig::default();
+        m_left.layout = Some("arc".into());
+        m_left.arc = Some(MenuArcConfig {
+            position: Some("left".into()),
+            span: Some(180.0),
+        });
+        assert_eq!(resolve_menu_angles(&m_left), ResolvedMenuAngles { start_angle: 90.0, end_angle: 270.0 });
+
+        // 4. arc right default span
+        let mut m_right = MenuConfig::default();
+        m_right.layout = Some("arc".into());
+        m_right.arc = Some(MenuArcConfig {
+            position: Some("right".into()),
+            span: Some(180.0),
+        });
+        assert_eq!(resolve_menu_angles(&m_right), ResolvedMenuAngles { start_angle: -90.0, end_angle: 90.0 });
+
+        // 5. span default when omitted
+        let mut m_span_def = MenuConfig::default();
+        m_span_def.layout = Some("arc".into());
+        m_span_def.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: None,
+        });
+        assert_eq!(resolve_menu_angles(&m_span_def), ResolvedMenuAngles { start_angle: -180.0, end_angle: 0.0 });
+
+        // 6. span custom 120
+        let mut m_span_custom = MenuConfig::default();
+        m_span_custom.layout = Some("arc".into());
+        m_span_custom.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(120.0),
+        });
+        assert_eq!(resolve_menu_angles(&m_span_custom), ResolvedMenuAngles { start_angle: -150.0, end_angle: -30.0 });
+    }
+
+    #[test]
+    fn test_menu_config_validation() {
+        // 1. Invalid layout
+        let mut m1 = MenuConfig::default();
+        m1.layout = Some("zigzag".into());
+        let errs1 = m1.validate().unwrap_err();
+        assert!(errs1.contains(&"menu.layout: must be 'orbit' or 'arc'".to_string()));
+
+        // 2. Invalid arc position
+        let mut m2 = MenuConfig::default();
+        m2.layout = Some("arc".into());
+        m2.arc = Some(MenuArcConfig {
+            position: Some("diagonal".into()),
+            span: Some(180.0),
+        });
+        let errs2 = m2.validate().unwrap_err();
+        assert!(errs2.contains(&"menu.arc.position: must be 'top', 'bottom', 'left', or 'right'".to_string()));
+
+        // 3. Invalid arc span (< 30 or > 300)
+        let mut m3 = MenuConfig::default();
+        m3.layout = Some("arc".into());
+        m3.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(20.0),
+        });
+        let errs3 = m3.validate().unwrap_err();
+        assert!(errs3.contains(&"menu.arc.span: must be between 30 and 300".to_string()));
+
+        let mut m3_large = MenuConfig::default();
+        m3_large.layout = Some("arc".into());
+        m3_large.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(350.0),
+        });
+        let errs3_large = m3_large.validate().unwrap_err();
+        assert!(errs3_large.contains(&"menu.arc.span: must be between 30 and 300".to_string()));
+
+        // 4. Valid arc config
+        let mut m4 = MenuConfig::default();
+        m4.layout = Some("arc".into());
+        m4.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(180.0),
+        });
+        assert!(m4.validate().is_ok());
+
+        // 5. Arc without layout arc is allowed
+        let mut m5 = MenuConfig::default();
+        m5.layout = Some("orbit".into());
+        m5.arc = Some(MenuArcConfig {
+            position: Some("top".into()),
+            span: Some(180.0),
+        });
+        assert!(m5.validate().is_ok());
+
+        // 6. Invalid animation
+        let mut m6 = MenuConfig::default();
+        m6.animation = Some("pop".into());
+        let errs6 = m6.validate().unwrap_err();
+        assert!(errs6.contains(&"menu.animation: must be one of spawn, none".to_string()));
+
+        // 7. Valid animation values
+        let mut m7_spawn = MenuConfig::default();
+        m7_spawn.animation = Some("spawn".into());
+        assert!(m7_spawn.validate().is_ok());
+
+        let mut m7_none = MenuConfig::default();
+        m7_none.animation = Some("none".into());
+        assert!(m7_none.validate().is_ok());
+    }
+
+    #[test]
+    fn test_menu_animation_serde_defaults_and_roundtrip() {
+        let json = r#"{"items":[]}"#;
+        let parsed: MenuConfig = serde_json::from_str(json).expect("deserialize menu without animation");
+        assert_eq!(parsed.animation, Some("spawn".to_string()));
+
+        let none_json = r#"{"items":[],"animation":"none"}"#;
+        let parsed_none: MenuConfig = serde_json::from_str(none_json).expect("deserialize menu with animation none");
+        assert_eq!(parsed_none.animation, Some("none".to_string()));
+
+        let serialized = serde_json::to_string(&parsed_none).expect("serialize");
+        assert!(serialized.contains(r#""animation":"none""#));
+    }
+
+    #[test]
+    fn test_menu_layout_arc_serde_roundtrip() {
+        let json = r#"{"items":[],"layout":"arc","arc":{"position":"left","span":120},"animation":"none"}"#;
+        let parsed: MenuConfig = serde_json::from_str(json).expect("deserialize menu layout arc");
+        assert_eq!(parsed.layout.as_deref(), Some("arc"));
+        assert_eq!(
+            parsed.arc,
+            Some(MenuArcConfig {
+                position: Some("left".to_string()),
+                span: Some(120.0),
+            })
+        );
+        assert_eq!(parsed.animation.as_deref(), Some("none"));
+
+        let serialized = serde_json::to_string(&parsed).expect("serialize menu layout arc");
+        assert!(serialized.contains(r#""layout":"arc""#));
+        assert!(serialized.contains(r#""arc":{"position":"left","span":120.0}"#));
+        assert!(serialized.contains(r#""animation":"none""#));
+
+        let roundtrip: MenuConfig = serde_json::from_str(&serialized).expect("deserialize roundtrip");
+        assert_eq!(parsed, roundtrip);
     }
 }

@@ -1,0 +1,12 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-arc-web/packages/orbitkit
+
+
+ Test Files  5 passed (5)
+      Tests  103 passed (103)
+   Start at  20:39:51
+   Duration  1.03s (environment 57%, transform 29%, import 8%, tests 6%)
+
+EXIT_CODE=0

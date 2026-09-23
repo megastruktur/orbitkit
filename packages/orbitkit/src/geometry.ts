@@ -80,3 +80,71 @@ export function layoutItems(
 
   return items;
 }
+
+export interface MenuAngleResolutionInput {
+  layout?: "orbit" | "arc";
+  arc?: {
+    position?: "top" | "bottom" | "left" | "right";
+    span?: number;
+  };
+  startAngle?: number;
+  endAngle?: number;
+}
+
+export interface ResolvedMenuAngles {
+  startAngle: number;
+  endAngle: number;
+}
+
+/**
+ * Resolves start and end angles for radial menu items based on layout configuration.
+ *
+ * Angles use K3 geometry: 0 = right, clockwise, screen y points down.
+ * Centre angles: top -90, right 0, bottom 90, left 180.
+ * For `layout: "arc"`:
+ *   startAngle = centre - span/2
+ *   endAngle = centre + span/2
+ * Defaults:
+ *   position: "top" (-90)
+ *   span: 180
+ *
+ * For `layout: "orbit"` (or default):
+ *   startAngle = menu.startAngle ?? -90
+ *   endAngle = menu.endAngle ?? 270
+ */
+export function resolveMenuAngles(
+  menu?: MenuAngleResolutionInput | null
+): ResolvedMenuAngles {
+  if (menu?.layout === "arc") {
+    const position = menu.arc?.position ?? "top";
+    const span = menu.arc?.span ?? 180;
+
+    let centre: number;
+    switch (position) {
+      case "top":
+        centre = -90;
+        break;
+      case "right":
+        centre = 0;
+        break;
+      case "bottom":
+        centre = 90;
+        break;
+      case "left":
+        centre = 180;
+        break;
+      default:
+        centre = -90;
+    }
+
+    return {
+      startAngle: round2(centre - span / 2),
+      endAngle: round2(centre + span / 2),
+    };
+  }
+
+  return {
+    startAngle: menu?.startAngle ?? -90,
+    endAngle: menu?.endAngle ?? 270,
+  };
+}

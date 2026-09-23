@@ -318,4 +318,63 @@ describe("RadialMenu component", () => {
 
     expect(onselect).toHaveBeenCalledTimes(1);
   });
+
+  it("renders with layout arc top where every item has y <= 0 (above the centre)", () => {
+    const arcTopConfig: MenuConfig = {
+      items: [
+        { id: "act1", label: "Act 1" },
+        { id: "act2", label: "Act 2" },
+        { id: "act3", label: "Act 3" },
+        { id: "act4", label: "Act 4" },
+        { id: "act5", label: "Act 5" },
+      ],
+      radius: 96,
+      startAngle: -90,
+      endAngle: 270,
+      layout: "arc",
+      arc: {
+        position: "top",
+        span: 180,
+      },
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    render(RadialMenu, {
+      props: {
+        config: arcTopConfig,
+        open: true,
+        onselect: () => {},
+        onclose: () => {},
+      },
+    });
+
+    const items = screen.getAllByRole("menuitem");
+    expect(items).toHaveLength(5);
+    for (const item of items) {
+      const topPx = parseFloat(item.style.top);
+      expect(topPx).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it("disables animation and transition when config.animation is 'none'", () => {
+    const noAnimConfig: MenuConfig = {
+      ...sampleConfig,
+      animation: "none",
+    };
+
+    render(RadialMenu, {
+      props: {
+        config: noAnimConfig,
+        open: true,
+        onselect: () => {},
+        onclose: () => {},
+      },
+    });
+
+    const menu = screen.getByRole("menu");
+    expect(menu.classList.contains("no-animation")).toBe(true);
+    expect(menu.style.animation).toBe("none");
+    expect(menu.style.transition).toBe("none");
+  });
 });

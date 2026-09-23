@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { layoutItems } from "./geometry";
+import { layoutItems, resolveMenuAngles } from "./geometry";
+import arcVectors from "./arc-vectors.json";
 
 describe("layoutItems geometry", () => {
   it("full ring n=4 distributes 4 cardinal points without duplicating endpoint (0..360)", () => {
@@ -127,5 +128,94 @@ describe("layoutItems geometry", () => {
     expect(p180[0].x).toBe(-100);
     expect(p180[0].y).toBe(0);
     expect(Object.is(p180[0].y, -0)).toBe(false);
+  });
+});
+
+describe("resolveMenuAngles geometry", () => {
+  it("resolves arc top with default span 180 (-180..0)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "top", span: 180 },
+    });
+    expect(angles).toEqual({ startAngle: -180, endAngle: 0 });
+  });
+
+  it("resolves arc bottom with default span 180 (0..180)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "bottom", span: 180 },
+    });
+    expect(angles).toEqual({ startAngle: 0, endAngle: 180 });
+  });
+
+  it("resolves arc left with default span 180 (90..270)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "left", span: 180 },
+    });
+    expect(angles).toEqual({ startAngle: 90, endAngle: 270 });
+  });
+
+  it("resolves arc right with default span 180 (-90..90)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "right", span: 180 },
+    });
+    expect(angles).toEqual({ startAngle: -90, endAngle: 90 });
+  });
+
+  it("resolves arc with omitted span defaulting to 180", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "top" },
+    });
+    expect(angles).toEqual({ startAngle: -180, endAngle: 0 });
+  });
+
+  it("resolves arc top with custom span 120 (-150..-30)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "top", span: 120 },
+    });
+    expect(angles).toEqual({ startAngle: -150, endAngle: -30 });
+  });
+
+  it("resolves arc right with custom span 90 (-45..45)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc",
+      arc: { position: "right", span: 90 },
+    });
+    expect(angles).toEqual({ startAngle: -45, endAngle: 45 });
+  });
+
+  it("resolves orbit layout from configured startAngle and endAngle", () => {
+    const angles = resolveMenuAngles({
+      layout: "orbit",
+      startAngle: 0,
+      endAngle: 360,
+    });
+    expect(angles).toEqual({ startAngle: 0, endAngle: 360 });
+  });
+
+  it("resolves default orbit angles when layout is undefined or omitted", () => {
+    const angles = resolveMenuAngles({});
+    expect(angles).toEqual({ startAngle: -90, endAngle: 270 });
+  });
+
+  it("matches all canonical vectors from arc-vectors.json", () => {
+    for (const vector of arcVectors) {
+      const input = {
+        layout: vector.layout as "orbit" | "arc",
+        arc: vector.arc as { position?: "top" | "bottom" | "left" | "right"; span?: number } | undefined,
+        startAngle: vector.layout === "orbit" ? vector.startAngle : undefined,
+        endAngle: vector.layout === "orbit" ? vector.endAngle : undefined,
+      };
+      const resolved = resolveMenuAngles(input);
+      expect(resolved.startAngle).toBe(vector.startAngle);
+      expect(resolved.endAngle).toBe(vector.endAngle);
+
+      const positions = layoutItems(vector.n, 96, resolved.startAngle, resolved.endAngle);
+      expect(positions).toEqual(vector.positions);
+    }
   });
 });

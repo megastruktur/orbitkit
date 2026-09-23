@@ -447,4 +447,144 @@ describe("validateConfig", () => {
       ).toBe(true);
     }
   });
+
+  it("validates menu layout must be orbit or arc", () => {
+    const res = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "linear" as unknown as MenuConfig["layout"],
+      },
+    });
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.errors).toContain("menu.layout: must be 'orbit' or 'arc'");
+    }
+  });
+
+  it("validates menu arc position must be one of the four", () => {
+    const res = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "arc",
+        arc: {
+          position: "middle" as unknown as "top",
+        },
+      },
+    });
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.errors).toContain(
+        "menu.arc.position: must be 'top', 'bottom', 'left', or 'right'"
+      );
+    }
+  });
+
+  it("validates menu arc span must be between 30 and 300", () => {
+    const tooSmall = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "arc",
+        arc: { position: "top", span: 15 },
+      },
+    });
+    expect(tooSmall.ok).toBe(false);
+    if (!tooSmall.ok) {
+      expect(tooSmall.errors).toContain("menu.arc.span: must be between 30 and 300");
+    }
+
+    const tooLarge = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "arc",
+        arc: { position: "top", span: 350 },
+      },
+    });
+    expect(tooLarge.ok).toBe(false);
+    if (!tooLarge.ok) {
+      expect(tooLarge.errors).toContain("menu.arc.span: must be between 30 and 300");
+    }
+  });
+
+  it("validates valid arc config passes validation", () => {
+    const res = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "arc",
+        arc: { position: "top", span: 180 },
+      },
+    });
+    expect(res.ok).toBe(true);
+  });
+
+  it("allows arc without layout arc", () => {
+    const res = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        layout: "orbit",
+        arc: { position: "top", span: 180 },
+      },
+    });
+    expect(res.ok).toBe(true);
+  });
+
+  it("withDefaults resolves arc layout angles and populates default arc config", () => {
+    const def = withDefaults({
+      ...validBaseConfig,
+      menu: {
+        items: validBaseConfig.menu.items,
+        layout: "arc",
+      },
+    });
+    expect(def.menu.layout).toBe("arc");
+    expect(def.menu.arc).toEqual({ position: "top", span: 180 });
+    expect(def.menu.startAngle).toBe(-180);
+    expect(def.menu.endAngle).toBe(0);
+  });
+
+  it("withDefaults defaults menu.animation to spawn", () => {
+    const def = withDefaults({
+      ...validBaseConfig,
+    });
+    expect(def.menu.animation).toBe("spawn");
+  });
+
+  it("validates menu.animation accepts spawn and none", () => {
+    const spawnRes = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        animation: "spawn",
+      },
+    });
+    expect(spawnRes.ok).toBe(true);
+
+    const noneRes = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        animation: "none",
+      },
+    });
+    expect(noneRes.ok).toBe(true);
+  });
+
+  it("validates menu.animation rejects invalid value", () => {
+    const invalidRes = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        animation: "zoom" as unknown as "spawn",
+      },
+    });
+    expect(invalidRes.ok).toBe(false);
+    if (!invalidRes.ok) {
+      expect(invalidRes.errors).toContain("menu.animation: must be one of spawn, none");
+    }
+  });
 });

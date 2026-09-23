@@ -68,6 +68,19 @@ Configures the radial or arc action menu that appears around the mascot.
 | `endAngle` | `number` | `270` | **Yes** | Ending angle in degrees. `-90` to `270` produces a complete 360-degree circle. |
 | `itemSize` | `number` | `44` | No | Positive number (pixels). Width and height of each radial button. |
 | `trigger` | `"click" \| "hover"` | `"click"` | No | Interaction model that activates a menu item. |
+| `layout` | `"orbit" \| "arc"` | `"orbit"` | No | Layout geometry: `"orbit"` (full ring or manual angles) or `"arc"` (side arc). |
+| `arc` | `MenuArcConfig` | `{ position: "top", span: 180 }` | No | Configures arc side and span when `layout: "arc"`. |
+| `animation` | `"spawn" \| "none"` | `"spawn"` | No | Animation behavior: `"spawn"` (grow from/collapse into mascot) or `"none"` (instant show/hide; more may be added). |
+
+> **Note on `layout: "arc"` (Contract Amendment K2-A1):**
+> When `layout` is set to `"arc"`, OrbitKit computes `startAngle = centre - span / 2` and `endAngle = centre + span / 2` using the mascot centre angles (top = -90°, right = 0°, bottom = 90°, left = 180°). The resolved angles supersede any manually configured `startAngle` and `endAngle`. If `arc` is specified without `layout: "arc"`, it is allowed but ignored during angle resolution.
+
+#### Menu Arc Configuration (`menu.arc`)
+
+| Field | Type | Default | Required | Validation & Description |
+|---|---|---|---|---|
+| `position` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | No | Side of the mascot the arc sits on. |
+| `span` | `number` | `180` | No | Arc width in degrees. Must be between 30 and 300. |
 
 #### Menu Item (`menu.items[]`)
 
@@ -274,9 +287,9 @@ For game-style or pixel-art character animations:
 }
 ```
 
-### Example 3: Arc / Semicircle Menu Layout
+### Example 3: Arc Menu Layout (K2-A1)
 
-To place radial buttons along an arc above the mascot (e.g. from -135 degrees to -45 degrees):
+To place radial buttons along a 180-degree half-circle arc above the mascot using `layout: "arc"`:
 
 ```json
 {
@@ -287,8 +300,11 @@ To place radial buttons along an arc above the mascot (e.g. from -135 degrees to
       { "id": "cut", "label": "Cut" }
     ],
     "radius": 80,
-    "startAngle": -135,
-    "endAngle": -45,
+    "layout": "arc",
+    "arc": {
+      "position": "top",
+      "span": 180
+    },
     "itemSize": 40,
     "trigger": "hover"
   }

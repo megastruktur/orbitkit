@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { MenuConfig } from "./config";
-  import { layoutItems } from "./geometry";
+  import { layoutItems, resolveMenuAngles } from "./geometry";
 
   interface Props {
     config: MenuConfig;
@@ -13,12 +13,13 @@
 
   let menuEl: HTMLElement | null = $state(null);
   let itemSize = $derived(config.itemSize ?? 44);
+  let angles = $derived(resolveMenuAngles(config));
   let positions = $derived(
     layoutItems(
       config.items.length,
       config.radius,
-      config.startAngle,
-      config.endAngle
+      angles.startAngle,
+      angles.endAngle
     )
   );
 
@@ -122,6 +123,8 @@
   <div
     bind:this={menuEl}
     class="orbitkit-radial-menu"
+    class:no-animation={config.animation === "none"}
+    style={config.animation === "none" ? "animation: none !important; transition: none !important;" : undefined}
     role="menu"
     tabindex="-1"
     aria-label="Radial Menu"
@@ -168,6 +171,15 @@
       opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     animation: orbitkit-radial-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .orbitkit-radial-menu.no-animation {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .orbitkit-radial-menu.no-animation .orbitkit-radial-item {
+    transition: none !important;
   }
 
   @keyframes orbitkit-radial-enter {

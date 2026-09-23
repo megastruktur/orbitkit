@@ -1,0 +1,24 @@
+Scope: all 3 workspace projects
+✓ Lockfile passes supply-chain policies (verified 3h ago)
+Lockfile is up to date, resolution step is skipped
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /home/megastruktur/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +123
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 123, reused 123, downloaded 0, added 123, done
+Done in 141ms using pnpm v12.4.1
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-pkg-cleanup/packages/orbitkit
+
+
+ Test Files  5 passed (5)
+      Tests  82 passed (82)
+   Start at  14:05:13
+   Duration  1.30s (environment 52%, transform 33%, import 8%, tests 6%)
+
+EXIT_CODE=0

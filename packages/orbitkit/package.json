@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./assets/*": "./assets/*"
   },
   "scripts": {
     "build": "svelte-package -i src -o dist && rm -f dist/*.test.*",

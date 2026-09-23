@@ -1,7 +1,5 @@
 package dev.orbitkit.native
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -32,9 +30,6 @@ import app.tauri.plugin.Channel
 import app.tauri.plugin.Invoke
 import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
-import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicLong
 
 @InvokeArg
 class OverlayShowArgs {

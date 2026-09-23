@@ -1,0 +1,212 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'oks/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  js:
+    name: js
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run JS pipeline
+        run: pnpm install --frozen-lockfile && pnpm -r build && pnpm -r check && pnpm -r test
+
+  rust:
+    name: rust
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            libssl-dev \
+            build-essential \
+            file \
+            pkg-config
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cargo test
+        run: cargo test --workspace --exclude starter
+
+      - name: Cargo clippy
+        run: cargo clippy -p tauri-plugin-orbitkit -p tauri-plugin-orbitkit-recorder --all-targets -- -D warnings
+
+  desktop:
+    name: desktop (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    env:
+      npm_config_shell_emulator: 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-24.04
+            binary-path: target/debug/starter
+          - platform: windows
+            os: windows-latest
+            binary-path: target/debug/starter.exe
+          - platform: macos
+            os: macos-latest
+            binary-path: target/debug/starter
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            libssl-dev \
+            build-essential \
+            file \
+            pkg-config
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure pnpm shell on Windows
+        if: runner.os == 'Windows'
+        run: pnpm config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Build starter desktop app
+        run: pnpm --filter starter tauri build --debug --no-bundle
+
+      - name: Upload desktop binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: starter-${{ matrix.platform }}
+          path: ${{ matrix.binary-path }}
+          if-no-files-found: error
+          retention-days: 1
+
+  android:
+    name: android
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java (JDK 17 Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK and NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "ndk;27.3.13750724"
+          {
+            echo "ANDROID_HOME=$ANDROID_HOME"
+            echo "NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724"
+            echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Build starter APK (core)
+        run: pnpm --filter starter tauri android build --debug --target aarch64 --apk
+
+      - name: Archive core APK
+        run: |
+          mkdir -p artifacts/android
+          cp examples/starter/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk artifacts/android/starter-core-debug.apk
+          test -s artifacts/android/starter-core-debug.apk
+      - name: Build starter APK (recorder)
+        run: pnpm --filter starter tauri android build --debug --target aarch64 --apk --features recorder
+
+      - name: Archive recorder APK
+        run: |
+          cp examples/starter/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk artifacts/android/starter-recorder-debug.apk
+          test -s artifacts/android/starter-recorder-debug.apk
+
+      - name: Run Gradle unit tests
+        run: |
+          cd examples/starter/src-tauri/gen/android
+          chmod +x gradlew
+          ./gradlew test
+
+      - name: Upload Android APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: starter-android-apks
+          path: artifacts/android/*.apk
+          if-no-files-found: error
+          retention-days: 1

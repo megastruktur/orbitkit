@@ -1,0 +1,49 @@
+$ tauri android build --debug --target aarch64 --apk --features recorder
+        Info Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 131 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.39 kB │ gzip:  0.26 kB
+dist/assets/index-DMK0Id8E.css  10.29 kB │ gzip:  2.53 kB
+dist/assets/index-CurN3cZR.js   73.09 kB │ gzip: 25.83 kB
+
+✓ built in 223ms
+[1m[92m   Compiling[0m tauri-plugin-orbitkit-recorder v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-ci/crates/tauri-plugin-orbitkit-recorder)
+[1m[92m   Compiling[0m starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 4.05s
+        Info symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+        Info "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/liborbitkit_lib.so" points to "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so"
+        Info connection; remote_addr=127.0.0.1:52432 conn_id=0
+$ tauri android android-studio-script --target aarch64
+[1m[32m        Info[0m Using installed NDK: /home/megastruktur/Android/Sdk/ndk/27.3.13750724
+[1m[92m   Compiling[0m starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.86s
+[1m[32m        Info[0m symlinking lib "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" in jniLibs dir "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libandroid.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libdl.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "liblog.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libm.so"
+[1m[32m        Info[0m "/home/megastruktur/orca/workspaces/orbitkit/oks-ci/target/aarch64-linux-android/debug/liborbitkit_lib.so" requires shared lib "libc.so"
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+    Finished 1 APK at:
+        /home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+
+EXIT_CODE=0

@@ -1,0 +1,460 @@
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preArm64DebugBuild UP-TO-DATE
+> Task :app:generateArm64DebugBuildConfig
+> Task :tauri-android:preBuild UP-TO-DATE
+> Task :tauri-android:preDebugBuild UP-TO-DATE
+> Task :tauri-android:writeDebugAarMetadata UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preDebugBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:writeDebugAarMetadata UP-TO-DATE
+> Task :app:generateArm64DebugResValues
+> Task :app:checkArm64DebugAarMetadata
+> Task :tauri-android:generateDebugResValues UP-TO-DATE
+> Task :tauri-android:generateDebugResources UP-TO-DATE
+> Task :tauri-android:packageDebugResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugResValues UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:packageDebugResources UP-TO-DATE
+> Task :app:mapArm64DebugSourceSetPaths
+> Task :app:generateArm64DebugResources
+> Task :app:packageArm64DebugResources
+> Task :app:createArm64DebugCompatibleScreenManifests
+> Task :app:extractDeepLinksArm64Debug
+> Task :tauri-android:extractDeepLinksDebug UP-TO-DATE
+> Task :tauri-android:processDebugManifest UP-TO-DATE
+> Task :tauri-plugin-orbitkit:extractDeepLinksDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:processDebugManifest UP-TO-DATE
+> Task :app:parseArm64DebugLocalResources
+> Task :app:processArm64DebugMainManifest
+> Task :app:processArm64DebugManifest
+> Task :tauri-android:compileDebugLibraryResources UP-TO-DATE
+> Task :tauri-android:parseDebugLocalResources UP-TO-DATE
+> Task :tauri-android:generateDebugRFile UP-TO-DATE
+> Task :tauri-plugin-orbitkit:compileDebugLibraryResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:parseDebugLocalResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugRFile UP-TO-DATE
+> Task :tauri-android:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:generateDebugBuildConfig UP-TO-DATE
+> Task :tauri-android:compileDebugKotlin UP-TO-DATE
+> Task :tauri-android:javaPreCompileDebug UP-TO-DATE
+> Task :tauri-android:compileDebugJavaWithJavac UP-TO-DATE
+> Task :tauri-android:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-plugin-orbitkit:compileDebugKotlin UP-TO-DATE
+> Task :tauri-plugin-orbitkit:javaPreCompileDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:compileDebugJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:preArm64DebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileArm64Debug
+> Task :app:javaPreCompileArm64DebugUnitTest
+> Task :tauri-android:processDebugJavaRes UP-TO-DATE
+> Task :tauri-android:bundleLibRuntimeToJarDebug
+> Task :tauri-plugin-orbitkit:processDebugJavaRes UP-TO-DATE
+> Task :tauri-plugin-orbitkit:bundleLibRuntimeToJarDebug
+> Task :app:buildKotlinToolingMetadata
+> Task :app:preArm64ReleaseBuild UP-TO-DATE
+> Task :app:generateArm64ReleaseBuildConfig
+> Task :tauri-android:preReleaseBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preReleaseBuild UP-TO-DATE
+> Task :tauri-android:writeReleaseAarMetadata
+> Task :tauri-plugin-orbitkit:writeReleaseAarMetadata
+> Task :app:generateArm64ReleaseResValues
+> Task :tauri-android:generateReleaseResValues
+> Task :app:checkArm64ReleaseAarMetadata
+> Task :tauri-android:generateReleaseResources
+> Task :tauri-android:packageReleaseResources
+> Task :tauri-plugin-orbitkit:generateReleaseResValues
+> Task :tauri-plugin-orbitkit:generateReleaseResources
+> Task :tauri-plugin-orbitkit:packageReleaseResources
+> Task :app:mapArm64ReleaseSourceSetPaths
+> Task :app:generateArm64ReleaseResources
+> Task :app:mergeArm64DebugResources
+> Task :app:packageArm64ReleaseResources
+> Task :app:createArm64ReleaseCompatibleScreenManifests
+> Task :app:parseArm64ReleaseLocalResources
+> Task :app:extractDeepLinksArm64Release
+> Task :tauri-android:extractDeepLinksRelease
+> Task :tauri-plugin-orbitkit:extractDeepLinksRelease
+> Task :tauri-android:processReleaseManifest
+> Task :tauri-android:compileReleaseLibraryResources
+> Task :tauri-plugin-orbitkit:processReleaseManifest
+> Task :tauri-android:parseReleaseLocalResources
+> Task :app:processArm64ReleaseMainManifest
+> Task :app:processArm64ReleaseManifest
+> Task :tauri-plugin-orbitkit:compileReleaseLibraryResources
+> Task :tauri-android:generateReleaseRFile
+> Task :app:processArm64DebugManifestForPackage
+> Task :tauri-plugin-orbitkit:parseReleaseLocalResources
+> Task :tauri-android:generateReleaseBuildConfig
+> Task :tauri-plugin-orbitkit:generateReleaseRFile
+> Task :tauri-android:javaPreCompileRelease
+> Task :tauri-plugin-orbitkit:javaPreCompileRelease
+> Task :app:preArm64ReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileArm64Release
+> Task :app:preArmDebugBuild UP-TO-DATE
+> Task :app:javaPreCompileArm64ReleaseUnitTest
+> Task :app:generateArmDebugBuildConfig
+> Task :app:generateArmDebugResValues
+> Task :app:checkArmDebugAarMetadata
+> Task :app:mapArmDebugSourceSetPaths
+> Task :app:generateArmDebugResources
+> Task :app:mergeArm64ReleaseResources
+> Task :app:packageArmDebugResources
+> Task :app:createArmDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksArmDebug
+> Task :app:parseArmDebugLocalResources
+> Task :app:processArmDebugMainManifest
+> Task :app:processArmDebugManifest
+> Task :app:processArm64ReleaseManifestForPackage
+> Task :app:javaPreCompileArmDebug
+> Task :app:preArmDebugUnitTestBuild UP-TO-DATE
+> Task :app:preArmReleaseBuild UP-TO-DATE
+> Task :app:javaPreCompileArmDebugUnitTest
+> Task :app:generateArmReleaseBuildConfig
+> Task :app:generateArmReleaseResValues
+> Task :app:checkArmReleaseAarMetadata
+> Task :app:mapArmReleaseSourceSetPaths
+> Task :app:generateArmReleaseResources
+> Task :app:processArm64DebugResources
+> Task :app:mergeArmDebugResources
+> Task :app:packageArmReleaseResources
+> Task :app:createArmReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksArmRelease
+> Task :app:parseArmReleaseLocalResources
+> Task :app:processArmReleaseMainManifest
+> Task :app:processArmReleaseManifest
+> Task :app:preArmReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileArmRelease
+> Task :app:preUniversalDebugBuild UP-TO-DATE
+> Task :app:javaPreCompileArmReleaseUnitTest
+> Task :app:generateUniversalDebugBuildConfig UP-TO-DATE
+> Task :app:checkUniversalDebugAarMetadata UP-TO-DATE
+> Task :app:generateUniversalDebugResValues UP-TO-DATE
+> Task :app:mapUniversalDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateUniversalDebugResources UP-TO-DATE
+> Task :app:mergeUniversalDebugResources UP-TO-DATE
+> Task :app:packageUniversalDebugResources UP-TO-DATE
+> Task :app:parseUniversalDebugLocalResources UP-TO-DATE
+> Task :app:createUniversalDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksUniversalDebug UP-TO-DATE
+> Task :app:processUniversalDebugMainManifest UP-TO-DATE
+> Task :app:processUniversalDebugManifest UP-TO-DATE
+> Task :app:processUniversalDebugManifestForPackage UP-TO-DATE
+> Task :app:processUniversalDebugResources UP-TO-DATE
+> Task :app:compileUniversalDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileUniversalDebug UP-TO-DATE
+> Task :app:compileUniversalDebugJavaWithJavac UP-TO-DATE
+> Task :app:preUniversalDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileUniversalDebugUnitTest
+> Task :app:processUniversalDebugJavaRes UP-TO-DATE
+> Task :app:preUniversalReleaseBuild UP-TO-DATE
+> Task :app:generateUniversalReleaseBuildConfig
+> Task :app:bundleUniversalDebugClassesToRuntimeJar
+> Task :app:bundleUniversalDebugClassesToCompileJar
+> Task :app:checkUniversalReleaseAarMetadata
+> Task :app:mergeArmReleaseResources
+> Task :app:processArm64ReleaseResources
+
+> Task :tauri-android:compileReleaseKotlin
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/megastruktur/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.6/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+
+> Task :tauri-android:compileReleaseJavaWithJavac
+> Task :tauri-android:processReleaseJavaRes
+> Task :tauri-android:bundleLibCompileToJarRelease
+> Task :tauri-android:bundleLibRuntimeToJarRelease
+> Task :app:generateUniversalReleaseResValues
+> Task :app:mapUniversalReleaseSourceSetPaths
+> Task :app:generateUniversalReleaseResources
+> Task :app:compileUniversalDebugUnitTestKotlin
+> Task :app:compileUniversalDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processUniversalDebugUnitTestJavaRes
+> Task :app:mergeUniversalReleaseResources
+
+> Task :app:compileArm64DebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :tauri-plugin-orbitkit:compileReleaseKotlin
+> Task :app:testUniversalDebugUnitTest
+> Task :app:compileArm64DebugJavaWithJavac
+> Task :app:processArm64DebugJavaRes
+> Task :tauri-plugin-orbitkit:compileReleaseJavaWithJavac NO-SOURCE
+> Task :app:bundleArm64DebugClassesToRuntimeJar
+> Task :app:processArmDebugManifestForPackage
+> Task :app:bundleArm64DebugClassesToCompileJar
+> Task :tauri-plugin-orbitkit:bundleLibCompileToJarRelease
+> Task :tauri-plugin-orbitkit:bundleLibRuntimeToJarRelease
+> Task :tauri-plugin-orbitkit:processReleaseJavaRes
+> Task :app:packageUniversalReleaseResources
+> Task :app:createUniversalReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksUniversalRelease
+> Task :app:parseUniversalReleaseLocalResources
+> Task :app:processUniversalReleaseMainManifest
+> Task :app:processUniversalReleaseManifest
+> Task :app:preUniversalReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileUniversalRelease
+> Task :app:preX86DebugBuild UP-TO-DATE
+> Task :app:javaPreCompileUniversalReleaseUnitTest
+> Task :app:generateX86DebugBuildConfig
+> Task :app:generateX86DebugResValues
+> Task :app:checkX86DebugAarMetadata
+> Task :app:mapX86DebugSourceSetPaths
+> Task :app:generateX86DebugResources
+> Task :app:compileArm64DebugUnitTestKotlin
+> Task :app:compileArm64DebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processArm64DebugUnitTestJavaRes
+> Task :app:mergeX86DebugResources
+> Task :app:processArmDebugResources
+> Task :app:testArm64DebugUnitTest
+> Task :app:packageX86DebugResources
+> Task :app:createX86DebugCompatibleScreenManifests
+> Task :app:extractDeepLinksX86Debug
+> Task :app:parseX86DebugLocalResources
+> Task :app:processX86DebugMainManifest
+> Task :app:processX86DebugManifest
+> Task :app:preX86DebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileX86Debug
+> Task :app:preX86ReleaseBuild UP-TO-DATE
+> Task :app:javaPreCompileX86DebugUnitTest
+> Task :app:generateX86ReleaseBuildConfig
+> Task :app:generateX86ReleaseResValues
+> Task :app:checkX86ReleaseAarMetadata
+> Task :app:mapX86ReleaseSourceSetPaths
+> Task :app:generateX86ReleaseResources
+
+> Task :app:compileArm64ReleaseKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileArm64ReleaseJavaWithJavac
+> Task :app:processUniversalReleaseManifestForPackage
+> Task :app:processArm64ReleaseJavaRes
+> Task :app:bundleArm64ReleaseClassesToRuntimeJar
+> Task :app:bundleArm64ReleaseClassesToCompileJar
+> Task :app:mergeX86ReleaseResources
+> Task :app:packageX86ReleaseResources
+> Task :app:createX86ReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksX86Release
+> Task :app:parseX86ReleaseLocalResources
+> Task :app:processX86ReleaseMainManifest
+> Task :app:processX86ReleaseManifest
+> Task :app:javaPreCompileX86Release
+> Task :app:processArmReleaseManifestForPackage
+> Task :app:preX86ReleaseUnitTestBuild UP-TO-DATE
+> Task :app:preX86_64DebugBuild UP-TO-DATE
+> Task :app:javaPreCompileX86ReleaseUnitTest
+> Task :app:generateX86_64DebugBuildConfig
+> Task :app:generateX86_64DebugResValues
+> Task :app:checkX86_64DebugAarMetadata
+> Task :app:mapX86_64DebugSourceSetPaths
+> Task :app:generateX86_64DebugResources
+> Task :app:compileArm64ReleaseUnitTestKotlin
+> Task :app:compileArm64ReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processArm64ReleaseUnitTestJavaRes
+> Task :app:processUniversalReleaseResources
+> Task :app:mergeX86_64DebugResources
+> Task :app:processArmReleaseResources
+
+> Task :app:compileArmDebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:testArm64ReleaseUnitTest
+> Task :app:compileArmDebugJavaWithJavac
+> Task :app:processArmDebugJavaRes
+> Task :app:bundleArmDebugClassesToRuntimeJar
+> Task :app:bundleArmDebugClassesToCompileJar
+> Task :app:packageX86_64DebugResources
+> Task :app:createX86_64DebugCompatibleScreenManifests
+> Task :app:extractDeepLinksX86_64Debug
+> Task :app:parseX86_64DebugLocalResources
+> Task :app:processX86_64DebugMainManifest
+> Task :app:processX86_64DebugManifest
+> Task :app:preX86_64DebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileX86_64Debug
+> Task :app:preX86_64ReleaseBuild UP-TO-DATE
+> Task :app:javaPreCompileX86_64DebugUnitTest
+> Task :app:generateX86_64ReleaseBuildConfig
+> Task :app:generateX86_64ReleaseResValues
+> Task :app:checkX86_64ReleaseAarMetadata
+> Task :app:processX86ReleaseManifestForPackage
+> Task :app:mapX86_64ReleaseSourceSetPaths
+> Task :app:generateX86_64ReleaseResources
+> Task :app:compileArmDebugUnitTestKotlin
+> Task :app:compileArmDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processArmDebugUnitTestJavaRes
+> Task :app:mergeX86_64ReleaseResources
+> Task :app:processX86ReleaseResources
+> Task :app:testArmDebugUnitTest
+> Task :app:packageX86_64ReleaseResources
+> Task :app:createX86_64ReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksX86_64Release
+> Task :app:parseX86_64ReleaseLocalResources
+> Task :app:processX86_64ReleaseMainManifest
+> Task :app:processX86_64ReleaseManifest
+> Task :app:preX86_64ReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileX86_64Release
+> Task :tauri-android:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileX86_64ReleaseUnitTest
+> Task :tauri-android:preReleaseUnitTestBuild UP-TO-DATE
+> Task :tauri-android:javaPreCompileDebugUnitTest
+> Task :tauri-plugin-orbitkit:preDebugUnitTestBuild UP-TO-DATE
+> Task :tauri-android:javaPreCompileReleaseUnitTest
+> Task :tauri-plugin-orbitkit:preReleaseUnitTestBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:javaPreCompileDebugUnitTest
+> Task :tauri-plugin-orbitkit:javaPreCompileReleaseUnitTest
+> Task :app:processX86DebugManifestForPackage
+> Task :app:processX86_64DebugManifestForPackage
+> Task :app:processX86_64ReleaseManifestForPackage
+> Task :tauri-plugin-orbitkit:generateDebugUnitTestStubRFile
+> Task :tauri-android:generateReleaseUnitTestStubRFile
+> Task :tauri-android:generateDebugUnitTestStubRFile
+> Task :tauri-plugin-orbitkit:generateReleaseUnitTestStubRFile
+> Task :tauri-android:compileDebugUnitTestKotlin
+> Task :tauri-android:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :tauri-android:processDebugUnitTestJavaRes
+
+> Task :app:compileArmReleaseKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileUniversalReleaseKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :tauri-android:compileReleaseUnitTestKotlin
+> Task :app:processX86DebugResources
+> Task :app:processX86_64DebugResources
+> Task :app:processX86_64ReleaseResources
+> Task :tauri-plugin-orbitkit:compileDebugUnitTestKotlin
+> Task :tauri-plugin-orbitkit:compileReleaseUnitTestKotlin
+> Task :tauri-android:testDebugUnitTest
+> Task :app:compileArmReleaseJavaWithJavac
+> Task :app:processArmReleaseJavaRes
+> Task :app:bundleArmReleaseClassesToRuntimeJar
+> Task :app:bundleArmReleaseClassesToCompileJar
+> Task :app:compileUniversalReleaseJavaWithJavac
+> Task :app:processUniversalReleaseJavaRes
+> Task :app:bundleUniversalReleaseClassesToRuntimeJar
+> Task :app:bundleUniversalReleaseClassesToCompileJar
+> Task :tauri-android:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :tauri-android:processReleaseUnitTestJavaRes
+> Task :app:compileArmReleaseUnitTestKotlin
+
+> Task :app:compileX86ReleaseKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileUniversalReleaseUnitTestKotlin
+> Task :tauri-android:testReleaseUnitTest
+> Task :app:compileArmReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processArmReleaseUnitTestJavaRes
+> Task :app:testArmReleaseUnitTest
+> Task :app:compileUniversalReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processUniversalReleaseUnitTestJavaRes
+
+> Task :app:compileX86DebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileX86_64ReleaseKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:compileX86_64DebugKotlin
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/app/src/main/java/dev/orbitkit/app/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+
+> Task :app:testUniversalReleaseUnitTest
+> Task :app:compileX86DebugJavaWithJavac
+> Task :app:processX86DebugJavaRes
+> Task :app:bundleX86DebugClassesToRuntimeJar
+> Task :app:bundleX86DebugClassesToCompileJar
+> Task :app:compileX86ReleaseJavaWithJavac
+> Task :app:processX86ReleaseJavaRes
+> Task :app:bundleX86ReleaseClassesToRuntimeJar
+> Task :app:bundleX86ReleaseClassesToCompileJar
+> Task :app:compileX86_64DebugJavaWithJavac
+> Task :app:processX86_64DebugJavaRes
+> Task :app:bundleX86_64DebugClassesToCompileJar
+> Task :app:bundleX86_64DebugClassesToRuntimeJar
+> Task :app:compileX86_64ReleaseJavaWithJavac
+> Task :app:compileX86DebugUnitTestKotlin
+> Task :app:compileX86DebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processX86DebugUnitTestJavaRes
+> Task :app:compileX86ReleaseUnitTestKotlin
+> Task :app:compileX86_64DebugUnitTestKotlin
+> Task :app:testX86DebugUnitTest
+> Task :app:compileX86ReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processX86ReleaseUnitTestJavaRes
+> Task :app:testX86ReleaseUnitTest
+> Task :app:compileX86_64DebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processX86_64DebugUnitTestJavaRes
+> Task :app:testX86_64DebugUnitTest
+> Task :app:processX86_64ReleaseJavaRes
+> Task :tauri-android:test
+> Task :app:bundleX86_64ReleaseClassesToRuntimeJar
+> Task :tauri-plugin-orbitkit:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:bundleX86_64ReleaseClassesToCompileJar
+> Task :tauri-plugin-orbitkit:processDebugUnitTestJavaRes
+> Task :app:compileX86_64ReleaseUnitTestKotlin
+> Task :tauri-plugin-orbitkit:testDebugUnitTest
+> Task :app:compileX86_64ReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processX86_64ReleaseUnitTestJavaRes
+> Task :app:testX86_64ReleaseUnitTest
+> Task :app:test
+> Task :tauri-plugin-orbitkit:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:processReleaseUnitTestJavaRes
+> Task :tauri-plugin-orbitkit:testReleaseUnitTest
+> Task :tauri-plugin-orbitkit:test
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-ci/examples/starter/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 8s
+328 actionable tasks: 278 executed, 50 up-to-date
+EXIT_CODE=0

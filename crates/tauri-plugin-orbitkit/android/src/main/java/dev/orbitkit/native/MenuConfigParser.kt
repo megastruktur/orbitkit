@@ -24,7 +24,8 @@ data class NativeMenuConfig(
     val startAngle: Double = DEFAULT_START_ANGLE,
     val endAngle: Double = DEFAULT_END_ANGLE,
     val itemSize: Double = DEFAULT_ITEM_SIZE,
-    val trigger: String = DEFAULT_TRIGGER
+    val trigger: String = DEFAULT_TRIGGER,
+    val animation: String = DEFAULT_ANIMATION
 ) {
     companion object {
         const val DEFAULT_RADIUS = 96.0
@@ -32,6 +33,7 @@ data class NativeMenuConfig(
         const val DEFAULT_END_ANGLE = 270.0
         const val DEFAULT_ITEM_SIZE = 44.0
         const val DEFAULT_TRIGGER = "click"
+        const val DEFAULT_ANIMATION = "spawn"
         val ID_PATTERN: Pattern = Pattern.compile("^[a-z0-9][a-z0-9_-]{0,31}$")
         fun isValidId(id: String): Boolean {
             return ID_PATTERN.matcher(id).matches()
@@ -59,6 +61,14 @@ data class OverlayConfig(
  * Throws IllegalArgumentException on invalid configurations (invalid item id, count > 12, etc.).
  */
 object MenuConfigParser {
+    private fun logW(msg: String) {
+        try {
+            android.util.Log.w("MenuConfigParser", msg)
+        } catch (_: Throwable) {
+            println("[MenuConfigParser] WARN: $msg")
+        }
+    }
+
 
     @JvmStatic
     fun parse(jsonStr: String): OverlayConfig {
@@ -174,13 +184,28 @@ object MenuConfigParser {
         } else {
             NativeMenuConfig.DEFAULT_TRIGGER
         }
+        val animation = if (obj.has("animation") && !obj.isNull("animation")) {
+            val raw = obj.getString("animation")
+            val normalized = raw.lowercase().trim()
+            if (normalized == "none") {
+                "none"
+            } else if (normalized == "spawn") {
+                "spawn"
+            } else {
+                logW("Unknown animation '$raw', falling back to 'spawn'")
+                "spawn"
+            }
+        } else {
+            NativeMenuConfig.DEFAULT_ANIMATION
+        }
         return NativeMenuConfig(
             items = items,
             radius = radius,
             startAngle = startAngle,
             endAngle = endAngle,
             itemSize = itemSize,
-            trigger = trigger
+            trigger = trigger,
+            animation = animation
         )
     }
 }

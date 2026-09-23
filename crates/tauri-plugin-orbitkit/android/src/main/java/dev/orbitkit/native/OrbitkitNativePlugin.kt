@@ -1,5 +1,10 @@
 package dev.orbitkit.native
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.OvershootInterpolator
+
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -43,7 +48,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
 
     private val TAG = "OrbitkitNative"
     private var windowManager: WindowManager? = null
-    private var overlayView: View? = null
     private var bubbleView: View? = null
     private var menuView: View? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
@@ -54,6 +58,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private var actionChannel: Channel? = null
     private var mascotView: TextView? = null
     private var currentMascotState: String = STATE_IDLE
+    private var activeOverlayTeardown: (() -> Unit)? = null
     companion object {
 
         const val STATE_IDLE = "idle"
@@ -244,10 +249,28 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         mascot.background = bg
     }
+    private fun getSystemAnimatorScale(context: Context): Float {
+        return try {
+            Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.ANIMATOR_DURATION_SCALE,
+                1.0f
+            )
+        } catch (_: Exception) {
+            1.0f
+        }
+    }
+
 
 
     private fun removeOverlayViews() {
         val wm = windowManager ?: return
+        try {
+            activeOverlayTeardown?.invoke()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error invoking activeOverlayTeardown", e)
+        }
+        activeOverlayTeardown = null
         if (isMenuAttached) {
             menuView?.let { menu ->
                 try {
@@ -270,7 +293,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             }
         }
         bubbleView = null
-        overlayView = null
         mascotView = null
         bubbleParams = null
         menuParams = null
@@ -423,7 +445,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         val mascotLp = FrameLayout.LayoutParams(mascotSizePx, mascotSizePx)
         bubbleContainer.addView(mascot, mascotLp)
         bubbleView = bubbleContainer
-        overlayView = bubbleContainer
 
         // 2. Menu window: contains ONLY the item views (no mascot)
         val menuContainer = FrameLayout(ctx).apply {
@@ -454,6 +475,10 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
 
                 if (item.disabled) {
                     isEnabled = false
+                    isClickable = true
+                    setOnClickListener {
+                        // Consumes tap so it does not fall through to container, keeping menu open
+                    }
                     alpha = 0.5f
                     setTextColor(Color.parseColor("#9CA3AF"))
                     background = GradientDrawable().apply {
@@ -516,21 +541,129 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             }
         }
 
-        fun collapseMenu() {
-            if (!isMenuExpanded) return
-            menuContainer.visibility = View.INVISIBLE
-            mParams.flags = mParams.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            try {
-                wm.updateViewLayout(menuContainer, mParams)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error updating menu window layout on collapse", e)
+        var targetOpen = true
+        var animSession = 0L
+        val overshootInterpolator = OvershootInterpolator(1.2f)
+        val accelerateInterpolator = AccelerateInterpolator()
+
+        fun cancelAllItemAnimators() {
+            for (itemView in itemViews) {
+                itemView.animate().setListener(null).cancel()
             }
-            isMenuExpanded = false
-            Log.i(TAG, "Menu collapsed, bubble untouched at ($bubbleCenterX, $bubbleCenterY)")
+        }
+        activeOverlayTeardown = {
+            cancelAllItemAnimators()
+        }
+
+        fun collapseMenu(animate: Boolean = true) {
+            if (!targetOpen && !isMenuExpanded) return
+            val animScale = getSystemAnimatorScale(ctx)
+            val animEnabled = animate && SpawnAnimation.enabled(menuConfig.animation, animScale)
+            targetOpen = false
+            val session = ++animSession
+
+            for (itemView in itemViews) {
+                itemView.isClickable = false
+            }
+
+            if (!animEnabled || items.isEmpty()) {
+                cancelAllItemAnimators()
+                menuContainer.visibility = View.INVISIBLE
+                mParams.flags = mParams.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                try {
+                    wm.updateViewLayout(menuContainer, mParams)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error updating menu window layout on instant collapse", e)
+                }
+                for (itemView in itemViews) {
+                    itemView.scaleX = 0f
+                    itemView.scaleY = 0f
+                    itemView.alpha = 0f
+                }
+                isMenuExpanded = false
+                Log.i(TAG, "Menu collapsed instantly (no animation)")
+                return
+            }
+
+            val screenBounds = getScreenBounds(wm, ctx)
+            var pendingAnimations = items.size
+
+            for (i in items.indices) {
+                val itemView = itemViews[i]
+                val pos = positions[i]
+                val itemScreenPos = OverlayGeometry.itemScreenPosition(
+                    bubbleCenterX = bubbleCenterX,
+                    bubbleCenterY = bubbleCenterY,
+                    relX = pos.x,
+                    relY = pos.y,
+                    itemSize = itemSizePx,
+                    screen = screenBounds
+                )
+                val offset = SpawnAnimation.startOffset(
+                    mascotCenterX = bubbleCenterX,
+                    mascotCenterY = bubbleCenterY,
+                    itemScreenX = itemScreenPos.x,
+                    itemScreenY = itemScreenPos.y,
+                    itemSize = itemSizePx
+                )
+
+                itemView.animate().setListener(null).cancel()
+
+                val currentFrac = SpawnAnimation.currentFraction(itemView.scaleX, 0f, 1f)
+                val duration = SpawnAnimation.reverseDuration(
+                    currentFraction = currentFrac,
+                    targetFraction = 0f,
+                    baseDurationMs = SpawnAnimation.CLOSE_DURATION_MS
+                )
+                val delay = if (currentFrac < 0.95f) 0L else SpawnAnimation.staggerDelay(
+                    index = i,
+                    totalItems = items.size,
+                    isOpening = false
+                )
+
+                var wasCanceled = false
+                itemView.animate()
+                    .translationX(offset.x)
+                    .translationY(offset.y)
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .alpha(0f)
+                    .setDuration(duration)
+                    .setStartDelay(delay)
+                    .setInterpolator(accelerateInterpolator)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationCancel(animation: Animator) {
+                            wasCanceled = true
+                        }
+                        override fun onAnimationEnd(animation: Animator) {
+                            itemView.animate().setListener(null)
+                            if (!wasCanceled && animSession == session && !targetOpen) {
+                                pendingAnimations--
+                                if (pendingAnimations <= 0) {
+                                    menuContainer.visibility = View.INVISIBLE
+                                    mParams.flags = mParams.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                                    try {
+                                        wm.updateViewLayout(menuContainer, mParams)
+                                    } catch (e: Exception) {
+                                        Log.w(TAG, "Error updating menu window layout on collapse complete", e)
+                                    }
+                                    isMenuExpanded = false
+                                    Log.i(TAG, "Spawn close animation completed, window invisible")
+                                }
+                            }
+                        }
+                    })
+                    .start()
+            }
         }
 
         fun expandMenu() {
-            if (isMenuExpanded) return
+            if (targetOpen && isMenuExpanded) return
+            val animScale = getSystemAnimatorScale(ctx)
+            val animEnabled = SpawnAnimation.enabled(menuConfig.animation, animScale)
+            targetOpen = true
+            val session = ++animSession
+
             updateMenuPositions(bubbleCenterX, bubbleCenterY)
             menuContainer.visibility = View.VISIBLE
             mParams.flags = mParams.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
@@ -539,13 +672,109 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             } catch (e: Exception) {
                 Log.e(TAG, "Error updating menu window layout on expand", e)
             }
-            isMenuExpanded = true
-            Log.i(TAG, "Menu expanded at ($bubbleCenterX, $bubbleCenterY)")
+
+            if (!animEnabled || items.isEmpty()) {
+                cancelAllItemAnimators()
+                for (i in itemViews.indices) {
+                    val item = items[i]
+                    val itemView = itemViews[i]
+                    itemView.translationX = 0f
+                    itemView.translationY = 0f
+                    itemView.scaleX = 1f
+                    itemView.scaleY = 1f
+                    itemView.alpha = if (item.disabled) 0.5f else 1.0f
+                    itemView.isClickable = true
+                }
+                isMenuExpanded = true
+                Log.i(TAG, "Menu expanded instantly at ($bubbleCenterX, $bubbleCenterY)")
+                return
+            }
+
+            for (itemView in itemViews) {
+                itemView.isClickable = false
+            }
+
+            val screenBounds = getScreenBounds(wm, ctx)
+            var pendingAnimations = items.size
+
+            for (i in items.indices) {
+                val item = items[i]
+                val itemView = itemViews[i]
+                val pos = positions[i]
+                val itemScreenPos = OverlayGeometry.itemScreenPosition(
+                    bubbleCenterX = bubbleCenterX,
+                    bubbleCenterY = bubbleCenterY,
+                    relX = pos.x,
+                    relY = pos.y,
+                    itemSize = itemSizePx,
+                    screen = screenBounds
+                )
+                val offset = SpawnAnimation.startOffset(
+                    mascotCenterX = bubbleCenterX,
+                    mascotCenterY = bubbleCenterY,
+                    itemScreenX = itemScreenPos.x,
+                    itemScreenY = itemScreenPos.y,
+                    itemSize = itemSizePx
+                )
+
+                itemView.animate().setListener(null).cancel()
+
+                if (!isMenuExpanded && itemView.scaleX <= 0.01f) {
+                    itemView.translationX = offset.x
+                    itemView.translationY = offset.y
+                    itemView.scaleX = 0f
+                    itemView.scaleY = 0f
+                    itemView.alpha = 0f
+                }
+
+                val currentFrac = SpawnAnimation.currentFraction(itemView.scaleX, 0f, 1f)
+                val duration = SpawnAnimation.reverseDuration(
+                    currentFraction = currentFrac,
+                    targetFraction = 1f,
+                    baseDurationMs = SpawnAnimation.OPEN_DURATION_MS
+                )
+                val delay = if (currentFrac > 0.05f) 0L else SpawnAnimation.staggerDelay(
+                    index = i,
+                    totalItems = items.size,
+                    isOpening = true
+                )
+                val targetAlpha = if (item.disabled) 0.5f else 1.0f
+
+                var wasCanceled = false
+                itemView.animate()
+                    .translationX(0f)
+                    .translationY(0f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(targetAlpha)
+                    .setDuration(duration)
+                    .setStartDelay(delay)
+                    .setInterpolator(overshootInterpolator)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationCancel(animation: Animator) {
+                            wasCanceled = true
+                        }
+                        override fun onAnimationEnd(animation: Animator) {
+                            itemView.animate().setListener(null)
+                            if (!wasCanceled && animSession == session && targetOpen) {
+                                pendingAnimations--
+                                if (pendingAnimations <= 0) {
+                                    isMenuExpanded = true
+                                    for (v in itemViews) {
+                                        v.isClickable = true
+                                    }
+                                    Log.i(TAG, "Spawn open animation completed, items clickable")
+                                }
+                            }
+                        }
+                    })
+                    .start()
+            }
         }
 
         menuContainer.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                if (isMenuExpanded) {
+                if (targetOpen) {
                     collapseMenu()
                 }
                 true
@@ -553,11 +782,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 false
             }
         }
-        menuContainer.setOnClickListener {
-            if (isMenuExpanded) {
-                collapseMenu()
-            }
-        }
+
         fun moveBubble(desiredX: Double, desiredY: Double) {
             val screenBounds = getScreenBounds(wm, ctx)
             val placement = OverlayGeometry.place(
@@ -604,8 +829,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                         val dy = event.rawY - initialTouchY
                         if (!isDragging && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
                             isDragging = true
-                            if (isMenuExpanded) {
-                                collapseMenu()
+                            if (targetOpen || isMenuExpanded) {
+                                collapseMenu(animate = false)
                             }
                         }
                         if (isDragging) {
@@ -625,8 +850,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         })
 
         mascot.setOnClickListener {
-            Log.i(TAG, "Mascot bubble tapped, toggling menu: current expanded=$isMenuExpanded")
-            if (isMenuExpanded) {
+            Log.i(TAG, "Mascot bubble tapped, toggling menu: current targetOpen=$targetOpen, expanded=$isMenuExpanded")
+            if (targetOpen) {
                 collapseMenu()
             } else {
                 expandMenu()
@@ -640,6 +865,11 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         wm.addView(bubbleContainer, bParams)
         isBubbleAttached = true
         isMenuExpanded = true
+        menuContainer.post {
+            if (isMenuAttached) {
+                updateMenuPositions(bubbleCenterX, bubbleCenterY)
+            }
+        }
 
         return bubbleContainer
     }

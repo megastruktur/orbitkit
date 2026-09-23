@@ -120,4 +120,5 @@ class OrbitkitNativePluginTest {
             assertTrue("Dispatch response must contain action: $act", res.contains(act))
         }
     }
+
 }

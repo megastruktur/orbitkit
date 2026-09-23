@@ -254,4 +254,27 @@ class MenuConfigParserTest {
             assertEquals(trigger, config.menu.trigger)
         }
     }
+
+    @Test
+    fun testParseAnimationField() {
+        // missing -> spawn
+        val missingJson = """{"items": [{"id": "act1", "label": "Act 1"}]}"""
+        val configMissing = MenuConfigParser.parse(missingJson)
+        assertEquals("spawn", configMissing.menu.animation)
+
+        // "none" -> none
+        val noneJson = """{"items": [{"id": "act1", "label": "Act 1"}], "animation": "none"}"""
+        val configNone = MenuConfigParser.parse(noneJson)
+        assertEquals("none", configNone.menu.animation)
+
+        // "spawn" -> spawn
+        val spawnJson = """{"items": [{"id": "act1", "label": "Act 1"}], "animation": "spawn"}"""
+        val configSpawn = MenuConfigParser.parse(spawnJson)
+        assertEquals("spawn", configSpawn.menu.animation)
+
+        // garbage -> spawn (falls back with warning)
+        val garbageJson = """{"items": [{"id": "act1", "label": "Act 1"}], "animation": "unknown-slide-fade"}"""
+        val configGarbage = MenuConfigParser.parse(garbageJson)
+        assertEquals("spawn", configGarbage.menu.animation)
+    }
 }

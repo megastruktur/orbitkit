@@ -1,0 +1,39 @@
+$ vitest run src/bridge.test.ts
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-bridge/packages/orbitkit
+
+ ❯ src/bridge.test.ts (23 tests | 1 failed) 11ms
+   ❯ bridge (23)
+     ❯ K4 commands via Tauri IPC (11)
+       × 1b. overlayPermission returns false when mockIPC returns { granted: false } 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/bridge.test.ts > bridge > K4 commands via Tauri IPC > 1b. overlayPermission returns false when mockIPC returns { granted: false }
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/bridge.test.ts:103:23
+    101|       const granted = await overlayPermission();
+    102|       expect(recordedCmd).toBe("plugin:orbitkit|overlay_permission");
+    103|       expect(granted).toBe(false);
+       |                       ^
+    104|     });
+    105|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 22 passed (23)
+   Start at  10:16:46
+   Duration  1.86s (transform 78%, environment 18%, import 4%, tests 1%)
+
+[ELIFECYCLE] Test failed. See above for more details.
+
+EXIT_CODE=1

@@ -14,12 +14,15 @@ mod desktop;
 #[cfg(mobile)]
 mod mobile;
 
-pub use config::OrbitKitConfig;
+pub use config::{MascotWindowConfig, OrbitKitConfig, PopupConfig};
 pub use error::{Error, ErrorCode, Result};
 pub use jni_bridge::MenuAction;
 
 #[cfg(desktop)]
-pub use desktop::Orbitkit;
+pub use desktop::{
+    calculate_overlay_position, calculate_overlay_size, lookup_popup, resolve_mascot_window,
+    MonitorBounds, Orbitkit, ResolvedMascotWindow,
+};
 #[cfg(mobile)]
 pub use mobile::Orbitkit;
 

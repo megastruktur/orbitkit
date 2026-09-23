@@ -1,0 +1,9 @@
+Launching exec container for /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-windows/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-windows/examples/starter/src-tauri/target-linux/exec-app.log
+
+(starter:57): dbind-WARNING **: 10:56:39.306: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+
+thread 'main' (57) panicked at crates/tauri-plugin-orbitkit/src/desktop.rs:126:21:
+Failed to parse ORBITKIT_SELFTEST_CONFIG file '/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-windows/target/bad-config.json': expected ident at line 1 column 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+EXIT_CODE=101

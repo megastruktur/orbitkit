@@ -343,6 +343,16 @@ host_image() {
   echo "Duration: ${duration}s"
   echo "=================================================="
 }
+collect_orbitkit_env_args() {
+  ORBITKIT_DOCKER_ENVS=()
+  local var
+  while IFS= read -r var; do
+    if [ -n "$var" ] && [ "$var" != "ORBITKIT_IN_CONTAINER" ]; then
+      ORBITKIT_DOCKER_ENVS+=("-e" "$var")
+    fi
+  done < <(env | cut -d= -f1 | grep '^ORBITKIT_' | sort -u || true)
+}
+
 
 host_build() {
   local app_dir_arg="$1"
@@ -353,6 +363,8 @@ host_build() {
   ensure_image
 
   echo "Launching build container for $abs_app_dir..."
+  collect_orbitkit_env_args
+
   docker run --rm \
     --user 1000:1000 \
     --shm-size=512m \
@@ -364,6 +376,7 @@ host_build() {
     -e PNPM_HOME=/pnpm-store \
     -e PNPM_STORE_DIR=/pnpm-store \
     -e ORBITKIT_IN_CONTAINER=1 \
+    "${ORBITKIT_DOCKER_ENVS[@]}" \
     -w "$REPO_ROOT" \
     "$IMAGE_NAME" \
     "$SCRIPT_PATH" build "$abs_app_dir"
@@ -399,6 +412,8 @@ host_run_screenshot() {
   echo "Launching screenshot container for $abs_app_dir (output: $abs_out_png, wait: ${seconds}s)..."
   local docker_exit=0
   set +e
+  collect_orbitkit_env_args
+
   docker run --rm \
     --user 1000:1000 \
     --shm-size=512m \
@@ -411,6 +426,7 @@ host_run_screenshot() {
     -e PNPM_HOME=/pnpm-store \
     -e PNPM_STORE_DIR=/pnpm-store \
     -e ORBITKIT_IN_CONTAINER=1 \
+    "${ORBITKIT_DOCKER_ENVS[@]}" \
     -w "$REPO_ROOT" \
     "$IMAGE_NAME" \
     "$SCRIPT_PATH" run-screenshot "$abs_app_dir" "$abs_out_png" "$seconds"
@@ -475,6 +491,8 @@ host_exec() {
   ensure_image
 
   echo "Launching exec container for $abs_app_dir..."
+  collect_orbitkit_env_args
+
   docker run --rm \
     --user 1000:1000 \
     --shm-size=512m \
@@ -486,6 +504,7 @@ host_exec() {
     -e PNPM_HOME=/pnpm-store \
     -e PNPM_STORE_DIR=/pnpm-store \
     -e ORBITKIT_IN_CONTAINER=1 \
+    "${ORBITKIT_DOCKER_ENVS[@]}" \
     -w "$REPO_ROOT" \
     "$IMAGE_NAME" \
     "$SCRIPT_PATH" exec "$abs_app_dir" -- "$@"

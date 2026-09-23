@@ -1,0 +1,2 @@
+0x00400003  0 fd9a66a6c119 orbitkit
+0x00400024  0 fd9a66a6c119 orbitkit-mascot

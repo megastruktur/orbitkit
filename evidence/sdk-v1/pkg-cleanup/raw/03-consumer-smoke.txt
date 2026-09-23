@@ -1,0 +1,64 @@
+package: @orbitkit/ui@0.1.0
+Tarball Contents
+assets/default-mascot.svg
+dist/bridge.d.ts
+dist/bridge.js
+dist/config.d.ts
+dist/config.js
+dist/geometry.d.ts
+dist/geometry.js
+dist/index.d.ts
+dist/index.js
+dist/Mascot.svelte
+dist/Mascot.svelte.d.ts
+dist/mascot/index.d.ts
+dist/mascot/index.js
+dist/mascot/sprite.d.ts
+dist/mascot/sprite.js
+dist/mascot/svg.d.ts
+dist/mascot/svg.js
+dist/RadialMenu.svelte
+dist/RadialMenu.svelte.d.ts
+package.json
+Tarball Details
+/tmp/orbitkit-ui-0.1.0.tgz
+Testing consumer smoke in /tmp/orbitkit-consumer-smoke-rnIzz2
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /tmp/.pnpm-store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +39
++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 39, reused 39, downloaded 0, added 39, done
+[WARN] Issues with peer dependencies found. Run "pnpm peers check" to list them.
+
+dependencies:
++ @orbitkit/ui 0.1.0
++ svelte 5.57.1
+
+devDependencies:
++ @sveltejs/vite-plugin-svelte 7.3.0
++ vite 6.4.3
+
+Error: ERR_PNPM_IGNORED_BUILDS
+
+  × installing dependencies
+  ╰─▶ Ignored build scripts: esbuild@0.25.12
+  help: Run "pnpm approve-builds" to pick which dependencies should be allowed
+        to run scripts.
+
+✓ Lockfile passes supply-chain policies (verified 49ms ago)
+Already up to date
+.../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+2:06:28 PM [vite-plugin-svelte] no Svelte config found at /tmp/orbitkit-consumer-smoke-rnIzz2 - using default configuration.
+vite v6.4.3 building for production...
+transforming...
+✓ 5 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                0.16 kB │ gzip: 0.14 kB
+dist/assets/index-B9m80EbO.js  2.00 kB │ gzip: 0.91 kB
+✓ built in 51ms
+Consumer smoke verification succeeded!
+EXIT_CODE=0

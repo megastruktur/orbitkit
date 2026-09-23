@@ -1,0 +1,36 @@
+Launching build container for /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build...
+=== Running in-container build for: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build ===
+Repository root: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build
+--> Installing dependencies at repo root...
+? Verifying lockfile against supply-chain policies (98 entries)...
+Update available! 12.4.1 → 12.5.1.
+Changelog: https://pnpm.io/v/12.5.1
+To update, run: pnpm self-update
+✓ Lockfile passes supply-chain policies (98 entries in 552ms)
+Lockfile is up to date, resolution step is skipped
+Done in 570ms using pnpm v12.4.1
+--> Building Tauri desktop application (debug, no-bundle)...
+--> CARGO_TARGET_DIR=/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux
+$ tauri build --debug --no-bundle
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 115 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.39 kB │ gzip:  0.26 kB
+dist/assets/index-DVn8_bU1.css   2.97 kB │ gzip:  0.96 kB
+dist/assets/index-38i9zzfl.js   38.22 kB │ gzip: 14.27 kB
+
+✓ built in 133ms
+   Compiling orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.50s
+       Built application at: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/debug/orbitkit
+=== Build successful ===
+Binary: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/debug/orbitkit
+/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/debug/orbitkit: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=6437e121c0eb904917aaf0b132b7ff89182278b0, with debug_info, not stripped
+Duration: 4s
+Exit code: 0

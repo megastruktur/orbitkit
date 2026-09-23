@@ -1,0 +1,13 @@
+K4 Command                     | Rust #[command] fn             | Permission ID                       | Status
+---------------------------------------------------------------------------------------------------------
+overlay_permission             | overlay_permission             | allow-overlay-permission            | MATCH
+request_overlay_permission     | request_overlay_permission     | allow-request-overlay-permission    | MATCH
+show_overlay                   | show_overlay                   | allow-show-overlay                  | MATCH
+hide_overlay                   | hide_overlay                   | allow-hide-overlay                  | MATCH
+open_popup                     | open_popup                     | allow-open-popup                    | MATCH
+close_popup                    | close_popup                    | allow-close-popup                   | MATCH
+set_mascot_state               | set_mascot_state               | allow-set-mascot-state              | MATCH
+emit_menu_action               | emit_menu_action               | allow-emit-menu-action              | MATCH
+---------------------------------------------------------------------------------------------------------
+Total commands checked: 8, all matched: True
+EXIT_CODE=0

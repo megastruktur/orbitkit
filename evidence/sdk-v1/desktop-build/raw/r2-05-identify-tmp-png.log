@@ -1,0 +1,12 @@
+=== Evidence: identify /tmp/oks-t01-r2.png ===
+  Format: PNG (Portable Network Graphics)
+  Geometry: 1280x800+0+0
+      mean: 21.5101 (0.0843532)
+      standard deviation: 48.8236 (0.191465)
+      mean: 23.7351 (0.0930787)
+      standard deviation: 47.9824 (0.188166)
+      mean: 29.0147 (0.113783)
+      standard deviation: 56.8848 (0.223077)
+      mean: 24.7533 (0.0970717)
+      standard deviation: 51.2302 (0.200903)
+EXIT_CODE=0

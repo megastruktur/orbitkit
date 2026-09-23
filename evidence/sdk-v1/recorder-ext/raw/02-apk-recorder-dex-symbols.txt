@@ -1,0 +1,5 @@
+=== APK DEX Class Verification ===
+OrbitkitRecorderService: FOUND in classes4.dex, classes9.dex
+OrbitkitStatePersistence: FOUND in classes4.dex, classes7.dex, classes9.dex
+OrbitkitRecorderPlugin: FOUND in classes9.dex
+EXIT_CODE=0

@@ -1,0 +1,691 @@
+=== APK DEX CLASS INSPECTION ===
+P d 407	434	47902	dev.orbitkit
+P d 226	244	19545	dev.orbitkit.app
+C d 42	42	4835	dev.orbitkit.app.RustWebChromeClient
+M d 1	1	39	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$2cp7DeUm6nyX3A78WC6O6TGZXy8(android.webkit.JsPromptResult,android.content.DialogInterface)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$Eoec_5sE9hK4fjW-UNTK715Iex4(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$bzLBzjeMd5F0-XSP2B9mS3tyjfg(android.webkit.JsResult,android.content.DialogInterface)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$jGNzX1My4N_pZZtsfevfB7U99i8(android.webkit.JsResult,android.content.DialogInterface)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$lunqR3icSrM0y_hn4IVLdhpYpSE(dev.orbitkit.app.RustWebChromeClient,androidx.activity.result.ActivityResult)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$ryJnC4Hvh9307BVoDS5shWoXV5k(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$t7sgg31E7VDncvKApv8MIPzqfOo(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$uaXpyMozkOnASDPO9tCdKgqLUlU(android.webkit.JsPromptResult,android.content.DialogInterface,int)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$xd-dIDdh-omZ68GCf7ZSyxFLppA(dev.orbitkit.app.RustWebChromeClient,java.util.Map)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void $r8$lambda$zpSJvmycShovkfZ-V6nK1vvUUzQ(android.widget.EditText,android.webkit.JsPromptResult,android.content.DialogInterface,int)
+M d 1	1	139	dev.orbitkit.app.RustWebChromeClient <init>(dev.orbitkit.app.WryActivity)
+M d 1	1	153	dev.orbitkit.app.RustWebChromeClient void _init_$lambda$0(dev.orbitkit.app.RustWebChromeClient,java.util.Map)
+M d 1	1	75	dev.orbitkit.app.RustWebChromeClient void _init_$lambda$1(dev.orbitkit.app.RustWebChromeClient,androidx.activity.result.ActivityResult)
+M d 1	1	36	dev.orbitkit.app.RustWebChromeClient dev.orbitkit.app.WryActivity access$getActivity$p(dev.orbitkit.app.RustWebChromeClient)
+M d 1	1	38	dev.orbitkit.app.RustWebChromeClient void access$showMediaCaptureOrFilePicker(dev.orbitkit.app.RustWebChromeClient,android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean)
+M d 1	1	147	dev.orbitkit.app.RustWebChromeClient java.io.File createImageFile(android.app.Activity)
+M d 1	1	124	dev.orbitkit.app.RustWebChromeClient android.net.Uri createImageFileUri()
+M d 1	1	215	dev.orbitkit.app.RustWebChromeClient java.lang.String[] getValidTypes(java.lang.String[])
+M d 1	1	102	dev.orbitkit.app.RustWebChromeClient boolean isMediaCaptureSupported()
+M d 1	1	128	dev.orbitkit.app.RustWebChromeClient boolean isValidMsg(java.lang.String)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsAlert$lambda$2(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsAlert$lambda$3(android.webkit.JsResult,android.content.DialogInterface)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsConfirm$lambda$4(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsConfirm$lambda$5(android.webkit.JsResult,android.content.DialogInterface,int)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsConfirm$lambda$6(android.webkit.JsResult,android.content.DialogInterface)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsPrompt$lambda$10(android.webkit.JsPromptResult,android.content.DialogInterface)
+M d 1	1	217	dev.orbitkit.app.RustWebChromeClient void onJsPrompt$lambda$8(android.widget.EditText,android.webkit.JsPromptResult,android.content.DialogInterface,int)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onJsPrompt$lambda$9(android.webkit.JsPromptResult,android.content.DialogInterface,int)
+M d 1	1	245	dev.orbitkit.app.RustWebChromeClient void showFilePicker(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams)
+M d 1	1	206	dev.orbitkit.app.RustWebChromeClient boolean showImageCapturePicker(android.webkit.ValueCallback)
+M d 1	1	111	dev.orbitkit.app.RustWebChromeClient void showMediaCaptureOrFilePicker(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean)
+M d 1	1	103	dev.orbitkit.app.RustWebChromeClient boolean showVideoCapturePicker(android.webkit.ValueCallback)
+M d 1	1	305	dev.orbitkit.app.RustWebChromeClient boolean onConsoleMessage(android.webkit.ConsoleMessage)
+M d 1	1	207	dev.orbitkit.app.RustWebChromeClient void onGeolocationPermissionsShowPrompt(java.lang.String,android.webkit.GeolocationPermissions$Callback)
+M d 1	1	37	dev.orbitkit.app.RustWebChromeClient void onHideCustomView()
+M d 1	1	180	dev.orbitkit.app.RustWebChromeClient boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult)
+M d 1	1	206	dev.orbitkit.app.RustWebChromeClient boolean onJsConfirm(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult)
+M d 1	1	248	dev.orbitkit.app.RustWebChromeClient boolean onJsPrompt(android.webkit.WebView,java.lang.String,java.lang.String,java.lang.String,android.webkit.JsPromptResult)
+M d 1	1	281	dev.orbitkit.app.RustWebChromeClient void onPermissionRequest(android.webkit.PermissionRequest)
+M d 1	1	71	dev.orbitkit.app.RustWebChromeClient void onReceivedTitle(android.webkit.WebView,java.lang.String)
+M d 1	1	63	dev.orbitkit.app.RustWebChromeClient void onShowCustomView(android.view.View,android.webkit.WebChromeClient$CustomViewCallback)
+M d 1	1	238	dev.orbitkit.app.RustWebChromeClient boolean onShowFileChooser(android.webkit.WebView,android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams)
+F d 0	0	10	dev.orbitkit.app.RustWebChromeClient dev.orbitkit.app.WryActivity activity
+F d 0	0	18	dev.orbitkit.app.RustWebChromeClient androidx.activity.result.ActivityResultLauncher activityLauncher
+F d 0	0	10	dev.orbitkit.app.RustWebChromeClient dev.orbitkit.app.RustWebChromeClient$ActivityResultListener activityListener
+F d 0	0	18	dev.orbitkit.app.RustWebChromeClient androidx.activity.result.ActivityResultLauncher permissionLauncher
+F d 0	0	10	dev.orbitkit.app.RustWebChromeClient dev.orbitkit.app.RustWebChromeClient$PermissionListener permissionListener
+C d 18	29	1558	dev.orbitkit.app.WryActivity
+M d 1	1	46	dev.orbitkit.app.WryActivity <init>()
+M d 1	1	36	dev.orbitkit.app.WryActivity dev.orbitkit.app.RustWebView access$getMWebView$p(dev.orbitkit.app.WryActivity)
+M d 1	1	60	dev.orbitkit.app.WryActivity java.lang.Class getAppClass(java.lang.String)
+M d 1	1	35	dev.orbitkit.app.WryActivity boolean getHandleBackNavigation()
+M d 1	1	35	dev.orbitkit.app.WryActivity int getId()
+M d 1	1	302	dev.orbitkit.app.WryActivity java.lang.String getVersion()
+M d 1	1	149	dev.orbitkit.app.WryActivity void onCreate(android.os.Bundle)
+M d 1	1	91	dev.orbitkit.app.WryActivity void onDestroy()
+M d 1	1	43	dev.orbitkit.app.WryActivity void onLowMemory()
+M d 1	1	53	dev.orbitkit.app.WryActivity void onNewIntent(android.content.Intent)
+M d 1	1	71	dev.orbitkit.app.WryActivity void onPause()
+M d 1	1	71	dev.orbitkit.app.WryActivity void onResume()
+M d 1	1	71	dev.orbitkit.app.WryActivity void onSaveInstanceState(android.os.Bundle)
+M d 1	1	41	dev.orbitkit.app.WryActivity void onWebViewCreate(android.webkit.WebView)
+M d 1	1	43	dev.orbitkit.app.WryActivity void onWindowFocusChanged(boolean)
+M d 1	1	35	dev.orbitkit.app.WryActivity void setId(int)
+M d 1	1	105	dev.orbitkit.app.WryActivity void setWebView(dev.orbitkit.app.RustWebView)
+M d 1	1	89	dev.orbitkit.app.WryActivity int startActivity(java.lang.Class)
+M r 0	1	8	dev.orbitkit.app.WryActivity android.content.Intent getIntent()
+M r 0	1	8	dev.orbitkit.app.WryActivity androidx.activity.OnBackPressedDispatcher getOnBackPressedDispatcher()
+M r 0	1	8	dev.orbitkit.app.WryActivity android.content.pm.PackageManager getPackageManager()
+M r 0	1	8	dev.orbitkit.app.WryActivity java.lang.String getPackageName()
+M r 0	1	8	dev.orbitkit.app.WryActivity int hashCode()
+M r 0	1	8	dev.orbitkit.app.WryActivity boolean isFinishing()
+M r 0	1	8	dev.orbitkit.app.WryActivity void onBackPressed()
+M r 0	1	8	dev.orbitkit.app.WryActivity void onConfigurationChanged(android.content.res.Configuration)
+M r 0	1	8	dev.orbitkit.app.WryActivity void onRestart()
+M r 0	1	8	dev.orbitkit.app.WryActivity androidx.activity.result.ActivityResultLauncher registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback)
+M r 0	1	8	dev.orbitkit.app.WryActivity void startActivity(android.content.Intent)
+F d 0	0	10	dev.orbitkit.app.WryActivity boolean handleBackNavigation
+F d 0	0	10	dev.orbitkit.app.WryActivity int id
+F d 0	0	10	dev.orbitkit.app.WryActivity dev.orbitkit.app.RustWebView mWebView
+C d 22	28	1590	dev.orbitkit.app.RustWebView
+M d 1	1	39	dev.orbitkit.app.RustWebView void $r8$lambda$Ht_FXEH8fv-wnRU0CJzBJOIeM9s(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	38	dev.orbitkit.app.RustWebView void $r8$lambda$P8w6dem6YYmr1-AzBQjnooSrxk4(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	38	dev.orbitkit.app.RustWebView void $r8$lambda$SF9bmc46Ty5ydMcjsJ3uHl9wVlc(dev.orbitkit.app.RustWebView,int,java.lang.String)
+M d 1	1	38	dev.orbitkit.app.RustWebView void $r8$lambda$_hLkWyTpeq2-wm2uzLCSN5i3VnY(dev.orbitkit.app.RustWebView,java.lang.String,java.util.Map)
+M d 1	1	38	dev.orbitkit.app.RustWebView void $r8$lambda$zv7oV9aAOrGMARoVi50Ctu4MFlU(dev.orbitkit.app.RustWebView,java.lang.String,int)
+M d 1	1	237	dev.orbitkit.app.RustWebView <init>(android.content.Context,java.lang.String[],java.lang.String)
+M d 1	1	67	dev.orbitkit.app.RustWebView void evalScript$lambda$4(dev.orbitkit.app.RustWebView,java.lang.String,int)
+M d 1	1	57	dev.orbitkit.app.RustWebView void evalScript$lambda$4$lambda$3(dev.orbitkit.app.RustWebView,int,java.lang.String)
+M d 1	1	63	dev.orbitkit.app.RustWebView void loadHTMLMainThread$lambda$2(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	57	dev.orbitkit.app.RustWebView void loadUrlMainThread$lambda$0(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	67	dev.orbitkit.app.RustWebView void loadUrlMainThread$lambda$1(dev.orbitkit.app.RustWebView,java.lang.String,java.util.Map)
+M d 1	1	163	dev.orbitkit.app.RustWebView void clearAllBrowsingData()
+M d 1	1	57	dev.orbitkit.app.RustWebView void evalScript(int,java.lang.String)
+M d 1	1	67	dev.orbitkit.app.RustWebView java.lang.String getCookies(java.lang.String)
+M d 1	1	35	dev.orbitkit.app.RustWebView java.lang.String getId()
+M d 1	1	35	dev.orbitkit.app.RustWebView java.lang.String[] getInitScripts()
+M d 1	1	35	dev.orbitkit.app.RustWebView boolean isDocumentStartScriptEnabled()
+M d 1	1	57	dev.orbitkit.app.RustWebView void loadHTMLMainThread(java.lang.String)
+M d 1	1	63	dev.orbitkit.app.RustWebView void loadUrl(java.lang.String)
+M d 1	1	73	dev.orbitkit.app.RustWebView void loadUrl(java.lang.String,java.util.Map)
+M d 1	1	57	dev.orbitkit.app.RustWebView void loadUrlMainThread(java.lang.String)
+M d 1	1	67	dev.orbitkit.app.RustWebView void loadUrlMainThread(java.lang.String,java.util.Map)
+M r 0	1	8	dev.orbitkit.app.RustWebView boolean canGoBack()
+M r 0	1	8	dev.orbitkit.app.RustWebView android.webkit.WebSettings getSettings()
+M r 0	1	8	dev.orbitkit.app.RustWebView void goBack()
+M r 0	1	8	dev.orbitkit.app.RustWebView void onPause()
+M r 0	1	8	dev.orbitkit.app.RustWebView void onResume()
+M r 0	1	8	dev.orbitkit.app.RustWebView boolean post(java.lang.Runnable)
+F d 0	0	10	dev.orbitkit.app.RustWebView java.lang.String id
+F d 0	0	10	dev.orbitkit.app.RustWebView java.lang.String[] initScripts
+F d 0	0	10	dev.orbitkit.app.RustWebView boolean isDocumentStartScriptEnabled
+C d 24	24	437	dev.orbitkit.app.Rust
+M d 1	1	60	dev.orbitkit.app.Rust <clinit>()
+M d 1	1	39	dev.orbitkit.app.Rust <init>()
+M d 1	1	12	dev.orbitkit.app.Rust java.lang.String assetLoaderDomain(java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void create()
+M d 1	1	12	dev.orbitkit.app.Rust void handleReceivedTitle(java.lang.String,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust android.webkit.WebResourceResponse handleRequest(java.lang.String,android.webkit.WebResourceRequest,boolean)
+M d 1	1	12	dev.orbitkit.app.Rust void ipc(java.lang.String,java.lang.String,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void onActivityCreate(dev.orbitkit.app.WryActivity)
+M d 1	1	12	dev.orbitkit.app.Rust void onActivityDestroy(dev.orbitkit.app.WryActivity)
+M d 1	1	12	dev.orbitkit.app.Rust void onActivityLowMemory()
+M d 1	1	12	dev.orbitkit.app.Rust void onActivitySaveInstanceState()
+M d 1	1	12	dev.orbitkit.app.Rust void onEval(java.lang.String,int,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void onNewIntent(android.content.Intent)
+M d 1	1	12	dev.orbitkit.app.Rust void onPageLoaded(java.lang.String,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void onPageLoading(java.lang.String,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void onWebviewDestroy(dev.orbitkit.app.WryActivity,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void onWindowFocusChanged(dev.orbitkit.app.WryActivity,boolean)
+M d 1	1	12	dev.orbitkit.app.Rust void pause()
+M d 1	1	12	dev.orbitkit.app.Rust void resume()
+M d 1	1	12	dev.orbitkit.app.Rust boolean shouldOverride(java.lang.String,java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void start()
+M d 1	1	12	dev.orbitkit.app.Rust void stop()
+M d 1	1	12	dev.orbitkit.app.Rust boolean withAssetLoader(java.lang.String)
+M d 1	1	12	dev.orbitkit.app.Rust void wryCreate()
+F d 0	0	10	dev.orbitkit.app.Rust dev.orbitkit.app.Rust INSTANCE
+C d 15	15	933	dev.orbitkit.app.Logger$Companion
+M d 1	1	39	dev.orbitkit.app.Logger$Companion <init>()
+M d 1	1	38	dev.orbitkit.app.Logger$Companion <init>(kotlin.jvm.internal.DefaultConstructorMarker)
+M d 1	1	34	dev.orbitkit.app.Logger$Companion boolean shouldLog()
+M d 1	1	50	dev.orbitkit.app.Logger$Companion void verbose(java.lang.String,java.lang.String)
+M d 1	1	51	dev.orbitkit.app.Logger$Companion void debug(java.lang.String)
+M d 1	1	70	dev.orbitkit.app.Logger$Companion void debug(java.lang.String,java.lang.String)
+M d 1	1	52	dev.orbitkit.app.Logger$Companion void error(java.lang.String)
+M d 1	1	70	dev.orbitkit.app.Logger$Companion void error(java.lang.String,java.lang.String,java.lang.Throwable)
+M d 1	1	50	dev.orbitkit.app.Logger$Companion void error(java.lang.String,java.lang.Throwable)
+M d 1	1	50	dev.orbitkit.app.Logger$Companion void info(java.lang.String)
+M d 1	1	70	dev.orbitkit.app.Logger$Companion void info(java.lang.String,java.lang.String)
+M d 1	1	117	dev.orbitkit.app.Logger$Companion java.lang.String tags(java.lang.String[])
+M d 1	1	50	dev.orbitkit.app.Logger$Companion void verbose(java.lang.String)
+M d 1	1	50	dev.orbitkit.app.Logger$Companion void warn(java.lang.String)
+M d 1	1	70	dev.orbitkit.app.Logger$Companion void warn(java.lang.String,java.lang.String)
+C d 10	10	1267	dev.orbitkit.app.RustWebViewClient
+M d 1	1	39	dev.orbitkit.app.RustWebViewClient void $r8$lambda$to6tkaLcavTNRwYKocQ6SPFeCDo(android.webkit.WebView,java.lang.String)
+M d 1	1	159	dev.orbitkit.app.RustWebViewClient <init>(dev.orbitkit.app.RustWebView,android.content.Context)
+M d 1	1	57	dev.orbitkit.app.RustWebViewClient void shouldInterceptRequest$lambda$1$lambda$0(android.webkit.WebView,java.lang.String)
+M d 1	1	36	dev.orbitkit.app.RustWebViewClient java.lang.String getCurrentUrl()
+M d 1	1	71	dev.orbitkit.app.RustWebViewClient void onPageFinished(android.webkit.WebView,java.lang.String)
+M d 1	1	147	dev.orbitkit.app.RustWebViewClient void onPageStarted(android.webkit.WebView,java.lang.String,android.graphics.Bitmap)
+M d 1	1	167	dev.orbitkit.app.RustWebViewClient void onReceivedError(android.webkit.WebView,android.webkit.WebResourceRequest,android.webkit.WebResourceError)
+M d 1	1	45	dev.orbitkit.app.RustWebViewClient void setCurrentUrl(java.lang.String)
+M d 1	1	325	dev.orbitkit.app.RustWebViewClient android.webkit.WebResourceResponse shouldInterceptRequest(android.webkit.WebView,android.webkit.WebResourceRequest)
+M d 1	1	99	dev.orbitkit.app.RustWebViewClient boolean shouldOverrideUrlLoading(android.webkit.WebView,android.webkit.WebResourceRequest)
+F d 0	0	10	dev.orbitkit.app.RustWebViewClient androidx.webkit.WebViewAssetLoader assetLoader
+F d 0	0	10	dev.orbitkit.app.RustWebViewClient java.lang.String currentUrl
+F d 0	0	18	dev.orbitkit.app.RustWebViewClient java.util.Map interceptedState
+F d 0	0	10	dev.orbitkit.app.RustWebViewClient android.net.Uri lastInterceptedUrl
+F d 0	0	10	dev.orbitkit.app.RustWebViewClient java.lang.String pendingUrlRedirect
+C d 8	8	458	dev.orbitkit.app.TauriActivity
+M d 1	1	40	dev.orbitkit.app.TauriActivity <init>()
+M d 1	1	36	dev.orbitkit.app.TauriActivity boolean getHandleBackNavigation()
+M d 1	1	35	dev.orbitkit.app.TauriActivity app.tauri.plugin.PluginManager getPluginManager()
+M d 1	1	57	dev.orbitkit.app.TauriActivity void onConfigurationChanged(android.content.res.Configuration)
+M d 1	1	53	dev.orbitkit.app.TauriActivity void onCreate(android.os.Bundle)
+M d 1	1	53	dev.orbitkit.app.TauriActivity void onDestroy()
+M d 1	1	57	dev.orbitkit.app.TauriActivity void onNewIntent(android.content.Intent)
+M d 1	1	53	dev.orbitkit.app.TauriActivity void onRestart()
+F d 0	0	10	dev.orbitkit.app.TauriActivity boolean handleBackNavigation
+C d 7	7	811	dev.orbitkit.app.PermissionHelper
+M d 1	1	47	dev.orbitkit.app.PermissionHelper <clinit>()
+M d 1	1	38	dev.orbitkit.app.PermissionHelper <init>()
+M d 1	1	133	dev.orbitkit.app.PermissionHelper java.lang.String[] getManifestPermissions(android.content.Context)
+M d 1	1	207	dev.orbitkit.app.PermissionHelper java.lang.String[] getUndefinedPermissions(android.content.Context,java.lang.String[])
+M d 1	1	140	dev.orbitkit.app.PermissionHelper boolean hasDefinedPermission(android.content.Context,java.lang.String)
+M d 1	1	86	dev.orbitkit.app.PermissionHelper boolean hasDefinedPermissions(android.content.Context,java.lang.String[])
+M d 1	1	86	dev.orbitkit.app.PermissionHelper boolean hasPermissions(android.content.Context,java.lang.String[])
+F d 0	0	10	dev.orbitkit.app.PermissionHelper dev.orbitkit.app.PermissionHelper INSTANCE
+C d 7	7	439	dev.orbitkit.app.WryLifecycleObserver
+M d 1	1	48	dev.orbitkit.app.WryLifecycleObserver <clinit>()
+M d 1	1	39	dev.orbitkit.app.WryLifecycleObserver <init>()
+M d 1	1	60	dev.orbitkit.app.WryLifecycleObserver void onCreate(androidx.lifecycle.LifecycleOwner)
+M d 1	1	53	dev.orbitkit.app.WryLifecycleObserver void onPause(androidx.lifecycle.LifecycleOwner)
+M d 1	1	53	dev.orbitkit.app.WryLifecycleObserver void onResume(androidx.lifecycle.LifecycleOwner)
+M d 1	1	53	dev.orbitkit.app.WryLifecycleObserver void onStart(androidx.lifecycle.LifecycleOwner)
+M d 1	1	53	dev.orbitkit.app.WryLifecycleObserver void onStop(androidx.lifecycle.LifecycleOwner)
+F d 0	0	10	dev.orbitkit.app.WryLifecycleObserver dev.orbitkit.app.WryLifecycleObserver INSTANCE
+C d 5	5	339	dev.orbitkit.app.TauriLifecycleObserver
+M d 1	1	48	dev.orbitkit.app.TauriLifecycleObserver <clinit>()
+M d 1	1	39	dev.orbitkit.app.TauriLifecycleObserver <init>()
+M d 1	1	58	dev.orbitkit.app.TauriLifecycleObserver void onPause(androidx.lifecycle.LifecycleOwner)
+M d 1	1	57	dev.orbitkit.app.TauriLifecycleObserver void onResume(androidx.lifecycle.LifecycleOwner)
+M d 1	1	57	dev.orbitkit.app.TauriLifecycleObserver void onStop(androidx.lifecycle.LifecycleOwner)
+F d 0	0	10	dev.orbitkit.app.TauriLifecycleObserver dev.orbitkit.app.TauriLifecycleObserver INSTANCE
+C d 4	4	292	dev.orbitkit.app.Ipc
+M d 1	1	67	dev.orbitkit.app.Ipc <init>(dev.orbitkit.app.RustWebView,dev.orbitkit.app.RustWebViewClient)
+M d 1	1	35	dev.orbitkit.app.Ipc dev.orbitkit.app.RustWebView getWebView()
+M d 1	1	34	dev.orbitkit.app.Ipc dev.orbitkit.app.RustWebViewClient getWebViewClient()
+M d 1	1	72	dev.orbitkit.app.Ipc void postMessage(java.lang.String)
+F d 0	0	10	dev.orbitkit.app.Ipc dev.orbitkit.app.RustWebView webView
+F d 0	0	10	dev.orbitkit.app.Ipc dev.orbitkit.app.RustWebViewClient webViewClient
+C d 2	3	287	dev.orbitkit.app.WryActivity$setWebView$callback$1
+M d 1	1	46	dev.orbitkit.app.WryActivity$setWebView$callback$1 <init>(dev.orbitkit.app.WryActivity)
+M d 1	1	150	dev.orbitkit.app.WryActivity$setWebView$callback$1 void handleOnBackPressed()
+M r 0	1	8	dev.orbitkit.app.WryActivity$setWebView$callback$1 void setEnabled(boolean)
+F d 0	0	11	dev.orbitkit.app.WryActivity$setWebView$callback$1 dev.orbitkit.app.WryActivity this$0
+C d 2	2	203	dev.orbitkit.app.BuildConfig
+M d 1	1	49	dev.orbitkit.app.BuildConfig <clinit>()
+M d 1	1	38	dev.orbitkit.app.BuildConfig <init>()
+F d 0	0	13	dev.orbitkit.app.BuildConfig java.lang.String APPLICATION_ID
+F d 0	0	13	dev.orbitkit.app.BuildConfig java.lang.String BUILD_TYPE
+F d 0	0	11	dev.orbitkit.app.BuildConfig boolean DEBUG
+F d 0	0	13	dev.orbitkit.app.BuildConfig java.lang.String FLAVOR
+F d 0	0	13	dev.orbitkit.app.BuildConfig int VERSION_CODE
+F d 0	0	12	dev.orbitkit.app.BuildConfig java.lang.String VERSION_NAME
+C d 2	2	180	dev.orbitkit.app.Logger
+M d 1	1	49	dev.orbitkit.app.Logger <clinit>()
+M d 1	1	38	dev.orbitkit.app.Logger <init>()
+F d 0	0	11	dev.orbitkit.app.Logger dev.orbitkit.app.Logger$Companion Companion
+F d 0	0	13	dev.orbitkit.app.Logger java.lang.String LOG_TAG_CORE
+C d 2	2	326	dev.orbitkit.app.MainActivity
+M d 1	1	39	dev.orbitkit.app.MainActivity <init>()
+M d 1	1	223	dev.orbitkit.app.MainActivity void onCreate(android.os.Bundle)
+C d 2	2	145	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda0
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda0 <init>(dev.orbitkit.app.RustWebChromeClient)
+M d 1	1	45	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda0 void onActivityResult(java.lang.Object)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda0 dev.orbitkit.app.RustWebChromeClient f$0
+C d 2	2	145	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda1
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda1 <init>(dev.orbitkit.app.RustWebChromeClient)
+M d 1	1	45	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda1 void onActivityResult(java.lang.Object)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda1 dev.orbitkit.app.RustWebChromeClient f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda2
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda2 <init>(android.webkit.JsResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda2 void onClick(android.content.DialogInterface,int)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda2 android.webkit.JsResult f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda3
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda3 <init>(android.webkit.JsResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda3 void onClick(android.content.DialogInterface,int)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda3 android.webkit.JsResult f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda4
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda4 <init>(android.webkit.JsResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda4 void onCancel(android.content.DialogInterface)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda4 android.webkit.JsResult f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda5
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda5 <init>(android.webkit.JsResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda5 void onClick(android.content.DialogInterface,int)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda5 android.webkit.JsResult f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda6
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda6 <init>(android.webkit.JsResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda6 void onCancel(android.content.DialogInterface)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda6 android.webkit.JsResult f$0
+C d 2	2	160	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda7
+M d 1	1	47	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda7 <init>(android.widget.EditText,android.webkit.JsPromptResult)
+M d 1	1	45	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda7 void onClick(android.content.DialogInterface,int)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda7 android.widget.EditText f$0
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda7 android.webkit.JsPromptResult f$1
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda8
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda8 <init>(android.webkit.JsPromptResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda8 void onClick(android.content.DialogInterface,int)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda8 android.webkit.JsPromptResult f$0
+C d 2	2	141	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda9
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda9 <init>(android.webkit.JsPromptResult)
+M d 1	1	41	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda9 void onCancel(android.content.DialogInterface)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$$ExternalSyntheticLambda9 android.webkit.JsPromptResult f$0
+C d 2	2	321	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1
+M d 1	1	51	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1 <init>(android.webkit.GeolocationPermissions$Callback,java.lang.String,dev.orbitkit.app.RustWebChromeClient)
+M d 1	1	159	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1 void onPermissionSelect(java.lang.Boolean)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1 android.webkit.GeolocationPermissions$Callback $callback
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1 java.lang.String $origin
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onGeolocationPermissionsShowPrompt$1 dev.orbitkit.app.RustWebChromeClient this$0
+C d 2	2	219	dev.orbitkit.app.RustWebChromeClient$onPermissionRequest$1
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$onPermissionRequest$1 <init>(android.webkit.PermissionRequest)
+M d 1	1	87	dev.orbitkit.app.RustWebChromeClient$onPermissionRequest$1 void onPermissionSelect(java.lang.Boolean)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onPermissionRequest$1 android.webkit.PermissionRequest $request
+C d 2	2	314	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1
+M d 1	1	55	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 <init>(dev.orbitkit.app.RustWebChromeClient,android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean)
+M d 1	1	129	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 void onPermissionSelect(java.lang.Boolean)
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 boolean $captureVideo
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 android.webkit.WebChromeClient$FileChooserParams $fileChooserParams
+F d 0	0	19	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 android.webkit.ValueCallback $filePathCallback
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$onShowFileChooser$1 dev.orbitkit.app.RustWebChromeClient this$0
+C d 2	2	343	dev.orbitkit.app.RustWebChromeClient$showFilePicker$1
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$showFilePicker$1 <init>(android.webkit.ValueCallback)
+M d 1	1	203	dev.orbitkit.app.RustWebChromeClient$showFilePicker$1 void onActivityResult(androidx.activity.result.ActivityResult)
+F d 0	0	19	dev.orbitkit.app.RustWebChromeClient$showFilePicker$1 android.webkit.ValueCallback $filePathCallback
+C d 2	2	244	dev.orbitkit.app.RustWebChromeClient$showImageCapturePicker$1
+M d 1	1	47	dev.orbitkit.app.RustWebChromeClient$showImageCapturePicker$1 <init>(android.net.Uri,android.webkit.ValueCallback)
+M d 1	1	89	dev.orbitkit.app.RustWebChromeClient$showImageCapturePicker$1 void onActivityResult(androidx.activity.result.ActivityResult)
+F d 0	0	19	dev.orbitkit.app.RustWebChromeClient$showImageCapturePicker$1 android.webkit.ValueCallback $filePathCallback
+F d 0	0	11	dev.orbitkit.app.RustWebChromeClient$showImageCapturePicker$1 android.net.Uri $imageFileUri
+C d 2	2	247	dev.orbitkit.app.RustWebChromeClient$showVideoCapturePicker$1
+M d 1	1	43	dev.orbitkit.app.RustWebChromeClient$showVideoCapturePicker$1 <init>(android.webkit.ValueCallback)
+M d 1	1	107	dev.orbitkit.app.RustWebChromeClient$showVideoCapturePicker$1 void onActivityResult(androidx.activity.result.ActivityResult)
+F d 0	0	19	dev.orbitkit.app.RustWebChromeClient$showVideoCapturePicker$1 android.webkit.ValueCallback $filePathCallback
+C d 2	2	162	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda0
+M d 1	1	48	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda0 <init>(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	46	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda0 void run()
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda0 dev.orbitkit.app.RustWebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda0 java.lang.String f$1
+C d 2	2	181	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1
+M d 1	1	52	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1 <init>(dev.orbitkit.app.RustWebView,java.lang.String,java.util.Map)
+M d 1	1	50	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1 void run()
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1 dev.orbitkit.app.RustWebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1 java.lang.String f$1
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda1 java.util.Map f$2
+C d 2	2	162	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda2
+M d 1	1	48	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda2 <init>(dev.orbitkit.app.RustWebView,java.lang.String)
+M d 1	1	46	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda2 void run()
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda2 dev.orbitkit.app.RustWebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda2 java.lang.String f$1
+C d 2	2	181	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3
+M d 1	1	52	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3 <init>(dev.orbitkit.app.RustWebView,java.lang.String,int)
+M d 1	1	50	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3 void run()
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3 dev.orbitkit.app.RustWebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3 java.lang.String f$1
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda3 int f$2
+C d 2	2	166	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda4
+M d 1	1	48	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda4 <init>(dev.orbitkit.app.RustWebView,int)
+M d 1	1	50	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda4 void onReceiveValue(java.lang.Object)
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda4 dev.orbitkit.app.RustWebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebView$$ExternalSyntheticLambda4 int f$1
+C d 2	2	162	dev.orbitkit.app.RustWebViewClient$$ExternalSyntheticLambda0
+M d 1	1	48	dev.orbitkit.app.RustWebViewClient$$ExternalSyntheticLambda0 <init>(android.webkit.WebView,java.lang.String)
+M d 1	1	46	dev.orbitkit.app.RustWebViewClient$$ExternalSyntheticLambda0 void run()
+F d 0	0	11	dev.orbitkit.app.RustWebViewClient$$ExternalSyntheticLambda0 android.webkit.WebView f$0
+F d 0	0	11	dev.orbitkit.app.RustWebViewClient$$ExternalSyntheticLambda0 java.lang.String f$1
+C d 2	2	152	dev.orbitkit.app.WryActivityKt
+M d 1	1	42	dev.orbitkit.app.WryActivityKt <clinit>()
+M d 1	1	36	dev.orbitkit.app.WryActivityKt java.lang.String access$getACTIVITY_ID_KEY$p()
+F d 0	0	10	dev.orbitkit.app.WryActivityKt java.lang.String ACTIVITY_ID_KEY
+C d 1	1	215	dev.orbitkit.app.R$color
+M d 1	1	40	dev.orbitkit.app.R$color <init>()
+F d 0	0	16	dev.orbitkit.app.R$color int black
+F d 0	0	15	dev.orbitkit.app.R$color int purple_200
+F d 0	0	15	dev.orbitkit.app.R$color int purple_500
+F d 0	0	15	dev.orbitkit.app.R$color int purple_700
+F d 0	0	15	dev.orbitkit.app.R$color int teal_200
+F d 0	0	15	dev.orbitkit.app.R$color int teal_700
+F d 0	0	15	dev.orbitkit.app.R$color int white
+C d 1	1	140	dev.orbitkit.app.R$drawable
+M d 1	1	40	dev.orbitkit.app.R$drawable <init>()
+F d 0	0	16	dev.orbitkit.app.R$drawable int ic_launcher_background
+F d 0	0	15	dev.orbitkit.app.R$drawable int ic_launcher_foreground
+C d 1	1	125	dev.orbitkit.app.R$layout
+M d 1	1	40	dev.orbitkit.app.R$layout <init>()
+F d 0	0	16	dev.orbitkit.app.R$layout int activity_main
+C d 1	1	155	dev.orbitkit.app.R$mipmap
+M d 1	1	40	dev.orbitkit.app.R$mipmap <init>()
+F d 0	0	16	dev.orbitkit.app.R$mipmap int ic_launcher
+F d 0	0	15	dev.orbitkit.app.R$mipmap int ic_launcher_foreground
+F d 0	0	15	dev.orbitkit.app.R$mipmap int ic_launcher_round
+C d 1	1	140	dev.orbitkit.app.R$string
+M d 1	1	40	dev.orbitkit.app.R$string <init>()
+F d 0	0	16	dev.orbitkit.app.R$string int app_name
+F d 0	0	15	dev.orbitkit.app.R$string int main_activity_title
+C d 1	1	125	dev.orbitkit.app.R$style
+M d 1	1	40	dev.orbitkit.app.R$style <init>()
+F d 0	0	16	dev.orbitkit.app.R$style int Theme_orbitkit
+C d 1	1	125	dev.orbitkit.app.R$xml
+M d 1	1	40	dev.orbitkit.app.R$xml <init>()
+F d 0	0	16	dev.orbitkit.app.R$xml int file_paths
+C d 1	1	104	dev.orbitkit.app.R
+M d 1	1	40	dev.orbitkit.app.R <init>()
+C d 1	1	85	dev.orbitkit.app.RustWebChromeClient$ActivityResultListener
+M d 1	1	13	dev.orbitkit.app.RustWebChromeClient$ActivityResultListener void onActivityResult(androidx.activity.result.ActivityResult)
+C d 1	1	85	dev.orbitkit.app.RustWebChromeClient$PermissionListener
+M d 1	1	13	dev.orbitkit.app.RustWebChromeClient$PermissionListener void onPermissionSelect(java.lang.Boolean)
+P d 180	189	28277	dev.orbitkit.native
+C d 31	31	3104	dev.orbitkit.native.PersistedRecorderState
+M d 1	1	43	dev.orbitkit.native.PersistedRecorderState long getBytesRecorded()
+M d 1	1	43	dev.orbitkit.native.PersistedRecorderState int getRecoveryCount()
+M d 1	1	43	dev.orbitkit.native.PersistedRecorderState java.lang.String getState()
+M d 1	1	50	dev.orbitkit.native.PersistedRecorderState <clinit>()
+M d 1	1	75	dev.orbitkit.native.PersistedRecorderState <init>()
+M d 1	1	109	dev.orbitkit.native.PersistedRecorderState <init>(java.lang.String,long,java.lang.String,long,java.lang.String,int,long,boolean,int,java.lang.String)
+M d 1	1	259	dev.orbitkit.native.PersistedRecorderState <init>(java.lang.String,long,java.lang.String,long,java.lang.String,int,long,boolean,int,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+M d 1	1	256	dev.orbitkit.native.PersistedRecorderState dev.orbitkit.native.PersistedRecorderState copy$default(dev.orbitkit.native.PersistedRecorderState,java.lang.String,long,java.lang.String,long,java.lang.String,int,long,boolean,int,java.lang.String,int,java.lang.Object)
+M d 1	1	93	dev.orbitkit.native.PersistedRecorderState java.lang.String toJsonString$escape(java.lang.String)
+M d 1	1	36	dev.orbitkit.native.PersistedRecorderState java.lang.String component1()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String component10()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState long component2()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String component3()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState long component4()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String component5()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState int component6()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState long component7()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState boolean component8()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState int component9()
+M d 1	1	111	dev.orbitkit.native.PersistedRecorderState dev.orbitkit.native.PersistedRecorderState copy(java.lang.String,long,java.lang.String,long,java.lang.String,int,long,boolean,int,java.lang.String)
+M d 1	1	241	dev.orbitkit.native.PersistedRecorderState boolean equals(java.lang.Object)
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String getLastAction()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String getLastError()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState long getLastRecoveredAt()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState int getProcessPid()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState java.lang.String getSpoolPath()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState long getUpdatedAt()
+M d 1	1	217	dev.orbitkit.native.PersistedRecorderState int hashCode()
+M d 1	1	35	dev.orbitkit.native.PersistedRecorderState boolean isForeground()
+M d 1	1	489	dev.orbitkit.native.PersistedRecorderState java.lang.String toJsonString()
+M d 1	1	301	dev.orbitkit.native.PersistedRecorderState java.lang.String toString()
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState dev.orbitkit.native.PersistedRecorderState$Companion Companion
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState long bytesRecorded
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState boolean isForeground
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState java.lang.String lastAction
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState java.lang.String lastError
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState long lastRecoveredAt
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState int processPid
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState int recoveryCount
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState java.lang.String spoolPath
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState java.lang.String state
+F d 0	0	10	dev.orbitkit.native.PersistedRecorderState long updatedAt
+C d 30	31	8528	dev.orbitkit.native.OrbitkitNativePlugin
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void $r8$lambda$S8FHfVHFabOwiGnewtJAnvFKt-E(dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String,android.view.View)
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void $r8$lambda$SiOlkMKV00iVXYJFqGH7TMZMxY8(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void $r8$lambda$VrY3kHS-bk0gxcrSRmcR8GwqM98(kotlin.jvm.functions.Function0,android.view.View)
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void $r8$lambda$iHkcZTWNhMxt1ja_OYgXB683CzU(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	48	dev.orbitkit.native.OrbitkitNativePlugin <clinit>()
+M d 1	1	60	dev.orbitkit.native.OrbitkitNativePlugin <init>(android.app.Activity)
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void access$buildOverlayView$sendRecorderServiceIntent(android.app.Activity,dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String)
+M d 1	1	35	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String access$getTAG$p(dev.orbitkit.native.OrbitkitNativePlugin)
+M d 1	1	37	dev.orbitkit.native.OrbitkitNativePlugin void access$handleAction(dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String)
+M d 1	1	2320	dev.orbitkit.native.OrbitkitNativePlugin android.view.View buildOverlayView(android.view.WindowManager$LayoutParams,android.view.WindowManager)
+M d 1	1	56	dev.orbitkit.native.OrbitkitNativePlugin void buildOverlayView$lambda$25$lambda$24(dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String,android.view.View)
+M d 1	1	46	dev.orbitkit.native.OrbitkitNativePlugin void buildOverlayView$lambda$32$lambda$31(kotlin.jvm.functions.Function0,android.view.View)
+M d 1	1	224	dev.orbitkit.native.OrbitkitNativePlugin void buildOverlayView$sendRecorderServiceIntent(android.app.Activity,dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String)
+M d 1	1	62	dev.orbitkit.native.OrbitkitNativePlugin int dpToPx(android.content.Context,float)
+M d 1	1	568	dev.orbitkit.native.OrbitkitNativePlugin void handleAction(java.lang.String)
+M d 1	1	208	dev.orbitkit.native.OrbitkitNativePlugin void overlayHide$lambda$5(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	376	dev.orbitkit.native.OrbitkitNativePlugin void overlayShow$lambda$4(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	119	dev.orbitkit.native.OrbitkitNativePlugin void isOverlayPermissionGranted(app.tauri.plugin.Invoke)
+M d 1	1	112	dev.orbitkit.native.OrbitkitNativePlugin void onDestroy(androidx.appcompat.app.AppCompatActivity)
+M d 1	1	74	dev.orbitkit.native.OrbitkitNativePlugin void overlayHide(app.tauri.plugin.Invoke)
+M d 1	1	292	dev.orbitkit.native.OrbitkitNativePlugin void overlayShow(app.tauri.plugin.Invoke)
+M d 1	1	629	dev.orbitkit.native.OrbitkitNativePlugin void recorderGetPersistedState(app.tauri.plugin.Invoke)
+M d 1	1	224	dev.orbitkit.native.OrbitkitNativePlugin void recorderPause(app.tauri.plugin.Invoke)
+M d 1	1	216	dev.orbitkit.native.OrbitkitNativePlugin void recorderPostStandbyNotification(app.tauri.plugin.Invoke)
+M d 1	1	497	dev.orbitkit.native.OrbitkitNativePlugin void recorderRecoverState(app.tauri.plugin.Invoke)
+M d 1	1	224	dev.orbitkit.native.OrbitkitNativePlugin void recorderResume(app.tauri.plugin.Invoke)
+M d 1	1	533	dev.orbitkit.native.OrbitkitNativePlugin void recorderStartForeground(app.tauri.plugin.Invoke)
+M d 1	1	577	dev.orbitkit.native.OrbitkitNativePlugin void recorderState(app.tauri.plugin.Invoke)
+M d 1	1	224	dev.orbitkit.native.OrbitkitNativePlugin void recorderStop(app.tauri.plugin.Invoke)
+M d 1	1	339	dev.orbitkit.native.OrbitkitNativePlugin void requestOverlayPermission(app.tauri.plugin.Invoke)
+M r 0	1	8	dev.orbitkit.native.OrbitkitNativePlugin void trigger(java.lang.String,app.tauri.plugin.JSObject)
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String ACTION_PAUSE
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String ACTION_POST_STANDBY
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String ACTION_RESUME
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String ACTION_START_FOREGROUND
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String ACTION_STOP
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin dev.orbitkit.native.OrbitkitNativePlugin$Companion Companion
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String PERSISTENCE_CLASS
+F d 0	0	13	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String RECORDER_SERVICE_CLASS
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin java.lang.String TAG
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin app.tauri.plugin.Channel actionChannel
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin android.app.Activity activity
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin android.view.View overlayView
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin android.widget.TextView statusView
+F d 0	0	10	dev.orbitkit.native.OrbitkitNativePlugin android.view.WindowManager windowManager
+C d 29	29	4575	dev.orbitkit.native.OrbitkitStatePersistence
+M d 1	1	80	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recoverState(android.content.Context)
+M d 1	1	94	dev.orbitkit.native.OrbitkitStatePersistence <clinit>()
+M d 1	1	38	dev.orbitkit.native.OrbitkitStatePersistence <init>()
+M d 1	1	103	dev.orbitkit.native.OrbitkitStatePersistence void logD(java.lang.String)
+M d 1	1	143	dev.orbitkit.native.OrbitkitStatePersistence void logE(java.lang.String,java.lang.Throwable)
+M d 1	1	47	dev.orbitkit.native.OrbitkitStatePersistence void logE$default(dev.orbitkit.native.OrbitkitStatePersistence,java.lang.String,java.lang.Throwable,int,java.lang.Object)
+M d 1	1	104	dev.orbitkit.native.OrbitkitStatePersistence void logI(java.lang.String)
+M d 1	1	104	dev.orbitkit.native.OrbitkitStatePersistence void logW(java.lang.String)
+M d 1	1	75	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordTransition$default(dev.orbitkit.native.OrbitkitStatePersistence,android.content.Context,java.lang.String,long,java.lang.String,java.lang.String,boolean,java.lang.String,int,java.lang.Object)
+M d 1	1	75	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordTransition$default(dev.orbitkit.native.OrbitkitStatePersistence,java.io.File,java.lang.String,long,java.lang.String,java.lang.String,boolean,java.lang.String,int,java.lang.Object)
+M d 1	1	59	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recoverState$default(dev.orbitkit.native.OrbitkitStatePersistence,java.io.File,int,int,java.lang.Object)
+M d 1	1	66	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getCorruptStateFile(android.content.Context)
+M d 1	1	54	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getCorruptStateFile(java.io.File)
+M d 1	1	34	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState getCurrentState()
+M d 1	1	66	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getStateFile(android.content.Context)
+M d 1	1	54	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getStateFile(java.io.File)
+M d 1	1	66	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String getStateJson(android.content.Context)
+M d 1	1	96	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String getStateJson(java.io.File)
+M d 1	1	66	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getTmpStateFile(android.content.Context)
+M d 1	1	54	dev.orbitkit.native.OrbitkitStatePersistence java.io.File getTmpStateFile(java.io.File)
+M d 1	1	66	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState loadState(android.content.Context)
+M d 1	1	522	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState loadState(java.io.File)
+M d 1	1	76	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordAction(android.content.Context,java.lang.String)
+M d 1	1	197	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordAction(java.io.File,java.lang.String)
+M d 1	1	118	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordTransition(android.content.Context,java.lang.String,long,java.lang.String,java.lang.String,boolean,java.lang.String)
+M d 1	1	201	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recordTransition(java.io.File,java.lang.String,long,java.lang.String,java.lang.String,boolean,java.lang.String)
+M d 1	1	1070	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState recoverState(java.io.File,int)
+M d 1	1	76	dev.orbitkit.native.OrbitkitStatePersistence boolean saveState(android.content.Context,dev.orbitkit.native.PersistedRecorderState)
+M d 1	1	626	dev.orbitkit.native.OrbitkitStatePersistence boolean saveState(java.io.File,dev.orbitkit.native.PersistedRecorderState)
+F d 0	0	19	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.OrbitkitStatePersistence INSTANCE
+F d 0	0	13	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String STATE_CORRUPT_FILE_NAME
+F d 0	0	13	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String STATE_FILE_NAME
+F d 0	0	13	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String STATE_TMP_FILE_NAME
+F d 0	0	12	dev.orbitkit.native.OrbitkitStatePersistence java.lang.String TAG
+F d 0	0	10	dev.orbitkit.native.OrbitkitStatePersistence dev.orbitkit.native.PersistedRecorderState currentState
+C d 21	29	5017	dev.orbitkit.native.OrbitkitRecorderService
+M d 1	1	37	dev.orbitkit.native.OrbitkitRecorderService void $r8$lambda$ISN5cqX8DC743P34vnk_6uJa9po(int,dev.orbitkit.native.OrbitkitRecorderService)
+M d 1	1	108	dev.orbitkit.native.OrbitkitRecorderService <clinit>()
+M d 1	1	68	dev.orbitkit.native.OrbitkitRecorderService <init>()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicLong access$getBytesRecorded$cp()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService java.lang.String access$getLastError$cp()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService java.lang.String access$getSpoolPath$cp()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicReference access$getStateRef$cp()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicBoolean access$isForegroundActive$cp()
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService void access$setLastError$cp(java.lang.String)
+M d 1	1	35	dev.orbitkit.native.OrbitkitRecorderService void access$setSpoolPath$cp(java.lang.String)
+M d 1	1	538	dev.orbitkit.native.OrbitkitRecorderService android.app.Notification buildForegroundNotification(java.lang.String)
+M d 1	1	324	dev.orbitkit.native.OrbitkitRecorderService void handlePause()
+M d 1	1	324	dev.orbitkit.native.OrbitkitRecorderService void handleResume()
+M d 1	1	1165	dev.orbitkit.native.OrbitkitRecorderService void handleStartForeground()
+M d 1	1	484	dev.orbitkit.native.OrbitkitRecorderService void handleStartForeground$lambda$0(int,dev.orbitkit.native.OrbitkitRecorderService)
+M d 1	1	537	dev.orbitkit.native.OrbitkitRecorderService void handleStop()
+M d 1	1	80	dev.orbitkit.native.OrbitkitRecorderService void updateNotification(java.lang.String)
+M d 1	1	32	dev.orbitkit.native.OrbitkitRecorderService android.os.IBinder onBind(android.content.Intent)
+M d 1	1	202	dev.orbitkit.native.OrbitkitRecorderService void onCreate()
+M d 1	1	96	dev.orbitkit.native.OrbitkitRecorderService void onDestroy()
+M d 1	1	360	dev.orbitkit.native.OrbitkitRecorderService int onStartCommand(android.content.Intent,int,int)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService int checkSelfPermission(java.lang.String)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService android.content.pm.PackageManager getPackageManager()
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService java.lang.String getPackageName()
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService java.lang.Object getSystemService(java.lang.String)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService void startForeground(int,android.app.Notification)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService void startForeground(int,android.app.Notification,int)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService void stopForeground(int)
+M r 0	1	8	dev.orbitkit.native.OrbitkitRecorderService void stopSelf()
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String ACTION_PAUSE
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String ACTION_POST_STANDBY_NOTIFICATION
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String ACTION_RESUME
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String ACTION_START_FOREGROUND
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String ACTION_STOP
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService int AUDIO_FORMAT
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService int CHANNEL_CONFIG
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService java.lang.String CHANNEL_ID
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService java.lang.String CHANNEL_NAME
+F d 0	0	11	dev.orbitkit.native.OrbitkitRecorderService dev.orbitkit.native.OrbitkitRecorderService$Companion Companion
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService int NOTIFICATION_ID
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService int SAMPLE_RATE
+F d 0	0	13	dev.orbitkit.native.OrbitkitRecorderService int STANDBY_NOTIFICATION_ID
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService java.lang.String TAG
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicLong bytesRecorded
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicBoolean isForegroundActive
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.lang.String lastError
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.lang.String spoolPath
+F d 0	0	18	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicReference stateRef
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService android.media.AudioRecord audioRecord
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.io.FileOutputStream fileOutputStream
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicBoolean isPaused
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.util.concurrent.atomic.AtomicBoolean isRecordingRunning
+F d 0	0	10	dev.orbitkit.native.OrbitkitRecorderService java.lang.Thread recordingThread
+C d 14	14	1116	dev.orbitkit.native.OrbitkitRecorderService$Companion
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion <init>()
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion <init>(kotlin.jvm.internal.DefaultConstructorMarker)
+M d 1	1	82	dev.orbitkit.native.OrbitkitRecorderService$Companion void cancelStandbyNotification(android.content.Context)
+M d 1	1	178	dev.orbitkit.native.OrbitkitRecorderService$Companion void createNotificationChannel(android.content.Context)
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion java.util.concurrent.atomic.AtomicLong getBytesRecorded()
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion java.lang.String getLastError()
+M d 1	1	62	dev.orbitkit.native.OrbitkitRecorderService$Companion java.io.File getSpoolFile(android.content.Context)
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion java.lang.String getSpoolPath()
+M d 1	1	60	dev.orbitkit.native.OrbitkitRecorderService$Companion dev.orbitkit.native.OrbitkitRecorderService$State getState()
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion java.util.concurrent.atomic.AtomicReference getStateRef()
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$Companion java.util.concurrent.atomic.AtomicBoolean isForegroundActive()
+M d 1	1	314	dev.orbitkit.native.OrbitkitRecorderService$Companion void postStandbyNotification(android.content.Context)
+M d 1	1	36	dev.orbitkit.native.OrbitkitRecorderService$Companion void setLastError(java.lang.String)
+M d 1	1	46	dev.orbitkit.native.OrbitkitRecorderService$Companion void setSpoolPath(java.lang.String)
+C d 11	11	1327	dev.orbitkit.native.OrbitkitJniBridge
+M d 1	1	267	dev.orbitkit.native.OrbitkitJniBridge boolean ensureLoaded()
+M d 1	1	417	dev.orbitkit.native.OrbitkitJniBridge java.lang.String dispatchNativeAction(java.lang.String)
+M d 1	1	58	dev.orbitkit.native.OrbitkitJniBridge <clinit>()
+M d 1	1	38	dev.orbitkit.native.OrbitkitJniBridge <init>()
+M d 1	1	12	dev.orbitkit.native.OrbitkitJniBridge long getActionCount()
+M d 1	1	12	dev.orbitkit.native.OrbitkitJniBridge java.lang.String getActionLogJson()
+M d 1	1	143	dev.orbitkit.native.OrbitkitJniBridge void logE(java.lang.String,java.lang.Throwable)
+M d 1	1	47	dev.orbitkit.native.OrbitkitJniBridge void logE$default(dev.orbitkit.native.OrbitkitJniBridge,java.lang.String,java.lang.Throwable,int,java.lang.Object)
+M d 1	1	103	dev.orbitkit.native.OrbitkitJniBridge void logI(java.lang.String)
+M d 1	1	103	dev.orbitkit.native.OrbitkitJniBridge void logW(java.lang.String)
+M d 1	1	12	dev.orbitkit.native.OrbitkitJniBridge java.lang.String onNativeAction(java.lang.String)
+F d 0	0	27	dev.orbitkit.native.OrbitkitJniBridge dev.orbitkit.native.OrbitkitJniBridge INSTANCE
+F d 0	0	13	dev.orbitkit.native.OrbitkitJniBridge java.lang.String TAG
+F d 0	0	10	dev.orbitkit.native.OrbitkitJniBridge boolean isLibraryLoaded
+C d 9	9	1425	dev.orbitkit.native.PersistedRecorderState$Companion
+M d 1	1	39	dev.orbitkit.native.PersistedRecorderState$Companion <init>()
+M d 1	1	39	dev.orbitkit.native.PersistedRecorderState$Companion <init>(kotlin.jvm.internal.DefaultConstructorMarker)
+M d 1	1	161	dev.orbitkit.native.PersistedRecorderState$Companion java.lang.Boolean fromJsonString$extractBoolean(java.lang.String,java.lang.String)
+M d 1	1	153	dev.orbitkit.native.PersistedRecorderState$Companion java.lang.Integer fromJsonString$extractInt(java.lang.String,java.lang.String)
+M d 1	1	153	dev.orbitkit.native.PersistedRecorderState$Companion java.lang.Long fromJsonString$extractLong(java.lang.String,java.lang.String)
+M d 1	1	217	dev.orbitkit.native.PersistedRecorderState$Companion java.lang.String fromJsonString$extractNullableString(java.lang.String,java.lang.String)
+M d 1	1	143	dev.orbitkit.native.PersistedRecorderState$Companion java.lang.String fromJsonString$extractString(java.lang.String,java.lang.String)
+M d 1	1	388	dev.orbitkit.native.PersistedRecorderState$Companion dev.orbitkit.native.PersistedRecorderState fromJsonString(java.lang.String)
+M d 1	1	60	dev.orbitkit.native.PersistedRecorderState$Companion int safeGetPid()
+C d 6	6	509	dev.orbitkit.native.OrbitkitRecorderService$State
+M d 1	1	55	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State[] $values()
+M d 1	1	144	dev.orbitkit.native.OrbitkitRecorderService$State <clinit>()
+M d 1	1	38	dev.orbitkit.native.OrbitkitRecorderService$State <init>(java.lang.String,int)
+M d 1	1	34	dev.orbitkit.native.OrbitkitRecorderService$State kotlin.enums.EnumEntries getEntries()
+M d 1	1	46	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State valueOf(java.lang.String)
+M d 1	1	46	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State[] values()
+F d 0	0	11	dev.orbitkit.native.OrbitkitRecorderService$State kotlin.enums.EnumEntries $ENTRIES
+F d 0	0	11	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State[] $VALUES
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State IDLE
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State PAUSED
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State RECORDING
+F d 0	0	12	dev.orbitkit.native.OrbitkitRecorderService$State dev.orbitkit.native.OrbitkitRecorderService$State STOPPED
+C d 3	3	255	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1
+M d 1	1	48	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1 <init>(dev.orbitkit.native.OrbitkitNativePlugin,android.app.Activity)
+M d 1	1	41	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1 java.lang.Object invoke()
+M d 1	1	62	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1 void invoke()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1 android.app.Activity $ctx
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$1 dev.orbitkit.native.OrbitkitNativePlugin this$0
+C d 3	3	255	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2
+M d 1	1	48	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2 <init>(dev.orbitkit.native.OrbitkitNativePlugin,android.app.Activity)
+M d 1	1	41	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2 java.lang.Object invoke()
+M d 1	1	62	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2 void invoke()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2 android.app.Activity $ctx
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$2 dev.orbitkit.native.OrbitkitNativePlugin this$0
+C d 3	3	255	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3
+M d 1	1	48	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3 <init>(dev.orbitkit.native.OrbitkitNativePlugin,android.app.Activity)
+M d 1	1	41	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3 java.lang.Object invoke()
+M d 1	1	62	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3 void invoke()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3 android.app.Activity $ctx
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$3 dev.orbitkit.native.OrbitkitNativePlugin this$0
+C d 3	3	255	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4
+M d 1	1	48	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4 <init>(dev.orbitkit.native.OrbitkitNativePlugin,android.app.Activity)
+M d 1	1	41	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4 java.lang.Object invoke()
+M d 1	1	62	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4 void invoke()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4 android.app.Activity $ctx
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$recActions$4 dev.orbitkit.native.OrbitkitNativePlugin this$0
+C d 3	3	189	dev.orbitkit.native.OverlayShowArgs
+M d 1	1	40	dev.orbitkit.native.OverlayShowArgs <init>()
+M d 1	1	36	dev.orbitkit.native.OverlayShowArgs app.tauri.plugin.Channel getChannel()
+M d 1	1	35	dev.orbitkit.native.OverlayShowArgs void setChannel(app.tauri.plugin.Channel)
+F d 0	0	10	dev.orbitkit.native.OverlayShowArgs app.tauri.plugin.Channel channel
+C d 2	2	158	dev.orbitkit.native.OrbitkitRecorderService$$ExternalSyntheticLambda0
+M d 1	1	46	dev.orbitkit.native.OrbitkitRecorderService$$ExternalSyntheticLambda0 <init>(int,dev.orbitkit.native.OrbitkitRecorderService)
+M d 1	1	44	dev.orbitkit.native.OrbitkitRecorderService$$ExternalSyntheticLambda0 void run()
+F d 0	0	11	dev.orbitkit.native.OrbitkitRecorderService$$ExternalSyntheticLambda0 int f$0
+F d 0	0	11	dev.orbitkit.native.OrbitkitRecorderService$$ExternalSyntheticLambda0 dev.orbitkit.native.OrbitkitRecorderService f$1
+C d 2	2	158	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda0
+M d 1	1	46	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda0 <init>(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	44	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda0 void run()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda0 dev.orbitkit.native.OrbitkitNativePlugin f$0
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda0 app.tauri.plugin.Invoke f$1
+C d 2	2	158	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda1
+M d 1	1	46	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda1 <init>(dev.orbitkit.native.OrbitkitNativePlugin,java.lang.String)
+M d 1	1	44	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda1 void onClick(android.view.View)
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda1 dev.orbitkit.native.OrbitkitNativePlugin f$0
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda1 java.lang.String f$1
+C d 2	2	139	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda2
+M d 1	1	42	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda2 <init>(kotlin.jvm.functions.Function0)
+M d 1	1	40	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda2 void onClick(android.view.View)
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda2 kotlin.jvm.functions.Function0 f$0
+C d 2	2	158	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda3
+M d 1	1	46	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda3 <init>(dev.orbitkit.native.OrbitkitNativePlugin,app.tauri.plugin.Invoke)
+M d 1	1	44	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda3 void run()
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda3 dev.orbitkit.native.OrbitkitNativePlugin f$0
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$$ExternalSyntheticLambda3 app.tauri.plugin.Invoke f$1
+C d 2	2	148	dev.orbitkit.native.OrbitkitNativePlugin$Companion
+M d 1	1	38	dev.orbitkit.native.OrbitkitNativePlugin$Companion <init>()
+M d 1	1	38	dev.orbitkit.native.OrbitkitNativePlugin$Companion <init>(kotlin.jvm.internal.DefaultConstructorMarker)
+C d 2	2	548	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1
+M d 1	1	70	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 <init>(kotlin.jvm.internal.Ref$IntRef,android.view.WindowManager$LayoutParams,kotlin.jvm.internal.Ref$IntRef,kotlin.jvm.internal.Ref$FloatRef,kotlin.jvm.internal.Ref$FloatRef,android.view.WindowManager,android.widget.LinearLayout,dev.orbitkit.native.OrbitkitNativePlugin)
+M d 1	1	312	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 boolean onTouch(android.view.View,android.view.MotionEvent)
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 android.widget.LinearLayout $container
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 kotlin.jvm.internal.Ref$FloatRef $initialTouchX
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 kotlin.jvm.internal.Ref$FloatRef $initialTouchY
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 kotlin.jvm.internal.Ref$IntRef $initialX
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 kotlin.jvm.internal.Ref$IntRef $initialY
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 android.view.WindowManager$LayoutParams $params
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 android.view.WindowManager $wm
+F d 0	0	11	dev.orbitkit.native.OrbitkitNativePlugin$buildOverlayView$dragListener$1 dev.orbitkit.native.OrbitkitNativePlugin this$0
+P d 1	1	80	dev.orbitkit.plugin
+C d 1	1	80	dev.orbitkit.plugin.R
+M d 1	1	40	dev.orbitkit.plugin.R <init>()
+=== LIBORBITKIT_LIB.SO JNI SYMBOLS ===
+000000000060b274 T Java_dev_orbitkit_native_OrbitkitJniBridge_00024Companion_onNativeAction
+000000000060b2a8 T Java_dev_orbitkit_native_OrbitkitJniBridge_getActionCount
+000000000060b31c T Java_dev_orbitkit_native_OrbitkitJniBridge_getActionLogJson
+000000000060b4bc T Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction
+EXIT_CODE=0

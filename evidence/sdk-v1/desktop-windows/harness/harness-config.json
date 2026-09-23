@@ -1,0 +1,34 @@
+{
+  "mascot": {
+    "kind": "image",
+    "src": "mascot.png",
+    "size": 96,
+    "initialState": "idle"
+  },
+  "menu": {
+    "items": [
+      {
+        "id": "item1",
+        "label": "Settings"
+      }
+    ],
+    "radius": 96.0,
+    "startAngle": -90.0,
+    "endAngle": 270.0,
+    "itemSize": 44.0,
+    "trigger": "click"
+  },
+  "windows": {
+    "popups": [
+      {
+        "id": "settings",
+        "url": "index.html?orbitkit=popup-settings",
+        "title": "orbitkit popup settings",
+        "width": 400.0,
+        "height": 300.0,
+        "resizable": true,
+        "alwaysOnTop": false
+      }
+    ]
+  }
+}

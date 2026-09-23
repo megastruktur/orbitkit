@@ -1,0 +1,21 @@
+[package]
+name = "tauri-plugin-orbitkit"
+version = "0.1.0"
+authors = ["OrbitKit Team"]
+edition = "2021"
+description = "OrbitKit Tauri plugin for floating overlay, mascot, and menus"
+links = "tauri-plugin-orbitkit"
+
+[dependencies]
+tauri = { version = "=2.11.6", default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+log = "0.4"
+jni = { version = "0.21", default-features = false }
+
+[build-dependencies]
+tauri-plugin = { version = "=2.6.3", features = ["build"] }
+
+[dev-dependencies]
+serde_json = "1.0"

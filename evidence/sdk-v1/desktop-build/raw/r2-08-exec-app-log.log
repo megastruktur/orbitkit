@@ -1,0 +1,15 @@
+=== Evidence: exec command and app log location ===
+Command: scripts/linux-desktop.sh exec . -- xdotool search --name orbitkit
+Launching exec container for /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/exec-app.log
+4194305
+4194307
+EXIT_CODE=0
+
+=== Verify exec app log on host ===
+-rw-r--r-- 1 megastruktur megastruktur 204 Sep 22 21:48 src-tauri/target-linux/exec-app.log
+LS_EXIT_CODE=0
+
+=== Content of exec-app.log ===
+
+(orbitkit:45): dbind-WARNING **: 21:48:25.108: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files

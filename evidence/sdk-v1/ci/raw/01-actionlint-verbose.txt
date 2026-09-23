@@ -1,0 +1,162 @@
+[Linter] Create a Linter instance with option &actionlint.LinterOptions{Verbose:false, Debug:true, LogWriter:(*os.File)(0x4309ee02028), Color:0, Oneline:false, Shellcheck:"shellcheck", Pyflakes:"pyflakes", IgnorePatterns:[]string(nil), ConfigFile:"", Format:"", StdinFileName:"<stdin>", WorkingDir:"", OnRulesCreated:(func([]actionlint.Rule) []actionlint.Rule)(nil)}
+verbose: Linting all workflow files in repository: /repo
+verbose: Detected project: /repo
+verbose: Collected 1 YAML files
+verbose: Linting .github/workflows/ci.yml
+verbose: Using project at /repo
+[Linter] No config was found
+verbose: Found 0 parse errors in 0 ms for .github/workflows/ci.yml
+[Visitor] VisitWorkflowPre took 0ms
+[Visitor] VisitWorkflowJobPre at job "desktop" took 0ms
+[Visitor] VisitStep at line:89,col:9 took 0ms
+[shellcheck] line:94,col:9: Run shellcheck for bash script:
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  libwebkit2gtk-4.1-dev \
+  libayatana-appindicator3-dev \
+  librsvg2-dev \
+  libxdo-dev \
+  libssl-dev \
+  build-essential \
+  file \
+  pkg-config
+
+[shellcheck] line:94,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:92,col:9 took 0ms
+[Visitor] VisitStep at line:106,col:9 took 0ms
+[action] This action is not found in popular actions data set: pnpm/action-setup@v4
+[Visitor] VisitStep at line:109,col:9 took 0ms
+[Visitor] VisitStep at line:114,col:9 took 0ms
+[shellcheck] line:121,col:9: Run shellcheck for bash script:
+pnpm config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+[shellcheck] line:121,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:119,col:9 took 0ms
+[shellcheck] line:124,col:9: Run shellcheck for bash script:
+pnpm install --frozen-lockfile
+[shellcheck] line:124,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:123,col:9 took 0ms
+[shellcheck] line:127,col:9: Run shellcheck for bash script:
+pnpm -r build
+[shellcheck] line:127,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:126,col:9 took 0ms
+[shellcheck] line:130,col:9: Run shellcheck for bash script:
+pnpm --filter starter tauri build --debug --no-bundle
+[shellcheck] line:130,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:129,col:9 took 0ms
+[Visitor] VisitStep at line:132,col:9 took 0ms
+[Visitor] Visiting 10 steps at job "desktop" took 0ms
+[Visitor] VisitWorkflowJobPost at job "desktop" took 0ms
+[Visitor] VisitWorkflowJobPre at job "android" took 0ms
+[Visitor] VisitStep at line:144,col:9 took 0ms
+[Visitor] VisitStep at line:147,col:9 took 0ms
+[shellcheck] line:154,col:9: Run shellcheck for bash script:
+yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "ndk;27.3.13750724"
+{
+  echo "ANDROID_HOME=$ANDROID_HOME"
+  echo "NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724"
+  echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724"
+} >> "$GITHUB_ENV"
+
+[shellcheck] line:154,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:153,col:9 took 0ms
+[Visitor] VisitStep at line:163,col:9 took 0ms
+[action] This action is not found in popular actions data set: pnpm/action-setup@v4
+[Visitor] VisitStep at line:168,col:9 took 0ms
+[Visitor] VisitStep at line:173,col:9 took 0ms
+[shellcheck] line:179,col:9: Run shellcheck for bash script:
+pnpm install --frozen-lockfile
+[shellcheck] line:179,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:178,col:9 took 0ms
+[shellcheck] line:182,col:9: Run shellcheck for bash script:
+pnpm -r build
+[shellcheck] line:182,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:181,col:9 took 0ms
+[shellcheck] line:185,col:9: Run shellcheck for bash script:
+pnpm --filter starter tauri android build --debug --target aarch64 --apk
+[shellcheck] line:185,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:184,col:9 took 0ms
+[shellcheck] line:188,col:9: Run shellcheck for bash script:
+mkdir -p artifacts/android
+find examples/starter/src-tauri/gen/android/app/build/outputs/apk -name "*.apk" -exec cp {} artifacts/android/starter-core-debug.apk \;
+
+[shellcheck] line:188,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:187,col:9 took 0ms
+[shellcheck] line:193,col:9: Run shellcheck for bash script:
+pnpm --filter starter tauri android build --debug --target aarch64 --apk --features recorder
+[shellcheck] line:193,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:192,col:9 took 0ms
+[shellcheck] line:196,col:9: Run shellcheck for bash script:
+find examples/starter/src-tauri/gen/android/app/build/outputs/apk -name "*.apk" -exec cp {} artifacts/android/starter-recorder-debug.apk \;
+
+[shellcheck] line:196,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:195,col:9 took 0ms
+[shellcheck] line:200,col:9: Run shellcheck for bash script:
+cd examples/starter/src-tauri/gen/android
+chmod +x gradlew
+./gradlew test
+
+[shellcheck] line:200,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:199,col:9 took 0ms
+[Visitor] VisitStep at line:205,col:9 took 0ms
+[Visitor] Visiting 14 steps at job "android" took 0ms
+[Visitor] VisitWorkflowJobPost at job "android" took 0ms
+[Visitor] VisitWorkflowJobPre at job "js" took 0ms
+[Visitor] VisitStep at line:23,col:9 took 0ms
+[action] This action is not found in popular actions data set: pnpm/action-setup@v4
+[Visitor] VisitStep at line:26,col:9 took 0ms
+[Visitor] VisitStep at line:31,col:9 took 0ms
+[shellcheck] line:37,col:9: Run shellcheck for bash script:
+pnpm install --frozen-lockfile && pnpm -r build && pnpm -r check && pnpm -r test
+[shellcheck] line:37,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:36,col:9 took 0ms
+[Visitor] Visiting 4 steps at job "js" took 0ms
+[Visitor] VisitWorkflowJobPost at job "js" took 0ms
+[Visitor] VisitWorkflowJobPre at job "rust" took 0ms
+[Visitor] VisitStep at line:43,col:9 took 0ms
+[shellcheck] line:47,col:9: Run shellcheck for bash script:
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  libwebkit2gtk-4.1-dev \
+  libayatana-appindicator3-dev \
+  librsvg2-dev \
+  libxdo-dev \
+  libssl-dev \
+  build-essential \
+  file \
+  pkg-config
+
+[shellcheck] line:47,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:46,col:9 took 0ms
+[Visitor] VisitStep at line:59,col:9 took 0ms
+[shellcheck] line:65,col:9: Run shellcheck for bash script:
+cargo test --workspace --exclude starter
+[shellcheck] line:65,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:64,col:9 took 0ms
+[shellcheck] line:68,col:9: Run shellcheck for bash script:
+cargo clippy -p tauri-plugin-orbitkit -p tauri-plugin-orbitkit-recorder --all-targets -- -D warnings
+[shellcheck] line:68,col:9: Running /usr/local/bin/shellcheck command with [--norc -f json -x --shell bash -e SC1091,SC2194,SC2050,SC2153,SC2154,SC2157,SC2043 -]
+[Visitor] VisitStep at line:67,col:9 took 0ms
+[Visitor] Visiting 5 steps at job "rust" took 0ms
+[Visitor] VisitWorkflowJobPost at job "rust" took 0ms
+[Visitor] Visiting 4 jobs took 0ms
+[Visitor] VisitWorkflowPost took 19ms
+[Linter] matrix found 0 errors
+[Linter] credentials found 0 errors
+[Linter] shell-name found 0 errors
+[Linter] runner-label found 0 errors
+[Linter] events found 0 errors
+[Linter] job-needs found 0 errors
+[Linter] action found 0 errors
+[Linter] env-var found 0 errors
+[Linter] id found 0 errors
+[Linter] glob found 0 errors
+[Linter] permissions found 0 errors
+[Linter] workflow-call found 0 errors
+[Linter] expression found 0 errors
+[Linter] deprecated-commands found 0 errors
+[Linter] if-cond found 0 errors
+[Linter] shellcheck found 0 errors
+[Linter] pyflakes found 0 errors
+verbose: Found total 0 errors in 19 ms for .github/workflows/ci.yml
+EXIT_CODE=0

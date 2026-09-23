@@ -1,0 +1,4 @@
+    Checking tauri-plugin-orbitkit v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-windows/crates/tauri-plugin-orbitkit)
+    Checking starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-windows/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s
+EXIT_CODE=0

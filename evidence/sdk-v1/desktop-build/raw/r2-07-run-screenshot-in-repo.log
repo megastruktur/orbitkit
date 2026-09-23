@@ -1,0 +1,22 @@
+=== Evidence: run-screenshot in-repo out path ===
+Command: scripts/linux-desktop.sh run-screenshot . evidence/sdk-v1/desktop-build/raw/spike-r2.png 15
+Launching screenshot container for /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build (output: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.png, wait: 15s)...
+--> Launching /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/src-tauri/target-linux/debug/orbitkit in Xvfb :77...
+--> Waiting 15 seconds for app to render...
+--> Capturing screenshot to /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.png...
+--> Dumping window list to /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.windows.txt...
+=== Run-screenshot successful ===
+App was alive at screenshot time.
+Screenshot: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.png
+Windows list: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.windows.txt
+App log: /home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build/evidence/sdk-v1/desktop-build/raw/spike-r2.log
+EXIT_CODE=0
+
+=== Host file verification ===
+-rw-r--r-- 1 megastruktur megastruktur 49162 Sep 22 21:48 evidence/sdk-v1/desktop-build/raw/spike-r2.png
+-rw-r--r-- 1 megastruktur megastruktur   204 Sep 22 21:48 evidence/sdk-v1/desktop-build/raw/spike-r2.png.log
+-rw-r--r-- 1 megastruktur megastruktur    36 Sep 22 21:48 evidence/sdk-v1/desktop-build/raw/spike-r2.png.windows.txt
+LS_EXIT_CODE=0
+
+=== Windows txt content ===
+0x00400003  0 29b437afa305 orbitkit

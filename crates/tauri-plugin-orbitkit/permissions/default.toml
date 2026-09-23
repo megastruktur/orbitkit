@@ -1,0 +1,13 @@
+"$schema" = "schemas/schema.json"
+[default]
+description = "Default permissions for OrbitKit plugin"
+permissions = [
+    "allow-overlay-permission",
+    "allow-request-overlay-permission",
+    "allow-show-overlay",
+    "allow-hide-overlay",
+    "allow-open-popup",
+    "allow-close-popup",
+    "allow-set-mascot-state",
+    "allow-emit-menu-action",
+]

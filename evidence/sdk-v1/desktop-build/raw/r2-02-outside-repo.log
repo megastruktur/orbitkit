@@ -1,0 +1,8 @@
+=== Evidence: app-dir outside repo rejection ===
+Command 1: scripts/linux-desktop.sh build /tmp
+Error: Application directory '/tmp' is outside repository root '/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build'.
+EXIT_CODE=1
+
+Command 2: scripts/linux-desktop.sh run-screenshot /tmp /tmp/test.png 15
+Error: Application directory '/tmp' is outside repository root '/home/megastruktur/orca/workspaces/orbitkit/oks-desktop-build'.
+EXIT_CODE=1

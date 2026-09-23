@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrbitKit Radial Menu Demo — Ring + Arc</title>
+    <style>
+      :root {
+        --bg-color: #0d1117;
+        --card-bg: #161b22;
+        --border-color: #30363d;
+        --text-color: #f0f6fc;
+        --text-muted: #8b949e;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+      }
+
+      header p {
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        max-width: 900px;
+        width: 100%;
+      }
+
+      .demo-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .demo-card h2 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .demo-card .meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+      }
+
+      .stage {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(99, 179, 237, 0.05) 0%, rgba(22, 27, 34, 0) 70%);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .center-marker {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #58a6ff;
+        box-shadow: 0 0 8px rgba(88, 166, 255, 0.6);
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .menu-anchor {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+      }
+
+      .status-box {
+        margin-top: 24px;
+        font-size: 13px;
+        font-family: monospace;
+        color: var(--text-muted);
+        background: rgba(0, 0, 0, 0.3);
+        padding: 6px 12px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>OrbitKit Radial Menu</h1>
+      <p>Pure geometry layout + Svelte 5 component runtime demo</p>
+    </header>
+
+    <div class="demo-grid">
+      <div class="demo-card">
+        <h2>Full Ring Menu</h2>
+        <div class="meta">6 items &bull; r=110px &bull; &minus;90&deg;..270&deg; (360&deg; ring)</div>
+        <div class="stage">
+          <div class="center-marker"></div>
+          <div class="menu-anchor" id="full-ring-target"></div>
+        </div>
+        <div class="status-box" id="full-status">Ready (click item)</div>
+      </div>
+
+      <div class="demo-card">
+        <h2>Half Arc Menu</h2>
+        <div class="meta">4 items &bull; r=110px &bull; &minus;90&deg;..90&deg; (180&deg; arc)</div>
+        <div class="stage">
+          <div class="center-marker"></div>
+          <div class="menu-anchor" id="half-arc-target"></div>
+        </div>
+        <div class="status-box" id="arc-status">Ready (click item)</div>
+      </div>
+    </div>
+
+    <script type="module" src="./menu.ts"></script>
+  </body>
+</html>

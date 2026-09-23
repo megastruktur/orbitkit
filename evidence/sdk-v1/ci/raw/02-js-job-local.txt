@@ -1,0 +1,31 @@
+Scope: all 3 workspace projects
+✓ Lockfile passes supply-chain policies (verified 4h ago)
+Lockfile is up to date, resolution step is skipped
+Done in 31ms using pnpm v12.4.1
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 131 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.39 kB │ gzip:  0.26 kB
+dist/assets/index-DMK0Id8E.css  10.29 kB │ gzip:  2.53 kB
+dist/assets/index-CurN3cZR.js   73.09 kB │ gzip: 25.83 kB
+
+✓ built in 129ms
+$ tsc --noEmit
+$ tsc --noEmit
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-ci/packages/orbitkit
+
+
+ Test Files  5 passed (5)
+      Tests  82 passed (82)
+   Start at  14:39:09
+   Duration  983ms (environment 57%, transform 30%, import 7%, tests 5%)
+
+EXIT_CODE=0

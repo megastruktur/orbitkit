@@ -1,0 +1,3 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+EXIT_CODE: 0

@@ -1,0 +1,3 @@
+0x00400003  0 ad731cfe353c orbitkit
+0x00400021  0 ad731cfe353c orbitkit-mascot
+0x0040002f  0 ad731cfe353c orbitkit popup settings

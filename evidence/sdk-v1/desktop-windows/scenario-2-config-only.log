@@ -1,0 +1,2 @@
+
+(starter:50): dbind-WARNING **: 10:55:02.580: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files

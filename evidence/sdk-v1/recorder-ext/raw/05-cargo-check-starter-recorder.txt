@@ -1,0 +1,3 @@
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-recorder-ext/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.27s
+EXIT_CODE=0

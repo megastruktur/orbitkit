@@ -1,0 +1,18 @@
+=== OrbitKit Mascot: Enter Key Activation Test ===
+Serving demo bundle at http://127.0.0.1:44593/mascot.html
+Mascot button inspection: {
+  "buttonCount": 3,
+  "focused": true,
+  "tag": "BUTTON",
+  "type": "button",
+  "className": "orbitkit-mascot   svelte-1jibtrp",
+  "ariaLabel": "Blue planet SVG mascot",
+  "dataState": "idle"
+}
+Dispatching Enter key event...
+Measured activation:
+- Keydown count: 1
+- Click count: 1
+- Event sequence: [{"type":"keydown","key":"Enter","code":"Enter"},{"type":"click","isTrusted":true}]
+VERIFICATION SUCCESS: Enter key dispatched exactly 1 onclick activation!
+EXIT_CODE: 0

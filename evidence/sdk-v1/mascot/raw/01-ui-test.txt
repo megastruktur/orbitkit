@@ -1,0 +1,11 @@
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-mascot/packages/orbitkit
+
+
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+   Start at  07:58:07
+   Duration  920ms (environment 53%, transform 34%, import 7%, tests 6%)
+
+EXIT_CODE: 0

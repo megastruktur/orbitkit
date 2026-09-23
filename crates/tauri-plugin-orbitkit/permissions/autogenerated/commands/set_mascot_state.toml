@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-mascot-state"
+description = "Enables the set_mascot_state command without any pre-configured scope."
+commands.allow = ["set_mascot_state"]
+
+[[permission]]
+identifier = "deny-set-mascot-state"
+description = "Denies the set_mascot_state command without any pre-configured scope."
+commands.deny = ["set_mascot_state"]

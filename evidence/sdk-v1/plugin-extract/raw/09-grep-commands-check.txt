@@ -1,0 +1,10 @@
+crates/tauri-plugin-orbitkit/src/mobile.rs:78:            .run_mobile_plugin::<()>("overlayShow", ())
+crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:95:    fun overlayShow(invoke: Invoke) {
+crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:96:        Log.i(TAG, "overlayShow called")
+crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:99:            Log.w(TAG, "overlayShow rejected: SYSTEM_ALERT_WINDOW permission not granted")
+crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:112:                Log.i(TAG, "actionChannel registered from overlayShow args")
+crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:115:            Log.d(TAG, "No channel argument in overlayShow args: ${e.message}")
+crates/tauri-plugin-orbitkit/android/src/test/java/dev/orbitkit/native/OrbitkitNativePluginTest.kt:48:            "overlayShow",
+examples/starter/src/App.svelte:54:      statusMessage = "overlayShow failed";
+examples/starter/src/App.svelte:241:      <button class="primary" onclick={showOverlay}>overlayShow</button>
+EXIT_CODE=0

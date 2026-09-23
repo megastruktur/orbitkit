@@ -5,19 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@12.4.1",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "2.11.1"
-  },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "7.3.0",
-    "@tauri-apps/cli": "2.11.5",
-    "svelte": "5.57.1",
-    "typescript": "7.0.2",
-    "vite": "8.3.0"
+    "build": "pnpm -r build",
+    "check": "pnpm -r check",
+    "test": "pnpm -r --if-present test"
   }
 }

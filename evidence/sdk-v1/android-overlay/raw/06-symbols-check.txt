@@ -1,0 +1,37 @@
+=== 1. JNI Export Symbols in liborbitkit_lib.so ===
+000000000061323c T Java_dev_orbitkit_native_OrbitkitJniBridge_00024Companion_onNativeAction
+0000000000613270 T Java_dev_orbitkit_native_OrbitkitJniBridge_getActionCount
+00000000006132e4 T Java_dev_orbitkit_native_OrbitkitJniBridge_getActionLogJson
+0000000000613484 T Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction
+
+=== 2. DEX Classes in app-universal-debug.apk ===
+  Class descriptor  : 'Ldev/orbitkit/native/ItemPosition;'
+  Class descriptor  : 'Ldev/orbitkit/native/MenuConfigParser;'
+  Class descriptor  : 'Ldev/orbitkit/native/NativeMascotArgs;'
+  Class descriptor  : 'Ldev/orbitkit/native/NativeMenuConfig;'
+  Class descriptor  : 'Ldev/orbitkit/native/NativeMenuConfig$Companion;'
+  Class descriptor  : 'Ldev/orbitkit/native/NativeMenuItem;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitJniBridge;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda0;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda1;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda2;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda3;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$$ExternalSyntheticLambda4;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$buildOverlayView$1;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$Companion;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$handleAction$1;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitNativePlugin$handleAction$2;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitRecorderService;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitRecorderService$$ExternalSyntheticLambda0;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitRecorderService$Companion;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitRecorderService$State;'
+  Class descriptor  : 'Ldev/orbitkit/native/OrbitkitStatePersistence;'
+  Class descriptor  : 'Ldev/orbitkit/native/OverlayActionDispatcher;'
+  Class descriptor  : 'Ldev/orbitkit/native/OverlayActionDispatcher$handleAction$1;'
+  Class descriptor  : 'Ldev/orbitkit/native/OverlayConfig;'
+  Class descriptor  : 'Ldev/orbitkit/native/OverlayShowArgs;'
+  Class descriptor  : 'Ldev/orbitkit/native/PersistedRecorderState;'
+  Class descriptor  : 'Ldev/orbitkit/native/PersistedRecorderState$Companion;'
+  Class descriptor  : 'Ldev/orbitkit/native/RadialLayout;'
+EXIT_CODE=0

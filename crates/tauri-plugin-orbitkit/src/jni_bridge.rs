@@ -54,7 +54,7 @@ pub struct MenuAction {
 }
 
 type MenuActionCallback = Box<dyn Fn(&MenuAction) + Send + Sync + 'static>;
-type EventEmitterCallback = Box<dyn Fn(&str, &serde_json::Value) + Send + Sync + 'static>;
+type EventEmitterCallback = Arc<dyn Fn(&str, &serde_json::Value) + Send + Sync + 'static>;
 
 pub const MENU_ACTION_EVENT: &str = "orbitkit://menu-action";
 
@@ -65,7 +65,7 @@ static EVENT_EMITTER: Mutex<Option<EventEmitterCallback>> = Mutex::new(None);
 
 pub fn register_event_emitter<F: Fn(&str, &serde_json::Value) + Send + Sync + 'static>(emitter: F) {
     if let Ok(mut guard) = EVENT_EMITTER.lock() {
-        *guard = Some(Box::new(emitter));
+        *guard = Some(Arc::new(emitter));
     }
 }
 
@@ -86,10 +86,15 @@ pub fn build_menu_action_payload(id: &str, source: &str) -> serde_json::Value {
 /// Pure / extracted dispatch function emitting overlay action event to registered emitter.
 pub fn emit_overlay_menu_action(id: &str) -> serde_json::Value {
     let payload = build_menu_action_payload(id, "overlay");
-    if let Ok(guard) = EVENT_EMITTER.lock() {
-        if let Some(emitter) = guard.as_ref() {
-            emitter(MENU_ACTION_EVENT, &payload);
+    let emitter = {
+        if let Ok(guard) = EVENT_EMITTER.lock() {
+            guard.clone()
+        } else {
+            None
         }
+    };
+    if let Some(emitter) = emitter {
+        emitter(MENU_ACTION_EVENT, &payload);
     }
     payload
 }
@@ -103,6 +108,11 @@ fn current_timestamp_millis() -> u64 {
 pub fn register_menu_action_handler<F: Fn(&MenuAction) + Send + Sync + 'static>(handler: F) {
     if let Ok(mut handlers) = MENU_ACTION_HANDLERS.lock() {
         handlers.push(Arc::new(Box::new(handler)));
+    }
+}
+pub fn clear_menu_action_handlers() {
+    if let Ok(mut handlers) = MENU_ACTION_HANDLERS.lock() {
+        handlers.clear();
     }
 }
 
@@ -163,26 +173,78 @@ pub fn clear_jni_action_log() {
     }
 }
 
+/// Wraps an action execution in `catch_unwind`, logging and returning a standardized
+/// JSON error payload if a panic occurs in user callbacks or emitters.
+pub fn guarded<F: FnOnce() -> String>(f: F) -> String {
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)) {
+        Ok(res) => res,
+        Err(err) => {
+            let msg = if let Some(s) = err.downcast_ref::<&str>() {
+                (*s).to_string()
+            } else if let Some(s) = err.downcast_ref::<String>() {
+                s.clone()
+            } else {
+                "panic in native action handler".to_string()
+            };
+            log_android_info(
+                "OrbitkitJni",
+                &format!("[RUST-JNI-ERROR] Panic in native action: {}", msg),
+            );
+            serde_json::json!({
+                "status": "ERROR",
+                "error": msg,
+            })
+            .to_string()
+        }
+    }
+}
+
 #[no_mangle]
 pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction(
     mut env: jni::JNIEnv,
     _class: jni::objects::JClass,
     action: jni::objects::JString,
 ) -> jni::sys::jstring {
-    let action_str: String = match env.get_string(&action) {
-        Ok(s) => s.into(),
-        Err(e) => {
-            log_android_info("OrbitkitJni", &format!("[RUST-JNI-ERROR] Failed to read action JString: {:?}", e));
-            "UNKNOWN".to_string()
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let action_str: String = match env.get_string(&action) {
+            Ok(s) => s.into(),
+            Err(e) => {
+                log_android_info(
+                    "OrbitkitJni",
+                    &format!("[RUST-JNI-ERROR] Failed to read action JString: {:?}", e),
+                );
+                "UNKNOWN".to_string()
+            }
+        };
+
+        let response_json = guarded(|| process_native_action(&action_str));
+
+        match env.new_string(&response_json) {
+            Ok(js) => js.into_raw(),
+            Err(e) => {
+                log_android_info(
+                    "OrbitkitJni",
+                    &format!("[RUST-JNI-ERROR] Failed to allocate return JString: {:?}", e),
+                );
+                std::ptr::null_mut()
+            }
         }
-    };
+    }));
 
-    let response_json = process_native_action(&action_str);
-
-    match env.new_string(&response_json) {
-        Ok(js) => js.into_raw(),
-        Err(e) => {
-            log_android_info("OrbitkitJni", &format!("[RUST-JNI-ERROR] Failed to allocate return JString: {:?}", e));
+    match result {
+        Ok(ptr) => ptr,
+        Err(err) => {
+            let msg = if let Some(s) = err.downcast_ref::<&str>() {
+                (*s).to_string()
+            } else if let Some(s) = err.downcast_ref::<String>() {
+                s.clone()
+            } else {
+                "panic in JNI export onNativeAction".to_string()
+            };
+            log_android_info(
+                "OrbitkitJni",
+                &format!("[RUST-JNI-ERROR] Fatal panic in JNI export: {}", msg),
+            );
             std::ptr::null_mut()
         }
     }
@@ -194,7 +256,13 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_00024Companion
     class: jni::objects::JClass,
     action: jni::objects::JString,
 ) -> jni::sys::jstring {
-    Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction(env, class, action)
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction(env, class, action)
+    }));
+    match result {
+        Ok(ptr) => ptr,
+        Err(_) => std::ptr::null_mut(),
+    }
 }
 
 #[no_mangle]
@@ -202,7 +270,10 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_getActionCount
     _env: jni::JNIEnv,
     _class: jni::objects::JClass,
 ) -> jni::sys::jlong {
-    ACTION_LOG.lock().map(|l| l.len() as i64).unwrap_or(0)
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        ACTION_LOG.lock().map(|l| l.len() as i64).unwrap_or(0)
+    }))
+    .unwrap_or(0)
 }
 
 #[no_mangle]
@@ -210,10 +281,16 @@ pub extern "system" fn Java_dev_orbitkit_native_OrbitkitJniBridge_getActionLogJs
     env: jni::JNIEnv,
     _class: jni::objects::JClass,
 ) -> jni::sys::jstring {
-    let actions = get_jni_action_log();
-    let json = serde_json::to_string(&actions).unwrap_or_else(|_| "[]".to_string());
-    match env.new_string(&json) {
-        Ok(js) => js.into_raw(),
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let actions = get_jni_action_log();
+        let json = serde_json::to_string(&actions).unwrap_or_else(|_| "[]".to_string());
+        match env.new_string(&json) {
+            Ok(js) => js.into_raw(),
+            Err(_) => std::ptr::null_mut(),
+        }
+    }));
+    match result {
+        Ok(ptr) => ptr,
         Err(_) => std::ptr::null_mut(),
     }
 }
@@ -226,7 +303,7 @@ mod tests {
 
     #[test]
     fn test_process_native_action_records_and_returns_json() {
-        let _guard = TEST_MUTEX.lock().unwrap();
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
         clear_jni_action_log();
         let res1 = process_native_action("ACT_A");
         let parsed: JniActionRecord = serde_json::from_str(&res1).expect("valid json record");
@@ -252,7 +329,7 @@ mod tests {
 
     #[test]
     fn test_recorder_actions_through_jni() {
-        let _guard = TEST_MUTEX.lock().unwrap();
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
         clear_jni_action_log();
         for act in ["REC_START", "REC_PAUSE", "REC_RESUME", "REC_STOP"] {
             let res = process_native_action(act);
@@ -287,7 +364,7 @@ mod tests {
 
     #[test]
     fn test_emit_overlay_menu_action_calls_registered_emitter() {
-        let _guard = TEST_MUTEX.lock().unwrap();
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
         clear_event_emitter();
 
         let call_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
@@ -317,9 +394,10 @@ mod tests {
 
     #[test]
     fn test_process_native_action_emits_overlay_event_and_notifies_handler() {
-        let _guard = TEST_MUTEX.lock().unwrap();
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
         clear_jni_action_log();
         clear_event_emitter();
+        clear_menu_action_handlers();
 
         let jni_called = Arc::new(std::sync::atomic::AtomicUsize::new(0));
         let jni_captured_id = Arc::new(Mutex::new(String::new()));
@@ -352,6 +430,73 @@ mod tests {
         assert_eq!(emitter_payload.lock().unwrap()["source"], "overlay");
 
         clear_jni_action_log();
+        clear_event_emitter();
+        clear_menu_action_handlers();
+    }
+
+    #[test]
+    fn test_guarded_handles_handler_panic_without_abort() {
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
+        clear_jni_action_log();
+        clear_event_emitter();
+        clear_menu_action_handlers();
+
+        register_menu_action_handler(|_action| {
+            panic!("simulated user callback panic");
+        });
+
+        let res = guarded(|| process_native_action("test_panic_action"));
+        let parsed: serde_json::Value =
+            serde_json::from_str(&res).expect("valid json error response");
+        assert_eq!(parsed["status"], "ERROR");
+        assert!(parsed["error"]
+            .as_str()
+            .unwrap()
+            .contains("simulated user callback panic"));
+
+        clear_menu_action_handlers();
+        clear_jni_action_log();
+    }
+
+    #[test]
+    fn test_guarded_handles_emitter_panic_without_abort() {
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
+        clear_jni_action_log();
+        clear_event_emitter();
+        clear_menu_action_handlers();
+
+        register_event_emitter(|_event, _payload| {
+            panic!("simulated emitter panic");
+        });
+
+        let res = guarded(|| process_native_action("test_emitter_panic"));
+        let parsed: serde_json::Value =
+            serde_json::from_str(&res).expect("valid json error response");
+        assert_eq!(parsed["status"], "ERROR");
+        assert!(parsed["error"]
+            .as_str()
+            .unwrap()
+            .contains("simulated emitter panic"));
+
+        clear_event_emitter();
+        clear_jni_action_log();
+    }
+
+    #[test]
+    fn test_event_emitter_reentrancy_no_deadlock() {
+        let _guard = TEST_MUTEX.lock().unwrap_or_else(|e| e.into_inner());
+        clear_event_emitter();
+
+        let called = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let c = called.clone();
+
+        register_event_emitter(move |_event, _payload| {
+            c.store(true, Ordering::SeqCst);
+            clear_event_emitter();
+        });
+
+        emit_overlay_menu_action("test_reentrancy");
+        assert!(called.load(Ordering::SeqCst));
         clear_event_emitter();
     }
 }

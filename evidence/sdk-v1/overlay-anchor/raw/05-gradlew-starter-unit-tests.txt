@@ -1,0 +1,86 @@
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preUniversalDebugBuild UP-TO-DATE
+> Task :app:generateUniversalDebugBuildConfig UP-TO-DATE
+> Task :tauri-android:preBuild UP-TO-DATE
+> Task :tauri-android:preDebugBuild UP-TO-DATE
+> Task :tauri-android:writeDebugAarMetadata UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:preDebugBuild UP-TO-DATE
+> Task :tauri-plugin-orbitkit:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkUniversalDebugAarMetadata UP-TO-DATE
+> Task :app:generateUniversalDebugResValues UP-TO-DATE
+> Task :tauri-android:generateDebugResValues UP-TO-DATE
+> Task :tauri-android:generateDebugResources UP-TO-DATE
+> Task :tauri-android:packageDebugResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugResValues UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:packageDebugResources UP-TO-DATE
+> Task :app:mapUniversalDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateUniversalDebugResources UP-TO-DATE
+> Task :app:mergeUniversalDebugResources UP-TO-DATE
+> Task :app:packageUniversalDebugResources UP-TO-DATE
+> Task :app:parseUniversalDebugLocalResources UP-TO-DATE
+> Task :app:createUniversalDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksUniversalDebug UP-TO-DATE
+> Task :tauri-android:extractDeepLinksDebug UP-TO-DATE
+> Task :tauri-android:processDebugManifest UP-TO-DATE
+> Task :tauri-plugin-orbitkit:extractDeepLinksDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:processDebugManifest UP-TO-DATE
+> Task :app:processUniversalDebugMainManifest UP-TO-DATE
+> Task :app:processUniversalDebugManifest UP-TO-DATE
+> Task :app:processUniversalDebugManifestForPackage UP-TO-DATE
+> Task :tauri-android:compileDebugLibraryResources UP-TO-DATE
+> Task :tauri-android:parseDebugLocalResources UP-TO-DATE
+> Task :tauri-android:generateDebugRFile UP-TO-DATE
+> Task :tauri-plugin-orbitkit:compileDebugLibraryResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:parseDebugLocalResources UP-TO-DATE
+> Task :tauri-plugin-orbitkit:generateDebugRFile UP-TO-DATE
+> Task :app:processUniversalDebugResources UP-TO-DATE
+> Task :tauri-android:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-android:generateDebugBuildConfig UP-TO-DATE
+> Task :tauri-android:compileDebugKotlin UP-TO-DATE
+> Task :tauri-android:javaPreCompileDebug UP-TO-DATE
+> Task :tauri-android:compileDebugJavaWithJavac UP-TO-DATE
+> Task :tauri-android:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:checkKotlinGradlePluginConfigurationErrors
+> Task :tauri-plugin-orbitkit:compileDebugKotlin UP-TO-DATE
+> Task :tauri-plugin-orbitkit:javaPreCompileDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:compileDebugJavaWithJavac NO-SOURCE
+> Task :tauri-plugin-orbitkit:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compileUniversalDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileUniversalDebug UP-TO-DATE
+> Task :app:compileUniversalDebugJavaWithJavac UP-TO-DATE
+> Task :app:preUniversalDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileUniversalDebugUnitTest
+> Task :app:processUniversalDebugJavaRes UP-TO-DATE
+> Task :tauri-android:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :tauri-android:processDebugJavaRes UP-TO-DATE
+> Task :tauri-plugin-orbitkit:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :tauri-plugin-orbitkit:processDebugJavaRes UP-TO-DATE
+> Task :app:bundleUniversalDebugClassesToRuntimeJar
+> Task :app:bundleUniversalDebugClassesToCompileJar
+> Task :app:compileUniversalDebugUnitTestKotlin
+> Task :app:compileUniversalDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processUniversalDebugUnitTestJavaRes
+> Task :app:testUniversalDebugUnitTest
+
+[Incubating] Problems report is available at: file:///home/megastruktur/orca/workspaces/orbitkit/oks-overlay-anchor/examples/starter/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1s
+61 actionable tasks: 9 executed, 52 up-to-date
+EXIT_CODE=0

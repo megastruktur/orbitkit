@@ -1,0 +1,6 @@
+TEST-dev.orbitkit.native.MenuConfigParserTest: tests=10 failures=0 errors=0 skipped=0
+TEST-dev.orbitkit.native.OrbitkitNativePluginTest: tests=9 failures=0 errors=0 skipped=0
+TEST-dev.orbitkit.native.OverlayActionDispatcherTest: tests=6 failures=0 errors=0 skipped=0
+TEST-dev.orbitkit.native.OverlayGeometryTest: tests=10 failures=0 errors=0 skipped=0
+TEST-dev.orbitkit.native.RadialLayoutTest: tests=11 failures=0 errors=0 skipped=0
+EXIT_CODE=0

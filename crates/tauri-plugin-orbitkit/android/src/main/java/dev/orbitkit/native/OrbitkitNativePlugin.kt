@@ -23,6 +23,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import kotlin.math.abs
+import android.view.WindowInsets
+import kotlin.math.roundToInt
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -42,6 +44,13 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private val TAG = "OrbitkitNative"
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
+    private var bubbleView: View? = null
+    private var menuView: View? = null
+    private var bubbleParams: WindowManager.LayoutParams? = null
+    private var menuParams: WindowManager.LayoutParams? = null
+    private var isMenuAttached: Boolean = false
+    private var isBubbleAttached: Boolean = false
+    private var isMenuExpanded: Boolean = false
     private var actionChannel: Channel? = null
     private var mascotView: TextView? = null
     private var currentMascotState: String = STATE_IDLE
@@ -149,15 +158,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 val wm = activity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 windowManager = wm
 
-                overlayView?.let { oldView ->
-                    try {
-                        wm.removeView(oldView)
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Error removing prior overlayView", e)
-                    }
-                    overlayView = null
-                    mascotView = null
-                }
+                removeOverlayViews()
 
                 val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -170,24 +171,24 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 val itemSizePx = dpToPx(activity, overlayConfig.itemSize.toFloat())
                 val halfExtent = radiusPx + itemSizePx + dpToPx(activity, 16f)
                 val containerSize = halfExtent * 2
+                val mascotSizePx = dpToPx(activity, 56f)
 
-                val params = WindowManager.LayoutParams(
-                    containerSize,
-                    containerSize,
-                    layoutType,
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                    PixelFormat.TRANSLUCENT
-                ).apply {
-                    gravity = Gravity.TOP or Gravity.START
-                    x = dpToPx(activity, 24f)
-                    y = dpToPx(activity, 80f)
-                }
+                val initialDesiredCenterX = dpToPx(activity, 24f) + halfExtent.toDouble()
+                val initialDesiredCenterY = dpToPx(activity, 80f) + halfExtent.toDouble()
 
-                val view = buildOverlayView(params, wm, overlayConfig)
-                wm.addView(view, params)
-                overlayView = view
+                buildOverlayView(
+                    wm = wm,
+                    layoutType = layoutType,
+                    menuConfig = overlayConfig,
+                    containerSize = containerSize,
+                    mascotSizePx = mascotSizePx,
+                    itemSizePx = itemSizePx,
+                    radiusPx = radiusPx,
+                    initialDesiredCenterX = initialDesiredCenterX,
+                    initialDesiredCenterY = initialDesiredCenterY
+                )
 
-                Log.i(TAG, "Overlay view added to WindowManager (items=${overlayConfig.items.size}, radius=$radiusPx)")
+                Log.i(TAG, "Overlay windows added to WindowManager (items=${overlayConfig.items.size}, radius=$radiusPx)")
                 invoke.resolve()
             } catch (e: Exception) {
                 Log.e(TAG, "Error displaying overlay view", e)
@@ -201,16 +202,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         Log.i(TAG, "overlayHide called")
         activity.runOnUiThread {
             try {
-                val view = overlayView
-                val wm = windowManager
-                if (view != null && wm != null) {
-                    wm.removeView(view)
-                    overlayView = null
-                    mascotView = null
-                    Log.i(TAG, "Overlay view removed cleanly from WindowManager")
-                } else {
-                    Log.i(TAG, "overlayHide: no active overlay view (no-op)")
-                }
+                removeOverlayViews()
+                Log.i(TAG, "Overlay views removed cleanly from WindowManager")
                 invoke.resolve()
             } catch (e: Exception) {
                 Log.e(TAG, "Error removing overlay view", e)
@@ -253,18 +246,44 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     }
 
 
+    private fun removeOverlayViews() {
+        val wm = windowManager ?: return
+        if (isMenuAttached) {
+            menuView?.let { menu ->
+                try {
+                    wm.removeViewImmediate(menu)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error removing menuView in removeOverlayViews", e)
+                }
+            }
+        }
+        menuView = null
+        isMenuAttached = false
+
+        if (isBubbleAttached) {
+            bubbleView?.let { bubble ->
+                try {
+                    wm.removeViewImmediate(bubble)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error removing bubbleView in removeOverlayViews", e)
+                }
+            }
+        }
+        bubbleView = null
+        overlayView = null
+        mascotView = null
+        bubbleParams = null
+        menuParams = null
+        isBubbleAttached = false
+        isMenuExpanded = false
+    }
+
     override fun onDestroy(activity: AppCompatActivity) {
         super.onDestroy(activity)
-        val view = overlayView
-        val wm = windowManager
-        if (view != null && wm != null) {
-            try {
-                wm.removeView(view)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error cleaning up overlay view in onDestroy", e)
-            }
-            overlayView = null
-            mascotView = null
+        try {
+            removeOverlayViews()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error cleaning up overlay views in onDestroy", e)
         }
     }
 
@@ -294,30 +313,95 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
     }
 
+    private fun getScreenBounds(wm: WindowManager, context: Context): OverlayGeometry.Bounds {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics = wm.currentWindowMetrics
+            val bounds = metrics.bounds
+            val insets = metrics.windowInsets.getInsetsIgnoringVisibility(
+                WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout()
+            )
+            return OverlayGeometry.Bounds(
+                left = bounds.left + insets.left,
+                top = bounds.top + insets.top,
+                right = bounds.right - insets.right,
+                bottom = bounds.bottom - insets.bottom
+            )
+        } else {
+            val dm = context.resources.displayMetrics
+            var statusBarHeight = 0
+            val resId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+            if (resId > 0) {
+                statusBarHeight = context.resources.getDimensionPixelSize(resId)
+            }
+            return OverlayGeometry.Bounds(
+                left = 0,
+                top = statusBarHeight,
+                right = dm.widthPixels,
+                bottom = dm.heightPixels
+            )
+        }
+    }
+
     private fun buildOverlayView(
-        params: WindowManager.LayoutParams,
         wm: WindowManager,
-        menuConfig: NativeMenuConfig
+        layoutType: Int,
+        menuConfig: NativeMenuConfig,
+        containerSize: Int,
+        mascotSizePx: Int,
+        itemSizePx: Int,
+        radiusPx: Int,
+        initialDesiredCenterX: Double,
+        initialDesiredCenterY: Double
     ): View {
         val ctx = activity
-        val radiusPx = dpToPx(ctx, menuConfig.radius.toFloat())
-        val itemSizePx = dpToPx(ctx, menuConfig.itemSize.toFloat())
-        val mascotSizePx = dpToPx(ctx, 56f)
+        val screen = getScreenBounds(wm, ctx)
 
-        val halfExtent = radiusPx + itemSizePx + dpToPx(ctx, 16f)
-        val containerSize = halfExtent * 2
-        val centerX = halfExtent.toDouble()
-        val centerY = halfExtent.toDouble()
+        // Compute initial bubble position clamped to usable screen bounds
+        val initialBubblePlacement = OverlayGeometry.place(
+            desiredCenterX = initialDesiredCenterX,
+            desiredCenterY = initialDesiredCenterY,
+            windowSize = mascotSizePx,
+            bubbleSize = mascotSizePx,
+            screen = screen
+        )
+        var bubbleCenterX = initialBubblePlacement.bubbleCenterX.toDouble()
+        var bubbleCenterY = initialBubblePlacement.bubbleCenterY.toDouble()
 
-        var isMenuExpanded = true
-        var bubbleCenterX = params.x + halfExtent.toDouble()
-        var bubbleCenterY = params.y + halfExtent.toDouble()
-        val container = FrameLayout(ctx).apply {
+        // 1. Bubble window params: exactly mascotSizePx x mascotSizePx, NEVER resized.
+        val bParams = WindowManager.LayoutParams(
+            mascotSizePx,
+            mascotSizePx,
+            layoutType,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            x = initialBubblePlacement.windowX
+            y = initialBubblePlacement.windowY
+            windowAnimations = 0
+        }
+        bubbleParams = bParams
+
+        // 2. Menu window params: full-screen, added ONCE before bubble window, never moves/resizes.
+        val mParams = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            layoutType,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            x = 0
+            y = 0
+            windowAnimations = 0
+        }
+        menuParams = mParams
+
+        // 1. Bubble window: contains ONLY the mascot
+        val bubbleContainer = FrameLayout(ctx).apply {
             isClickable = false
             isFocusable = false
         }
-
-        // 1. Mascot bubble at center
         val mascot = TextView(ctx).apply {
             text = "🪐"
             gravity = Gravity.CENTER
@@ -336,13 +420,167 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             }
         }
         mascotView = mascot
+        val mascotLp = FrameLayout.LayoutParams(mascotSizePx, mascotSizePx)
+        bubbleContainer.addView(mascot, mascotLp)
+        bubbleView = bubbleContainer
+        overlayView = bubbleContainer
 
-        val mascotLp = FrameLayout.LayoutParams(mascotSizePx, mascotSizePx).apply {
-            leftMargin = (centerX - mascotSizePx / 2.0).toInt()
-            topMargin = (centerY - mascotSizePx / 2.0).toInt()
+        // 2. Menu window: contains ONLY the item views (no mascot)
+        val menuContainer = FrameLayout(ctx).apply {
+            isClickable = true
+            isFocusable = false
+        }
+        val itemViews = ArrayList<View>()
+        val items = menuConfig.items
+        val positions = if (items.isNotEmpty()) {
+            RadialLayout.positions(
+                items.size,
+                radiusPx.toDouble(),
+                menuConfig.startAngle,
+                menuConfig.endAngle
+            )
+        } else {
+            emptyList()
         }
 
-        // Drag listener on mascot bubble keeping bubble center anchored
+        for (i in items.indices) {
+            val item = items[i]
+            val itemView = TextView(ctx).apply {
+                contentDescription = item.label
+                gravity = Gravity.CENTER
+                text = item.icon ?: item.label
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+
+                if (item.disabled) {
+                    isEnabled = false
+                    alpha = 0.5f
+                    setTextColor(Color.parseColor("#9CA3AF"))
+                    background = GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(Color.parseColor("#4B5563"))
+                    }
+                } else {
+                    isEnabled = true
+                    alpha = 1.0f
+                    setTextColor(Color.WHITE)
+                    background = GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(Color.parseColor("#1E293B"))
+                        setStroke(dpToPx(ctx, 2f), Color.parseColor("#38BDF8"))
+                    }
+                    setOnClickListener {
+                        handleAction(item.id, item.disabled)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        elevation = dpToPx(ctx, 6f).toFloat()
+                    }
+                }
+            }
+            val itemLp = FrameLayout.LayoutParams(itemSizePx, itemSizePx)
+            itemViews.add(itemView)
+            menuContainer.addView(itemView, itemLp)
+        }
+        menuView = menuContainer
+
+        fun updateMenuPositions(centerPxX: Double, centerPxY: Double) {
+            val screenBounds = getScreenBounds(wm, ctx)
+            val originX: Int
+            val originY: Int
+            if (menuContainer.isAttachedToWindow) {
+                val loc = IntArray(2)
+                menuContainer.getLocationOnScreen(loc)
+                originX = loc[0]
+                originY = loc[1]
+            } else {
+                originX = screenBounds.left
+                originY = screenBounds.top
+            }
+            for (i in itemViews.indices) {
+                val itemView = itemViews[i]
+                val pos = positions[i]
+                val itemLp = itemView.layoutParams as FrameLayout.LayoutParams
+                val margin = OverlayGeometry.itemMargin(
+                    bubbleCenterX = centerPxX,
+                    bubbleCenterY = centerPxY,
+                    relX = pos.x,
+                    relY = pos.y,
+                    itemSize = itemSizePx,
+                    screen = screenBounds,
+                    menuOriginX = originX,
+                    menuOriginY = originY,
+                )
+                itemLp.leftMargin = margin.left
+                itemLp.topMargin = margin.top
+                itemView.layoutParams = itemLp
+            }
+        }
+
+        fun collapseMenu() {
+            if (!isMenuExpanded) return
+            menuContainer.visibility = View.INVISIBLE
+            mParams.flags = mParams.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            try {
+                wm.updateViewLayout(menuContainer, mParams)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error updating menu window layout on collapse", e)
+            }
+            isMenuExpanded = false
+            Log.i(TAG, "Menu collapsed, bubble untouched at ($bubbleCenterX, $bubbleCenterY)")
+        }
+
+        fun expandMenu() {
+            if (isMenuExpanded) return
+            updateMenuPositions(bubbleCenterX, bubbleCenterY)
+            menuContainer.visibility = View.VISIBLE
+            mParams.flags = mParams.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+            try {
+                wm.updateViewLayout(menuContainer, mParams)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating menu window layout on expand", e)
+            }
+            isMenuExpanded = true
+            Log.i(TAG, "Menu expanded at ($bubbleCenterX, $bubbleCenterY)")
+        }
+
+        menuContainer.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                if (isMenuExpanded) {
+                    collapseMenu()
+                }
+                true
+            } else {
+                false
+            }
+        }
+        menuContainer.setOnClickListener {
+            if (isMenuExpanded) {
+                collapseMenu()
+            }
+        }
+        fun moveBubble(desiredX: Double, desiredY: Double) {
+            val screenBounds = getScreenBounds(wm, ctx)
+            val placement = OverlayGeometry.place(
+                desiredCenterX = desiredX,
+                desiredCenterY = desiredY,
+                windowSize = mascotSizePx,
+                bubbleSize = mascotSizePx,
+                screen = screenBounds
+            )
+            bubbleCenterX = placement.bubbleCenterX.toDouble()
+            bubbleCenterY = placement.bubbleCenterY.toDouble()
+            bParams.x = placement.windowX
+            bParams.y = placement.windowY
+            if (isBubbleAttached) {
+                try {
+                    wm.updateViewLayout(bubbleContainer, bParams)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error updating bubble layout", e)
+                }
+            }
+        }
+
+        // Drag listener on mascot bubble
         var initialTouchX = 0f
         var initialTouchY = 0f
         var initialBubbleCenterX = 0.0
@@ -366,22 +604,12 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                         val dy = event.rawY - initialTouchY
                         if (!isDragging && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
                             isDragging = true
+                            if (isMenuExpanded) {
+                                collapseMenu()
+                            }
                         }
                         if (isDragging) {
-                            bubbleCenterX = initialBubbleCenterX + dx
-                            bubbleCenterY = initialBubbleCenterY + dy
-                            if (isMenuExpanded) {
-                                params.x = (bubbleCenterX - halfExtent).toInt()
-                                params.y = (bubbleCenterY - halfExtent).toInt()
-                            } else {
-                                params.x = (bubbleCenterX - mascotSizePx / 2.0).toInt()
-                                params.y = (bubbleCenterY - mascotSizePx / 2.0).toInt()
-                            }
-                            try {
-                                wm.updateViewLayout(container, params)
-                            } catch (e: Exception) {
-                                Log.w(TAG, "Error updating overlay layout during drag", e)
-                            }
+                            moveBubble(initialBubbleCenterX + dx, initialBubbleCenterY + dy)
                         }
                         return true
                     }
@@ -395,106 +623,25 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 return false
             }
         })
-        val itemViews = ArrayList<View>()
 
-        // Mascot click toggles menu: when collapsed, window sizes to mascotSizePx so touches pass through;
-        // when expanded, window sizes to containerSize with items visible. Bubble stays anchored at bubbleCenter.
         mascot.setOnClickListener {
-            isMenuExpanded = !isMenuExpanded
-            Log.i(TAG, "Mascot bubble tapped, toggling menu: expanded=$isMenuExpanded")
+            Log.i(TAG, "Mascot bubble tapped, toggling menu: current expanded=$isMenuExpanded")
             if (isMenuExpanded) {
-                params.width = containerSize
-                params.height = containerSize
-                params.x = (bubbleCenterX - halfExtent).toInt()
-                params.y = (bubbleCenterY - halfExtent).toInt()
-
-                mascotLp.leftMargin = (halfExtent - mascotSizePx / 2.0).toInt()
-                mascotLp.topMargin = (halfExtent - mascotSizePx / 2.0).toInt()
-                mascot.layoutParams = mascotLp
-
-                for (v in itemViews) {
-                    v.visibility = View.VISIBLE
-                }
+                collapseMenu()
             } else {
-                for (v in itemViews) {
-                    v.visibility = View.GONE
-                }
-
-                params.width = mascotSizePx
-                params.height = mascotSizePx
-                params.x = (bubbleCenterX - mascotSizePx / 2.0).toInt()
-                params.y = (bubbleCenterY - mascotSizePx / 2.0).toInt()
-
-                mascotLp.leftMargin = 0
-                mascotLp.topMargin = 0
-                mascot.layoutParams = mascotLp
-            }
-            try {
-                wm.updateViewLayout(container, params)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error updating overlay layout on toggle", e)
-            }
-        }
-        // 2. Radial menu items around mascot bubble
-        val items = menuConfig.items
-        if (items.isNotEmpty()) {
-            val positions = RadialLayout.positions(
-                items.size,
-                radiusPx.toDouble(),
-                menuConfig.startAngle,
-                menuConfig.endAngle
-            )
-
-            for (i in items.indices) {
-                val item = items[i]
-                val pos = positions[i]
-
-                val itemView = TextView(ctx).apply {
-                    contentDescription = item.label
-                    gravity = Gravity.CENTER
-                    text = item.icon ?: item.label
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                    setTypeface(typeface, android.graphics.Typeface.BOLD)
-
-                    if (item.disabled) {
-                        isEnabled = false
-                        alpha = 0.5f
-                        setTextColor(Color.parseColor("#9CA3AF"))
-                        background = GradientDrawable().apply {
-                            shape = GradientDrawable.OVAL
-                            setColor(Color.parseColor("#4B5563"))
-                        }
-                    } else {
-                        isEnabled = true
-                        alpha = 1.0f
-                        setTextColor(Color.WHITE)
-                        background = GradientDrawable().apply {
-                            shape = GradientDrawable.OVAL
-                            setColor(Color.parseColor("#1E293B"))
-                            setStroke(dpToPx(ctx, 2f), Color.parseColor("#38BDF8"))
-                        }
-                        setOnClickListener {
-                            handleAction(item.id, item.disabled)
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            elevation = dpToPx(ctx, 6f).toFloat()
-                        }
-                    }
-                }
-
-                val itemLp = FrameLayout.LayoutParams(itemSizePx, itemSizePx).apply {
-                    leftMargin = (centerX + pos.x - itemSizePx / 2.0).toInt()
-                    topMargin = (centerY + pos.y - itemSizePx / 2.0).toInt()
-                }
-                itemViews.add(itemView)
-                container.addView(itemView, itemLp)
+                expandMenu()
             }
         }
 
-        // Add mascot after items so it sits on top in center
-        container.addView(mascot, mascotLp)
+        // Initial show: add menu window FIRST, then bubble window on top
+        updateMenuPositions(bubbleCenterX, bubbleCenterY)
+        wm.addView(menuContainer, mParams)
+        isMenuAttached = true
+        wm.addView(bubbleContainer, bParams)
+        isBubbleAttached = true
+        isMenuExpanded = true
 
-        return container
+        return bubbleContainer
     }
 
     private fun dpToPx(context: Context, dp: Float): Int {

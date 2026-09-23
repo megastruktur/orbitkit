@@ -1,0 +1,70 @@
+File: TEST-dev.orbitkit.native.MenuConfigParserTest.xml
+<testsuite name="dev.orbitkit.native.MenuConfigParserTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:00:11.908Z" hostname="megaserver" time="0.027">
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+  - dev.orbitkit.native.MenuConfigParserTest
+
+File: TEST-dev.orbitkit.native.OrbitkitNativePluginTest.xml
+<testsuite name="dev.orbitkit.native.OrbitkitNativePluginTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:00:11.936Z" hostname="megaserver" time="0.023">
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+  - dev.orbitkit.native.OrbitkitNativePluginTest
+
+File: TEST-dev.orbitkit.native.OverlayActionDispatcherTest.xml
+<testsuite name="dev.orbitkit.native.OverlayActionDispatcherTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:00:11.960Z" hostname="megaserver" time="0.001">
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+  - dev.orbitkit.native.OverlayActionDispatcherTest
+
+File: TEST-dev.orbitkit.native.OverlayGeometryTest.xml
+<testsuite name="dev.orbitkit.native.OverlayGeometryTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:00:11.962Z" hostname="megaserver" time="0.008">
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+  - dev.orbitkit.native.OverlayGeometryTest
+
+File: TEST-dev.orbitkit.native.RadialLayoutTest.xml
+<testsuite name="dev.orbitkit.native.RadialLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:00:11.971Z" hostname="megaserver" time="0.001">
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+  - dev.orbitkit.native.RadialLayoutTest
+
+EXIT_CODE=0

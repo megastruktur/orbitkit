@@ -1,0 +1,5 @@
+Screenshot captured from http://127.0.0.1:33303/mascot.html
+68377 bytes written to file /home/megastruktur/orca/workspaces/orbitkit/oks-mascot/evidence/sdk-v1/mascot/mascot.png
+68377 bytes written to file /home/megastruktur/orca/workspaces/orbitkit/oks-mascot/evidence/sdk-v1/mascot/raw/visual.png
+/home/megastruktur/orca/workspaces/orbitkit/oks-mascot/evidence/sdk-v1/mascot/mascot.png: PNG image data, 900 x 600 (display viewport 900x600), 8-bit/color RGB, non-interlaced
+EXIT_CODE: 0

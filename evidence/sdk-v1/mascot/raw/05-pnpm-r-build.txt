@@ -1,0 +1,14 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 115 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.39 kB │ gzip:  0.26 kB
+dist/assets/index-DVn8_bU1.css   2.97 kB │ gzip:  0.96 kB
+dist/assets/index-38i9zzfl.js   38.22 kB │ gzip: 14.27 kB
+
+✓ built in 698ms
+EXIT_CODE: 0

@@ -1,0 +1,8 @@
+Found DEX symbols in examples/starter/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk:
+- IconDecoder
+- SvgDrawable
+- SvgIcon
+- SvgParser
+- parseColor
+- parseTransform
+EXIT_CODE=0

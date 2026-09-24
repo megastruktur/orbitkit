@@ -1,6 +1,6 @@
 package dev.orbitkit.native
 
-import org.w3c.dom.Element
+import org.w3c.dom.Element as DomElement
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -23,11 +23,44 @@ data class SvgViewBox(
     val height: Float
 )
 
+data class Paint(
+    val fill: Int?,
+    val stroke: Int?,
+    val strokeWidth: Float = 1f,
+    val cap: String? = null,
+    val join: String? = null
+) {
+    val hasFill: Boolean get() = fill != null
+    val hasStroke: Boolean get() = stroke != null
+    val fillHex: String? get() = fill?.let { String.format("#%06x", it and 0xFFFFFF) }
+    val strokeHex: String? get() = stroke?.let { String.format("#%06x", it and 0xFFFFFF) }
+}
+
+data class Element(
+    val commands: List<PathCommand>,
+    val paint: Paint,
+    val matrix: FloatArray = floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f)
+) {
+    fun toPath(): android.graphics.Path {
+        val path = android.graphics.Path()
+        for (cmd in commands) {
+            when (cmd) {
+                is PathCommand.MoveTo -> path.moveTo(cmd.x, cmd.y)
+                is PathCommand.LineTo -> path.lineTo(cmd.x, cmd.y)
+                is PathCommand.CubicTo -> path.cubicTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y)
+                is PathCommand.Close -> path.close()
+            }
+        }
+        return path
+    }
+}
+
 data class SvgIcon(
     val viewBox: SvgViewBox,
     val strokeColor: String,
     val strokeWidth: Float,
-    val commands: List<PathCommand>
+    val commands: List<PathCommand>,
+    val elements: List<Element> = emptyList()
 ) {
     fun toPath(): android.graphics.Path {
         val path = android.graphics.Path()
@@ -45,6 +78,126 @@ data class SvgIcon(
 
 object SvgParser {
     private const val KAPPA = 0.55228475f
+    val IDENTITY_MATRIX = floatArrayOf(
+        1f, 0f, 0f,
+        0f, 1f, 0f,
+        0f, 0f, 1f
+    )
+
+    fun multiplyMatrices(a: FloatArray, b: FloatArray): FloatArray {
+        val res = FloatArray(9)
+        for (r in 0..2) {
+            for (c in 0..2) {
+                res[r * 3 + c] =
+                    a[r * 3 + 0] * b[0 * 3 + c] +
+                    a[r * 3 + 1] * b[1 * 3 + c] +
+                    a[r * 3 + 2] * b[2 * 3 + c]
+            }
+        }
+        return res
+    }
+
+    fun parseTransform(transformStr: String): FloatArray? {
+        val trimmed = transformStr.trim()
+        if (trimmed.isEmpty()) return IDENTITY_MATRIX.clone()
+
+        val cmdRegex = Regex("""([a-zA-Z]+)\s*\(([^)]*)\)""")
+        val matches = cmdRegex.findAll(trimmed).toList()
+        if (matches.isEmpty()) return null
+
+        var result = IDENTITY_MATRIX.clone()
+        var consumedLength = 0
+        for (match in matches) {
+            consumedLength += match.value.length
+            val name = match.groupValues[1].lowercase()
+            val rawArgs = match.groupValues[2].trim()
+            val args = if (rawArgs.isEmpty()) emptyList() else {
+                rawArgs.split(Regex("[\\s,]+")).filter { it.isNotEmpty() }.map { it.toFloatOrNull() ?: return null }
+            }
+
+            val mat = when (name) {
+                "translate" -> {
+                    when (args.size) {
+                        1 -> floatArrayOf(1f, 0f, args[0], 0f, 1f, 0f, 0f, 0f, 1f)
+                        2 -> floatArrayOf(1f, 0f, args[0], 0f, 1f, args[1], 0f, 0f, 1f)
+                        else -> return null
+                    }
+                }
+                "scale" -> {
+                    when (args.size) {
+                        1 -> floatArrayOf(args[0], 0f, 0f, 0f, args[0], 0f, 0f, 0f, 1f)
+                        2 -> floatArrayOf(args[0], 0f, 0f, 0f, args[1], 0f, 0f, 0f, 1f)
+                        else -> return null
+                    }
+                }
+                "rotate" -> {
+                    when (args.size) {
+                        1 -> {
+                            val rad = Math.toRadians(args[0].toDouble())
+                            val cos = Math.cos(rad).toFloat()
+                            val sin = Math.sin(rad).toFloat()
+                            floatArrayOf(cos, -sin, 0f, sin, cos, 0f, 0f, 0f, 1f)
+                        }
+                        3 -> {
+                            val a = args[0]
+                            val cx = args[1]
+                            val cy = args[2]
+                            val rad = Math.toRadians(a.toDouble())
+                            val cos = Math.cos(rad).toFloat()
+                            val sin = Math.sin(rad).toFloat()
+                            val tx = cx * (1f - cos) + cy * sin
+                            val ty = cy * (1f - cos) - cx * sin
+                            floatArrayOf(cos, -sin, tx, sin, cos, ty, 0f, 0f, 1f)
+                        }
+                        else -> return null
+                    }
+                }
+                "matrix" -> {
+                    if (args.size != 6) return null
+                    // SVG matrix(a, b, c, d, e, f) where x' = a*x + c*y + e, y' = b*x + d*y + f
+                    floatArrayOf(
+                        args[0], args[2], args[4],
+                        args[1], args[3], args[5],
+                        0f, 0f, 1f
+                    )
+                }
+                else -> return null
+            }
+            result = multiplyMatrices(result, mat)
+        }
+        return result
+    }
+
+    fun parseColor(colorStr: String?, rootStroke: Int? = null): Int? {
+        if (colorStr == null) return null
+        val s = colorStr.trim().lowercase()
+        if (s.isEmpty() || s == "none") return null
+        if (s == "currentcolor") {
+            return rootStroke ?: 0xFFE6F6FF.toInt()
+        }
+        if (s == "white") return 0xFFFFFFFF.toInt()
+        if (s == "black") return 0xFF000000.toInt()
+        val hex = s.removePrefix("#")
+        return try {
+            when (hex.length) {
+                3 -> {
+                    val r = hex[0].toString().repeat(2).toInt(16)
+                    val g = hex[1].toString().repeat(2).toInt(16)
+                    val b = hex[2].toString().repeat(2).toInt(16)
+                    (0xFF shl 24) or (r shl 16) or (g shl 8) or b
+                }
+                6 -> {
+                    (0xFF shl 24) or hex.toLong(16).toInt()
+                }
+                8 -> {
+                    hex.toLong(16).toInt()
+                }
+                else -> null
+            }
+        } catch (_: Throwable) {
+            null
+        }
+    }
 
     fun parse(svgXml: String): SvgIcon? {
         return try {
@@ -67,22 +220,47 @@ object SvgParser {
             val stroke = parseStroke(root)
             val strokeWidth = parseStrokeWidth(root)
 
+            val rootStroke = if (root.hasAttribute("stroke")) {
+                parseColor(root.getAttribute("stroke"))
+            } else null
+
+            val rootFill = if (root.hasAttribute("fill")) {
+                val f = root.getAttribute("fill").trim()
+                if (f.equals("none", ignoreCase = true)) null else parseColor(f, rootStroke)
+            } else {
+                // Default fill per SVG specification is black
+                0xFF000000.toInt()
+            }
+
+            val rootCap = if (root.hasAttribute("stroke-linecap")) root.getAttribute("stroke-linecap").trim() else null
+            val rootJoin = if (root.hasAttribute("stroke-linejoin")) root.getAttribute("stroke-linejoin").trim() else null
+
+            val initialPaint = Paint(
+                fill = rootFill,
+                stroke = rootStroke,
+                strokeWidth = strokeWidth,
+                cap = rootCap,
+                join = rootJoin
+            )
+
             val commands = ArrayList<PathCommand>()
-            val success = parseChildren(root, commands)
+            val elements = ArrayList<Element>()
+            val success = parseElementChildren(root, initialPaint, IDENTITY_MATRIX, rootStroke, commands, elements)
             if (!success) return null
 
             SvgIcon(
                 viewBox = viewBox,
                 strokeColor = stroke,
                 strokeWidth = strokeWidth,
-                commands = commands
+                commands = commands,
+                elements = elements
             )
         } catch (_: Throwable) {
             null
         }
     }
 
-    private fun parseViewBox(root: Element): SvgViewBox? {
+    private fun parseViewBox(root: DomElement): SvgViewBox? {
         val vbAttr = root.getAttribute("viewBox")
         if (vbAttr.isNotEmpty()) {
             val parts = vbAttr.split(Regex("[\\s,]+")).filter { it.isNotEmpty() }
@@ -109,53 +287,127 @@ object SvgParser {
         return null
     }
 
-    private fun parseStroke(root: Element): String {
+    private fun parseStroke(root: DomElement): String {
         val s = root.getAttribute("stroke").trim()
         return if (s.isNotEmpty() && s.lowercase() != "none") s else "#E6F6FF"
     }
 
-    private fun parseStrokeWidth(root: Element): Float {
+    private fun parseStrokeWidth(root: DomElement): Float {
         val sw = root.getAttribute("stroke-width").replace("px", "").trim()
         return sw.toFloatOrNull() ?: 2f
     }
 
-    private fun parseChildren(parent: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parseElementChildren(
+        parent: DomElement,
+        currentPaint: Paint,
+        currentMatrix: FloatArray,
+        rootStroke: Int?,
+        allCommands: MutableList<PathCommand>,
+        elements: MutableList<Element>
+    ): Boolean {
         val children = parent.childNodes
         for (i in 0 until children.length) {
             val node = children.item(i)
             if (node.nodeType != Node.ELEMENT_NODE) continue
-            val elem = node as Element
+            val elem = node as DomElement
+
+            val elemMatrix = if (elem.hasAttribute("transform")) {
+                val t = parseTransform(elem.getAttribute("transform")) ?: return false
+                multiplyMatrices(currentMatrix, t)
+            } else {
+                currentMatrix
+            }
+
+            val elemFill = if (elem.hasAttribute("fill")) {
+                val f = elem.getAttribute("fill").trim()
+                if (f.equals("none", ignoreCase = true)) null else (parseColor(f, rootStroke) ?: return false)
+            } else {
+                currentPaint.fill
+            }
+
+            val elemStroke = if (elem.hasAttribute("stroke")) {
+                val s = elem.getAttribute("stroke").trim()
+                if (s.equals("none", ignoreCase = true)) null else (parseColor(s, rootStroke) ?: return false)
+            } else {
+                currentPaint.stroke
+            }
+
+            val elemStrokeWidth = if (elem.hasAttribute("stroke-width")) {
+                elem.getAttribute("stroke-width").replace("px", "").trim().toFloatOrNull() ?: return false
+            } else {
+                currentPaint.strokeWidth
+            }
+
+            val elemCap = if (elem.hasAttribute("stroke-linecap")) {
+                elem.getAttribute("stroke-linecap").trim()
+            } else {
+                currentPaint.cap
+            }
+
+            val elemJoin = if (elem.hasAttribute("stroke-linejoin")) {
+                elem.getAttribute("stroke-linejoin").trim()
+            } else {
+                currentPaint.join
+            }
+
+            val elemPaint = Paint(
+                fill = elemFill,
+                stroke = elemStroke,
+                strokeWidth = elemStrokeWidth,
+                cap = elemCap,
+                join = elemJoin
+            )
+
             when (elem.tagName.lowercase()) {
+                "g" -> {
+                    if (!parseElementChildren(elem, elemPaint, elemMatrix, rootStroke, allCommands, elements)) {
+                        return false
+                    }
+                }
                 "path" -> {
                     val d = elem.getAttribute("d")
-                    if (!PathParser.parse(d, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!PathParser.parse(d, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "circle" -> {
-                    if (!parseCircle(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parseCircle(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "ellipse" -> {
-                    if (!parseEllipse(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parseEllipse(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "line" -> {
-                    if (!parseLine(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parseLine(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "rect" -> {
-                    if (!parseRect(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parseRect(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "polyline" -> {
-                    if (!parsePolyline(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parsePolyline(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 "polygon" -> {
-                    if (!parsePolygon(elem, commands)) return false
-                }
-                "g" -> {
-                    // Allow transparent group containers without transforms
-                    val transform = elem.getAttribute("transform")
-                    if (transform.isNotEmpty()) return false
-                    if (!parseChildren(elem, commands)) return false
+                    val cmds = ArrayList<PathCommand>()
+                    if (!parsePolygon(elem, cmds)) return false
+                    elements.add(Element(cmds, elemPaint, elemMatrix))
+                    allCommands.addAll(cmds)
                 }
                 else -> {
-                    // Unsupported element -> return null/false
                     return false
                 }
             }
@@ -163,7 +415,7 @@ object SvgParser {
         return true
     }
 
-    private fun parseCircle(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parseCircle(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val cx = elem.getAttribute("cx").toFloatOrNull() ?: 0f
         val cy = elem.getAttribute("cy").toFloatOrNull() ?: 0f
         val r = elem.getAttribute("r").toFloatOrNull() ?: return false
@@ -179,7 +431,7 @@ object SvgParser {
         return true
     }
 
-    private fun parseEllipse(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parseEllipse(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val cx = elem.getAttribute("cx").toFloatOrNull() ?: 0f
         val cy = elem.getAttribute("cy").toFloatOrNull() ?: 0f
         val rx = elem.getAttribute("rx").toFloatOrNull() ?: return false
@@ -197,7 +449,7 @@ object SvgParser {
         return true
     }
 
-    private fun parseLine(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parseLine(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val x1 = elem.getAttribute("x1").toFloatOrNull() ?: 0f
         val y1 = elem.getAttribute("y1").toFloatOrNull() ?: 0f
         val x2 = elem.getAttribute("x2").toFloatOrNull() ?: 0f
@@ -207,7 +459,7 @@ object SvgParser {
         return true
     }
 
-    private fun parseRect(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parseRect(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val x = elem.getAttribute("x").toFloatOrNull() ?: 0f
         val y = elem.getAttribute("y").toFloatOrNull() ?: 0f
         val w = elem.getAttribute("width").toFloatOrNull() ?: return false
@@ -244,7 +496,7 @@ object SvgParser {
         return true
     }
 
-    private fun parsePolyline(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parsePolyline(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val pts = parsePoints(elem.getAttribute("points")) ?: return false
         if (pts.size < 2 || pts.size % 2 != 0) return false
         commands.add(PathCommand.MoveTo(pts[0], pts[1]))
@@ -256,7 +508,7 @@ object SvgParser {
         return true
     }
 
-    private fun parsePolygon(elem: Element, commands: MutableList<PathCommand>): Boolean {
+    private fun parsePolygon(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
         val pts = parsePoints(elem.getAttribute("points")) ?: return false
         if (pts.size < 2 || pts.size % 2 != 0) return false
         commands.add(PathCommand.MoveTo(pts[0], pts[1]))

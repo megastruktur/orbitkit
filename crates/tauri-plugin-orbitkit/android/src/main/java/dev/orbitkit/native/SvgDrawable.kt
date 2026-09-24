@@ -14,21 +14,33 @@ import kotlin.math.min
 
 class SvgDrawable(
     private val icon: SvgIcon,
-    overrideStrokeColor: Int? = null
+    private val overrideStrokeColor: Int? = null,
+    private val fraction: Float = 0.55f
 ) : Drawable() {
     private val rawPath: Path by lazy { icon.toPath() }
     private val transformedPath = Path()
     private val matrix = Matrix()
+    private val elemMatrix = Matrix()
+    private val compositeMatrix = Matrix()
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+    }
+
+    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
         color = overrideStrokeColor ?: parseColorHex(icon.strokeColor)
     }
 
+    private val elementPaths by lazy {
+        icon.elements.map { it to it.toPath() }
+    }
+
     private var lastWidth = -1
     private var lastHeight = -1
+    private var currentScale = 1f
 
     override fun draw(canvas: Canvas) {
         val b = bounds
@@ -42,7 +54,8 @@ class SvgDrawable(
 
             val discDim = min(w, h).toFloat()
             val maxVb = max(icon.viewBox.width, icon.viewBox.height)
-            val scale = if (maxVb > 0f) (discDim * 0.55f) / maxVb else 1f
+            val scale = if (maxVb > 0f) (discDim * fraction) / maxVb else 1f
+            currentScale = scale
 
             val cx = b.left + w / 2f
             val cy = b.top + h / 2f
@@ -58,20 +71,56 @@ class SvgDrawable(
 
             transformedPath.reset()
             rawPath.transform(matrix, transformedPath)
-            paint.strokeWidth = icon.strokeWidth * scale
+            strokePaint.strokeWidth = icon.strokeWidth * scale
         }
 
-        canvas.drawPath(transformedPath, paint)
+        if (icon.elements.isEmpty()) {
+            canvas.drawPath(transformedPath, strokePaint)
+            return
+        }
+
+        for ((element, elemPath) in elementPaths) {
+            elemMatrix.setValues(element.matrix)
+            compositeMatrix.set(matrix)
+            compositeMatrix.preConcat(elemMatrix)
+
+            transformedPath.reset()
+            elemPath.transform(compositeMatrix, transformedPath)
+
+            val paintSpec = element.paint
+
+            if (paintSpec.hasFill && paintSpec.fill != null) {
+                fillPaint.color = paintSpec.fill
+                canvas.drawPath(transformedPath, fillPaint)
+            }
+
+            if (paintSpec.hasStroke && paintSpec.stroke != null) {
+                strokePaint.color = overrideStrokeColor ?: paintSpec.stroke
+                strokePaint.strokeWidth = paintSpec.strokeWidth * currentScale
+                strokePaint.strokeCap = when (paintSpec.cap?.lowercase()) {
+                    "butt" -> Paint.Cap.BUTT
+                    "square" -> Paint.Cap.SQUARE
+                    else -> Paint.Cap.ROUND
+                }
+                strokePaint.strokeJoin = when (paintSpec.join?.lowercase()) {
+                    "miter" -> Paint.Join.MITER
+                    "bevel" -> Paint.Join.BEVEL
+                    else -> Paint.Join.ROUND
+                }
+                canvas.drawPath(transformedPath, strokePaint)
+            }
+        }
     }
 
     override fun setAlpha(alpha: Int) {
-        paint.alpha = alpha
+        fillPaint.alpha = alpha
+        strokePaint.alpha = alpha
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
-        paint.colorFilter = colorFilter
+        fillPaint.colorFilter = colorFilter
+        strokePaint.colorFilter = colorFilter
     }
-
     @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 

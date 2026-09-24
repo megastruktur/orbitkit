@@ -81,6 +81,10 @@ object IconDecoder {
         val trimmed = raw.trim()
         if (trimmed.isEmpty()) return null
 
+        if (trimmed.startsWith("<svg", ignoreCase = true)) {
+            val icon = SvgParser.parse(trimmed) ?: return null
+            return DecodedIcon.Svg(icon)
+        }
         if (trimmed.startsWith("data:", ignoreCase = true)) {
             // "Never display a string that starts with data:"
             when {

@@ -184,4 +184,37 @@ class IconDecoderTest {
         assertEquals(24f, svg.viewBox.width, 0.001f)
         assertEquals(24f, svg.viewBox.height, 0.001f)
     }
+
+    @Test
+    fun testRawSvgStringDecodes() {
+        val rawSvg = """<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#4f7cff" /></svg>"""
+        val decoded = IconDecoder.decode(rawSvg)
+        assertNotNull("Raw <svg string must decode", decoded)
+        assertTrue("Decoded icon must be Svg", decoded is DecodedIcon.Svg)
+        val icon = (decoded as DecodedIcon.Svg).icon
+        assertEquals(24f, icon.viewBox.width, 0.001f)
+        assertEquals(24f, icon.viewBox.height, 0.001f)
+        assertEquals(1, icon.elements.size)
+        assertEquals(0xFF4F7CFF.toInt(), icon.elements[0].paint.fill)
+    }
+
+    @Test
+    fun testUnsupportedInputReturnsNullAndNeverThrows() {
+        // Unsupported elements in raw SVG
+        val textSvg = """<svg viewBox="0 0 24 24"><text>hello</text></svg>"""
+        assertNull("Raw SVG with <text> must return null", IconDecoder.decode(textSvg))
+
+        val imageSvg = """<svg viewBox="0 0 24 24"><image href="foo.png"/></svg>"""
+        assertNull("Raw SVG with <image> must return null", IconDecoder.decode(imageSvg))
+
+        val filterSvg = """<svg viewBox="0 0 24 24"><filter id="f"/></svg>"""
+        assertNull("Raw SVG with <filter> must return null", IconDecoder.decode(filterSvg))
+
+        // Malformed XML
+        assertNull("Malformed XML must return null", IconDecoder.decode("<svg><path d=\"M0 0\""))
+        assertNull("Unclosed tag must return null", IconDecoder.decode("<svg><circle></svg>"))
+
+        // Invalid numbers
+        assertNull("Infinity in SVG must return null", IconDecoder.decode("""<svg viewBox="0 0 24 24"><path d="M 0 0 L 1e999 10" /></svg>"""))
+    }
 }

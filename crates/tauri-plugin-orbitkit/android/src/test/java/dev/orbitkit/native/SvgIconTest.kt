@@ -7,6 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import org.json.JSONObject
 import java.io.File
 
 class SvgIconTest {
@@ -35,6 +36,29 @@ class SvgIconTest {
         fail("Required icon file $name not found in repo!")
         throw AssertionError("Unreachable")
     }
+    private fun loadConfigFile(): File {
+        val userDir = File(System.getProperty("user.dir", "."))
+        val candidates = listOf(
+            File("examples/starter/src/orbitkit.config.json"),
+            File("../../../examples/starter/src/orbitkit.config.json"),
+            File("../../../../examples/starter/src/orbitkit.config.json"),
+            File(userDir, "examples/starter/src/orbitkit.config.json"),
+            File(userDir, "../../../examples/starter/src/orbitkit.config.json"),
+            File(userDir, "../../../../examples/starter/src/orbitkit.config.json")
+        )
+        for (c in candidates) {
+            if (c.exists()) return c
+        }
+        var dir: File? = userDir
+        while (dir != null) {
+            val check = File(dir, "examples/starter/src/orbitkit.config.json")
+            if (check.exists()) return check
+            dir = dir.parentFile
+        }
+        fail("Required config file examples/starter/src/orbitkit.config.json not found in repo!")
+        throw AssertionError("Unreachable")
+    }
+
 
     @Test
     fun testMoveToAbsoluteAndRelative() {
@@ -417,5 +441,169 @@ class SvgIconTest {
         // Path with -1e999 (-Infinity) -> reject
         val svgPathNegInfinity = """<svg viewBox="0 0 24 24"><path d="M 0 0 L -1e999 10" /></svg>"""
         assertNull(SvgParser.parse(svgPathNegInfinity))
+    }
+
+    @Test
+    fun testIdleMascotFromConfigParsesCorrectElementsAndPaint() {
+        val configFile = loadConfigFile()
+        assertTrue("ConfigFile must exist", configFile.exists())
+        val json = JSONObject(configFile.readText(Charsets.UTF_8))
+        val idleSvg = json.getJSONObject("mascot").getJSONObject("states").getJSONObject("idle").getString("src")
+
+        val icon = SvgParser.parse(idleSvg)
+        assertNotNull("Idle mascot must parse successfully", icon)
+        assertEquals("Idle mascot must parse into exactly 6 elements", 6, icon!!.elements.size)
+
+        // 1. Body circle: #4f7cff
+        val body = icon.elements[0]
+        assertEquals(0xFF4F7CFF.toInt(), body.paint.fill)
+        assertEquals("#4f7cff", body.paint.fillHex)
+        assertNull("Body circle has no stroke", body.paint.stroke)
+
+        // 2. Orbit ring ellipse: fill="none", stroke="#9db4ff", stroke-width="4", transform="rotate(-20 80 80)"
+        val ring = icon.elements[1]
+        assertNull("Orbit ring has no fill", ring.paint.fill)
+        assertFalse(ring.paint.hasFill)
+        assertEquals(0xFF9DB4FF.toInt(), ring.paint.stroke)
+        assertEquals("#9db4ff", ring.paint.strokeHex)
+        assertEquals(4f, ring.paint.strokeWidth, DELTA)
+
+        // Check transform rotate(-20 80 80)
+        val rad = Math.toRadians(-20.0)
+        val cos = Math.cos(rad).toFloat()
+        val sin = Math.sin(rad).toFloat()
+        val tx = 80f * (1f - cos) + 80f * sin
+        val ty = 80f * (1f - cos) - 80f * sin
+        val m = ring.matrix
+        assertEquals(cos, m[0], DELTA)
+        assertEquals(-sin, m[1], DELTA)
+        assertEquals(tx, m[2], DELTA)
+        assertEquals(sin, m[3], DELTA)
+        assertEquals(cos, m[4], DELTA)
+        assertEquals(ty, m[5], DELTA)
+
+        // 3. Eye left: #ffffff
+        val eyeL = icon.elements[2]
+        assertEquals(0xFFFFFFFF.toInt(), eyeL.paint.fill)
+        assertEquals("#ffffff", eyeL.paint.fillHex)
+
+        // 4. Eye right: #ffffff
+        val eyeR = icon.elements[3]
+        assertEquals(0xFFFFFFFF.toInt(), eyeR.paint.fill)
+        assertEquals("#ffffff", eyeR.paint.fillHex)
+
+        // 5. Pupil left: #10141a
+        val pupilL = icon.elements[4]
+        assertEquals(0xFF10141A.toInt(), pupilL.paint.fill)
+        assertEquals("#10141a", pupilL.paint.fillHex)
+
+        // 6. Pupil right: #10141a
+        val pupilR = icon.elements[5]
+        assertEquals(0xFF10141A.toInt(), pupilR.paint.fill)
+        assertEquals("#10141a", pupilR.paint.fillHex)
+    }
+
+    @Test
+    fun testBusyMascotFromConfigGivesAmberBody() {
+        val configFile = loadConfigFile()
+        assertTrue("ConfigFile must exist", configFile.exists())
+        val json = JSONObject(configFile.readText(Charsets.UTF_8))
+        val busySvg = json.getJSONObject("mascot").getJSONObject("states").getJSONObject("busy").getString("src")
+
+        val icon = SvgParser.parse(busySvg)
+        assertNotNull("Busy mascot must parse successfully", icon)
+        assertEquals(6, icon!!.elements.size)
+
+        // Body circle: #f59e0b
+        val body = icon.elements[0]
+        assertEquals(0xFFF59E0B.toInt(), body.paint.fill)
+        assertEquals("#f59e0b", body.paint.fillHex)
+
+        // Ring ellipse: #fcd34d stroke
+        val ring = icon.elements[1]
+        assertEquals(0xFFFCD34D.toInt(), ring.paint.stroke)
+        assertEquals("#fcd34d", ring.paint.strokeHex)
+    }
+
+    @Test
+    fun testTransformCompositionNumericallyChecked() {
+        // Matrix composition of translate(10, 20) followed by scale(2, 3)
+        val t = SvgParser.parseTransform("translate(10, 20) scale(2, 3)")
+        assertNotNull(t)
+        assertEquals(2f, t!![0], DELTA)
+        assertEquals(0f, t[1], DELTA)
+        assertEquals(10f, t[2], DELTA)
+        assertEquals(0f, t[3], DELTA)
+        assertEquals(3f, t[4], DELTA)
+        assertEquals(20f, t[5], DELTA)
+        assertEquals(0f, t[6], DELTA)
+        assertEquals(0f, t[7], DELTA)
+        assertEquals(1f, t[8], DELTA)
+
+        // Nested group transform: parent translate, child scale
+        val svg = """<svg viewBox="0 0 100 100"><g transform="translate(15, 25)"><circle cx="0" cy="0" r="5" transform="scale(3, 4)" /></g></svg>"""
+        val icon = SvgParser.parse(svg)
+        assertNotNull(icon)
+        assertEquals(1, icon!!.elements.size)
+        val m = icon.elements[0].matrix
+        assertEquals(3f, m[0], DELTA)
+        assertEquals(15f, m[2], DELTA)
+        assertEquals(4f, m[4], DELTA)
+        assertEquals(25f, m[5], DELTA)
+    }
+
+    @Test
+    fun testFillNoneMeansNoFill() {
+        val svg = """<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="10" fill="none" /></svg>"""
+        val icon = SvgParser.parse(svg)
+        assertNotNull(icon)
+        assertEquals(1, icon!!.elements.size)
+        assertNull("fill='none' must result in null fill", icon.elements[0].paint.fill)
+        assertFalse("fill='none' hasFill must be false", icon.elements[0].paint.hasFill)
+    }
+
+    @Test
+    fun testInheritanceRootStrokeAppliesToChildren() {
+        val svg = """<svg viewBox="0 0 100 100" stroke="#123456" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="5" /></svg>"""
+        val icon = SvgParser.parse(svg)
+        assertNotNull(icon)
+        assertEquals(1, icon!!.elements.size)
+        val p = icon.elements[0].paint
+        assertEquals(0xFF123456.toInt(), p.stroke)
+        assertEquals(3f, p.strokeWidth, DELTA)
+        assertEquals("round", p.cap)
+        assertEquals("round", p.join)
+    }
+
+    @Test
+    fun testCurrentColorResolvesToRootStroke() {
+        val svg = """<svg viewBox="0 0 100 100" stroke="#4477aa"><circle cx="10" cy="10" r="5" stroke="currentColor" fill="currentColor" /></svg>"""
+        val icon = SvgParser.parse(svg)
+        assertNotNull(icon)
+        assertEquals(1, icon!!.elements.size)
+        val p = icon.elements[0].paint
+        assertEquals(0xFF4477AA.toInt(), p.stroke)
+        assertEquals(0xFF4477AA.toInt(), p.fill)
+    }
+
+    @Test
+    fun testGroupPaintInheritanceAndOverride() {
+        val svg = """<svg viewBox="0 0 100 100" stroke="#111111" stroke-width="2">
+            <g stroke="#222222" stroke-width="4">
+                <circle cx="10" cy="10" r="5" />
+                <circle cx="20" cy="20" r="5" stroke="#333333" stroke-width="6" />
+            </g>
+        </svg>"""
+        val icon = SvgParser.parse(svg)
+        assertNotNull(icon)
+        assertEquals(2, icon!!.elements.size)
+
+        // First circle inherits group paint
+        assertEquals(0xFF222222.toInt(), icon.elements[0].paint.stroke)
+        assertEquals(4f, icon.elements[0].paint.strokeWidth, DELTA)
+
+        // Second circle overrides group paint
+        assertEquals(0xFF333333.toInt(), icon.elements[1].paint.stroke)
+        assertEquals(6f, icon.elements[1].paint.strokeWidth, DELTA)
     }
 }

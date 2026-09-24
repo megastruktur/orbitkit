@@ -25,6 +25,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import kotlin.math.abs
@@ -467,12 +468,21 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
 
         for (i in items.indices) {
             val item = items[i]
-            val itemView = TextView(ctx).apply {
+            val itemView = ImageView(ctx).apply {
                 contentDescription = item.label
-                gravity = Gravity.CENTER
-                text = item.icon ?: item.label
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                scaleType = ImageView.ScaleType.FIT_CENTER
+
+                val decoded = IconDecoder.resolveItemIcon(item.icon, item.label)
+
+                if (decoded != null) {
+                    when (decoded) {
+                        is DecodedIcon.Svg -> setImageDrawable(SvgDrawable(decoded.icon))
+                        is DecodedIcon.Bitmap -> setImageBitmap(decoded.bitmap)
+                        is DecodedIcon.Text -> setImageDrawable(
+                            TextDrawable(decoded.text, density = ctx.resources.displayMetrics.density)
+                        )
+                    }
+                }
 
                 if (item.disabled) {
                     isEnabled = false
@@ -481,7 +491,6 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                         // Consumes tap so it does not fall through to container, keeping menu open
                     }
                     alpha = 0.5f
-                    setTextColor(Color.parseColor("#9CA3AF"))
                     background = GradientDrawable().apply {
                         shape = GradientDrawable.OVAL
                         setColor(Color.parseColor("#4B5563"))
@@ -489,11 +498,10 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 } else {
                     isEnabled = true
                     alpha = 1.0f
-                    setTextColor(Color.WHITE)
                     background = GradientDrawable().apply {
                         shape = GradientDrawable.OVAL
-                        setColor(Color.parseColor("#1E293B"))
-                        setStroke(dpToPx(ctx, 2f), Color.parseColor("#38BDF8"))
+                        setColor(Color.argb((255 * 0.85f).toInt(), 0x0E, 0x14, 0x33))
+                        setStroke(Math.max(1, dpToPx(ctx, 1.5f)), Color.parseColor("#38BDF8"))
                     }
                     setOnClickListener {
                         handleAction(item.id, item.disabled)

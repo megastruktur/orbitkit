@@ -1,0 +1,10 @@
+dev.orbitkit.native.IconDecoderTest: tests=14 failures=0 errors=0 skipped=0
+dev.orbitkit.native.MenuConfigParserTest: tests=17 failures=0 errors=0 skipped=0
+dev.orbitkit.native.OrbitkitNativePluginTest: tests=9 failures=0 errors=0 skipped=0
+dev.orbitkit.native.OverlayActionDispatcherTest: tests=6 failures=0 errors=0 skipped=0
+dev.orbitkit.native.OverlayGeometryTest: tests=18 failures=0 errors=0 skipped=0
+dev.orbitkit.native.RadialLayoutTest: tests=16 failures=0 errors=0 skipped=0
+dev.orbitkit.native.SpawnAnimationTest: tests=9 failures=0 errors=0 skipped=0
+dev.orbitkit.native.SvgIconTest: tests=24 failures=0 errors=0 skipped=0
+TOTAL_TESTS=113
+EXIT_CODE=0

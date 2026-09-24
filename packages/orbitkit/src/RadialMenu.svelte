@@ -1,6 +1,12 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import type { MenuConfig } from "./config";
   import { layoutItems, resolveMenuAngles } from "./geometry";
+  import {
+    type MenuAnimPhase,
+    getItemAnimationStyle,
+    getTotalAnimationDuration,
+  } from "./menuAnimation";
 
   interface Props {
     config: MenuConfig;
@@ -23,6 +29,119 @@
     )
   );
 
+  function checkReducedMotion(): boolean {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return false;
+    }
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  let isMounted = $state(false);
+  let animPhase = $state<MenuAnimPhase>("closed");
+
+  let openTimer: ReturnType<typeof setTimeout> | null = null;
+  let closeTimer: ReturnType<typeof setTimeout> | null = null;
+  let rafId1: number | null = null;
+  let rafId2: number | null = null;
+
+  function cancelPendingRafs() {
+    if (rafId1 !== null) {
+      if (typeof cancelAnimationFrame === "function") {
+        cancelAnimationFrame(rafId1);
+      } else {
+        clearTimeout(rafId1);
+      }
+      rafId1 = null;
+    }
+    if (rafId2 !== null) {
+      if (typeof cancelAnimationFrame === "function") {
+        cancelAnimationFrame(rafId2);
+      } else {
+        clearTimeout(rafId2);
+      }
+      rafId2 = null;
+    }
+  }
+
+  function scheduleRaf(cb: () => void): number {
+    if (typeof requestAnimationFrame === "function") {
+      return requestAnimationFrame(cb);
+    }
+    return setTimeout(cb, 16) as unknown as number;
+  }
+
+  $effect(() => {
+    const shouldBeOpen = open;
+
+    untrack(() => {
+      const isAnimDisabled =
+        config.animation === "none" || checkReducedMotion();
+      const itemsCount = config.items.length;
+
+      if (openTimer) {
+        clearTimeout(openTimer);
+        openTimer = null;
+      }
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+      cancelPendingRafs();
+
+      if (shouldBeOpen) {
+        isMounted = true;
+        if (isAnimDisabled || itemsCount === 0) {
+          animPhase = "open";
+        } else {
+          // Mount with the start state (scale 0, at the mascot centre, opacity 0)
+          animPhase = "closed";
+          rafId1 = scheduleRaf(() => {
+            rafId1 = null;
+            rafId2 = scheduleRaf(() => {
+              rafId2 = null;
+              if (!open) return;
+              animPhase = "opening";
+              const duration = getTotalAnimationDuration(itemsCount, "open");
+              openTimer = setTimeout(() => {
+                animPhase = "open";
+                openTimer = null;
+              }, duration);
+            });
+          });
+        }
+      } else {
+        if (!isMounted) {
+          animPhase = "closed";
+          return;
+        }
+        if (isAnimDisabled || itemsCount === 0) {
+          isMounted = false;
+          animPhase = "closed";
+        } else {
+          animPhase = "closing";
+          const duration = getTotalAnimationDuration(itemsCount, "close");
+          closeTimer = setTimeout(() => {
+            isMounted = false;
+            animPhase = "closed";
+            closeTimer = null;
+          }, duration);
+        }
+      }
+    });
+
+    return () => {
+      if (openTimer) {
+        clearTimeout(openTimer);
+        openTimer = null;
+      }
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+      cancelPendingRafs();
+    };
+  });
+
   function isUrl(icon?: string): boolean {
     if (!icon) return false;
     return (
@@ -33,29 +152,95 @@
 
   function handleItemClick(itemId: string, disabled?: boolean) {
     if (disabled) return;
+    if (
+      animPhase !== "open" &&
+      config.animation !== "none" &&
+      !checkReducedMotion()
+    ) {
+      return;
+    }
     onselect(itemId);
   }
 
   function handleItemMouseEnter(itemId: string, disabled?: boolean) {
+    if (
+      animPhase !== "open" &&
+      config.animation !== "none" &&
+      !checkReducedMotion()
+    ) {
+      return;
+    }
     if (config.trigger === "hover" && !disabled) {
       onselect(itemId);
     }
   }
 
+  function handleItemAnimationEnd(e: AnimationEvent, index: number) {
+    if (e.target !== e.currentTarget) return;
+    if (animPhase === "closing") {
+      if (index === 0) {
+        isMounted = false;
+        animPhase = "closed";
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      }
+    } else if (animPhase === "opening") {
+      if (index === config.items.length - 1) {
+        animPhase = "open";
+        if (openTimer) {
+          clearTimeout(openTimer);
+          openTimer = null;
+        }
+      }
+    }
+  }
+
+  function handleItemTransitionEnd(e: TransitionEvent, index: number) {
+    if (e.target !== e.currentTarget) return;
+    if (animPhase === "closing") {
+      if (index === 0) {
+        isMounted = false;
+        animPhase = "closed";
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      }
+    } else if (animPhase === "opening") {
+      if (index === config.items.length - 1) {
+        animPhase = "open";
+        if (openTimer) {
+          clearTimeout(openTimer);
+          openTimer = null;
+        }
+      }
+    }
+  }
 
   $effect(() => {
     if (!open) return;
 
     function handlePointerDown(e: PointerEvent) {
-      const target = e.target as Node | null;
-      if (menuEl && target && !menuEl.contains(target)) {
+      const target = e.target as Element | null;
+      if (!target) return;
+
+      if (
+        typeof target.closest === "function" &&
+        target.closest("[data-orbitkit-menu-toggle]")
+      ) {
+        return;
+      }
+
+      if (menuEl && !menuEl.contains(target)) {
         onclose();
       }
     }
 
     const t = setTimeout(() => {
       window.addEventListener("pointerdown", handlePointerDown, true);
-    });
+    }, 0);
 
     return () => {
       clearTimeout(t);
@@ -119,29 +304,42 @@
 
 <svelte:window onkeydown={handleKeyDown} />
 
-{#if open}
+{#if isMounted}
   <div
     bind:this={menuEl}
     class="orbitkit-radial-menu"
     class:no-animation={config.animation === "none"}
-    style={config.animation === "none" ? "animation: none !important; transition: none !important;" : undefined}
+    class:animating={animPhase !== "open" && config.animation !== "none"}
+    style={config.animation === "none"
+      ? "animation: none !important; transition: none !important;"
+      : undefined}
     role="menu"
     tabindex="-1"
     aria-label="Radial Menu"
   >
     {#each config.items as item, i (item.id)}
       {@const pos = positions[i] ?? { x: 0, y: 0, angle: 0 }}
+      {@const animStyle = getItemAnimationStyle(
+        i,
+        config.items.length,
+        animPhase,
+        pos,
+        config.animation
+      )}
       <button
         type="button"
         role="menuitem"
         class="orbitkit-radial-item"
+        class:animating={animPhase !== "open" && config.animation !== "none"}
         disabled={item.disabled}
         aria-disabled={item.disabled}
         aria-label={item.label}
         title={item.label}
-        style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px;"
+        style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px;{animStyle ? ` ${animStyle};` : ''}"
         onclick={() => handleItemClick(item.id, item.disabled)}
         onmouseenter={() => handleItemMouseEnter(item.id, item.disabled)}
+        onanimationend={(e) => handleItemAnimationEnd(e, i)}
+        ontransitionend={(e) => handleItemTransitionEnd(e, i)}
       >
         {#if item.icon}
           {#if isUrl(item.icon)}
@@ -167,10 +365,6 @@
     align-items: center;
     justify-content: center;
     pointer-events: auto;
-    transition:
-      opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    animation: orbitkit-radial-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .orbitkit-radial-menu.no-animation {
@@ -179,19 +373,37 @@
   }
 
   .orbitkit-radial-menu.no-animation .orbitkit-radial-item {
+    animation: none !important;
     transition: none !important;
   }
 
-  @keyframes orbitkit-radial-enter {
-    from {
+  @keyframes -global-orbitkit-radial-item-open {
+    0% {
       opacity: 0;
-      transform: scale(0.8);
+      scale: 0;
+      translate: var(--spawn-tx, 0px) var(--spawn-ty, 0px);
     }
-    to {
+    100% {
       opacity: 1;
-      transform: scale(1);
+      scale: 1;
+      translate: 0px 0px;
     }
   }
+
+  @keyframes -global-orbitkit-radial-item-close {
+    0% {
+      opacity: 1;
+      scale: 1;
+      translate: 0px 0px;
+    }
+    100% {
+      opacity: 0;
+      scale: 0;
+      translate: var(--spawn-tx, 0px) var(--spawn-ty, 0px);
+    }
+  }
+
+
 
   .orbitkit-radial-item {
     position: absolute;
@@ -218,6 +430,10 @@
     box-sizing: border-box;
   }
 
+  .orbitkit-radial-item.animating {
+    pointer-events: none !important;
+  }
+
   .orbitkit-radial-item:hover:not(:disabled),
   .orbitkit-radial-item:focus-visible:not(:disabled) {
     background: rgba(45, 55, 72, 1);
@@ -225,6 +441,10 @@
     box-shadow: 0 0 10px rgba(99, 179, 237, 0.5);
     transform: translate(-50%, -50%) scale(1.08);
     outline: none;
+  }
+
+  .orbitkit-radial-item:active:not(:disabled) {
+    transform: translate(-50%, -50%) scale(0.95);
   }
 
   .orbitkit-radial-item:disabled {
@@ -261,6 +481,7 @@
       transition: none !important;
     }
     .orbitkit-radial-item {
+      animation: none !important;
       transition: none !important;
     }
     .orbitkit-radial-item:hover:not(:disabled),

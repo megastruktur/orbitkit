@@ -54,6 +54,7 @@
       role="button"
       tabindex="0"
       aria-label="OrbitKit Mascot"
+      data-orbitkit-menu-toggle
       onclick={toggleMenu}
       onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

@@ -1,0 +1,4 @@
+Input #0, gif, from 'docs/media/demo-desktop.gif':
+  Duration: 00:00:14.33, start: 0.000000, bitrate: 472 kb/s
+  Stream #0:0: Video: gif, bgra, 800x500, 12 fps, 12 tbr, 100 tbn
+EXIT_CODE=0

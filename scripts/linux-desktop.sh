@@ -19,6 +19,7 @@ Commands:
   run-screenshot <app-dir> <out.png> [sec=15]  Run app under Xvfb :77, take screenshot, dump windows & log
   exec <app-dir> -- <cmd...>                   Run arbitrary command with Xvfb and app running ($APP_PID exported)
   run-scenario <app-dir> <script-path>         Run automated scenario script against running app
+  record <app-dir> <script> <out.gif>          Record GIF demo of scenario execution against running app
 EOF
   exit 1
 }
@@ -102,11 +103,18 @@ ensure_image() {
 # ==============================================================================
 
 CLEANUP_APP_PID=""
+CLEANUP_RECORD_PID=""
 CLEANUP_WM_PID=""
 CLEANUP_XVFB_PID=""
 CLEANUP_DBUS_PID=""
 
 cleanup() {
+  if [ -n "$CLEANUP_RECORD_PID" ]; then
+    kill -INT "$CLEANUP_RECORD_PID" 2>/dev/null || true
+    sleep 0.5
+    kill -9 "$CLEANUP_RECORD_PID" 2>/dev/null || true
+    CLEANUP_RECORD_PID=""
+  fi
   if [ -n "$CLEANUP_APP_PID" ]; then
     kill -TERM "$CLEANUP_APP_PID" 2>/dev/null || true
     sleep 0.2
@@ -138,6 +146,9 @@ container_build() {
   cd "$REPO_ROOT"
   echo "--> Installing dependencies at repo root..."
   pnpm install --frozen-lockfile --store-dir /pnpm-store
+  echo "--> Building workspace packages..."
+  pnpm --filter @orbitkit/ui build
+
 
   cd "$app_dir"
   export CARGO_TARGET_DIR="$app_dir/src-tauri/target-linux"
@@ -399,6 +410,142 @@ container_run_scenario() {
 
   exit "$cmd_exit"
 }
+container_record() {
+  local app_dir="$1"
+  local scenario_script="$2"
+  local out_gif="$3"
+
+  local bin_path
+  if ! bin_path=$(find_binary "$app_dir"); then
+    echo "Error: Binary not found in '$app_dir/src-tauri/target-linux/debug/'. Run 'build' first." >&2
+    exit 1
+  fi
+
+  if [ ! -f "$scenario_script" ]; then
+    echo "Error: Scenario script not found at '$scenario_script'" >&2
+    exit 1
+  fi
+
+  rm -f /tmp/.X77-lock /tmp/.X11-unix/X77 2>/dev/null || true
+
+  trap cleanup EXIT
+
+  export DISPLAY=:77
+  Xvfb :77 -screen 0 1280x800x24 -ac &
+  CLEANUP_XVFB_PID=$!
+
+  local xvfb_ready=0
+  for _ in $(seq 1 50); do
+    if xdpyinfo -display :77 >/dev/null 2>&1; then
+      xvfb_ready=1
+      break
+    fi
+    sleep 0.1
+  done
+  if [ "$xvfb_ready" -ne 1 ]; then
+    echo "Error: Xvfb failed to start on display :77" >&2
+    exit 1
+  fi
+
+  if command -v dbus-launch >/dev/null 2>&1; then
+    eval "$(dbus-launch --sh-syntax)"
+    CLEANUP_DBUS_PID="${DBUS_SESSION_BUS_PID:-}"
+  fi
+
+  openbox >/dev/null 2>&1 &
+  CLEANUP_WM_PID=$!
+  sleep 0.5
+  export WEBKIT_DISABLE_COMPOSITING_MODE=1
+  export WEBKIT_DISABLE_DMABUF_RENDERER=1
+  export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
+  export LIBGL_ALWAYS_SOFTWARE=1
+  export GDK_BACKEND=x11
+
+  cd "$app_dir"
+  local exec_log_dir="$app_dir/src-tauri/target-linux"
+  mkdir -p "$exec_log_dir"
+  local exec_log="$exec_log_dir/record-app.log"
+  echo "--> Application log: $exec_log"
+  "$bin_path" > "$exec_log" 2>&1 &
+  APP_PID=$!
+  export APP_PID
+  CLEANUP_APP_PID=$!
+
+  sleep 2
+  xdotool mousemove 20 20 || true
+
+  local temp_mp4="/tmp/orbitkit-record-$$.mp4"
+  local ffmpeg_rec_log="/tmp/orbitkit-ffmpeg-record-$$.log"
+  rm -f "$temp_mp4" "$ffmpeg_rec_log"
+
+  echo "--> Starting x11grab recording to $temp_mp4..."
+  ffmpeg -y -f x11grab -framerate 15 -video_size 1280x800 -i :77 \
+    -c:v libx264 -preset ultrafast -pix_fmt yuv420p "$temp_mp4" > "$ffmpeg_rec_log" 2>&1 &
+  CLEANUP_RECORD_PID=$!
+
+  sleep 0.2
+
+  local cmd_exit=0
+  set +e
+  bash "$scenario_script"
+  cmd_exit=$?
+  set -e
+
+  if [ -n "$CLEANUP_RECORD_PID" ]; then
+    echo "--> Stopping x11grab recording (PID $CLEANUP_RECORD_PID)..."
+    kill -INT "$CLEANUP_RECORD_PID" 2>/dev/null || true
+    wait "$CLEANUP_RECORD_PID" 2>/dev/null || true
+    CLEANUP_RECORD_PID=""
+  fi
+
+  if [ "$cmd_exit" -ne 0 ]; then
+    echo "Error: Scenario script failed with exit code $cmd_exit" >&2
+    exit "$cmd_exit"
+  fi
+
+  if [ ! -s "$temp_mp4" ]; then
+    echo "Error: Temporary recording $temp_mp4 is missing or empty" >&2
+    if [ -f "$ffmpeg_rec_log" ]; then
+      cat "$ffmpeg_rec_log" >&2
+    fi
+    exit 1
+  fi
+
+  echo "--> Converting recording to GIF with two-pass palette..."
+  local palette_png="/tmp/orbitkit-palette-$$.png"
+  ffmpeg -y -i "$temp_mp4" \
+    -vf "fps=12,scale=800:-1:flags=lanczos,palettegen=stats_mode=diff" \
+    "$palette_png"
+
+  mkdir -p "$(dirname "$out_gif")"
+  ffmpeg -y -i "$temp_mp4" -i "$palette_png" \
+    -lavfi "fps=12,scale=800:-1:flags=lanczos [x]; [x][1:v] paletteuse=dither=bayer:bayer_scale=4" \
+    "$out_gif"
+
+  rm -f "$palette_png" "$temp_mp4" "$ffmpeg_rec_log"
+
+  if [ ! -f "$out_gif" ]; then
+    echo "Error: Output GIF not found at '$out_gif'" >&2
+    exit 1
+  fi
+
+  local gif_size
+  gif_size=$(wc -c < "$out_gif")
+  local max_size=$((8 * 1024 * 1024))
+  if [ "$gif_size" -gt "$max_size" ]; then
+    echo "Error: Output GIF is too large: $gif_size bytes (max $max_size bytes / 8 MB)" >&2
+    exit 1
+  fi
+
+  if [ "$gif_size" -le 0 ]; then
+    echo "Error: Output GIF is empty (0 bytes)" >&2
+    exit 1
+  fi
+
+  echo "--> Recorded GIF successfully: $out_gif ($gif_size bytes)"
+  exit 0
+}
+
 
 
 # ==============================================================================
@@ -627,6 +774,52 @@ host_run_scenario() {
     "$IMAGE_NAME" \
     "$SCRIPT_PATH" run-scenario "$abs_app_dir" "$abs_scenario_script"
 }
+host_record() {
+  local app_dir_arg="$1"
+  local scenario_script_arg="$2"
+  local out_gif_arg="$3"
+  validate_app_dir "$app_dir_arg"
+  local abs_app_dir
+  abs_app_dir="$(cd "$app_dir_arg" && pwd -P)"
+  local abs_scenario_script
+  abs_scenario_script="$(realpath "$scenario_script_arg")"
+  local abs_out_gif
+  abs_out_gif="$(realpath -m "$out_gif_arg")"
+  local out_gif_dir
+  out_gif_dir="$(dirname "$abs_out_gif")"
+  mkdir -p "$out_gif_dir"
+
+  local extra_mounts=()
+  case "$abs_out_gif" in
+    "$REPO_ROOT"/*|"$REPO_ROOT")
+      ;;
+    *)
+      extra_mounts+=("-v" "$out_gif_dir:$out_gif_dir")
+      ;;
+  esac
+
+  ensure_image
+
+  echo "Launching recording container for $abs_app_dir -> $abs_out_gif..."
+  collect_orbitkit_env_args
+
+  docker run --rm \
+    --user 1000:1000 \
+    --shm-size=512m \
+    -v "$REPO_ROOT:$REPO_ROOT" \
+    "${extra_mounts[@]}" \
+    -v "$CARGO_VOLUME:/cargo-cache" \
+    -v "$PNPM_VOLUME:/pnpm-store" \
+    -e HOME=/home/builder \
+    -e CARGO_HOME=/cargo-cache \
+    -e PNPM_HOME=/pnpm-store \
+    -e PNPM_STORE_DIR=/pnpm-store \
+    -e ORBITKIT_IN_CONTAINER=1 \
+    "${ORBITKIT_DOCKER_ENVS[@]}" \
+    -w "$REPO_ROOT" \
+    "$IMAGE_NAME" \
+    "$SCRIPT_PATH" record "$abs_app_dir" "$abs_scenario_script" "$abs_out_gif"
+}
 
 
 # ==============================================================================
@@ -660,6 +853,10 @@ if is_in_container; then
       if [ "$#" -lt 2 ]; then usage; fi
       container_run_scenario "$1" "$2"
       ;;
+    record)
+      if [ "$#" -lt 3 ]; then usage; fi
+      container_record "$1" "$2" "$3"
+      ;;
     *)
       echo "Unknown in-container command: $CMD" >&2
       usage
@@ -685,6 +882,10 @@ else
     run-scenario)
       if [ "$#" -lt 2 ]; then usage; fi
       host_run_scenario "$1" "$2"
+      ;;
+    record)
+      if [ "$#" -lt 3 ]; then usage; fi
+      host_record "$1" "$2" "$3"
       ;;
     *)
       echo "Unknown command: $CMD" >&2

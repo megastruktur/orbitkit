@@ -24,6 +24,7 @@ RUN apt-get update && \
         x11-utils \
         wmctrl \
         imagemagick \
+        ffmpeg \
         openbox \
         shellcheck \
         fonts-dejavu-core \

@@ -136,19 +136,47 @@ Under Android 14+ (API 34) and Android 16, Google introduced strict "While-In-Us
 
 ---
 
-## 6. Platform Support & Device Testing Status
+## 6. Popups on Android (In-App Popup Sheet)
+
+Desktop OrbitKit launches auxiliary popups into discrete Tauri `WebviewWindow` frames. Android does not support multi-window Tauri popups; instead, popups are rendered **in-app** within the main activity's webview via `<PopupSheet />`.
+
+### Architecture & Contract
+1. **Event Emission**: When a menu action or plugin triggers a popup on Android, the native layer emits `orbitkit://popup-open` with payload:
+   ```ts
+   {
+     id: string;      // Matching windows.popups[i].id (e.g. "notes", "settings")
+     title: string;   // Window title from config
+     url: string;     // URL route
+     width: number;   // Target width in px
+     height: number;  // Target height in px
+   }
+   ```
+2. **PopupSheet Component**: The application's `MainView` mounts `@orbitkit/ui`'s `<PopupSheet components={popupComponents} fallback={UnknownPopup} />`.
+3. **Layout & Planetary Styling**:
+   - Renders as a centered glass card (`rgba(14, 20, 51, 0.92)`) with a `#38BDF8` ring and dimmed backdrop.
+   - Dimensions scale responsively: width is `min(payload.width, 100vw - 24px)` and height is `min(payload.height, 85vh)`.
+   - Title bar shows `payload.title` alongside an accessible close (`✕`) button.
+4. **Dismissal & Back Navigation**:
+   - Tapping the backdrop, clicking `✕`, pressing `Escape`, or performing the Android back gesture (`popstate`) dismisses the sheet and invokes `closePopup(id)`.
+   - Native `orbitkit://popup-close` events also dismiss the sheet.
+   - Transitions animate smoothly in and out (~180 ms) while honoring `prefers-reduced-motion`.
+
+---
+
+## 7. Platform Support & Device Testing Status
 
 | Capability | Status | Evidence & Verification |
 |---|---|---|
 | `SYSTEM_ALERT_WINDOW` Overlay | Supported | Verified via `OrbitkitNativePluginTest` JUnit suite |
 | Touch Drag & Radial Expansion | Supported | Verified via native touch simulation |
 | Direct JNI Dispatch | Supported | Verified via `OrbitkitSurvivalJniTest` |
-| Multi-Window Popups (`open_popup`) | Unsupported | Explicitly returns `ErrorCode::Unsupported` |
+| In-App Popups (`PopupSheet`) | Supported | Android in-app sheet via `orbitkit://popup-open` / `orbitkit://popup-close` |
+| Multi-Window Popups (`open_popup`) | Unsupported | Explicitly returns `ErrorCode::Unsupported` on Android (desktop only) |
 | On-Device Physical Execution | **DEFERRED** | No physical device was connected during campaign CI; runbooks prepared and verified via automated test suites |
 
 ---
 
-## 7. Build Commands
+## 8. Build Commands
 
 To build the Android APK or run unit tests from the workspace:
 

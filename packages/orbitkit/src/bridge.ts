@@ -199,3 +199,49 @@ export async function onMascotState(
     throw normalizeError(err);
   }
 }
+
+export type PopupOpenPayload = {
+  id: string;
+  title: string;
+  url: string;
+  width: number;
+  height: number;
+};
+
+export type PopupOpenCallback = (payload: PopupOpenPayload) => void;
+
+export async function onPopupOpen(
+  cb: PopupOpenCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<PopupOpenPayload>("orbitkit://popup-open", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+export type PopupClosePayload = {
+  id: string;
+};
+
+export type PopupCloseCallback = (payload: PopupClosePayload) => void;
+
+export async function onPopupClose(
+  cb: PopupCloseCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<PopupClosePayload>("orbitkit://popup-close", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}

@@ -1,0 +1,27 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 137 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.49 kB │ gzip:  0.30 kB
+dist/assets/index-BEKJoKDJ.css  20.69 kB │ gzip:  4.17 kB
+dist/assets/index-CHLogP-J.js   89.98 kB │ gzip: 31.08 kB
+
+✓ built in 351ms
+$ tsc --noEmit
+$ tsc --noEmit
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/packages/orbitkit
+
+
+ Test Files  6 passed (6)
+      Tests  119 passed (119)
+   Start at  10:35:18
+   Duration  1.06s (environment 50%, transform 34%, tests 8%, import 8%)
+
+EXIT_CODE=0

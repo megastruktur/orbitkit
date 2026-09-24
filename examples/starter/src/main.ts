@@ -1,9 +1,7 @@
 import { mount, type Component } from "svelte";
 import MainView from "./views/MainView.svelte";
 import MascotView from "./views/MascotView.svelte";
-import NotesPopup from "./views/NotesPopup.svelte";
-import SettingsPopup from "./views/SettingsPopup.svelte";
-import UnknownPopup from "./views/UnknownPopup.svelte";
+import { popupComponents, popupFallback } from "./popupViews";
 
 const params = new URLSearchParams(window.location.search);
 
@@ -13,14 +11,13 @@ let viewProps: Record<string, any> = {};
 if (params.get("orbitkit") === "mascot") {
   ActiveView = MascotView;
 } else if (params.has("popup")) {
-  const popupId = params.get("popup");
-  if (popupId === "notes") {
-    ActiveView = NotesPopup;
-  } else if (popupId === "settings") {
-    ActiveView = SettingsPopup;
+  document.body.classList.add("orbitkit-popup-window");
+  const popupId = params.get("popup") ?? "";
+  if (popupId in popupComponents) {
+    ActiveView = popupComponents[popupId];
   } else {
-    ActiveView = UnknownPopup;
-    viewProps = { id: popupId ?? "" };
+    ActiveView = popupFallback;
+    viewProps = { id: popupId };
   }
 }
 

@@ -64,6 +64,35 @@ Svelte 5 component rendering a circular or arc menu arranged geometrically aroun
 | `onselect` | `(id: string) => void` | Invoked when an enabled menu item is clicked or hovered (depending on `trigger`). |
 | `onclose` | `() => void` | Invoked when user presses Escape or clicks outside the menu. |
 
+
+---
+
+#### `<PopupSheet />`
+
+Svelte 5 component rendering an in-app popup sheet dialog for mobile (Android) platforms, replacing multi-window popups with an in-app glass sheet.
+
+```svelte
+<script lang="ts">
+  import { PopupSheet } from "@orbitkit/ui";
+  import NotesPopup from "./views/NotesPopup.svelte";
+  import SettingsPopup from "./views/SettingsPopup.svelte";
+  import UnknownPopup from "./views/UnknownPopup.svelte";
+</script>
+
+<PopupSheet
+  components={{ notes: NotesPopup, settings: SettingsPopup }}
+  fallback={UnknownPopup}
+/>
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `components` | `Record<string, Component<any>>` | *Required* | Map of popup identifiers to view components. |
+| `fallback` | `Component<any>` | `undefined` | Optional fallback component for unknown popup ids (receives `{ id }`). |
+| `reducedMotion`| `boolean` | `false` | When `true`, disables intro/outro animation transitions. Defaults to `prefers-reduced-motion`. |
+| `class` | `string` | `""` | Optional CSS class applied to the backdrop. |
 ---
 
 ### 1.2 Geometry Calculations
@@ -159,6 +188,22 @@ Listens for `orbitkit://mascot-state` events:
 ```ts
 const unlisten = await onMascotState((payload) => {
   console.log("New state:", payload.state);
+});
+```
+
+#### `onPopupOpen(handler: (payload: PopupOpenPayload) => void): Promise<UnlistenFn>`
+Listens for `orbitkit://popup-open` events (emitted when an in-app popup sheet should be displayed):
+```ts
+const unlisten = await onPopupOpen((payload) => {
+  console.log("Open popup:", payload.id, payload.title, payload.width, payload.height);
+});
+```
+
+#### `onPopupClose(handler: (payload: PopupClosePayload) => void): Promise<UnlistenFn>`
+Listens for `orbitkit://popup-close` events:
+```ts
+const unlisten = await onPopupClose((payload) => {
+  console.log("Close popup:", payload.id);
 });
 ```
 

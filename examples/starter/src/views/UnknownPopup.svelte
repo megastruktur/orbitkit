@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   let { id = "" }: { id?: string } = $props();
 
   const popupId = $derived(
@@ -7,6 +9,15 @@
         ? (new URLSearchParams(window.location.search).get("popup") ?? "")
         : "")
   );
+
+  onMount(() => {
+    const isStandalone =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("popup");
+    if (isStandalone) {
+      document.body.classList.add("orbitkit-popup-window");
+    }
+  });
 </script>
 
 <main class="unknown-popup-container">
@@ -37,9 +48,15 @@
 </main>
 
 <style>
-  :global(body) {
+  :global(body.orbitkit-popup-window),
+  :global(html:has(body.orbitkit-popup-window)),
+  :global(body.orbitkit-popup-window #app) {
+    height: 100%;
     margin: 0;
     padding: 0;
+  }
+
+  :global(body.orbitkit-popup-window) {
     background: #070b1a;
     color: #e6f6ff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -53,7 +70,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    height: 100%;
+    min-height: 0;
     box-sizing: border-box;
     padding: 1.5rem;
     background:

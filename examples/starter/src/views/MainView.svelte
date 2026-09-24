@@ -8,9 +8,11 @@
     requestOverlayPermission,
     onMenuAction,
     setMascotState,
+    PopupSheet,
     type MenuActionPayload,
   } from "@orbitkit/ui";
   import config from "../orbitkit.config";
+  import { popupComponents, popupFallback } from "../popupViews";
 
   interface LogEntry {
     id: string;
@@ -426,6 +428,8 @@
     </footer>
   </div>
 </main>
+
+<PopupSheet components={popupComponents} fallback={popupFallback} />
 
 <style>
   :global(body) {

@@ -1,0 +1,36 @@
+Launching build container for /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter...
+=== Running in-container build for: /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter ===
+Repository root: /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet
+--> Installing dependencies at repo root...
+Scope: all 3 workspace projects
+? Verifying lockfile against supply-chain policies (177 entries)...
+Update available! 12.4.1 → 12.6.0.
+Changelog: https://pnpm.io/v/12.6.0
+To update, run: pnpm self-update
+✓ Lockfile passes supply-chain policies (177 entries in 675ms)
+Lockfile is up to date, resolution step is skipped
+Done in 704ms using pnpm v12.4.1
+--> Building Tauri desktop application (debug, no-bundle)...
+--> CARGO_TARGET_DIR=/home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter/src-tauri/target-linux
+$ tauri build --debug --no-bundle
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 137 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.49 kB │ gzip:  0.30 kB
+dist/assets/index-BEKJoKDJ.css  20.69 kB │ gzip:  4.17 kB
+dist/assets/index-DW5oTnJc.js   89.25 kB │ gzip: 30.86 kB
+
+✓ built in 158ms
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.03s
+       Built application at: /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter/src-tauri/target-linux/debug/starter
+=== Build successful ===
+Binary: /home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter/src-tauri/target-linux/debug/starter
+/home/megastruktur/orca/workspaces/orbitkit/oks-popup-sheet/examples/starter/src-tauri/target-linux/debug/starter: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=1e6b6b4af102b7ec006106f5c2e31d9ba9fee7fd, with debug_info, not stripped
+EXIT_CODE=0

@@ -8,6 +8,8 @@ import {
   normalizeError,
   onMascotState,
   onMenuAction,
+  onPopupClose,
+  onPopupOpen,
   openPopup,
   OrbitKitError,
   overlayPermission,
@@ -15,6 +17,7 @@ import {
   setMascotState,
   showOverlay,
   type MenuConfig,
+  type PopupOpenPayload,
 } from "./index";
 
 const sampleMenu: MenuConfig = {
@@ -343,6 +346,106 @@ describe("bridge", () => {
       unlisten();
       expect(unlistened).toBe(true);
     });
+
+    it("subscribes to orbitkit://popup-open and delivers payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 103;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupOpen(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-open");
+      expect(eventHandlerId).not.toBeNull();
+
+      const payload: PopupOpenPayload = {
+        id: "notes",
+        title: "Notes",
+        url: "index.html?popup=notes",
+        width: 320,
+        height: 400,
+      };
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-open",
+        payload,
+      });
+
+      expect(callback).toHaveBeenCalledWith(payload);
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("subscribes to orbitkit://popup-close and delivers payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 104;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupClose(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-close");
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-close",
+        payload: { id: "notes" },
+      });
+
+      expect(callback).toHaveBeenCalledWith({ id: "notes" });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
   });
 
   describe("Error normalization", () => {
@@ -501,6 +604,24 @@ describe("bridge", () => {
       expect(isTauri()).toBe(false);
       const cb = vi.fn();
       const unlisten = await onMascotState(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onPopupOpen returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupOpen(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onPopupClose returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupClose(cb);
       expect(typeof unlisten).toBe("function");
       expect(() => unlisten()).not.toThrow();
       expect(cb).not.toHaveBeenCalled();

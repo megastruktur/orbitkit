@@ -1,0 +1,9 @@
+MascotSpec: FOUND
+MascotKind: FOUND
+createMascotView: FOUND
+updateMascotDisplay: FOUND
+srcFor: FOUND
+SvgDrawable: FOUND
+SvgIcon: FOUND
+SvgParser: FOUND
+initialState: FOUND

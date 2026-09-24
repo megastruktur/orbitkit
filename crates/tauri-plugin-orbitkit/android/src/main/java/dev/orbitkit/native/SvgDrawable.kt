@@ -96,7 +96,7 @@ class SvgDrawable(
 
             if (paintSpec.hasStroke && paintSpec.stroke != null) {
                 strokePaint.color = overrideStrokeColor ?: paintSpec.stroke
-                strokePaint.strokeWidth = paintSpec.strokeWidth * currentScale
+                strokePaint.strokeWidth = paintSpec.strokeWidth * currentScale * element.strokeScale()
                 strokePaint.strokeCap = when (paintSpec.cap?.lowercase()) {
                     "butt" -> Paint.Cap.BUTT
                     "square" -> Paint.Cap.SQUARE

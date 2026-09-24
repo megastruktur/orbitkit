@@ -41,6 +41,15 @@ data class Element(
     val paint: Paint,
     val matrix: FloatArray = floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f)
 ) {
+    fun matrixDeterminant(): Float {
+        return matrix[0] * matrix[4] - matrix[1] * matrix[3]
+    }
+
+    fun strokeScale(): Float {
+        val det = matrixDeterminant()
+        return kotlin.math.sqrt(kotlin.math.abs(det))
+    }
+
     fun toPath(): android.graphics.Path {
         val path = android.graphics.Path()
         for (cmd in commands) {
@@ -78,6 +87,12 @@ data class SvgIcon(
 
 object SvgParser {
     private const val KAPPA = 0.55228475f
+
+    fun toFiniteFloatOrNull(str: String?): Float? {
+        if (str == null) return null
+        val f = str.toFloatOrNull() ?: return null
+        return if (f.isFinite()) f else null
+    }
     val IDENTITY_MATRIX = floatArrayOf(
         1f, 0f, 0f,
         0f, 1f, 0f,
@@ -105,14 +120,24 @@ object SvgParser {
         val matches = cmdRegex.findAll(trimmed).toList()
         if (matches.isEmpty()) return null
 
+        // Reject leading garbage before first command
+        if (matches.first().range.first != 0) return null
+        // Reject trailing garbage after last command
+        if (matches.last().range.last != trimmed.length - 1) return null
+        // Reject invalid separators/garbage between commands
+        for (i in 0 until matches.size - 1) {
+            val between = trimmed.substring(matches[i].range.last + 1, matches[i + 1].range.first)
+            if (!between.all { it.isWhitespace() || it == ',' }) {
+                return null
+            }
+        }
+
         var result = IDENTITY_MATRIX.clone()
-        var consumedLength = 0
         for (match in matches) {
-            consumedLength += match.value.length
             val name = match.groupValues[1].lowercase()
             val rawArgs = match.groupValues[2].trim()
             val args = if (rawArgs.isEmpty()) emptyList() else {
-                rawArgs.split(Regex("[\\s,]+")).filter { it.isNotEmpty() }.map { it.toFloatOrNull() ?: return null }
+                rawArgs.split(Regex("[\\s,]+")).filter { it.isNotEmpty() }.map { toFiniteFloatOrNull(it) ?: return null }
             }
 
             val mat = when (name) {
@@ -265,10 +290,10 @@ object SvgParser {
         if (vbAttr.isNotEmpty()) {
             val parts = vbAttr.split(Regex("[\\s,]+")).filter { it.isNotEmpty() }
             if (parts.size == 4) {
-                val minX = parts[0].toFloatOrNull() ?: return null
-                val minY = parts[1].toFloatOrNull() ?: return null
-                val width = parts[2].toFloatOrNull() ?: return null
-                val height = parts[3].toFloatOrNull() ?: return null
+                val minX = toFiniteFloatOrNull(parts[0]) ?: return null
+                val minY = toFiniteFloatOrNull(parts[1]) ?: return null
+                val width = toFiniteFloatOrNull(parts[2]) ?: return null
+                val height = toFiniteFloatOrNull(parts[3]) ?: return null
                 if (width <= 0f || height <= 0f) return null
                 return SvgViewBox(minX, minY, width, height)
             }
@@ -278,8 +303,8 @@ object SvgParser {
         val wAttr = root.getAttribute("width").replace("px", "").trim()
         val hAttr = root.getAttribute("height").replace("px", "").trim()
         if (wAttr.isNotEmpty() && hAttr.isNotEmpty()) {
-            val width = wAttr.toFloatOrNull() ?: return null
-            val height = hAttr.toFloatOrNull() ?: return null
+            val width = toFiniteFloatOrNull(wAttr) ?: return null
+            val height = toFiniteFloatOrNull(hAttr) ?: return null
             if (width <= 0f || height <= 0f) return null
             return SvgViewBox(0f, 0f, width, height)
         }
@@ -293,8 +318,8 @@ object SvgParser {
     }
 
     private fun parseStrokeWidth(root: DomElement): Float {
-        val sw = root.getAttribute("stroke-width").replace("px", "").trim()
-        return sw.toFloatOrNull() ?: 2f
+        val sw = toFiniteFloatOrNull(root.getAttribute("stroke-width").replace("px", "").trim()) ?: 2f
+        return if (sw.isFinite()) sw else 2f
     }
 
     private fun parseElementChildren(
@@ -333,7 +358,7 @@ object SvgParser {
             }
 
             val elemStrokeWidth = if (elem.hasAttribute("stroke-width")) {
-                elem.getAttribute("stroke-width").replace("px", "").trim().toFloatOrNull() ?: return false
+                toFiniteFloatOrNull(elem.getAttribute("stroke-width").replace("px", "").trim()) ?: return false
             } else {
                 currentPaint.strokeWidth
             }
@@ -416,9 +441,9 @@ object SvgParser {
     }
 
     private fun parseCircle(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
-        val cx = elem.getAttribute("cx").toFloatOrNull() ?: 0f
-        val cy = elem.getAttribute("cy").toFloatOrNull() ?: 0f
-        val r = elem.getAttribute("r").toFloatOrNull() ?: return false
+        val cx = if (elem.hasAttribute("cx")) (toFiniteFloatOrNull(elem.getAttribute("cx")) ?: return false) else 0f
+        val cy = if (elem.hasAttribute("cy")) (toFiniteFloatOrNull(elem.getAttribute("cy")) ?: return false) else 0f
+        val r = toFiniteFloatOrNull(elem.getAttribute("r")) ?: return false
         if (r <= 0f) return false
 
         val k = KAPPA * r
@@ -432,10 +457,10 @@ object SvgParser {
     }
 
     private fun parseEllipse(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
-        val cx = elem.getAttribute("cx").toFloatOrNull() ?: 0f
-        val cy = elem.getAttribute("cy").toFloatOrNull() ?: 0f
-        val rx = elem.getAttribute("rx").toFloatOrNull() ?: return false
-        val ry = elem.getAttribute("ry").toFloatOrNull() ?: return false
+        val cx = if (elem.hasAttribute("cx")) (toFiniteFloatOrNull(elem.getAttribute("cx")) ?: return false) else 0f
+        val cy = if (elem.hasAttribute("cy")) (toFiniteFloatOrNull(elem.getAttribute("cy")) ?: return false) else 0f
+        val rx = toFiniteFloatOrNull(elem.getAttribute("rx")) ?: return false
+        val ry = toFiniteFloatOrNull(elem.getAttribute("ry")) ?: return false
         if (rx <= 0f || ry <= 0f) return false
 
         val kx = KAPPA * rx
@@ -450,24 +475,24 @@ object SvgParser {
     }
 
     private fun parseLine(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
-        val x1 = elem.getAttribute("x1").toFloatOrNull() ?: 0f
-        val y1 = elem.getAttribute("y1").toFloatOrNull() ?: 0f
-        val x2 = elem.getAttribute("x2").toFloatOrNull() ?: 0f
-        val y2 = elem.getAttribute("y2").toFloatOrNull() ?: 0f
+        val x1 = if (elem.hasAttribute("x1")) (toFiniteFloatOrNull(elem.getAttribute("x1")) ?: return false) else 0f
+        val y1 = if (elem.hasAttribute("y1")) (toFiniteFloatOrNull(elem.getAttribute("y1")) ?: return false) else 0f
+        val x2 = if (elem.hasAttribute("x2")) (toFiniteFloatOrNull(elem.getAttribute("x2")) ?: return false) else 0f
+        val y2 = if (elem.hasAttribute("y2")) (toFiniteFloatOrNull(elem.getAttribute("y2")) ?: return false) else 0f
         commands.add(PathCommand.MoveTo(x1, y1))
         commands.add(PathCommand.LineTo(x2, y2))
         return true
     }
 
     private fun parseRect(elem: DomElement, commands: MutableList<PathCommand>): Boolean {
-        val x = elem.getAttribute("x").toFloatOrNull() ?: 0f
-        val y = elem.getAttribute("y").toFloatOrNull() ?: 0f
-        val w = elem.getAttribute("width").toFloatOrNull() ?: return false
-        val h = elem.getAttribute("height").toFloatOrNull() ?: return false
+        val x = if (elem.hasAttribute("x")) (toFiniteFloatOrNull(elem.getAttribute("x")) ?: return false) else 0f
+        val y = if (elem.hasAttribute("y")) (toFiniteFloatOrNull(elem.getAttribute("y")) ?: return false) else 0f
+        val w = toFiniteFloatOrNull(elem.getAttribute("width")) ?: return false
+        val h = toFiniteFloatOrNull(elem.getAttribute("height")) ?: return false
         if (w <= 0f || h <= 0f) return false
 
-        var rx = elem.getAttribute("rx").toFloatOrNull() ?: 0f
-        var ry = elem.getAttribute("ry").toFloatOrNull() ?: 0f
+        var rx = if (elem.hasAttribute("rx")) (toFiniteFloatOrNull(elem.getAttribute("rx")) ?: return false) else 0f
+        var ry = if (elem.hasAttribute("ry")) (toFiniteFloatOrNull(elem.getAttribute("ry")) ?: return false) else 0f
         if (rx > 0f && ry <= 0f) ry = rx
         if (ry > 0f && rx <= 0f) rx = ry
         rx = rx.coerceAtMost(w / 2f)

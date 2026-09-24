@@ -74,7 +74,8 @@ data class NativeMascotArgs(
  */
 data class OverlayConfig(
     val menu: NativeMenuConfig,
-    val mascot: NativeMascotArgs? = null
+    val mascot: NativeMascotArgs? = null,
+    val mascotSpec: MascotSpec? = null
 )
 
 /**
@@ -125,7 +126,8 @@ object MenuConfigParser {
             NativeMascotArgs(size = size)
         } else null
 
-        return OverlayConfig(menu = menu, mascot = mascot)
+        val mascotSpec = MascotSpec.parse(obj)
+        return OverlayConfig(menu = menu, mascot = mascot, mascotSpec = mascotSpec)
     }
 
     @JvmStatic

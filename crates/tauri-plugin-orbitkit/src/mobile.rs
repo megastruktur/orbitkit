@@ -1,3 +1,4 @@
+#![cfg_attr(not(target_os = "android"), allow(dead_code))]
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tauri::plugin::{PluginApi, PluginHandle};
@@ -45,9 +46,17 @@ impl<R: Runtime> Orbitkit<R> {
         method: &str,
         payload: impl Serialize,
     ) -> Result<T> {
-        self.handle
-            .run_mobile_plugin(method, payload)
-            .map_err(Into::into)
+        #[cfg(target_os = "android")]
+        {
+            self.handle
+                .run_mobile_plugin(method, payload)
+                .map_err(Into::into)
+        }
+        #[cfg(not(target_os = "android"))]
+        {
+            let _ = (method, payload);
+            Err(Error::unsupported("mobile is only supported on android"))
+        }
     }
 
     pub fn overlay_permission(&self) -> Result<OverlayPermissionResponse> {
@@ -56,21 +65,16 @@ impl<R: Runtime> Orbitkit<R> {
             granted: bool,
         }
 
-        self.handle
-            .run_mobile_plugin::<bool>("isOverlayPermissionGranted", ())
+        self.run_mobile_plugin::<bool>("isOverlayPermissionGranted", ())
             .map(|granted| OverlayPermissionResponse { granted })
             .or_else(|_| {
-                self.handle
-                    .run_mobile_plugin::<Status>("isOverlayPermissionGranted", ())
+                self.run_mobile_plugin::<Status>("isOverlayPermissionGranted", ())
                     .map(|s| OverlayPermissionResponse { granted: s.granted })
             })
-            .map_err(Into::into)
     }
 
     pub fn request_overlay_permission(&self) -> Result<()> {
-        self.handle
-            .run_mobile_plugin::<()>("requestOverlayPermission", ())
-            .map_err(Into::into)
+        self.run_mobile_plugin::<()>("requestOverlayPermission", ())
     }
 
     pub fn show_overlay(
@@ -85,19 +89,12 @@ impl<R: Runtime> Orbitkit<R> {
                 menu_config.items.len()
             )));
         }
-        let payload = serde_json::json!({
-            "menu": menu_config,
-            "mascot": mascot,
-        });
-        self.handle
-            .run_mobile_plugin::<()>("overlayShow", payload)
-            .map_err(Into::into)
+        let payload = build_overlay_payload(&menu_config, &mascot, &self.config.mascot);
+        self.run_mobile_plugin::<()>("overlayShow", payload)
     }
 
     pub fn hide_overlay(&self) -> Result<()> {
-        self.handle
-            .run_mobile_plugin::<()>("overlayHide", ())
-            .map_err(Into::into)
+        self.run_mobile_plugin::<()>("overlayHide", ())
     }
 
     pub fn open_popup(&self, id: String) -> Result<()> {
@@ -117,9 +114,7 @@ impl<R: Runtime> Orbitkit<R> {
     pub fn set_mascot_state(&self, state: String) -> Result<()> {
         let payload = serde_json::json!({ "state": state.clone() });
         let _ = self.handle.app().emit("orbitkit://mascot-state", payload);
-        self.handle
-            .run_mobile_plugin::<()>("setMascotState", serde_json::json!({ "state": state }))
-            .map_err(Into::into)
+        self.run_mobile_plugin::<()>("setMascotState", serde_json::json!({ "state": state }))
     }
 
     pub fn emit_menu_action(&self, id: String) -> Result<()> {
@@ -131,5 +126,84 @@ impl<R: Runtime> Orbitkit<R> {
         let payload = serde_json::json!({ "id": id, "source": "webview" });
         let _ = self.handle.app().emit("orbitkit://menu-action", payload);
         Ok(())
+    }
+}
+
+pub(crate) fn build_overlay_payload(
+    menu_config: &MenuConfig,
+    mascot: &Option<ShowOverlayMascotArgs>,
+    base_mascot_config: &crate::config::MascotConfig,
+) -> serde_json::Value {
+    let mut mascot_config = base_mascot_config.clone();
+    if let Some(s) = mascot.as_ref().and_then(|m| m.size) {
+        mascot_config.size = s.round() as u32;
+    }
+    serde_json::json!({
+        "menu": menu_config,
+        "mascot": mascot,
+        "mascotConfig": mascot_config,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{MascotConfig, MascotKind, MascotStateDefinition, MenuConfig};
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_build_overlay_payload_mascot_config_camel_case_and_states() {
+        let mut states = HashMap::new();
+        states.insert(
+            "idle".to_string(),
+            MascotStateDefinition::Source {
+                src: "<svg id=\"idle\"></svg>".to_string(),
+            },
+        );
+        states.insert(
+            "busy".to_string(),
+            MascotStateDefinition::Source {
+                src: "<svg id=\"busy\"></svg>".to_string(),
+            },
+        );
+
+        let base_mascot = MascotConfig {
+            kind: MascotKind::Svg,
+            src: "<svg id=\"default\"></svg>".to_string(),
+            size: 96,
+            frame_width: None,
+            frame_height: None,
+            states: Some(states),
+            initial_state: "idle".to_string(),
+        };
+
+        let menu = MenuConfig::default();
+        let mascot_args = Some(ShowOverlayMascotArgs { size: Some(64.0) });
+
+        let payload = build_overlay_payload(&menu, &mascot_args, &base_mascot);
+
+        // Verify mascotConfig is present
+        assert!(payload.get("mascotConfig").is_some());
+        let mc = &payload["mascotConfig"];
+
+        // Verify camelCase fields
+        assert_eq!(mc["kind"], "svg");
+        assert_eq!(mc["src"], "<svg id=\"default\"></svg>");
+        assert_eq!(mc["size"], 64);
+        assert_eq!(mc["initialState"], "idle");
+
+        // Verify states.busy.src is present
+        assert!(mc.get("states").is_some());
+        let states_val = &mc["states"];
+        assert_eq!(states_val["busy"]["src"], "<svg id=\"busy\"></svg>");
+        assert_eq!(states_val["idle"]["src"], "<svg id=\"idle\"></svg>");
+
+        // Verify legacy mascot key is kept for compatibility
+        assert!(payload.get("mascot").is_some());
+        assert_eq!(payload["mascot"]["size"], 64.0);
+
+        // Verify without mascot size override
+        let payload_no_override = build_overlay_payload(&menu, &None, &base_mascot);
+        assert_eq!(payload_no_override["mascotConfig"]["size"], 96);
     }
 }

@@ -1,0 +1,12 @@
+dev.orbitkit.native.IconDecoderTest: 16 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.MascotSpecTest: 10 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.MenuConfigParserTest: 17 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.OrbitkitNativePluginTest: 9 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.OverlayActionDispatcherTest: 6 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.OverlayGeometryTest: 18 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.RadialLayoutTest: 16 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.SpawnAnimationTest: 9 tests, 0 failures, 0 errors, 0 skipped
+dev.orbitkit.native.SvgIconTest: 35 tests, 0 failures, 0 errors, 0 skipped
+
+Total: 136 tests, 0 failures, 0 errors
+EXIT_CODE=0

@@ -606,4 +606,80 @@ class SvgIconTest {
         assertEquals(0xFF333333.toInt(), icon.elements[1].paint.stroke)
         assertEquals(6f, icon.elements[1].paint.strokeWidth, DELTA)
     }
+
+    @Test
+    fun testParseTransformRejectsTrailingGarbage() {
+        assertNull("Trailing text must be rejected", SvgParser.parseTransform("rotate(45) garbage"))
+        assertNull("Trailing semicolon must be rejected", SvgParser.parseTransform("rotate(45);"))
+        assertNull("Trailing closing paren must be rejected", SvgParser.parseTransform("rotate(45))"))
+        assertNull("Trailing number must be rejected", SvgParser.parseTransform("rotate(45) 123"))
+        assertNull("Leading garbage must be rejected", SvgParser.parseTransform("bad rotate(45)"))
+        assertNull("Garbage between commands must be rejected", SvgParser.parseTransform("rotate(45) bad scale(2)"))
+        assertNotNull("Valid sequence with spaces is accepted", SvgParser.parseTransform("rotate(45) scale(2)"))
+        assertNotNull("Valid sequence with comma is accepted", SvgParser.parseTransform("rotate(45), scale(2)"))
+    }
+
+    @Test
+    fun testRejectNonFiniteFloatsInTransformsAndShapeAttributes() {
+        // Non-finite in transforms
+        assertNull("NaN in translate must be rejected", SvgParser.parseTransform("translate(NaN, 10)"))
+        assertNull("Infinity in translate must be rejected", SvgParser.parseTransform("translate(10, Infinity)"))
+        assertNull("-Infinity in scale must be rejected", SvgParser.parseTransform("scale(-Infinity)"))
+
+        // Non-finite in shape attributes
+        assertNull("NaN in cx must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><circle cx="NaN" cy="50" r="10" /></svg>"""))
+        assertNull("Infinity in r must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="Infinity" /></svg>"""))
+        assertNull("NaN in rx must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="NaN" ry="10" /></svg>"""))
+        assertNull("Infinity in width must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><rect x="0" y="0" width="Infinity" height="20" /></svg>"""))
+        assertNull("NaN in line coord must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><line x1="0" y1="0" x2="NaN" y2="20" /></svg>"""))
+        assertNull("NaN in stroke-width must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="10" stroke-width="NaN" /></svg>"""))
+    }
+
+    @Test
+    fun testStrokeWidthScalesWithSqrtAbsDetMatrix() {
+        val elemIdentity = Element(emptyList(), Paint(null, 0xFF000000.toInt(), 2f), SvgParser.IDENTITY_MATRIX)
+        assertEquals(1f, elemIdentity.matrixDeterminant(), DELTA)
+        assertEquals(1f, elemIdentity.strokeScale(), DELTA)
+
+        // Scale 2x uniform -> det = 4 -> strokeScale = 2
+        val matScale2 = SvgParser.parseTransform("scale(2)")!!
+        val elemScale2 = Element(emptyList(), Paint(null, 0xFF000000.toInt(), 2f), matScale2)
+        assertEquals(4f, elemScale2.matrixDeterminant(), DELTA)
+        assertEquals(2f, elemScale2.strokeScale(), DELTA)
+
+        // Non-uniform scale 3x and 12x -> det = 36 -> strokeScale = 6
+        val matNonUniform = SvgParser.parseTransform("scale(3, 12)")!!
+        val elemNonUniform = Element(emptyList(), Paint(null, 0xFF000000.toInt(), 2f), matNonUniform)
+        assertEquals(36f, elemNonUniform.matrixDeterminant(), DELTA)
+        assertEquals(6f, elemNonUniform.strokeScale(), DELTA)
+
+        // Pure rotation -> det = 1 -> strokeScale = 1
+        val matRotate = SvgParser.parseTransform("rotate(45)")!!
+        val elemRotate = Element(emptyList(), Paint(null, 0xFF000000.toInt(), 2f), matRotate)
+        assertEquals(1f, elemRotate.matrixDeterminant(), DELTA)
+        assertEquals(1f, elemRotate.strokeScale(), DELTA)
+
+        // Negative scale (reflection) -2x and 2x -> det = -4 -> abs(det) = 4 -> strokeScale = 2
+        val matReflect = SvgParser.parseTransform("scale(-2, 2)")!!
+        val elemReflect = Element(emptyList(), Paint(null, 0xFF000000.toInt(), 2f), matReflect)
+        assertEquals(-4f, elemReflect.matrixDeterminant(), DELTA)
+        assertEquals(2f, elemReflect.strokeScale(), DELTA)
+    }
+
+    @Test
+    fun testParseViewBoxRejectsZeroAndNegativeRootDimensions() {
+        // Root width/height fallback
+        assertNull("Zero width must be rejected", SvgParser.parse("""<svg width="0" height="100"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Zero height must be rejected", SvgParser.parse("""<svg width="100" height="0"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Zero width and height must be rejected", SvgParser.parse("""<svg width="0" height="0"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Negative width must be rejected", SvgParser.parse("""<svg width="-24" height="24"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Negative height must be rejected", SvgParser.parse("""<svg width="24" height="-24"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Negative width and height must be rejected", SvgParser.parse("""<svg width="-24" height="-24"><circle cx="10" cy="10" r="5" /></svg>"""))
+
+        // viewBox attribute dimensions
+        assertNull("Zero viewBox width must be rejected", SvgParser.parse("""<svg viewBox="0 0 0 100"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Zero viewBox height must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 0"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Negative viewBox width must be rejected", SvgParser.parse("""<svg viewBox="0 0 -100 100"><circle cx="10" cy="10" r="5" /></svg>"""))
+        assertNull("Negative viewBox height must be rejected", SvgParser.parse("""<svg viewBox="0 0 100 -100"><circle cx="10" cy="10" r="5" /></svg>"""))
+    }
 }

@@ -1,0 +1,355 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded adler2 v2.0.1
+  Downloaded jni-sys v0.4.1
+  Downloaded jni-sys v0.3.1
+  Downloaded dyn-clone v1.0.20
+  Downloaded dtor-proc-macro v0.0.6
+  Downloaded markup5ever v0.38.0
+  Downloaded scopeguard v1.2.0
+  Downloaded jni-sys-macros v0.4.1
+  Downloaded memoffset v0.9.1
+  Downloaded percent-encoding v2.3.2
+  Downloaded num-conv v0.2.2
+  Downloaded dunce v1.0.5
+  Downloaded new_debug_unreachable v1.0.6
+  Downloaded tauri-build v2.6.3
+  Downloaded option-ext v0.2.0
+  Downloaded mime v0.3.17
+  Downloaded proc-macro-crate v1.3.1
+  Downloaded serde_repr v0.1.21
+  Downloaded dtor v0.3.0
+  Downloaded proc-macro-error-attr v1.0.4
+  Downloaded ref-cast-impl v1.0.27
+  Downloaded precomputed-hash v0.1.1
+  Downloaded serde_spanned v0.6.9
+  Downloaded form_urlencoded v1.2.2
+  Downloaded futures-sink v0.3.34
+  Downloaded proc-macro-crate v2.0.2
+  Downloaded phf_shared v0.13.1
+  Downloaded powerfmt v0.2.0
+  Downloaded rustc-hash v2.1.3
+  Downloaded tauri-plugin v2.6.3
+  Downloaded serialize-to-javascript v0.1.2
+  Downloaded siphasher v1.0.3
+  Downloaded tauri-winres v0.3.6
+  Downloaded ref-cast v1.0.27
+  Downloaded phf_generator v0.13.1
+  Downloaded same-file v1.0.6
+  Downloaded serde_spanned v1.1.1
+  Downloaded string_cache_codegen v0.6.1
+  Downloaded defmt-parser v1.0.0
+  Downloaded serialize-to-javascript-impl v0.1.2
+  Downloaded rustc_version v0.4.1
+  Downloaded phf_codegen v0.13.1
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded json-patch v3.0.1
+  Downloaded lock_api v0.4.14
+  Downloaded futures-task v0.3.34
+  Downloaded version_check v0.9.5
+  Downloaded zerofrom-derive v0.1.8
+  Downloaded potential_utf v0.1.6
+  Downloaded phf_macros v0.13.1
+  Downloaded raw-window-handle v0.6.2
+  Downloaded schemars_derive v0.8.22
+  Downloaded sha2 v0.10.9
+  Downloaded serde-untagged v0.1.9
+  Downloaded shlex v2.0.1
+  Downloaded pin-project-lite v0.2.17
+  Downloaded strsim v0.11.1
+  Downloaded simd-adler32 v0.3.10
+  Downloaded smallvec v1.16.1
+  Downloaded soup3-sys v0.5.0
+  Downloaded quote v1.0.47
+  Downloaded string_cache v0.9.0
+  Downloaded generic-array v0.14.7
+  Downloaded servo_arc v0.4.3
+  Downloaded slab v0.4.12
+  Downloaded fnv v1.0.7
+  Downloaded hex v0.4.3
+  Downloaded pkg-config v0.3.34
+  Downloaded system-deps v6.2.2
+  Downloaded target-lexicon v0.12.16
+  Downloaded futures-core v0.3.34
+  Downloaded proc-macro-error v1.0.4
+  Downloaded phf v0.13.1
+  Downloaded serde_derive_internals v0.29.1
+  Downloaded digest v0.10.7
+  Downloaded parking_lot_core v0.9.12
+  Downloaded jsonptr v0.6.3
+  Downloaded keyboard-types v0.7.0
+  Downloaded once_cell v1.21.4
+  Downloaded parking_lot v0.12.5
+  Downloaded pango-sys v0.18.0
+  Downloaded webkit2gtk-sys v2.0.2
+  Downloaded cesu8 v1.1.0
+  Downloaded gtk3-macros v0.18.2
+  Downloaded dirs-sys v0.5.0
+  Downloaded serde_with_macros v3.23.0
+  Downloaded soup3 v0.5.0
+  Downloaded synstructure v0.14.0
+  Downloaded semver v1.0.28
+  Downloaded heck v0.4.1
+  Downloaded dirs v6.0.0
+  Downloaded litemap v0.8.3
+  Downloaded log v0.4.34
+  Downloaded gdk-pixbuf-sys v0.18.0
+  Downloaded ident_case v1.0.1
+  Downloaded atk v0.18.2
+  Downloaded unic-char-range v0.9.0
+  Downloaded defmt-macros v1.1.1
+  Downloaded zerofrom v0.1.8
+  Downloaded cairo-sys-rs v0.18.2
+  Downloaded jiff-core v0.1.1
+  Downloaded serde_derive v1.0.229
+  Downloaded idna_adapter v1.2.2
+  Downloaded proc-macro2 v1.0.107
+  Downloaded typeid v1.0.3
+  Downloaded unic-char-property v0.9.0
+  Downloaded unic-ucd-ident v0.9.0
+  Downloaded unic-ucd-version v0.9.0
+  Downloaded equivalent v1.0.2
+  Downloaded futures-macro v0.3.34
+  Downloaded javascriptcore-rs-sys v1.1.1
+  Downloaded time-core v0.1.9
+  Downloaded unic-common v0.9.0
+  Downloaded zerovec-derive v0.11.6
+  Downloaded zmij v1.0.23
+  Downloaded camino v1.2.6
+  Downloaded ctor v0.8.0
+  Downloaded darling v0.24.1
+  Downloaded futures-io v0.3.34
+  Downloaded glob v0.3.4
+  Downloaded gobject-sys v0.18.0
+  Downloaded heck v0.5.0
+  Downloaded infer v0.19.0
+  Downloaded itoa v1.0.18
+  Downloaded javascriptcore-rs v1.1.2
+  Downloaded jni v0.21.1
+  Downloaded miniz_oxide v0.8.9
+  Downloaded miniz_oxide v0.9.1
+  Downloaded num-traits v0.2.19
+  Downloaded pango v0.18.3
+  Downloaded plist v1.10.1
+  Downloaded schemars v0.8.22
+  Downloaded schemars v0.9.0
+  Downloaded schemars v1.2.2
+  Downloaded selectors v0.36.1
+  Downloaded serde_core v1.0.229
+  Downloaded socket2 v0.6.5
+  Downloaded tinystr v0.8.4
+  Downloaded toml_datetime v0.6.3
+  Downloaded toml_datetime v1.1.1+spec-1.1.0
+  Downloaded toml_writer v1.1.2+spec-1.1.0
+  Downloaded writeable v0.6.4
+  Downloaded autocfg v1.5.1
+  Downloaded bit-set v0.8.0
+  Downloaded bitflags v2.13.2
+  Downloaded block-buffer v0.10.4
+  Downloaded cairo-rs v0.18.5
+  Downloaded crossbeam-channel v0.5.17
+  Downloaded defmt v1.1.1
+  Downloaded dom_query v0.27.0
+  Downloaded embed-resource v3.0.11
+  Downloaded erased-serde v0.4.10
+  Downloaded field-offset v0.3.6
+  Downloaded foldhash v0.2.0
+  Downloaded futures-executor v0.3.34
+  Downloaded gdk-pixbuf v0.18.5
+  Downloaded memchr v2.8.3
+  Downloaded mio v1.2.3
+  Downloaded muda v0.19.3
+  Downloaded png v0.17.16
+  Downloaded serde v1.0.229
+  Downloaded thiserror-impl v1.0.69
+  Downloaded url v2.5.8
+  Downloaded urlpattern v0.3.0
+  Downloaded walkdir v2.5.0
+  Downloaded cargo_metadata v0.19.2
+  Downloaded cfg-if v1.0.5
+  Downloaded combine v4.6.8
+  Downloaded derive_more-impl v2.1.1
+  Downloaded regex v1.13.1
+  Downloaded serde_json v1.0.151
+  Downloaded utf8_iter v1.0.4
+  Downloaded winnow v1.0.4
+  Downloaded cargo-platform v0.1.9
+  Downloaded crypto-common v0.1.7
+  Downloaded darling_macro v0.24.1
+  Downloaded displaydoc v0.2.7
+  Downloaded dtoa-short v0.3.5
+  Downloaded serde_with v3.23.0
+  Downloaded version-compare v0.2.1
+  Downloaded web_atoms v0.2.6
+  Downloaded winnow v0.7.15
+  Downloaded zerovec v0.11.8
+  Downloaded anyhow v1.0.104
+  Downloaded cpufeatures v0.2.17
+  Downloaded cssparser v0.36.0
+  Downloaded darling_core v0.24.1
+  Downloaded quick-xml v0.42.0
+  Downloaded zlib-rs v0.6.8
+  Downloaded bs58 v0.5.1
+  Downloaded cfg-expr v0.15.8
+  Downloaded chrono v0.4.45
+  Downloaded cookie v0.18.2
+  Downloaded syn v1.0.109
+  Downloaded zerotrie v0.2.5
+  Downloaded atk-sys v0.18.2
+  Downloaded bitflags v1.3.2
+  Downloaded crc32fast v1.5.2
+  Downloaded deranged v0.5.8
+  Downloaded dpi v0.1.2
+  Downloaded dtoa v1.0.11
+  Downloaded uuid v1.26.1
+  Downloaded webkit2gtk v2.0.2
+  Downloaded bit-vec v0.8.0
+  Downloaded byteorder v1.5.0
+  Downloaded cargo_toml v0.22.3
+  Downloaded syn v2.0.119
+  Downloaded tauri v2.11.6
+  Downloaded cc v1.4.7
+  Downloaded syn v3.0.6
+  Downloaded aho-corasick v1.1.5
+  Downloaded base64 v0.23.1
+  Downloaded derive_more v2.1.1
+  Downloaded regex-syntax v0.8.11
+  Downloaded winnow v0.5.40
+  Downloaded regex-automata v0.4.18
+  Downloaded libc v0.2.189
+  Downloaded cssparser-macros v0.6.1
+  Downloaded ctor-proc-macro v0.0.7
+  Downloaded yoke-derive v0.8.3
+  Downloaded toml_datetime v0.7.5+spec-1.1.0
+  Downloaded fdeflate v0.3.7
+  Downloaded fastrand v2.5.0
+  Downloaded thiserror v2.0.20
+  Downloaded futures-channel v0.3.34
+  Downloaded find-msvc-tools v0.1.13
+  Downloaded thiserror-impl v2.0.20
+  Downloaded tauri-runtime v2.11.3
+  Downloaded thiserror v1.0.69
+  Downloaded iana-time-zone v0.1.65
+  Downloaded tauri-codegen v2.6.3
+  Downloaded time-macros v0.2.32
+  Downloaded tauri-macros v2.6.3
+  Downloaded toml_parser v1.1.3+spec-1.1.0
+  Downloaded crossbeam-utils v0.8.23
+  Downloaded unicode-ident v1.0.26
+  Downloaded getrandom v0.3.4
+  Downloaded tinyvec v1.13.3
+  Downloaded toml v1.1.6+spec-1.1.0
+  Downloaded toml v0.8.2
+  Downloaded yoke v0.8.3
+  Downloaded tendril v0.5.1
+  Downloaded getrandom v0.4.3
+  Downloaded toml v0.9.12+spec-1.1.0
+  Downloaded glib-macros v0.18.5
+  Downloaded indexmap v1.9.3
+  Downloaded cfb v0.7.3
+  Downloaded icu_locale_core v2.3.0
+  Downloaded glib-sys v0.18.1
+  Downloaded gio-sys v0.18.1
+  Downloaded flate2 v1.1.10
+  Downloaded gdk-sys v0.18.2
+  Downloaded ico v0.5.0
+  Downloaded icu_provider v2.3.1
+  Downloaded html5ever v0.38.0
+  Downloaded base64 v0.22.1
+  Downloaded icu_normalizer_data v2.3.0
+  Downloaded toml_edit v0.19.15
+  Downloaded gdk v0.18.2
+  Downloaded icu_collections v2.3.0
+  Downloaded toml_edit v0.20.2
+  Downloaded bytes v1.12.1
+  Downloaded icu_properties v2.3.0
+  Downloaded typenum v1.20.1
+  Downloaded indexmap v2.14.2
+  Downloaded hashbrown v0.12.3
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded http v1.5.0
+  Downloaded gtk-sys v0.18.2
+  Downloaded tauri-utils v2.9.3
+  Downloaded idna v1.1.0
+  Downloaded hashbrown v0.17.1
+  Downloaded icu_properties_data v2.3.0
+  Downloaded futures-util v0.3.34
+  Downloaded gio v0.18.4
+  Downloaded glib v0.18.5
+  Downloaded time v0.3.55
+  Downloaded gtk v0.18.2
+  Downloaded icu_normalizer v2.3.0
+  Downloaded jiff v0.2.37
+  Downloaded tokio v1.53.1
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.66s
+     Running unittests src/lib.rs (target/debug/deps/tauri_plugin_orbitkit-62cee086359a0b30)
+
+running 22 tests
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=1 action="test_emitter_panic" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+
+thread 'jni_bridge::tests::test_guarded_handles_emitter_panic_without_abort' (44) panicked at crates/tauri-plugin-orbitkit/src/jni_bridge.rs:469:13:
+simulated emitter panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test config::tests::test_k2_minimal_config_defaults ... ok
+test config::tests::test_menu_config_validation ... ok
+test config::tests::test_menu_item_id_validation ... ok
+test config::tests::test_menu_animation_serde_defaults_and_roundtrip ... ok
+test config::tests::test_k2_config_serde_roundtrip ... ok
+test config::tests::test_canonical_vectors_against_arc_vectors_json ... ok
+test config::tests::test_resolve_menu_angles_positions_and_defaults ... ok
+test config::tests::test_menu_layout_arc_serde_roundtrip ... ok
+test error::tests::test_error_serialization ... ok
+test error::tests::test_reject_code_mapping ... ok
+test jni_bridge::tests::test_build_menu_action_payload ... ok
+test jni_bridge::tests::test_emit_overlay_menu_action_calls_registered_emitter ... ok
+test jni_bridge::tests::test_event_emitter_reentrancy_no_deadlock ... ok
+test jni_bridge::tests::test_log_fmt_and_safe_cstring ... ok
+test tests::test_lookup_popup_found_and_not_found ... ok
+test tests::test_popup_open_payload_builder ... ok
+test mobile::tests::test_build_overlay_payload_mascot_config_camel_case_and_states ... ok
+[OrbitkitJni] [RUST-JNI-ERROR] Panic in native action: simulated emitter panic
+test jni_bridge::tests::test_guarded_handles_emitter_panic_without_abort ... ok
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=2 action="test_panic_action" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+
+thread 'jni_bridge::tests::test_guarded_handles_handler_panic_without_abort' (45) panicked at crates/tauri-plugin-orbitkit/src/jni_bridge.rs:445:13:
+simulated user callback panic
+[OrbitkitJni] [RUST-JNI-ERROR] Panic in native action: simulated user callback panic
+test jni_bridge::tests::test_guarded_handles_handler_panic_without_abort ... ok
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=3 action="overlay_btn_clicked" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=4 action="ACT_A" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=5 action="ACT_B" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+test jni_bridge::tests::test_process_native_action_emits_overlay_event_and_notifies_handler ... ok
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=6 action="REC_START" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=7 action="REC_PAUSE" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=8 action="REC_RESUME" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+test jni_bridge::tests::test_process_native_action_records_and_returns_json ... ok
+[OrbitkitJni] [RUST-JNI-RECEIPT] receiptId=9 action="REC_STOP" timestamp=1790247777957 webviewSuspended=true (Direct native dispatch, no WebView JS)
+test jni_bridge::tests::test_recorder_actions_through_jni ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/desktop_windows.rs (target/debug/deps/desktop_windows-cdda5eae637b5d0d)
+
+running 12 tests
+test test_calculate_overlay_position_bottom_right_default ... ok
+test test_calculate_overlay_position_non_zero_origin_monitor ... ok
+test test_calculate_overlay_position_custom_coordinates ... ok
+test test_calculate_overlay_size_edge_cases ... ok
+test test_calculate_overlay_size_mascot_dominates ... ok
+test test_calculate_overlay_size_menu_dominates ... ok
+test test_lookup_popup_empty_popups_list ... ok
+test test_harness_config_deserialization ... ok
+test test_lookup_popup_not_found_scenario_3 ... ok
+test test_lookup_popup_success ... ok
+test test_resolve_mascot_window_custom ... ok
+test test_resolve_mascot_window_defaults ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests tauri_plugin_orbitkit
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT_CODE=0

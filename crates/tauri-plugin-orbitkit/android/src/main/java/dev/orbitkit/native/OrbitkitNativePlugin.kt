@@ -57,7 +57,10 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private var isBubbleAttached: Boolean = false
     private var isMenuExpanded: Boolean = false
     private var actionChannel: Channel? = null
-    private var mascotView: TextView? = null
+    private var mascotView: View? = null
+    private var activeMascotSpec: MascotSpec? = null
+    private var isMascotFallback: Boolean = false
+    private var hasLoggedFallbackWarning: Boolean = false
     private var currentMascotState: String = STATE_IDLE
     private var activeOverlayTeardown: (() -> Unit)? = null
     private var activeMenuCollapse: ((animate: Boolean) -> Unit)? = null
@@ -143,13 +146,12 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             Log.d(TAG, "No channel argument in overlayShow args: ${e.message}")
         }
 
-        val overlayConfig = try {
+        val parsedOverlayConfig = try {
             val raw = invoke.getRawArgs()
             if (raw.isNullOrEmpty() || raw == "{}" || raw == "null") {
                 throw IllegalArgumentException("Missing menu configuration: items must have 1..12 items")
             }
-            val parsed = MenuConfigParser.parse(raw)
-            parsed.menu
+            MenuConfigParser.parse(raw)
         } catch (e: IllegalArgumentException) {
             Log.e(TAG, "Invalid menu configuration for overlayShow", e)
             invoke.reject("Invalid menu configuration: ${e.message}", "INVALID_CONFIG", e, null)
@@ -159,6 +161,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             invoke.reject("Invalid config: ${e.message}", "INVALID_CONFIG", e, null)
             return
         }
+        val overlayConfig = parsedOverlayConfig.menu
 
         activity.runOnUiThread {
             try {
@@ -178,15 +181,24 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                 val itemSizePx = dpToPx(activity, overlayConfig.itemSize.toFloat())
                 val halfExtent = radiusPx + itemSizePx + dpToPx(activity, 16f)
                 val containerSize = halfExtent * 2
-                val mascotSizePx = dpToPx(activity, 56f)
+                val mascotDp = parsedOverlayConfig.mascot?.size?.toFloat()
+                    ?: parsedOverlayConfig.mascotSpec?.size?.toFloat()
+                    ?: 56f
+                val mascotSizePx = dpToPx(activity, mascotDp)
+
+                parsedOverlayConfig.mascotSpec?.initialState?.let { initial ->
+                    if (initial.isNotEmpty()) {
+                        currentMascotState = initial
+                    }
+                }
 
                 val initialDesiredCenterX = dpToPx(activity, 24f) + halfExtent.toDouble()
                 val initialDesiredCenterY = dpToPx(activity, 80f) + halfExtent.toDouble()
-
                 buildOverlayView(
                     wm = wm,
                     layoutType = layoutType,
                     menuConfig = overlayConfig,
+                    mascotSpec = parsedOverlayConfig.mascotSpec,
                     containerSize = containerSize,
                     mascotSizePx = mascotSizePx,
                     itemSizePx = itemSizePx,
@@ -235,7 +247,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
 
         currentMascotState = state
         activity.runOnUiThread {
-            applyMascotStateTint(state)
+            updateMascotDisplay(state)
             invoke.resolve()
         }
     }
@@ -288,6 +300,74 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         mascot.background = bg
     }
+
+    private fun createMascotView(ctx: Context, spec: MascotSpec?, mascotSizePx: Int): View {
+        activeMascotSpec = spec
+        if (spec != null && !spec.isFallback) {
+            val src = spec.srcFor(currentMascotState)
+            val decoded = IconDecoder.decode(src)
+            if (decoded is DecodedIcon.Svg) {
+                isMascotFallback = false
+                return ImageView(ctx).apply {
+                    contentDescription = "OrbitKit Mascot"
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    setImageDrawable(SvgDrawable(decoded.icon, fraction = 1.0f))
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        elevation = dpToPx(ctx, 8f).toFloat()
+                    }
+                }
+            } else if (decoded is DecodedIcon.Bitmap && spec.kind == MascotKind.IMAGE) {
+                isMascotFallback = false
+                return ImageView(ctx).apply {
+                    contentDescription = "OrbitKit Mascot"
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    setImageBitmap(decoded.bitmap)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        elevation = dpToPx(ctx, 8f).toFloat()
+                    }
+                }
+            }
+        }
+
+        // Fallback path
+        isMascotFallback = true
+        if (!hasLoggedFallbackWarning) {
+            Log.w(TAG, "Mascot config missing, undecodable, or sprite; falling back to default planet bubble")
+            hasLoggedFallbackWarning = true
+        }
+        return TextView(ctx).apply {
+            text = "🪐"
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+            contentDescription = "OrbitKit Mascot"
+            val bg = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(getMascotTint(currentMascotState))
+                setStroke(dpToPx(ctx, 2f), Color.WHITE)
+            }
+            background = bg
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                elevation = dpToPx(ctx, 8f).toFloat()
+            }
+        }
+    }
+
+    private fun updateMascotDisplay(state: String) {
+        val spec = activeMascotSpec
+        val view = mascotView
+        if (!isMascotFallback && spec != null && view is ImageView) {
+            val src = spec.srcFor(state)
+            val decoded = IconDecoder.decode(src)
+            if (decoded is DecodedIcon.Svg) {
+                view.setImageDrawable(SvgDrawable(decoded.icon, fraction = 1.0f))
+                return
+            } else if (decoded is DecodedIcon.Bitmap && spec.kind == MascotKind.IMAGE) {
+                view.setImageBitmap(decoded.bitmap)
+                return
+            }
+        }
+        applyMascotStateTint(state)
+    }
     private fun getSystemAnimatorScale(context: Context): Float {
         return try {
             Settings.Global.getFloat(
@@ -334,6 +414,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
         bubbleView = null
         mascotView = null
+        activeMascotSpec = null
+        isMascotFallback = false
         bubbleParams = null
         menuParams = null
         isBubbleAttached = false
@@ -408,6 +490,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         wm: WindowManager,
         layoutType: Int,
         menuConfig: NativeMenuConfig,
+        mascotSpec: MascotSpec? = null,
         containerSize: Int,
         mascotSizePx: Int,
         itemSizePx: Int,
@@ -464,23 +547,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             isClickable = false
             isFocusable = false
         }
-        val mascot = TextView(ctx).apply {
-            text = "🪐"
-            gravity = Gravity.CENTER
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
-            contentDescription = "OrbitKit Mascot"
-
-            val bg = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(getMascotTint(currentMascotState))
-                setStroke(dpToPx(ctx, 2f), Color.WHITE)
-            }
-            background = bg
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                elevation = dpToPx(ctx, 8f).toFloat()
-            }
-        }
+        val mascot = createMascotView(ctx, mascotSpec, mascotSizePx)
         mascotView = mascot
         val mascotLp = FrameLayout.LayoutParams(mascotSizePx, mascotSizePx)
         bubbleContainer.addView(mascot, mascotLp)

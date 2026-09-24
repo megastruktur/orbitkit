@@ -11,7 +11,7 @@ pub mod jni_bridge;
 
 #[cfg(desktop)]
 mod desktop;
-#[cfg(mobile)]
+#[cfg(any(mobile, test))]
 mod mobile;
 
 pub use config::{MascotWindowConfig, OrbitKitConfig, PopupConfig};

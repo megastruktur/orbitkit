@@ -1,0 +1,5 @@
+=== Host Clippy ===
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.35s
+=== Android Clippy ===
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s
+EXIT_CODE=0

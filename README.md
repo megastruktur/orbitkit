@@ -17,7 +17,9 @@
 
 <div align="center">
 
-![OrbitKit Desktop Demo](docs/media/demo-desktop.gif)
+![OrbitKit desktop demo on Windows: show overlay, radial menu spawns from the mascot, Notes popup, drag, quit](docs/media/demo-desktop.gif)
+
+<sub>Recorded automatically on a GitHub Actions <code>windows-latest</code> runner.</sub>
 
 </div>
 

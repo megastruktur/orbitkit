@@ -1,0 +1,54 @@
+Extracted JSON from README.md successfully.
+Keys in root: [ 'mascot', 'menu', 'windows' ]
+validateConfig result: {
+  "ok": true,
+  "config": {
+    "mascot": {
+      "kind": "svg",
+      "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#4f7cff\" /><circle cx=\"60\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /><circle cx=\"100\" cy=\"68\" r=\"10\" fill=\"#ffffff\" /></svg>",
+      "size": 96,
+      "initialState": "idle",
+      "states": {
+        "idle": {
+          "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#4f7cff\" /></svg>"
+        },
+        "busy": {
+          "src": "<svg width=\"160\" height=\"160\" viewBox=\"0 0 160 160\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"80\" cy=\"80\" r=\"56\" fill=\"#f59e0b\" /></svg>"
+        }
+      }
+    },
+    "menu": {
+      "layout": "arc",
+      "arc": {
+        "position": "top",
+        "span": 180
+      },
+      "animation": "spawn",
+      "radius": 96,
+      "startAngle": -180,
+      "endAngle": 0,
+      "items": [
+        {
+          "id": "notes",
+          "label": "Notes",
+          "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNFNkY2RkYiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTE0IDJ2NWExIDEgMCAwIDAgMSAxaDUiLz48cGF0aCBkPSJNNiAyMmEyIDIgMCAwIDEtMi0yVjRhMiAyIDAgMCAxIDItMmg4YTIuNCAyLjQgMCAwIDEgMS43MDQuNzA2bDMuNTg4IDMuNTg4QTIuNCAyLjQgMCAwIDEgMjAgOHYxMmEyIDIgMCAwIDEtMiAyeiIvPjwvc3ZnPg=="
+        }
+      ]
+    },
+    "windows": {
+      "popups": [
+        {
+          "id": "notes",
+          "url": "index.html?orbitkit=popup&popup=notes",
+          "title": "Notes",
+          "width": 360,
+          "height": 420,
+          "resizable": false,
+          "alwaysOnTop": true
+        }
+      ]
+    }
+  }
+}
+SUCCESS: Config snippet in README.md is valid!
+EXIT_CODE=0

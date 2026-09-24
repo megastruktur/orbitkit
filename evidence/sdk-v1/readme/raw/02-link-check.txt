@@ -1,0 +1,33 @@
+Total links extracted: 29
+[EXTERNAL] https://github.com/megastruktur/orbitkit/actions/workflows/ci.yml/badge.svg
+[EXTERNAL] https://img.shields.io/badge/license-MIT-blue.svg
+[EXTERNAL] https://img.shields.io/badge/Tauri-v2-24C8D5?logo=tauri&logoColor=white
+[EXTERNAL] https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-lightgrey
+[OK] Exists: "docs/media/demo-desktop.gif" 
+[ANCHOR] #windows-console-note
+[OK] Exists: "docs/platforms/macos.md" 
+[OK] Exists: "docs/platforms/windows.md" (anchor: #console-window-in-debug-builds)
+[OK] Exists: "packages/orbitkit" 
+[OK] Exists: "crates/tauri-plugin-orbitkit" 
+[OK] Exists: "crates/tauri-plugin-orbitkit-recorder" 
+[OK] Exists: "examples/starter" 
+[OK] Exists: "scripts/linux-desktop.sh" 
+[OK] Exists: "docs/getting-started.md" 
+[OK] Exists: "docs/configuration.md" 
+[OK] Exists: "docs/api.md" 
+[OK] Exists: "docs/architecture.md" 
+[OK] Exists: "docs/platforms/android.md" 
+[OK] Exists: "docs/platforms/desktop.md" 
+[OK] Exists: "docs/platforms/macos.md" 
+[OK] Exists: "docs/platforms/windows.md" 
+[OK] Exists: "docs/extensions.md" 
+[OK] Exists: "docs/development.md" 
+[OK] Exists: "CHANGELOG.md" 
+[EXTERNAL] https://lucide.dev/
+[OK] Exists: "examples/starter/public/icons/LICENSE-lucide.txt" 
+[EXTERNAL] https://v2.tauri.app
+[OK] Exists: "LICENSE" 
+[OK] Exists: "docs/media/orbitkit-mascot.svg" 
+
+SUCCESS: All relative links and images resolve.
+EXIT_CODE=0

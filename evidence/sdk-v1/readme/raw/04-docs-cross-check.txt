@@ -1,0 +1,51 @@
+Searching across 102 source files for 46 symbols...
+
+[FOUND] RadialMenu                -> packages/orbitkit/src/RadialMenu.test.ts:3 : import RadialMenu from "./RadialMenu.svelte";
+[FOUND] PopupSheet                -> packages/orbitkit/src/PopupSheet.test.ts:4 : import PopupSheet from "./PopupSheet.svelte";
+[FOUND] defineConfig              -> packages/orbitkit/src/config.test.ts:3 : defineConfig,
+[FOUND] validateConfig            -> packages/orbitkit/src/config.test.ts:4 : validateConfig,
+[FOUND] startMascotDrag           -> packages/orbitkit/src/bridge.test.ts:19 : startMascotDrag,
+[FOUND] OrbitKitConfig            -> packages/orbitkit/src/config.test.ts:7 : type OrbitKitConfig,
+[FOUND] MascotConfig              -> packages/orbitkit/src/Mascot.svelte:2 : import type { MascotConfig, MascotStateName } from "./config
+[FOUND] MenuConfig                -> packages/orbitkit/src/RadialMenu.svelte:3 : import type { MenuConfig } from "./config";
+[FOUND] WindowsConfig             -> packages/orbitkit/src/config.ts:62 : export interface WindowsConfig {
+[FOUND] OrbitkitJniBridge         -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:5 : object OrbitkitJniBridge {
+[FOUND] onNativeAction            -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitJniBridge.kt:52 : * `Java_dev_orbitkit_native_OrbitkitJniBridge_onNativeAction
+[FOUND] TYPE_APPLICATION_OVERLAY  -> crates/tauri-plugin-orbitkit/android/src/main/java/dev/orbitkit/native/OrbitkitNativePlugin.kt:174 : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+[FOUND] SYSTEM_ALERT_WINDOW       -> crates/tauri-plugin-orbitkit/android/src/main/AndroidManifest.xml:3 : <uses-permission android:name="android.permission.SYSTEM_ALE
+[FOUND] FOREGROUND_SERVICE_TYPE_MICROPHONE -> crates/tauri-plugin-orbitkit-recorder/android/src/main/java/dev/orbitkit/native/OrbitkitRecorderService.kt:214 : ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+[FOUND] orbitkit-mascot           -> packages/orbitkit/src/Mascot.svelte:78 : class="orbitkit-mascot {isReducedMotion ? 'reduced-motion or
+[FOUND] macOSPrivateApi           -> examples/starter/src-tauri/tauri.conf.json:13 : "macOSPrivateApi": true,
+[FOUND] windows_subsystem         -> examples/starter/src-tauri/src/main.rs:2 : #![cfg_attr(not(debug_assertions), windows_subsystem = "wind
+[FOUND] "mascot"                  -> packages/orbitkit/src/Mascot.svelte:3 : import { resolveSvgSrc } from "./mascot/svg";
+[FOUND] "kind"                    -> packages/orbitkit/src/Mascot.svelte:70 : if (!config || config.kind !== "sprite") return null;
+[FOUND] "src"                     -> packages/orbitkit/src/Mascot.svelte:53 : const raw = (stateDef && "src" in stateDef && typeof stateDe
+[FOUND] "size"                    -> packages/orbitkit/src/Mascot.svelte:43 : // Resolved size
+[FOUND] "initialState"            -> packages/orbitkit/src/Mascot.svelte:27 : // Resolved state: explicit prop -> config.initialState -> "
+[FOUND] "states"                  -> packages/orbitkit/src/Mascot.svelte:52 : const stateDef = config.states?.[currentState];
+[FOUND] "idle"                    -> packages/orbitkit/src/Mascot.svelte:27 : // Resolved state: explicit prop -> config.initialState -> "
+[FOUND] "busy"                    -> packages/orbitkit/src/Mascot.test.ts:26 : busy: { src: "/assets/cat-busy.png" },
+[FOUND] "menu"                    -> packages/orbitkit/src/RadialMenu.svelte:9 : } from "./menuAnimation";
+[FOUND] "layout"                  -> packages/orbitkit/src/RadialMenu.svelte:4 : import { layoutItems, resolveMenuAngles } from "./geometry";
+[FOUND] "arc"                     -> packages/orbitkit/src/RadialMenu.test.ts:340 : it("renders with layout arc top where every item has y <= 0 
+[FOUND] "position"                -> packages/orbitkit/src/Mascot.svelte:112 : background-position-x: 0px;
+[FOUND] "span"                    -> packages/orbitkit/src/PopupSheet.svelte:256 : <span aria-hidden="true">✕</span>
+[FOUND] "animation"               -> packages/orbitkit/src/Mascot.svelte:154 : animation-name: orbitkit-sprite-step;
+[FOUND] "radius"                  -> packages/orbitkit/src/PopupSheet.svelte:292 : border-radius: 16px;
+[FOUND] "startAngle"              -> packages/orbitkit/src/RadialMenu.svelte:27 : angles.startAngle,
+[FOUND] "endAngle"                -> packages/orbitkit/src/RadialMenu.svelte:28 : angles.endAngle
+[FOUND] "items"                   -> packages/orbitkit/src/Mascot.svelte:121 : align-items: center;
+[FOUND] "id"                      -> packages/orbitkit/src/Mascot.svelte:9 : onclick?: ((e: MouseEvent) => void) | (() => void);
+[FOUND] "label"                   -> packages/orbitkit/src/Mascot.svelte:30 : // Effective aria-label
+[FOUND] "icon"                    -> packages/orbitkit/src/RadialMenu.svelte:145 : function isUrl(icon?: string): boolean {
+[FOUND] "windows"                 -> packages/orbitkit/src/config.test.ts:27 : windows: {
+[FOUND] "popups"                  -> packages/orbitkit/src/config.test.ts:28 : popups: [],
+[FOUND] "url"                     -> packages/orbitkit/src/PopupSheet.test.ts:126 : url: "index.html?popup=notes",
+[FOUND] "title"                   -> packages/orbitkit/src/PopupSheet.svelte:242 : aria-labelledby="orbitkit-popup-sheet-title"
+[FOUND] "width"                   -> packages/orbitkit/src/Mascot.svelte:46 : `width: ${mascotSize}px; height: ${mascotSize}px; --mascot-s
+[FOUND] "height"                  -> packages/orbitkit/src/Mascot.svelte:46 : `width: ${mascotSize}px; height: ${mascotSize}px; --mascot-s
+[FOUND] "resizable"               -> packages/orbitkit/src/config.ts:58 : resizable?: boolean;
+[FOUND] "alwaysOnTop"             -> packages/orbitkit/src/config.test.ts:82 : alwaysOnTop: true,
+
+SUCCESS: All 46 API symbols and config keys exist in source.
+EXIT_CODE=0

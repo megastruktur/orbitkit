@@ -46,3 +46,20 @@ OrbitKit's window manager handles fractional DPI scaling automatically:
    $$x = \text{monitorWidth} - \text{windowSize} - 24\text{ px}$$
    $$y = \text{monitorHeight} - \text{windowSize} - 24\text{ px}$$
 This ensures the mascot remains properly anchored to the bottom-right corner without being shifted offscreen or cropped across different display scales.
+
+---
+
+## 4. Console Window in Debug Builds
+
+<a id="console-window-in-debug-builds"></a>
+
+When running or compiling debug binaries (`tauri build --debug` or `tauri dev`), Windows displays an attached console window alongside the application. This is expected behavior: it carries the application's stdout/stderr log output during development.
+
+Production release builds (`pnpm tauri build`) do not display a console window because `examples/starter/src-tauri/src/main.rs` includes the Windows subsystem attribute:
+
+```rust
+// Prevents an additional console window on Windows in release, DO NOT REMOVE!!
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+```
+
+Applications built on OrbitKit should keep this attribute in their own `src-tauri/src/main.rs` to ensure the console window is suppressed in release builds while remaining available for debugging.

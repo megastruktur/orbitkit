@@ -1,0 +1,10 @@
+[OK] 200 - https://github.com/megastruktur/orbitkit/actions/workflows/ci.yml/badge.svg
+[OK] 200 - https://github.com/megastruktur/orbitkit/actions/workflows/ci.yml
+[OK] 200 - https://img.shields.io/badge/license-MIT-blue.svg
+[OK] 200 - https://img.shields.io/badge/Tauri-v2-24C8D5?logo=tauri&logoColor=white
+[OK] 200 - https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-lightgrey
+[OK] 200 - https://v2.tauri.app
+[OK] 200 - https://lucide.dev/
+
+SUCCESS: All badge and external URLs returned HTTP 200.
+EXIT_CODE=0

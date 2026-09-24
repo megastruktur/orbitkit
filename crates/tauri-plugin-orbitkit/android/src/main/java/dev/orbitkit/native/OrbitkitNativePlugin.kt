@@ -60,6 +60,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
     private var mascotView: TextView? = null
     private var currentMascotState: String = STATE_IDLE
     private var activeOverlayTeardown: (() -> Unit)? = null
+    private var activeMenuCollapse: ((animate: Boolean) -> Unit)? = null
     companion object {
 
         const val STATE_IDLE = "idle"
@@ -239,6 +240,43 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
         }
     }
 
+    @Command
+    fun bringToFront(invoke: Invoke) {
+        Log.i(TAG, "bringToFront called")
+        activity.runOnUiThread {
+            try {
+                val intent = Intent(activity, activity.javaClass).apply {
+                    addFlags(
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    )
+                }
+                activity.startActivity(intent)
+
+                if (activeMenuCollapse != null) {
+                    activeMenuCollapse?.invoke(false)
+                } else if (menuView != null && menuParams != null) {
+                    menuView?.visibility = View.INVISIBLE
+                    menuParams?.let { params ->
+                        params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        try {
+                            windowManager?.updateViewLayout(menuView, params)
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Error updating menu layout on fallback collapse", e)
+                        }
+                    }
+                    isMenuExpanded = false
+                }
+
+                invoke.resolve()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to bring activity to front", e)
+                invoke.reject("Failed to bring activity to front: ${e.message}", "UNSUPPORTED", e, null)
+            }
+        }
+    }
+
     private fun applyMascotStateTint(state: String) {
         val mascot = mascotView ?: return
         val ctx = activity
@@ -272,6 +310,7 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
             Log.w(TAG, "Error invoking activeOverlayTeardown", e)
         }
         activeOverlayTeardown = null
+        activeMenuCollapse = null
         if (isMenuAttached) {
             menuView?.let { menu ->
                 try {
@@ -664,6 +703,9 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                     })
                     .start()
             }
+        }
+        activeMenuCollapse = { animate ->
+            collapseMenu(animate)
         }
 
         fun expandMenu() {

@@ -88,13 +88,14 @@ snake_case ONLY (the spike's duplicated camelCase commands are removed).
 | `request_overlay_permission` | — | `()` | no-op | opens settings |
 | `show_overlay` | `{menu: MenuConfig, mascot?: {size:number}}` | `()` | shows mascot window | SAW overlay: mascot bubble + menu items from `menu` |
 | `hide_overlay` | — | `()` | hides mascot window | removes overlay |
-| `open_popup` | `{id: string}` | `()` | WebviewWindow from config popups[id], focus if open | error `unsupported` |
-| `close_popup` | `{id: string}` | `()` | close | error `unsupported` |
+| `open_popup` | `{id: string}` | `()` | WebviewWindow from config popups[id], focus if open | lookup popup (error `not_found` if unknown), collapse menu, bring app to front, emit `orbitkit://popup-open` |
+| `close_popup` | `{id: string}` | `()` | close | emit `orbitkit://popup-close` |
 | `set_mascot_state` | `{state: string}` | `()` | emits `orbitkit://mascot-state {state}` | updates overlay state |
 | `emit_menu_action` | `{id: string}` | `()` | emits menu-action (source webview) + Rust handlers | same |
 Bridge wrapper for the last one: `emitMenuAction(id)`; also `onMascotState(cb) => unlisten`.
 Desktop window labels: `orbitkit-mascot` (url `index.html?orbitkit=mascot`), `orbitkit-popup-<id>`.
 Event (both platforms): `orbitkit://menu-action` payload `{ id: string, source: "webview" | "overlay" }`.
+Events (Android popups): `orbitkit://popup-open` payload `{ "id": string, "title": string, "url": string, "width": number, "height": number }` (from `windows.popups[id]`), `orbitkit://popup-close` payload `{ "id": string }`.
 Android native path: overlay tap -> Kotlin -> `OrbitkitJniBridge.onNativeAction(id)` (JNI, works while
 WebView suspended) AND plugin event when WebView alive. Rust side exposes
 `OrbitkitExt::on_menu_action(Fn(MenuAction))` for app-level native handlers.

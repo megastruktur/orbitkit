@@ -5,7 +5,7 @@ use tauri::{AppHandle, Emitter, Runtime};
 use crate::config::{MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
-use crate::{OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{lookup_popup, popup_open_payload, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 #[cfg(target_os = "android")]
 const PLUGIN_IDENTIFIER: &str = "dev.orbitkit.native";
@@ -24,7 +24,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
         });
         Ok(Orbitkit {
             handle,
-            _config: config,
+            config,
         })
     }
     #[cfg(not(target_os = "android"))]
@@ -36,7 +36,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
 
 pub struct Orbitkit<R: Runtime> {
     handle: PluginHandle<R>,
-    _config: OrbitKitConfig,
+    pub(crate) config: OrbitKitConfig,
 }
 
 impl<R: Runtime> Orbitkit<R> {
@@ -78,7 +78,7 @@ impl<R: Runtime> Orbitkit<R> {
         menu: Option<MenuConfig>,
         mascot: Option<ShowOverlayMascotArgs>,
     ) -> Result<()> {
-        let menu_config = menu.unwrap_or_else(|| self._config.menu.clone());
+        let menu_config = menu.unwrap_or_else(|| self.config.menu.clone());
         if menu_config.items.is_empty() || menu_config.items.len() > 12 {
             return Err(Error::invalid_config(format!(
                 "menu items count must be between 1 and 12 (got {})",
@@ -100,12 +100,18 @@ impl<R: Runtime> Orbitkit<R> {
             .map_err(Into::into)
     }
 
-    pub fn open_popup(&self, _id: String) -> Result<()> {
-        Err(Error::unsupported("open_popup is unsupported on android"))
+    pub fn open_popup(&self, id: String) -> Result<()> {
+        let popup = lookup_popup(&self.config.windows.popups, &id)?;
+        let payload = popup_open_payload(popup);
+        self.run_mobile_plugin::<()>("bringToFront", ())?;
+        let _ = self.handle.app().emit("orbitkit://popup-open", payload);
+        Ok(())
     }
 
-    pub fn close_popup(&self, _id: String) -> Result<()> {
-        Err(Error::unsupported("close_popup is unsupported on android"))
+    pub fn close_popup(&self, id: String) -> Result<()> {
+        let payload = serde_json::json!({ "id": id });
+        let _ = self.handle.app().emit("orbitkit://popup-close", payload);
+        Ok(())
     }
 
     pub fn set_mascot_state(&self, state: String) -> Result<()> {

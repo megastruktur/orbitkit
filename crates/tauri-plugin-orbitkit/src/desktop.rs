@@ -1,8 +1,8 @@
 use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewUrl, WebviewWindowBuilder};
-use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig, PopupConfig};
+use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
-use crate::{OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{lookup_popup, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 /// Calculates the square dimension of the mascot overlay window.
 /// Formula: max(mascot_size, 2 * (menu_radius + menu_item_size)) + 16
@@ -44,16 +44,6 @@ pub fn calculate_overlay_position(
     (config_x.unwrap_or(default_x), config_y.unwrap_or(default_y))
 }
 
-/// Looks up a popup by id in the configured popups list.
-pub fn lookup_popup<'a>(
-    popups: &'a [PopupConfig],
-    id: &str,
-) -> Result<&'a PopupConfig> {
-    popups
-        .iter()
-        .find(|p| p.id == id)
-        .ok_or_else(|| Error::not_found(format!("popup with id '{}' not found in config", id)))
-}
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResolvedMascotWindow {
     pub transparent: bool,

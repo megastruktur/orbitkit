@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `validate()` on `MenuConfig` and `OrbitKitConfig` enforcing layout, position, span, and animation constraints.
   - Unit tests validating against canonical `arc-vectors.json`.
 
+- **Android In-App Popups (Native/Rust Lifecycle)**:
+  - Implemented `open_popup` and `close_popup` on Android.
+  - Moved `lookup_popup` into shared code (`lib.rs`) and added `popup_open_payload` pure builder with unit tests.
+  - Added native Android `@Command fun bringToFront(invoke)` in `OrbitkitNativePlugin.kt` which reorders activity to front and collapses the overlay menu instantly without animation.
+  - Emitted `orbitkit://popup-open` with `{ id, title, url, width, height }` payload and `orbitkit://popup-close` with `{ id }` payload to the in-app webview.
+
 ## [0.1.0] - 2026-09-23
 
 Initial release of the OrbitKit SDK.

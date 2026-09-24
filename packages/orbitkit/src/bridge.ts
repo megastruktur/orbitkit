@@ -155,6 +155,10 @@ export async function emitMenuAction(id: string): Promise<void> {
   await callPlugin<void>("plugin:orbitkit|emit_menu_action", { id });
 }
 
+export async function startMascotDrag(): Promise<void> {
+  await callPlugin<void>("plugin:orbitkit|start_mascot_drag");
+}
+
 export type MenuActionPayload = {
   id: string;
   source: "webview" | "overlay";
@@ -245,3 +249,5 @@ export async function onPopupClose(
     throw normalizeError(err);
   }
 }
+
+export * from "./dragGesture.js";

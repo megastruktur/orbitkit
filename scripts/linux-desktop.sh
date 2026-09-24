@@ -438,7 +438,7 @@ collect_orbitkit_env_args() {
     if [ -n "$var" ] && [ "$var" != "ORBITKIT_IN_CONTAINER" ]; then
       ORBITKIT_DOCKER_ENVS+=("-e" "$var")
     fi
-  done < <(env | cut -d= -f1 | grep '^ORBITKIT_' | sort -u || true)
+  done < <(env | cut -d= -f1 | grep -E '^(ORBITKIT_|VITE_)' | sort -u || true)
 }
 
 

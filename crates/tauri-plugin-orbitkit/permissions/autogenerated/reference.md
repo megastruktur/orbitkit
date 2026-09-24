@@ -12,6 +12,7 @@ Default permissions for OrbitKit plugin
 - `allow-close-popup`
 - `allow-set-mascot-state`
 - `allow-emit-menu-action`
+- `allow-start-mascot-drag`
 
 ## Permission Table
 
@@ -226,6 +227,32 @@ Enables the show_overlay command without any pre-configured scope.
 <td>
 
 Denies the show_overlay command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:allow-start-mascot-drag`
+
+</td>
+<td>
+
+Enables the start_mascot_drag command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:deny-start-mascot-drag`
+
+</td>
+<td>
+
+Denies the start_mascot_drag command without any pre-configured scope.
 
 </td>
 </tr>

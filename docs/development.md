@@ -114,14 +114,17 @@ cd examples/starter/src-tauri/gen/android
 
 ## 5. Development-Only Environment Variables (Debug Builds Only)
 
-`tauri-plugin-orbitkit` provides runtime hooks under `#[cfg(debug_assertions)]`:
+`tauri-plugin-orbitkit` and the starter example provide diagnostic hooks for testing:
 
 | Variable | Values | Description |
 |---|---|---|
 | `ORBITKIT_SELFTEST` | `"1"` | Automatically opens the mascot overlay window and the first configured popup window 2 seconds after startup. |
 | `ORBITKIT_SELFTEST_CONFIG` | Path to JSON | Path to an alternate `OrbitKitConfig` JSON file that overrides the compiled configuration during selftests. |
+| `VITE_ORBITKIT_DEBUG` | `"1"` | Enables frontend gesture telemetry in the starter, forwarding `console` logs to Tauri via `log_telemetry`. |
 
-Both hooks are completely removed in release builds.
+Setting `VITE_ORBITKIT_DEBUG="1"` at frontend build or development time enables verbose gesture diagnostics in the starter example. When set, `main.ts` forwards console messages (`log`, `warn`, `error`) to the Tauri backend via `log_telemetry`, and `MascotView` logs window focus/blur and pointer/click events to aid in automated headless testing. In production builds or when unset, this telemetry is completely disabled and console output is not forwarded.
+
+Rust selftest hooks are completely removed in release builds.
 
 ---
 

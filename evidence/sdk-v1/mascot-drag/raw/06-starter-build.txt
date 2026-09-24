@@ -1,0 +1,38 @@
+Launching build container for /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter...
+=== Running in-container build for: /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter ===
+Repository root: /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag
+--> Installing dependencies at repo root...
+Scope: all 3 workspace projects
+? Verifying lockfile against supply-chain policies (177 entries)...
+Update available! 12.4.1 → 12.6.0.
+Changelog: https://pnpm.io/v/12.6.0
+To update, run: pnpm self-update
+✓ Lockfile passes supply-chain policies (177 entries in 699ms)
+Lockfile is up to date, resolution step is skipped
+Packages: +123
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 123, reused 123, downloaded 0, added 123, done
+Done in 876ms using pnpm v12.4.1
+--> Building Tauri desktop application (debug, no-bundle)...
+--> CARGO_TARGET_DIR=/home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter/src-tauri/target-linux
+$ tauri build --debug --no-bundle
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 139 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.49 kB │ gzip:  0.30 kB
+dist/assets/index-8JtR8yc9.css  20.81 kB │ gzip:  4.20 kB
+dist/assets/index-BkAzSgn3.js   95.19 kB │ gzip: 32.71 kB
+
+✓ built in 219ms
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.05s
+       Built application at: /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter/src-tauri/target-linux/debug/starter
+=== Build successful ===
+Binary: /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter/src-tauri/target-linux/debug/starter
+/home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/examples/starter/src-tauri/target-linux/debug/starter: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=e94b4a26c859b5799485a363f558ad7e4a9b8f6f, with debug_info, not stripped

@@ -64,3 +64,10 @@ pub(crate) async fn emit_menu_action<R: Runtime>(
 ) -> Result<()> {
     app.orbitkit().emit_menu_action(id)
 }
+
+#[command]
+pub(crate) async fn start_mascot_drag<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<()> {
+    app.orbitkit().start_mascot_drag()
+}

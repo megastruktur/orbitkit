@@ -309,4 +309,14 @@ To place radial buttons along a 180-degree half-circle arc above the mascot usin
     "trigger": "hover"
   }
 }
+
+---
+
+## 5. Environment Variables & Diagnostics
+
+| Variable | Values | Description |
+|---|---|---|
+| `VITE_ORBITKIT_DEBUG` | `"1"` | Enables frontend gesture telemetry in the starter, forwarding `console` logs to Tauri via `log_telemetry`. |
+
+Setting `VITE_ORBITKIT_DEBUG="1"` at frontend build or development time enables verbose gesture diagnostics in the starter example. When set, `main.ts` forwards console messages (`log`, `warn`, `error`) to the Tauri backend via `log_telemetry`, and `MascotView` logs window focus/blur and pointer/click events to aid in automated headless testing. In production builds or when unset, this telemetry is completely disabled and console output is not forwarded.
 ```

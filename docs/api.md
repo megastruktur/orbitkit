@@ -142,7 +142,9 @@ import {
   requestOverlayPermission,
   onMenuAction,
   onMascotState,
-  isTauri
+  isTauri,
+  startMascotDrag,
+  createDragGesture
 } from "@orbitkit/ui";
 ```
 
@@ -174,6 +176,14 @@ Updates the mascot state across webviews and Android native overlay, emitting an
 #### `emitMenuAction(id: string): Promise<void>`
 Dispatches a menu action for `id` through the unified action pipeline, triggering Rust native handlers and broadcasting `orbitkit://menu-action`.
 
+#### `startMascotDrag(): Promise<void>`
+Initiates native window dragging on desktop for the `orbitkit-mascot` window via Tauri's `start_dragging()`. Resolves as a no-op on Android where overlay dragging is handled natively.
+
+#### `createDragGesture(options?: DragGestureOptions): DragGestureHandlers`
+Creates a pure gesture handler for mascot dragging and menu toggle disambiguation.
+- Moves <= 4 px trigger `onToggle` on click.
+- Moves > 4 px collapse open menus instantly and trigger native dragging via `onDragStart`.
+- Optional `dragClearDelay` (default 400 ms) auto-clears the `dragged` state on drag end (armed on window focus, pointerup/cancel while dragged, or subsequent pointerdown) to ensure the first subsequent click always toggles the menu even if native window dragging swallows the terminating release event.
 #### `onMenuAction(handler: (action: MenuActionPayload) => void): Promise<UnlistenFn>`
 Listens for `orbitkit://menu-action` events:
 ```ts

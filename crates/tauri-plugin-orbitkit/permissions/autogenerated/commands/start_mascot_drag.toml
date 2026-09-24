@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-start-mascot-drag"
+description = "Enables the start_mascot_drag command without any pre-configured scope."
+commands.allow = ["start_mascot_drag"]
+
+[[permission]]
+identifier = "deny-start-mascot-drag"
+description = "Denies the start_mascot_drag command without any pre-configured scope."
+commands.deny = ["start_mascot_drag"]

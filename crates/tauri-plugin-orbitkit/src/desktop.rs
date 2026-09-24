@@ -295,4 +295,15 @@ impl<R: Runtime> Orbitkit<R> {
         let _ = self.app.emit("orbitkit://menu-action", payload);
         Ok(())
     }
+
+    pub fn start_mascot_drag(&self) -> Result<()> {
+        let window = self
+            .app
+            .get_webview_window("orbitkit-mascot")
+            .ok_or_else(|| Error::not_found("Mascot window not found"))?;
+        window
+            .start_dragging()
+            .map_err(|e| Error::unsupported(e.to_string()))?;
+        Ok(())
+    }
 }

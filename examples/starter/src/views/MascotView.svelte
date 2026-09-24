@@ -3,19 +3,42 @@
   import {
     Mascot,
     RadialMenu,
+    createDragGesture,
     emitMenuAction,
     onMascotState,
+    startMascotDrag,
     type MascotStateName,
+    type MenuConfig,
   } from "@orbitkit/ui";
   import config from "../orbitkit.config";
 
   let mascotState = $state<MascotStateName>(config.mascot.initialState ?? "idle");
+  const isDebug = import.meta.env.VITE_ORBITKIT_DEBUG === "1";
+  function debugLog(...args: unknown[]) {
+    if (isDebug) {
+      console.log(...args);
+    }
+  }
+
   let menuOpen = $state<boolean>(false);
+  let activeMenuConfig = $state<MenuConfig>(config.menu);
 
   function toggleMenu() {
+    activeMenuConfig = config.menu;
     menuOpen = !menuOpen;
   }
 
+  const gesture = createDragGesture({
+    isMenuOpen: () => menuOpen,
+    closeMenuInstant: () => {
+      activeMenuConfig = { ...config.menu, animation: "none" };
+      menuOpen = false;
+    },
+    onDragStart: async () => {
+      await startMascotDrag();
+    },
+    onToggle: toggleMenu,
+  });
   async function handleSelect(id: string) {
     menuOpen = false;
     try {
@@ -44,6 +67,14 @@
     };
   });
 </script>
+<svelte:window
+  onfocus={() => {
+    debugLog("[MascotView:window:focus]");
+    gesture.onwindowfocus?.();
+  }}
+  onblur={() => debugLog("[MascotView:window:blur]")}
+/>
+
 
 <div class="mascot-window-root" data-testid="mascot-window">
   <div class="mascot-center-anchor">
@@ -55,13 +86,25 @@
       tabindex="0"
       aria-label="OrbitKit Mascot"
       data-orbitkit-menu-toggle
-      onclick={toggleMenu}
-      onkeydown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggleMenu();
-        }
+      onpointerdown={(e) => {
+        debugLog("[MascotView:dom:pointerdown]", { button: e.button, clientX: e.clientX, clientY: e.clientY });
+        gesture.onpointerdown(e);
       }}
+      onpointermove={gesture.onpointermove}
+      onpointerup={(e) => {
+        debugLog("[MascotView:dom:pointerup]", { button: e.button });
+        gesture.onpointerup(e);
+      }}
+      onpointercancel={() => {
+        debugLog("[MascotView:dom:pointercancel]");
+        gesture.onpointercancel();
+      }}
+      onclick={(e) => {
+        debugLog("[MascotView:dom:click]", { menuOpenBefore: menuOpen });
+        gesture.onclick(e);
+        debugLog("[MascotView:dom:click:done]", { menuOpenAfter: menuOpen });
+      }}
+      onkeydown={gesture.onkeydown}
     >
       <Mascot
         config={config.mascot}
@@ -72,7 +115,7 @@
     <!-- Radial menu anchored to the center of the mascot -->
     <div class="radial-anchor">
       <RadialMenu
-        config={config.menu}
+        config={activeMenuConfig}
         open={menuOpen}
         onselect={handleSelect}
         onclose={handleClose}

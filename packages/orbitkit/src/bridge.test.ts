@@ -16,6 +16,7 @@ import {
   requestOverlayPermission,
   setMascotState,
   showOverlay,
+  startMascotDrag,
   type MenuConfig,
   type PopupOpenPayload,
 } from "./index";
@@ -238,6 +239,25 @@ describe("bridge", () => {
       await emitMenuAction("item-1");
       expect(recordedCmd).toBe("plugin:orbitkit|emit_menu_action");
       expect(recordedArgs).toEqual({ id: "item-1" });
+    });
+
+    it("9. startMascotDrag invokes plugin:orbitkit|start_mascot_drag", async () => {
+      let recordedCmd = "";
+      mockIPC((cmd) => {
+        recordedCmd = cmd;
+        return null;
+      });
+
+      await startMascotDrag();
+      expect(recordedCmd).toBe("plugin:orbitkit|start_mascot_drag");
+    });
+
+    it("10. startMascotDrag normalizes plugin errors to OrbitKitError", async () => {
+      mockIPC(() => {
+        throw { code: "not_found", message: "Window not found" };
+      });
+
+      await expect(startMascotDrag()).rejects.toThrow(OrbitKitError);
     });
   });
 

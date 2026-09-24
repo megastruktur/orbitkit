@@ -92,7 +92,8 @@ snake_case ONLY (the spike's duplicated camelCase commands are removed).
 | `close_popup` | `{id: string}` | `()` | close | emit `orbitkit://popup-close` |
 | `set_mascot_state` | `{state: string}` | `()` | emits `orbitkit://mascot-state {state}` | updates overlay state |
 | `emit_menu_action` | `{id: string}` | `()` | emits menu-action (source webview) + Rust handlers | same |
-Bridge wrapper for the last one: `emitMenuAction(id)`; also `onMascotState(cb) => unlisten`.
+| `start_mascot_drag` | — | `()` | initiates native window dragging on `orbitkit-mascot` (`start_dragging`) | no-op |
+Bridge wrappers: `emitMenuAction(id)`, `startMascotDrag()`; also `onMascotState(cb) => unlisten`.
 Desktop window labels: `orbitkit-mascot` (url `index.html?orbitkit=mascot`), `orbitkit-popup-<id>`.
 Event (both platforms): `orbitkit://menu-action` payload `{ id: string, source: "webview" | "overlay" }`.
 Events (Android popups): `orbitkit://popup-open` payload `{ "id": string, "title": string, "url": string, "width": number, "height": number }` (from `windows.popups[id]`), `orbitkit://popup-close` payload `{ "id": string }`.

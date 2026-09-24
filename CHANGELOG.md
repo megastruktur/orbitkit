@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Frontend (`@orbitkit/ui`)
+- **Mascot Window Dragging & Gesture State Machine (P2 mascot-drag)**:
+  - Added `startMascotDrag()` bridge helper calling plugin `start_mascot_drag`.
+  - Added pure `createDragGesture` state machine disambiguating drag (> 4px threshold) vs click toggle, suppressing clicks after drag, instantly collapsing open menus when drag starts, and falling through to click on error.
+  - Integrated drag gesture into starter `MascotView.svelte` while preserving outside-click radial menu dismiss behavior and keyboard navigation.
 - **Menu Layout ("orbit" | "arc") (Contract Amendment K2-A1)**:
   - Added optional `layout?: "orbit" | "arc"` and `arc?: { position?: "top" | "bottom" | "left" | "right", span?: number }` to `MenuConfig`.
   - Added pure `resolveMenuAngles` helper exported from `@orbitkit/ui` (`./geometry.js`) resolving angles based on mascot side and arc span.
@@ -21,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Canonical angle vectors codified in `arc-vectors.json`.
 
 #### Plugin (`tauri-plugin-orbitkit`)
+- **Mascot Window Dragging Command (P2 mascot-drag)**:
+  - Added `start_mascot_drag` command: initiates native window drag via `window.start_dragging()` on desktop (`orbitkit-mascot`), returns `not_found` if window absent, and no-ops on mobile.
+  - Added `allow-start-mascot-drag` permission to default permission set.
 - **Config Mirror & Angle Resolution (Contract Amendment K2-A1)**:
   - Mirrored `layout` and `arc` fields in `MenuConfig` with camelCase serde serialization.
   - Implemented `resolve_menu_angles` resolving start and end angles identical to frontend geometry.

@@ -7,6 +7,12 @@ fn jni_get_action_log() -> Vec<tauri_plugin_orbitkit::jni_bridge::JniActionRecor
     tauri_plugin_orbitkit::jni_bridge::get_jni_action_log()
 }
 
+/// Receives webview debug log telemetry forwarded from the frontend when `VITE_ORBITKIT_DEBUG=1`.
+#[tauri::command]
+fn log_telemetry(msg: String) {
+    eprintln!("[telemetry] {}", msg);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let config_str = include_str!("../../src/orbitkit.config.json");
@@ -24,6 +30,7 @@ pub fn run() {
 
     builder = builder.invoke_handler(tauri::generate_handler![
         jni_get_action_log,
+        log_telemetry,
     ]);
 
     builder = builder.setup(|app| {

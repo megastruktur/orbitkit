@@ -127,6 +127,10 @@ impl<R: Runtime> Orbitkit<R> {
         let _ = self.handle.app().emit("orbitkit://menu-action", payload);
         Ok(())
     }
+
+    pub fn start_mascot_drag(&self) -> Result<()> {
+        Ok(())
+    }
 }
 
 pub(crate) fn build_overlay_payload(

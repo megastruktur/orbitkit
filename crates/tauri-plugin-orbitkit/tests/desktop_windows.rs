@@ -206,3 +206,17 @@ fn test_harness_config_deserialization() {
     assert_eq!(config.windows.popups.len(), 1);
     assert_eq!(config.windows.popups[0].id, "settings");
 }
+
+#[test]
+fn test_start_mascot_drag_not_found_when_no_window() {
+    let app = tauri::test::mock_app();
+    let orbitkit = tauri_plugin_orbitkit::Orbitkit::new(
+        app.handle().clone(),
+        tauri_plugin_orbitkit::OrbitKitConfig::default(),
+    );
+    let result = orbitkit.start_mascot_drag();
+    assert!(result.is_err());
+    let err = result.unwrap_err();
+    assert_eq!(err.code, ErrorCode::NotFound);
+    assert!(err.message.contains("Mascot window not found"));
+}

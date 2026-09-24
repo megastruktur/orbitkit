@@ -1,0 +1,11 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/oks-mascot-drag/packages/orbitkit
+
+
+ Test Files  8 passed (8)
+      Tests  148 passed (148)
+   Start at  13:56:59
+   Duration  1.39s (environment 49%, transform 29%, tests 14%, import 7%)
+

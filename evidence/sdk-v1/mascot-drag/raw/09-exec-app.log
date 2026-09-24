@@ -1,0 +1,13 @@
+
+(starter:54): dbind-WARNING **: 13:57:20.615: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+[telemetry] [console.log] [MascotView:dom:pointerdown] {"button":0,"clientX":148,"clientY":148}
+[telemetry] [console.log] [MascotView:window:blur]
+[telemetry] [console.log] [MascotView:window:focus]
+[telemetry] [console.log] [MascotView:window:focus]
+[telemetry] [console.log] [MascotView:dom:pointerup] {"button":0}
+[telemetry] [console.log] [MascotView:dom:click] {"menuOpenBefore":false}
+[telemetry] [console.log] [MascotView:dom:click:done] {"menuOpenAfter":true}
+[telemetry] [console.log] [MascotView:dom:pointerdown] {"button":0,"clientX":148,"clientY":148}
+[telemetry] [console.log] [MascotView:dom:pointerup] {"button":0}
+[telemetry] [console.log] [MascotView:dom:click] {"menuOpenBefore":true}
+[telemetry] [console.log] [MascotView:dom:click:done] {"menuOpenAfter":false}

@@ -10,4 +10,5 @@ permissions = [
     "allow-close-popup",
     "allow-set-mascot-state",
     "allow-emit-menu-action",
+    "allow-start-mascot-drag",
 ]

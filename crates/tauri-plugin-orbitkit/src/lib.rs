@@ -84,6 +84,7 @@ pub fn init<R: Runtime>(config: OrbitKitConfig) -> TauriPlugin<R> {
             commands::close_popup,
             commands::set_mascot_state,
             commands::emit_menu_action,
+            commands::start_mascot_drag,
         ])
         .setup(move |app, _api| {
             #[cfg(mobile)]

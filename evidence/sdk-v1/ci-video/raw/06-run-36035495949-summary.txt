@@ -1,0 +1,23 @@
+
+✓ oks/ci-video Desktop Video · 36035495949
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ video-macos in 3m4s (ID 107754434351)
+✓ video-windows in 4m55s (ID 107754434435)
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+video-macos: .github#2
+
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+video-windows: .github#3
+
+
+ARTIFACTS
+video-windows
+video-macos
+
+For more information about a job, try: gh run view --job=<job-id>
+View this run on GitHub: https://github.com/megastruktur/orbitkit/actions/runs/36035495949
+EXIT_CODE=0

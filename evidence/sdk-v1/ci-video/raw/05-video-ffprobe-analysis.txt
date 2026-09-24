@@ -1,0 +1,27 @@
+=== ffprobe and Luminance Analysis on Downloaded Artifacts ===
+
+Windows Video (evidence/sdk-v1/ci-video/probe-36031433300/probe-windows/video-windows.mp4):
+- Dimensions: 1024x768
+- Framerate: 30 fps
+- Frames: 315 frames
+- Duration: 11.400000 s
+- Size: 642016 bytes (627 KB)
+- Sample mean luminance: 94.81 (non-black, valid desktop frames)
+
+macOS Video (screencapture) (evidence/sdk-v1/ci-video/probe-36031433300/probe-macos/screencapture-test.mp4):
+- Dimensions: 1024x768
+- Framerate: 60 fps
+- Frames: 50 frames
+- Duration: 5.000000 s
+- Size: 63216 bytes (61.7 KB)
+- Sample mean luminance: 41.95 (non-black, valid desktop frames)
+
+macOS Video (avfoundation) (evidence/sdk-v1/ci-video/probe-36031433300/probe-macos/video-avfoundation.mp4):
+- Dimensions: 1024x768
+- Framerate: 30 fps
+- Frames: 119 frames
+- Duration: 4.967000 s
+- Size: 31708 bytes (31.0 KB)
+- Sample mean luminance: 41.72 (non-black, valid desktop frames)
+
+EXIT_CODE=0

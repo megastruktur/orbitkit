@@ -1,0 +1,37 @@
+=== Final Video Verification Analysis for Run 36035495949 ===
+
+Windows Video (evidence/sdk-v1/ci-video/run-36035495949/video-windows/video-windows.mp4):
+- Dimensions: 1024x768
+- Framerate: 30 fps (r_frame_rate=30/1)
+- Frame count: 674 frames
+- Duration: 24.800000 s
+- Size: 1,266,171 bytes (~1.2 MB)
+- Bitrate: 408,442 bps
+- Visual inspection across key steps:
+  * Step 1 (t=4s, 01-main.png): Main window 'orbitkit' (800x600 client area) rendered cleanly, dark background #0e1433, hero section with mascot and rings, Overlay Controls card visible.
+  * Step 2-3 (t=10s, 02-overlay.png): Show Overlay button clicked, mascot window 'orbitkit-mascot' (296x296) appears at bottom-right (704, 448). Mascot center RGB (80, 121, 254) (#4f7cff). Window background is transparent; no black box.
+  * Step 4-5 (t=12s, 03-menu-open.png): Mascot clicked at center (852, 596). Radial menu spawn animation completes. 5 menu items expand into round glass discs around the mascot. Lucide Notes icon at (852, 500) is bright white/cyan (230, 244, 255).
+  * Step 6 (t=14s): Mascot clicked again. Menu collapses smoothly into mascot.
+  * Step 7 (t=18s, 04-notes-popup.png): Mascot clicked to reopen menu, Notes disc clicked. Notes popup window 'Notes' (320x420) appears cleanly at (26, 26).
+  * Step 8 (t=20s): Mascot dragged by (-200, -80) to new center (665, 521). Window smoothly moves to new location without ghost trails.
+  * Step 9 (t=22s): Mascot clicked at new center (665, 521). Radial menu reopens smoothly at the new mascot position.
+  * Step 10 (t=24s): Quit menu item at (574, 491) clicked. Starter app exits cleanly with exit code 0. Screen recorder flushes MP4 and exits cleanly.
+
+macOS Video (evidence/sdk-v1/ci-video/run-36035495949/video-macos/video-macos.mp4):
+- Dimensions: 1024x768
+- Framerate: 30 fps (r_frame_rate=30/1)
+- Frame count: 405 frames
+- Duration: 22.067000 s
+- Size: 605,359 bytes (~605 KB)
+- Bitrate: 219,462 bps
+- Visual inspection across key steps:
+  * Step 1 (t=3s, 01-main.png): Main window 'orbitkit' centered at (112, 50), 800x600 bounds. Native macOS window frame, dark glass UI rendered cleanly.
+  * Step 2-3 (t=8s, 02-overlay.png): Show Overlay clicked at (407, 294) via cliclick. Floating mascot overlay window 'orbitkit-mascot' (296x296) appears at bottom-right (704, 448). Circular blue mascot planet RGB (72, 106, 245). Transparent window composited against desktop; no black box.
+  * Step 4-5 (t=10s, 03-menu-open.png): Mascot clicked at (852, 596). Radial menu discs spawn smoothly from mascot center. Notes icon at (852, 500) renders at RGB (226, 245, 253).
+  * Step 6 (t=12s): Mascot clicked again; menu items collapse back into the mascot.
+  * Step 7 (t=14s, 04-notes-popup.png): Mascot clicked, Notes disc clicked. Notes popup 'Notes' (320x420) opens at (352, 96).
+  * Step 8 (t=18s): Synthetic drag gesture executed via cliclick. On macOS, synthetic Quartz drag events do not trigger Tauri/AppKit native window move loop (start_dragging), so window rect re-query shows center remains at (852, 596).
+  * Step 9 (t=20s): Mascot clicked at (852, 596), radial menu opens cleanly.
+  * Step 10 (t=21s): Quit menu item at (761, 566) clicked. Process exits cleanly; screen recorder flushes and stops.
+
+EXIT_CODE=0

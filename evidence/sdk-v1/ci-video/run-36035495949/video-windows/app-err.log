@@ -1,0 +1,2 @@
+[starter] Menu action: quit
+[0924/174125.985:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412

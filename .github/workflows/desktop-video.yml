@@ -1,0 +1,124 @@
+name: Desktop Video
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  video-windows:
+    name: video-windows
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure pnpm shell on Windows
+        run: pnpm config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Build starter desktop app
+        run: pnpm --filter starter tauri build --debug --no-bundle
+
+      - name: Record desktop flow
+        shell: pwsh
+        run: |
+          scripts/ci/record-windows.ps1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-windows
+          path: |
+            video-windows.mp4
+            01-main.png
+            02-overlay.png
+            03-menu-open.png
+            04-notes-popup.png
+            main.png
+            overlay.png
+            menu-open.png
+            notes-popup.png
+            app.log
+            app-err.log
+            timeline.txt
+          retention-days: 14
+
+  video-macos:
+    name: video-macos
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Build starter desktop app
+        run: pnpm --filter starter tauri build --debug --no-bundle
+
+      - name: Record desktop flow
+        run: |
+          chmod +x scripts/ci/record-macos.sh
+          scripts/ci/record-macos.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-macos
+          path: |
+            video-macos.mp4
+            01-main.png
+            02-overlay.png
+            03-menu-open.png
+            04-notes-popup.png
+            main.png
+            overlay.png
+            menu-open.png
+            notes-popup.png
+            app.log
+            timeline.txt
+          retention-days: 14

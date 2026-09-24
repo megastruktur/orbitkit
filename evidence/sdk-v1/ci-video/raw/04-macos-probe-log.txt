@@ -1,0 +1,1205 @@
+video-macos	Set up job	﻿2026-09-24T17:01:55.6414520Z Current runner version: '2.337.0'
+video-macos	Set up job	2026-09-24T17:01:55.6476060Z ##[group]Runner Image Provisioner
+video-macos	Set up job	2026-09-24T17:01:55.6482680Z Hosted Compute Agent
+video-macos	Set up job	2026-09-24T17:01:55.6483130Z Version: 20260828.587
+video-macos	Set up job	2026-09-24T17:01:55.6483570Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+video-macos	Set up job	2026-09-24T17:01:55.6484090Z Build Date: 2026-08-28T16:44:25Z
+video-macos	Set up job	2026-09-24T17:01:55.6484610Z Worker ID: {23f329c1-aae6-4dc7-86d2-ffd2370f0300}
+video-macos	Set up job	2026-09-24T17:01:55.6485080Z Azure Region: westus
+video-macos	Set up job	2026-09-24T17:01:55.6485470Z ##[endgroup]
+video-macos	Set up job	2026-09-24T17:01:55.6487270Z ##[group]Operating System
+video-macos	Set up job	2026-09-24T17:01:55.6487780Z macOS
+video-macos	Set up job	2026-09-24T17:01:55.6488130Z 26.6.2
+video-macos	Set up job	2026-09-24T17:01:55.6488490Z 25G83
+video-macos	Set up job	2026-09-24T17:01:55.6488850Z ##[endgroup]
+video-macos	Set up job	2026-09-24T17:01:55.6489240Z ##[group]Runner Image
+video-macos	Set up job	2026-09-24T17:01:55.6489640Z Image: macos-26-arm64
+video-macos	Set up job	2026-09-24T17:01:55.6490010Z Version: 20260907.0351.1
+video-macos	Set up job	2026-09-24T17:01:55.6490850Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20260907.0351/images/macos/macos-26-arm64-Readme.md
+video-macos	Set up job	2026-09-24T17:01:55.6492120Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20260907.0351
+video-macos	Set up job	2026-09-24T17:01:55.6492890Z ##[endgroup]
+video-macos	Set up job	2026-09-24T17:01:55.6493740Z ##[group]GITHUB_TOKEN Permissions
+video-macos	Set up job	2026-09-24T17:01:55.6496190Z Contents: read
+video-macos	Set up job	2026-09-24T17:01:55.6496580Z Metadata: read
+video-macos	Set up job	2026-09-24T17:01:55.6496960Z ##[endgroup]
+video-macos	Set up job	2026-09-24T17:01:55.6498770Z Secret source: Actions
+video-macos	Set up job	2026-09-24T17:01:55.6499380Z Cache mode: write
+video-macos	Set up job	2026-09-24T17:01:55.6499860Z Prepare workflow directory
+video-macos	Set up job	2026-09-24T17:01:55.6864170Z Prepare all required actions
+video-macos	Set up job	2026-09-24T17:01:55.6922190Z Getting action download info
+video-macos	Set up job	2026-09-24T17:01:56.1807580Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+video-macos	Set up job	2026-09-24T17:01:56.5098150Z Download action repository 'dtolnay/rust-toolchain@stable' (SHA:6bed0761d98439e5a578e2877258200ad565ba87)
+video-macos	Set up job	2026-09-24T17:01:56.7803760Z Download action repository 'pnpm/action-setup@v4' (SHA:b906affcce14559ad1aafd4ab0e942779e9f58b1)
+video-macos	Set up job	2026-09-24T17:01:57.2073550Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+video-macos	Set up job	2026-09-24T17:01:57.3486390Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+video-macos	Set up job	2026-09-24T17:01:57.6659660Z Complete job name: video-macos
+video-macos	Checkout repository	﻿2026-09-24T17:01:57.7478580Z ##[group]Run actions/checkout@v4
+video-macos	Checkout repository	2026-09-24T17:01:57.7479620Z with:
+video-macos	Checkout repository	2026-09-24T17:01:57.7479970Z   repository: megastruktur/orbitkit
+video-macos	Checkout repository	2026-09-24T17:01:57.7483570Z   token: ***
+video-macos	Checkout repository	2026-09-24T17:01:57.7483960Z   ssh-strict: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7484900Z   ssh-user: git
+video-macos	Checkout repository	2026-09-24T17:01:57.7485280Z   persist-credentials: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7485650Z   clean: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7486040Z   sparse-checkout-cone-mode: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7486560Z   fetch-depth: 1
+video-macos	Checkout repository	2026-09-24T17:01:57.7486890Z   fetch-tags: false
+video-macos	Checkout repository	2026-09-24T17:01:57.7487310Z   show-progress: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7487700Z   lfs: false
+video-macos	Checkout repository	2026-09-24T17:01:57.7488080Z   submodules: false
+video-macos	Checkout repository	2026-09-24T17:01:57.7488530Z   set-safe-directory: true
+video-macos	Checkout repository	2026-09-24T17:01:57.7488910Z   allow-unsafe-pr-checkout: false
+video-macos	Checkout repository	2026-09-24T17:01:57.7489730Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:01:58.3607370Z Syncing repository: megastruktur/orbitkit
+video-macos	Checkout repository	2026-09-24T17:01:58.3610440Z ##[group]Getting Git version info
+video-macos	Checkout repository	2026-09-24T17:01:58.3612790Z Working directory is '/Users/runner/work/orbitkit/orbitkit'
+video-macos	Checkout repository	2026-09-24T17:01:58.3616960Z [command]/opt/homebrew/bin/git version
+video-macos	Checkout repository	2026-09-24T17:01:58.4206150Z git version 2.55.0
+video-macos	Checkout repository	2026-09-24T17:01:58.4234790Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:01:58.4248000Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/2c9eb4d7-86a9-4032-adab-8603ac5a3a5c/.gitconfig'
+video-macos	Checkout repository	2026-09-24T17:01:58.4254390Z Temporarily overriding HOME='/Users/runner/work/_temp/2c9eb4d7-86a9-4032-adab-8603ac5a3a5c' before making global git config changes
+video-macos	Checkout repository	2026-09-24T17:01:58.4260120Z Adding repository directory to the temporary git global config as a safe directory
+video-macos	Checkout repository	2026-09-24T17:01:58.4265890Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/orbitkit/orbitkit
+video-macos	Checkout repository	2026-09-24T17:01:58.4415540Z Deleting the contents of '/Users/runner/work/orbitkit/orbitkit'
+video-macos	Checkout repository	2026-09-24T17:01:58.4423740Z ##[group]Initializing the repository
+video-macos	Checkout repository	2026-09-24T17:01:58.4432320Z [command]/opt/homebrew/bin/git init /Users/runner/work/orbitkit/orbitkit
+video-macos	Checkout repository	2026-09-24T17:01:58.4772690Z hint: Using 'master' as the name for the initial branch. This default branch name
+video-macos	Checkout repository	2026-09-24T17:01:58.4777930Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+video-macos	Checkout repository	2026-09-24T17:01:58.4783900Z hint: to use in all of your new repositories, which will suppress this warning,
+video-macos	Checkout repository	2026-09-24T17:01:58.4785890Z hint: call:
+video-macos	Checkout repository	2026-09-24T17:01:58.4786710Z hint:
+video-macos	Checkout repository	2026-09-24T17:01:58.4787700Z hint: 	git config --global init.defaultBranch <name>
+video-macos	Checkout repository	2026-09-24T17:01:58.4788950Z hint:
+video-macos	Checkout repository	2026-09-24T17:01:58.4790130Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+video-macos	Checkout repository	2026-09-24T17:01:58.4792760Z hint: 'development'. The just-created branch can be renamed via this command:
+video-macos	Checkout repository	2026-09-24T17:01:58.4794390Z hint:
+video-macos	Checkout repository	2026-09-24T17:01:58.4795130Z hint: 	git branch -m <name>
+video-macos	Checkout repository	2026-09-24T17:01:58.4796010Z hint:
+video-macos	Checkout repository	2026-09-24T17:01:58.4797160Z hint: Disable this message with "git config set advice.defaultBranchName false"
+video-macos	Checkout repository	2026-09-24T17:01:58.4798990Z Initialized empty Git repository in /Users/runner/work/orbitkit/orbitkit/.git/
+video-macos	Checkout repository	2026-09-24T17:01:58.4802160Z [command]/opt/homebrew/bin/git remote add origin https://github.com/megastruktur/orbitkit
+video-macos	Checkout repository	2026-09-24T17:01:58.4876760Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:01:58.4878380Z ##[group]Disabling automatic garbage collection
+video-macos	Checkout repository	2026-09-24T17:01:58.4879690Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+video-macos	Checkout repository	2026-09-24T17:01:58.4960150Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:01:58.4961570Z ##[group]Setting up auth
+video-macos	Checkout repository	2026-09-24T17:01:58.4964720Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+video-macos	Checkout repository	2026-09-24T17:01:58.5074240Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+video-macos	Checkout repository	2026-09-24T17:01:58.6560610Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+video-macos	Checkout repository	2026-09-24T17:01:58.6642400Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+video-macos	Checkout repository	2026-09-24T17:01:58.7866250Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+video-macos	Checkout repository	2026-09-24T17:01:58.7962180Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+video-macos	Checkout repository	2026-09-24T17:01:58.9511500Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+video-macos	Checkout repository	2026-09-24T17:01:58.9606310Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:01:58.9608110Z ##[group]Fetching the repository
+video-macos	Checkout repository	2026-09-24T17:01:58.9613000Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +27e2ac153be280f626d1173487b5dc76738f7e17:refs/remotes/origin/oks/ci-video
+video-macos	Checkout repository	2026-09-24T17:02:00.0603620Z From https://github.com/megastruktur/orbitkit
+video-macos	Checkout repository	2026-09-24T17:02:00.0620450Z  * [new ref]         27e2ac153be280f626d1173487b5dc76738f7e17 -> origin/oks/ci-video
+video-macos	Checkout repository	2026-09-24T17:02:00.0759230Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:02:00.0760900Z ##[group]Determining the checkout info
+video-macos	Checkout repository	2026-09-24T17:02:00.0765020Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:02:00.0766350Z [command]/opt/homebrew/bin/git sparse-checkout disable
+video-macos	Checkout repository	2026-09-24T17:02:00.0840420Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+video-macos	Checkout repository	2026-09-24T17:02:00.0961710Z ##[group]Checking out the ref
+video-macos	Checkout repository	2026-09-24T17:02:00.0970730Z [command]/opt/homebrew/bin/git checkout --progress --force -B oks/ci-video refs/remotes/origin/oks/ci-video
+video-macos	Checkout repository	2026-09-24T17:02:00.2627670Z Switched to a new branch 'oks/ci-video'
+video-macos	Checkout repository	2026-09-24T17:02:00.2637990Z branch 'oks/ci-video' set up to track 'origin/oks/ci-video'.
+video-macos	Checkout repository	2026-09-24T17:02:00.2644240Z ##[endgroup]
+video-macos	Checkout repository	2026-09-24T17:02:00.2766740Z [command]/opt/homebrew/bin/git log -1 --format=%H
+video-macos	Checkout repository	2026-09-24T17:02:00.2863440Z 27e2ac153be280f626d1173487b5dc76738f7e17
+video-macos	Setup Rust toolchain	﻿2026-09-24T17:02:00.3632110Z ##[group]Run dtolnay/rust-toolchain@stable
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3634410Z with:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3635770Z   toolchain: stable
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3637200Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3772820Z ##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3859360Z ##[group]Run if [[ -z $toolchain ]]; then
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3860430Z ^[[36;1mif [[ -z $toolchain ]]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3861720Z ^[[36;1m  # GitHub does not enforce `required: true` inputs itself. https://github.com/actions/runner/issues/1070^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3863180Z ^[[36;1m  echo "'toolchain' is a required input" >&2^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3863990Z ^[[36;1m  exit 1^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3864890Z ^[[36;1melif [[ $toolchain =~ ^stable' '[0-9]+' '(year|month|week|day)s?' 'ago$ ]]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3865950Z ^[[36;1m  if [[ macOS == macOS ]]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3867260Z ^[[36;1m    echo "toolchain=1.$((($(date -v-$(sed 's/stable \([0-9]*\) \(.\).*/\1\2/' <<< $toolchain) +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3868660Z ^[[36;1m  else^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3869710Z ^[[36;1m    echo "toolchain=1.$((($(date --date "${toolchain#stable }" +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3871000Z ^[[36;1m  fi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3871800Z ^[[36;1melif [[ $toolchain =~ ^stable' 'minus' '[0-9]+' 'releases?$ ]]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3873290Z ^[[36;1m  echo "toolchain=1.$((($(date +%s)/60/60/24-16569)/7/6-${toolchain//[^0-9]/}))" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3874630Z ^[[36;1melif [[ $toolchain =~ ^1\.[0-9]+$ ]]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3876100Z ^[[36;1m  echo "toolchain=1.$((i=${toolchain#1.}, c=($(date +%s)/60/60/24-16569)/7/6, i+9*i*(10*i<=c)+90*i*(100*i<=c)))" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3877520Z ^[[36;1melse^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3878210Z ^[[36;1m  echo "toolchain=$toolchain" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3879030Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3937460Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3939710Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3941020Z   toolchain: stable
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.3942410Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4503600Z ##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=72]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4517050Z ##[start-action display=Construct rustup command line;id=__dtolnay_rust-toolchain.flags]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4563990Z ##[group]Run echo "targets=$(for t in ${targets//,/ }; do echo -n ' --target' $t; done)" >> $GITHUB_OUTPUT
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4565670Z ^[[36;1mecho "targets=$(for t in ${targets//,/ }; do echo -n ' --target' $t; done)" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4567420Z ^[[36;1mecho "components=$(for c in ${components//,/ }; do echo -n ' --component' $c; done)" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4568820Z ^[[36;1mecho "downgrade=" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4611370Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4612470Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4613220Z   targets: 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4613900Z   components: 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.4614580Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5177230Z ##[end-action id=__dtolnay_rust-toolchain.flags;outcome=success;conclusion=success;duration_ms=65]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5190300Z ##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5237480Z ##[group]Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5238780Z ^[[36;1mecho CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5277160Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5278100Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5782650Z ##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=58]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5788400Z ##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5849210Z ##[group]Run if ! command -v rustup &>/dev/null; then
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5850700Z ^[[36;1mif ! command -v rustup &>/dev/null; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5852500Z ^[[36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5854340Z ^[[36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5855110Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5892150Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5893100Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5893680Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.5894460Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6238920Z ##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=44]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6244270Z ##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6256290Z ##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6266940Z ##[start-action display=rustup toolchain install stable;id=__dtolnay_rust-toolchain.__run_4]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6303620Z ##[group]Run rustup toolchain install stable --profile minimal --no-self-update
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6305070Z ^[[36;1mrustup toolchain install stable --profile minimal --no-self-update^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6362640Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6364790Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6366100Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6368470Z   RUSTUP_PERMIT_COPY_RENAME: 1
+video-macos	Setup Rust toolchain	2026-09-24T17:02:00.6369890Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.1355640Z info: syncing channel updates for stable-aarch64-apple-darwin
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2162970Z 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2353840Z info: self-update is disabled for this build of rustup
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2354450Z   stable-aarch64-apple-darwin unchanged - rustc 1.98.1 (48a229cea 2026-09-01)
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2354960Z info: any updates to rustup will need to be fetched with your system package manager
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2355390Z 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2379450Z ##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=611]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2383540Z ##[start-action display=rustup default stable;id=__dtolnay_rust-toolchain.__run_5]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2404250Z ##[group]Run rustup default stable
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2404530Z ^[[36;1mrustup default stable^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2446500Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2446860Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2447060Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.2447310Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3031080Z info: using existing install for stable-aarch64-apple-darwin
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3056300Z info: default toolchain set to stable-aarch64-apple-darwin
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3057140Z 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3289900Z   stable-aarch64-apple-darwin unchanged - rustc 1.98.1 (48a229cea 2026-09-01)
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3290470Z 
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3302920Z ##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=91]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3305400Z ##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3352480Z ##[group]Run DATE=$(rustc +stable --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3353370Z ^[[36;1mDATE=$(rustc +stable --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3353950Z ^[[36;1mHASH=$(rustc +stable --version --verbose | sed -ne 's/^commit-hash: //p')^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3354510Z ^[[36;1mecho "cachekey=$(echo $DATE$HASH | head -c12)" >> $GITHUB_OUTPUT^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3403390Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3403820Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3404110Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.3404330Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4832680Z ##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=152]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4836840Z ##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4861050Z ##[group]Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4861500Z ^[[36;1mif [ -z "${CARGO_INCREMENTAL+set}" ]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4861810Z ^[[36;1m  echo CARGO_INCREMENTAL=0 >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4862100Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4908310Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4908750Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4908970Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.4909250Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5321880Z ##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=48]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5324310Z ##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5348480Z ##[group]Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5349020Z ^[[36;1mif [ -z "${CARGO_TERM_COLOR+set}" ]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5349350Z ^[[36;1m  echo CARGO_TERM_COLOR=always >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5349620Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5388720Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5389070Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5389280Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5389570Z   CARGO_INCREMENTAL: 0
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5389920Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5784730Z ##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=45]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5787310Z ##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5812190Z ##[group]Run # implemented in 1.66, stabilized in 1.68, made default in 1.70
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5813420Z ^[[36;1m# implemented in 1.66, stabilized in 1.68, made default in 1.70^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5814110Z ^[[36;1mif [ -z "${CARGO_REGISTRIES_CRATES_IO_PROTOCOL+set}" -o -f "/Users/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol ]; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5815030Z ^[[36;1m  if rustc +stable --version --verbose | grep -q '^release: 1\.6[89]\.'; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5815860Z ^[[36;1m    touch "/Users/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5817210Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5818190Z ^[[36;1m  elif rustc +stable --version --verbose | grep -q '^release: 1\.6[67]\.'; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5818900Z ^[[36;1m    touch "/Users/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5819480Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5819920Z ^[[36;1m  fi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5820140Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5876190Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5876610Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5876880Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5877130Z   CARGO_INCREMENTAL: 0
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5877420Z   CARGO_TERM_COLOR: always
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.5877680Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6962020Z ##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=117]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6964730Z ##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6992690Z ##[group]Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6993520Z ^[[36;1m# https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6994510Z ^[[36;1mif rustc +stable --version --verbose | grep -q '^release: 1\.7[01]\.'; then^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6995600Z ^[[36;1m  echo CARGO_HTTP_MULTIPLEXING=false >> $GITHUB_ENV^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.6995910Z ^[[36;1mfi^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7039040Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7039530Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7039750Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7040030Z   CARGO_INCREMENTAL: 0
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7040300Z   CARGO_TERM_COLOR: always
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7040500Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7788580Z ##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=82]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7793020Z ##[start-action display=rustc +stable --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7814120Z ##[group]Run rustc +stable --version --verbose
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7814600Z ^[[36;1mrustc +stable --version --verbose^[[0m
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7878160Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7878590Z env:
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7878800Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7879060Z   CARGO_INCREMENTAL: 0
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7879300Z   CARGO_TERM_COLOR: always
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.7879570Z ##[endgroup]
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8558920Z rustc 1.98.1 (48a229cea 2026-09-01)
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8559500Z binary: rustc
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8559850Z commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8560320Z commit-date: 2026-09-01
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8560760Z host: aarch64-apple-darwin
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8561010Z release: 1.98.1
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8563680Z LLVM version: 22.1.8
+video-macos	Setup Rust toolchain	2026-09-24T17:02:01.8582560Z ##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=78]
+video-macos	Setup pnpm	﻿2026-09-24T17:02:01.8673400Z ##[group]Run pnpm/action-setup@v4
+video-macos	Setup pnpm	2026-09-24T17:02:01.8673730Z with:
+video-macos	Setup pnpm	2026-09-24T17:02:01.8673960Z   version: 12.4.1
+video-macos	Setup pnpm	2026-09-24T17:02:01.8674260Z   dest: ~/setup-pnpm
+video-macos	Setup pnpm	2026-09-24T17:02:01.8674510Z   run_install: null
+video-macos	Setup pnpm	2026-09-24T17:02:01.8674750Z   cache: false
+video-macos	Setup pnpm	2026-09-24T17:02:01.8674990Z   cache_dependency_path: pnpm-lock.yaml
+video-macos	Setup pnpm	2026-09-24T17:02:01.8675280Z   package_json_file: package.json
+video-macos	Setup pnpm	2026-09-24T17:02:01.8675510Z   standalone: false
+video-macos	Setup pnpm	2026-09-24T17:02:01.8675700Z env:
+video-macos	Setup pnpm	2026-09-24T17:02:01.8675940Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup pnpm	2026-09-24T17:02:01.8676230Z   CARGO_INCREMENTAL: 0
+video-macos	Setup pnpm	2026-09-24T17:02:01.8676480Z   CARGO_TERM_COLOR: always
+video-macos	Setup pnpm	2026-09-24T17:02:01.8676740Z ##[endgroup]
+video-macos	Setup pnpm	2026-09-24T17:02:02.0855800Z ##[group]Running self-installer...
+video-macos	Setup pnpm	2026-09-24T17:02:02.7026500Z (node:1209) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+video-macos	Setup pnpm	2026-09-24T17:02:02.7030330Z (Use `node --trace-deprecation ...` to show where the warning was created)
+video-macos	Setup pnpm	2026-09-24T17:02:03.0814710Z Progress: resolved 1, reused 0, downloaded 0, added 0
+video-macos	Setup pnpm	2026-09-24T17:02:03.2965680Z Packages: +2
+video-macos	Setup pnpm	2026-09-24T17:02:03.3069440Z ++
+video-macos	Setup pnpm	2026-09-24T17:02:04.0815240Z Progress: resolved 15, reused 0, downloaded 2, added 1
+video-macos	Setup pnpm	2026-09-24T17:02:04.0926890Z Progress: resolved 15, reused 0, downloaded 2, added 2, done
+video-macos	Setup pnpm	2026-09-24T17:02:04.1200820Z .../.pnpm/pnpm@12.4.1/node_modules/pnpm preinstall$ node install.js
+video-macos	Setup pnpm	2026-09-24T17:02:04.7328350Z .../.pnpm/pnpm@12.4.1/node_modules/pnpm preinstall: Done
+video-macos	Setup pnpm	2026-09-24T17:02:04.7339930Z .../.pnpm/pnpm@12.4.1/node_modules/pnpm postinstall$ node install.js
+video-macos	Setup pnpm	2026-09-24T17:02:04.8184560Z .../.pnpm/pnpm@12.4.1/node_modules/pnpm postinstall: Done
+video-macos	Setup pnpm	2026-09-24T17:02:06.1161480Z 
+video-macos	Setup pnpm	2026-09-24T17:02:06.1263360Z dependencies:
+video-macos	Setup pnpm	2026-09-24T17:02:06.1379130Z + pnpm 12.4.1 (12.6.0 is available)
+video-macos	Setup pnpm	2026-09-24T17:02:06.1480530Z 
+video-macos	Setup pnpm	2026-09-24T17:02:06.1574760Z Done in 3.7s
+video-macos	Setup pnpm	2026-09-24T17:02:06.1641340Z ##[endgroup]
+video-macos	Setup pnpm	2026-09-24T17:02:06.1662850Z Installation Completed!
+video-macos	Setup Node.js	﻿2026-09-24T17:02:06.2002080Z ##[group]Run actions/setup-node@v4
+video-macos	Setup Node.js	2026-09-24T17:02:06.2016160Z with:
+video-macos	Setup Node.js	2026-09-24T17:02:06.2018180Z   node-version: 22
+video-macos	Setup Node.js	2026-09-24T17:02:06.2018610Z   always-auth: false
+video-macos	Setup Node.js	2026-09-24T17:02:06.2019290Z   check-latest: false
+video-macos	Setup Node.js	2026-09-24T17:02:06.2022250Z   token: ***
+video-macos	Setup Node.js	2026-09-24T17:02:06.2022840Z env:
+video-macos	Setup Node.js	2026-09-24T17:02:06.2023330Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Setup Node.js	2026-09-24T17:02:06.2024500Z   CARGO_INCREMENTAL: 0
+video-macos	Setup Node.js	2026-09-24T17:02:06.2026320Z   CARGO_TERM_COLOR: always
+video-macos	Setup Node.js	2026-09-24T17:02:06.2027470Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Setup Node.js	2026-09-24T17:02:06.2028080Z ##[endgroup]
+video-macos	Setup Node.js	2026-09-24T17:02:06.6235600Z (node:1311) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+video-macos	Setup Node.js	2026-09-24T17:02:06.6361200Z (Use `node --trace-deprecation ...` to show where the warning was created)
+video-macos	Setup Node.js	2026-09-24T17:02:06.6613520Z Found in cache @ /Users/runner/hostedtoolcache/node/22.23.2/arm64
+video-macos	Setup Node.js	2026-09-24T17:02:06.6704420Z ##[group]Environment details
+video-macos	Setup Node.js	2026-09-24T17:02:07.5728700Z node: v22.23.2
+video-macos	Setup Node.js	2026-09-24T17:02:07.5831140Z npm: 10.9.8
+video-macos	Setup Node.js	2026-09-24T17:02:07.5843350Z yarn: 1.22.22
+video-macos	Setup Node.js	2026-09-24T17:02:07.5850830Z ##[endgroup]
+video-macos	Install dependencies	﻿2026-09-24T17:02:07.5987670Z ##[group]Run pnpm install --frozen-lockfile
+video-macos	Install dependencies	2026-09-24T17:02:07.5987980Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+video-macos	Install dependencies	2026-09-24T17:02:07.6085180Z shell: /bin/bash -e {0}
+video-macos	Install dependencies	2026-09-24T17:02:07.6085740Z env:
+video-macos	Install dependencies	2026-09-24T17:02:07.6086290Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Install dependencies	2026-09-24T17:02:07.6087070Z   CARGO_INCREMENTAL: 0
+video-macos	Install dependencies	2026-09-24T17:02:07.6087660Z   CARGO_TERM_COLOR: always
+video-macos	Install dependencies	2026-09-24T17:02:07.6088380Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Install dependencies	2026-09-24T17:02:07.6089030Z ##[endgroup]
+video-macos	Install dependencies	2026-09-24T17:02:07.7877880Z Scope: all 3 workspace projects
+video-macos	Install dependencies	2026-09-24T17:02:07.8277300Z ? Verifying lockfile against supply-chain policies (177 entries)...
+video-macos	Install dependencies	2026-09-24T17:02:08.2337040Z Downloading @typescript/typescript-darwin-arm64@7.0.2: 0.00 B/9.27 MB
+video-macos	Install dependencies	2026-09-24T17:02:08.2460170Z Downloading @rolldown/binding-darwin-arm64@1.2.9: 0.00 B/7.18 MB
+video-macos	Install dependencies	2026-09-24T17:02:08.6797620Z Packages are cloned from the content-addressable store to the virtual store.
+video-macos	Install dependencies	2026-09-24T17:02:08.6911140Z   Content-addressable store is at: /Users/runner/setup-pnpm/node_modules/.bin/store/v11
+video-macos	Install dependencies	2026-09-24T17:02:08.7026240Z   Virtual store is at:             node_modules/.pnpm
+video-macos	Install dependencies	2026-09-24T17:02:08.9154090Z Downloading @tauri-apps/cli-darwin-arm64@2.11.5: 0.00 B/7.74 MB
+video-macos	Install dependencies	2026-09-24T17:02:09.9540180Z Progress: resolved 124, reused 0, downloaded 113, added 96
+video-macos	Install dependencies	2026-09-24T17:02:10.3757730Z ✓ Lockfile passes supply-chain policies (177 entries in 2.5s)
+video-macos	Install dependencies	2026-09-24T17:02:10.3758970Z Lockfile is up to date, resolution step is skipped
+video-macos	Install dependencies	2026-09-24T17:02:10.9209810Z Packages: +124
+video-macos	Install dependencies	2026-09-24T17:02:10.9237680Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+video-macos	Install dependencies	2026-09-24T17:02:10.9579270Z Progress: resolved 124, reused 0, downloaded 124, added 124, done
+video-macos	Install dependencies	2026-09-24T17:02:10.9915920Z Done in 3.2s using pnpm v12.4.1
+video-macos	Build workspace packages	﻿2026-09-24T17:02:11.0148770Z ##[group]Run pnpm -r build
+video-macos	Build workspace packages	2026-09-24T17:02:11.0150550Z ^[[36;1mpnpm -r build^[[0m
+video-macos	Build workspace packages	2026-09-24T17:02:11.0208320Z shell: /bin/bash -e {0}
+video-macos	Build workspace packages	2026-09-24T17:02:11.0208720Z env:
+video-macos	Build workspace packages	2026-09-24T17:02:11.0209160Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Build workspace packages	2026-09-24T17:02:11.0209560Z   CARGO_INCREMENTAL: 0
+video-macos	Build workspace packages	2026-09-24T17:02:11.0209980Z   CARGO_TERM_COLOR: always
+video-macos	Build workspace packages	2026-09-24T17:02:11.0210430Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Build workspace packages	2026-09-24T17:02:11.0210930Z ##[endgroup]
+video-macos	Build workspace packages	2026-09-24T17:02:11.1868730Z $ svelte-package -i src -o dist && rm -f dist/*.test.*
+video-macos	Build workspace packages	2026-09-24T17:02:15.3486260Z src -> dist
+video-macos	Build workspace packages	2026-09-24T17:02:15.4108340Z $ vite build
+video-macos	Build workspace packages	2026-09-24T17:02:16.2231830Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+video-macos	Build workspace packages	2026-09-24T17:02:16.2414840Z transforming...
+video-macos	Build workspace packages	2026-09-24T17:02:16.6189670Z ✓ 139 modules transformed.
+video-macos	Build workspace packages	2026-09-24T17:02:16.7237560Z rendering chunks...
+video-macos	Build workspace packages	2026-09-24T17:02:16.7633880Z computing gzip size...
+video-macos	Build workspace packages	2026-09-24T17:02:16.7658250Z dist/index.html                  0.49 kB │ gzip:  0.30 kB
+video-macos	Build workspace packages	2026-09-24T17:02:16.7659630Z dist/assets/index-3V41EJun.css  20.82 kB │ gzip:  4.20 kB
+video-macos	Build workspace packages	2026-09-24T17:02:16.7668460Z dist/assets/index-CLVeSB7A.js   94.52 kB │ gzip: 32.49 kB
+video-macos	Build workspace packages	2026-09-24T17:02:16.7668780Z 
+video-macos	Build workspace packages	2026-09-24T17:02:16.7671370Z ^[[32m✓ built in 542ms^[[39m
+video-macos	Build starter desktop app	﻿2026-09-24T17:02:17.3275680Z ##[group]Run pnpm --filter starter tauri build --debug --no-bundle
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3277170Z ^[[36;1mpnpm --filter starter tauri build --debug --no-bundle^[[0m
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3369030Z shell: /bin/bash -e {0}
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3369380Z env:
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3370540Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3371190Z   CARGO_INCREMENTAL: 0
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3371960Z   CARGO_TERM_COLOR: always
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3372390Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Build starter desktop app	2026-09-24T17:02:17.3372760Z ##[endgroup]
+video-macos	Build starter desktop app	2026-09-24T17:02:17.5626250Z $ tauri build --debug --no-bundle
+video-macos	Build starter desktop app	2026-09-24T17:02:18.7584780Z         Info Looking up installed tauri packages to check mismatched versions...
+video-macos	Build starter desktop app	2026-09-24T17:02:18.8362320Z         Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+video-macos	Build starter desktop app	2026-09-24T17:02:18.8365640Z      Running beforeBuildCommand `pnpm build`
+video-macos	Build starter desktop app	2026-09-24T17:02:18.8957720Z $ vite build
+video-macos	Build starter desktop app	2026-09-24T17:02:19.4905910Z ^[[36mvite v8.3.0 ^[[32mbuilding client environment for production...^[[36m^[[39m
+video-macos	Build starter desktop app	2026-09-24T17:02:19.5027340Z transforming...
+video-macos	Build starter desktop app	2026-09-24T17:02:19.9449260Z ✓ 139 modules transformed.
+video-macos	Build starter desktop app	2026-09-24T17:02:20.0689860Z rendering chunks...
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1135110Z computing gzip size...
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1161310Z dist/index.html                  0.49 kB │ gzip:  0.30 kB
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1163140Z dist/assets/index-3V41EJun.css  20.82 kB │ gzip:  4.20 kB
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1164620Z dist/assets/index-CLVeSB7A.js   94.52 kB │ gzip: 32.49 kB
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1165150Z 
+video-macos	Build starter desktop app	2026-09-24T17:02:20.1166280Z ^[[32m✓ built in 625ms^[[39m
+video-macos	Build starter desktop app	2026-09-24T17:02:20.5998890Z ^[[1m^[[92m    Updating^[[0m crates.io index
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5052270Z ^[[1m^[[92m Downloading^[[0m crates ...
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5509570Z ^[[1m^[[92m  Downloaded^[[0m cookie v0.18.2
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5671820Z ^[[1m^[[92m  Downloaded^[[0m base64 v0.23.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5777820Z ^[[1m^[[92m  Downloaded^[[0m alloc-stdlib v0.2.4
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5810240Z ^[[1m^[[92m  Downloaded^[[0m autocfg v1.5.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5852120Z ^[[1m^[[92m  Downloaded^[[0m cargo_metadata v0.19.2
+video-macos	Build starter desktop app	2026-09-24T17:02:21.5929500Z ^[[1m^[[92m  Downloaded^[[0m bit-set v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.6079980Z ^[[1m^[[92m  Downloaded^[[0m dom_query v0.27.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.6500470Z ^[[1m^[[92m  Downloaded^[[0m getrandom v0.3.4
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7009510Z ^[[1m^[[92m  Downloaded^[[0m hex v0.4.3
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7220700Z ^[[1m^[[92m  Downloaded^[[0m icu_normalizer_data v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7326700Z ^[[1m^[[92m  Downloaded^[[0m anyhow v1.0.104
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7539450Z ^[[1m^[[92m  Downloaded^[[0m precomputed-hash v0.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7638080Z ^[[1m^[[92m  Downloaded^[[0m base64 v0.22.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7746930Z ^[[1m^[[92m  Downloaded^[[0m same-file v1.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7853080Z ^[[1m^[[92m  Downloaded^[[0m bitflags v1.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:21.7967840Z ^[[1m^[[92m  Downloaded^[[0m block-buffer v0.10.4
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8079660Z ^[[1m^[[92m  Downloaded^[[0m block2 v0.6.2
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8195520Z ^[[1m^[[92m  Downloaded^[[0m bytes v1.12.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8224020Z ^[[1m^[[92m  Downloaded^[[0m cssparser-macros v0.6.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8236420Z ^[[1m^[[92m  Downloaded^[[0m defmt v1.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8457660Z ^[[1m^[[92m  Downloaded^[[0m time-core v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8509440Z ^[[1m^[[92m  Downloaded^[[0m zerofrom-derive v0.1.8
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8546890Z ^[[1m^[[92m  Downloaded^[[0m adler2 v2.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8578710Z ^[[1m^[[92m  Downloaded^[[0m byteorder v1.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8611600Z ^[[1m^[[92m  Downloaded^[[0m cargo-platform v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8640520Z ^[[1m^[[92m  Downloaded^[[0m core-foundation-sys v0.8.7
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8740590Z ^[[1m^[[92m  Downloaded^[[0m ctor-proc-macro v0.0.7
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8778270Z ^[[1m^[[92m  Downloaded^[[0m defmt-macros v1.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8928760Z ^[[1m^[[92m  Downloaded^[[0m toml_datetime v1.1.1+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8966620Z ^[[1m^[[92m  Downloaded^[[0m typeid v1.0.3
+video-macos	Build starter desktop app	2026-09-24T17:02:21.8994100Z ^[[1m^[[92m  Downloaded^[[0m jni-sys v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9016020Z ^[[1m^[[92m  Downloaded^[[0m alloc-no-stdlib v2.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9065520Z ^[[1m^[[92m  Downloaded^[[0m bit-vec v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9164970Z ^[[1m^[[92m  Downloaded^[[0m cfb v0.7.3
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9286980Z ^[[1m^[[92m  Downloaded^[[0m core-graphics-types v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9321480Z ^[[1m^[[92m  Downloaded^[[0m cpufeatures v0.2.17
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9364840Z ^[[1m^[[92m  Downloaded^[[0m cssparser v0.36.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9486540Z ^[[1m^[[92m  Downloaded^[[0m darling v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9794740Z ^[[1m^[[92m  Downloaded^[[0m defmt-parser v1.0.0
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9821760Z ^[[1m^[[92m  Downloaded^[[0m tauri-plugin v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9853660Z ^[[1m^[[92m  Downloaded^[[0m tauri-winres v0.3.6
+video-macos	Build starter desktop app	2026-09-24T17:02:21.9907250Z ^[[1m^[[92m  Downloaded^[[0m thiserror v2.0.20
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0206770Z ^[[1m^[[92m  Downloaded^[[0m toml_datetime v0.7.5+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0254050Z ^[[1m^[[92m  Downloaded^[[0m web_atoms v0.2.6
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0334260Z ^[[1m^[[92m  Downloaded^[[0m yoke v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0444750Z ^[[1m^[[92m  Downloaded^[[0m log v0.4.34
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0501320Z ^[[1m^[[92m  Downloaded^[[0m memchr v2.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0649380Z ^[[1m^[[92m  Downloaded^[[0m miniz_oxide v0.9.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0775950Z ^[[1m^[[92m  Downloaded^[[0m objc2-core-graphics v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.0952410Z ^[[1m^[[92m  Downloaded^[[0m once_cell v1.21.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1099060Z ^[[1m^[[92m  Downloaded^[[0m parking_lot v0.12.5
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1248350Z ^[[1m^[[92m  Downloaded^[[0m phf v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1293590Z ^[[1m^[[92m  Downloaded^[[0m rustc_version v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1346710Z ^[[1m^[[92m  Downloaded^[[0m camino v1.2.6
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1394960Z ^[[1m^[[92m  Downloaded^[[0m core-graphics v0.25.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1467700Z ^[[1m^[[92m  Downloaded^[[0m crypto-common v0.1.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1491300Z ^[[1m^[[92m  Downloaded^[[0m ctor v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1518890Z ^[[1m^[[92m  Downloaded^[[0m darling_macro v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1554510Z ^[[1m^[[92m  Downloaded^[[0m foreign-types v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1592180Z ^[[1m^[[92m  Downloaded^[[0m foreign-types-macros v0.2.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1628040Z ^[[1m^[[92m  Downloaded^[[0m heck v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1682870Z ^[[1m^[[92m  Downloaded^[[0m idna v1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1757870Z ^[[1m^[[92m  Downloaded^[[0m tauri-build v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1812420Z ^[[1m^[[92m  Downloaded^[[0m tauri-codegen v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1851680Z ^[[1m^[[92m  Downloaded^[[0m tauri-macros v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.1919760Z ^[[1m^[[92m  Downloaded^[[0m tauri-runtime v2.11.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2001220Z ^[[1m^[[92m  Downloaded^[[0m tauri-runtime-wry v2.11.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2107950Z ^[[1m^[[92m  Downloaded^[[0m tendril v0.5.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2146540Z ^[[1m^[[92m  Downloaded^[[0m thiserror v1.0.69
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2291130Z ^[[1m^[[92m  Downloaded^[[0m thiserror-impl v1.0.69
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2325070Z ^[[1m^[[92m  Downloaded^[[0m toml v1.1.6+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2418170Z ^[[1m^[[92m  Downloaded^[[0m toml_parser v1.1.3+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2478100Z ^[[1m^[[92m  Downloaded^[[0m toml_writer v1.1.2+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2530890Z ^[[1m^[[92m  Downloaded^[[0m tray-icon v0.24.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2635700Z ^[[1m^[[92m  Downloaded^[[0m unic-ucd-version v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2677650Z ^[[1m^[[92m  Downloaded^[[0m unicode-segmentation v1.13.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2756110Z ^[[1m^[[92m  Downloaded^[[0m utf8_iter v1.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2786410Z ^[[1m^[[92m  Downloaded^[[0m uuid v1.26.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2904360Z ^[[1m^[[92m  Downloaded^[[0m walkdir v2.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.2974690Z ^[[1m^[[92m  Downloaded^[[0m zerovec-derive v0.11.6
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3023270Z ^[[1m^[[92m  Downloaded^[[0m zmij v1.0.23
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3085050Z ^[[1m^[[92m  Downloaded^[[0m indexmap v1.9.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3178800Z ^[[1m^[[92m  Downloaded^[[0m indexmap v2.14.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3320580Z ^[[1m^[[92m  Downloaded^[[0m infer v0.19.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3451670Z ^[[1m^[[92m  Downloaded^[[0m jiff-core v0.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3561210Z ^[[1m^[[92m  Downloaded^[[0m objc2 v0.6.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3844100Z ^[[1m^[[92m  Downloaded^[[0m smallvec v1.16.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3887210Z ^[[1m^[[92m  Downloaded^[[0m cfg-if v1.0.5
+video-macos	Build starter desktop app	2026-09-24T17:02:22.3934230Z ^[[1m^[[92m  Downloaded^[[0m crc32fast v1.5.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4022760Z ^[[1m^[[92m  Downloaded^[[0m displaydoc v0.2.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4144100Z ^[[1m^[[92m  Downloaded^[[0m dpi v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4178740Z ^[[1m^[[92m  Downloaded^[[0m dtoa-short v0.3.5
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4235330Z ^[[1m^[[92m  Downloaded^[[0m dtor v0.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4276370Z ^[[1m^[[92m  Downloaded^[[0m dtor-proc-macro v0.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4309350Z ^[[1m^[[92m  Downloaded^[[0m find-msvc-tools v0.1.13
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4364280Z ^[[1m^[[92m  Downloaded^[[0m fnv v1.0.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4414260Z ^[[1m^[[92m  Downloaded^[[0m foreign-types-shared v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4424140Z ^[[1m^[[92m  Downloaded^[[0m form_urlencoded v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4464770Z ^[[1m^[[92m  Downloaded^[[0m tauri-utils v2.9.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4610670Z ^[[1m^[[92m  Downloaded^[[0m thiserror-impl v2.0.20
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4647360Z ^[[1m^[[92m  Downloaded^[[0m time-macros v0.2.32
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4718410Z ^[[1m^[[92m  Downloaded^[[0m tinyvec v1.13.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.4885690Z ^[[1m^[[92m  Downloaded^[[0m toml v0.9.12+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5018460Z ^[[1m^[[92m  Downloaded^[[0m unic-char-property v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5057080Z ^[[1m^[[92m  Downloaded^[[0m unic-common v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5139050Z ^[[1m^[[92m  Downloaded^[[0m unic-ucd-ident v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5214950Z ^[[1m^[[92m  Downloaded^[[0m url v2.5.8
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5327340Z ^[[1m^[[92m  Downloaded^[[0m version_check v0.9.5
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5436760Z ^[[1m^[[92m  Downloaded^[[0m wry v0.55.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5733700Z ^[[1m^[[92m  Downloaded^[[0m zerofrom v0.1.8
+video-macos	Build starter desktop app	2026-09-24T17:02:22.5842060Z ^[[1m^[[92m  Downloaded^[[0m zlib-rs v0.6.8
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6046070Z ^[[1m^[[92m  Downloaded^[[0m idna_adapter v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6151670Z ^[[1m^[[92m  Downloaded^[[0m itoa v1.0.18
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6279280Z ^[[1m^[[92m  Downloaded^[[0m jiff v0.2.37
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6502030Z ^[[1m^[[92m  Downloaded^[[0m json-patch v3.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6585650Z ^[[1m^[[92m  Downloaded^[[0m objc2-exception-helper v0.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6611960Z ^[[1m^[[92m  Downloaded^[[0m percent-encoding v2.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6651440Z ^[[1m^[[92m  Downloaded^[[0m powerfmt v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6674230Z ^[[1m^[[92m  Downloaded^[[0m ref-cast-impl v1.0.27
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6703790Z ^[[1m^[[92m  Downloaded^[[0m cesu8 v1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6738520Z ^[[1m^[[92m  Downloaded^[[0m core-foundation v0.10.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6811210Z ^[[1m^[[92m  Downloaded^[[0m digest v0.10.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6906150Z ^[[1m^[[92m  Downloaded^[[0m dirs v6.0.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6939420Z ^[[1m^[[92m  Downloaded^[[0m dirs-sys v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.6971070Z ^[[1m^[[92m  Downloaded^[[0m dtoa v1.0.11
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7033990Z ^[[1m^[[92m  Downloaded^[[0m dyn-clone v1.0.20
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7107840Z ^[[1m^[[92m  Downloaded^[[0m embed-resource v3.0.11
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7156920Z ^[[1m^[[92m  Downloaded^[[0m embed_plist v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7177780Z ^[[1m^[[92m  Downloaded^[[0m equivalent v1.0.2
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7205340Z ^[[1m^[[92m  Downloaded^[[0m erased-serde v0.4.10
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7288430Z ^[[1m^[[92m  Downloaded^[[0m foldhash v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7330450Z ^[[1m^[[92m  Downloaded^[[0m generic-array v0.14.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7424700Z ^[[1m^[[92m  Downloaded^[[0m glob v0.3.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7451330Z ^[[1m^[[92m  Downloaded^[[0m ident_case v1.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7468920Z ^[[1m^[[92m  Downloaded^[[0m unic-char-range v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7499850Z ^[[1m^[[92m  Downloaded^[[0m urlpattern v0.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7561670Z ^[[1m^[[92m  Downloaded^[[0m winnow v1.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.7910850Z ^[[1m^[[92m  Downloaded^[[0m writeable v0.6.4
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8021820Z ^[[1m^[[92m  Downloaded^[[0m zerotrie v0.2.5
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8198450Z ^[[1m^[[92m  Downloaded^[[0m zerovec v0.11.8
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8381170Z ^[[1m^[[92m  Downloaded^[[0m jni-sys-macros v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8463560Z ^[[1m^[[92m  Downloaded^[[0m jsonptr v0.6.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8549810Z ^[[1m^[[92m  Downloaded^[[0m keyboard-types v0.7.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8609760Z ^[[1m^[[92m  Downloaded^[[0m lock_api v0.4.14
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8683960Z ^[[1m^[[92m  Downloaded^[[0m markup5ever v0.38.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8708120Z ^[[1m^[[92m  Downloaded^[[0m mime v0.3.17
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8739370Z ^[[1m^[[92m  Downloaded^[[0m miniz_oxide v0.8.9
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8829380Z ^[[1m^[[92m  Downloaded^[[0m parking_lot_core v0.9.12
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8909900Z ^[[1m^[[92m  Downloaded^[[0m phf_codegen v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8955800Z ^[[1m^[[92m  Downloaded^[[0m schemars_derive v0.8.22
+video-macos	Build starter desktop app	2026-09-24T17:02:22.8995890Z ^[[1m^[[92m  Downloaded^[[0m simd-adler32 v0.3.10
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9073660Z ^[[1m^[[92m  Downloaded^[[0m phf_macros v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9112540Z ^[[1m^[[92m  Downloaded^[[0m phf_shared v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9177480Z ^[[1m^[[92m  Downloaded^[[0m ref-cast v1.0.27
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9323700Z ^[[1m^[[92m  Downloaded^[[0m synstructure v0.14.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9344300Z ^[[1m^[[92m  Downloaded^[[0m shlex v2.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9379880Z ^[[1m^[[92m  Downloaded^[[0m siphasher v1.0.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9430350Z ^[[1m^[[92m  Downloaded^[[0m bs58 v0.5.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9473600Z ^[[1m^[[92m  Downloaded^[[0m cargo_toml v0.22.3
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9492670Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-channel v0.5.17
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9628110Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-utils v0.8.23
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9693290Z ^[[1m^[[92m  Downloaded^[[0m darling_core v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9852660Z ^[[1m^[[92m  Downloaded^[[0m deranged v0.5.8
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9876580Z ^[[1m^[[92m  Downloaded^[[0m fastrand v2.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9905920Z ^[[1m^[[92m  Downloaded^[[0m fdeflate v0.3.7
+video-macos	Build starter desktop app	2026-09-24T17:02:22.9941090Z ^[[1m^[[92m  Downloaded^[[0m iana-time-zone v0.1.65
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0006280Z ^[[1m^[[92m  Downloaded^[[0m ico v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0127270Z ^[[1m^[[92m  Downloaded^[[0m icu_provider v2.3.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0275300Z ^[[1m^[[92m  Downloaded^[[0m winnow v0.7.15
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0548360Z ^[[1m^[[92m  Downloaded^[[0m yoke-derive v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0653090Z ^[[1m^[[92m  Downloaded^[[0m jni-sys v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0662130Z ^[[1m^[[92m  Downloaded^[[0m litemap v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0778770Z ^[[1m^[[92m  Downloaded^[[0m num-conv v0.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0859140Z ^[[1m^[[92m  Downloaded^[[0m objc2-encode v4.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0899850Z ^[[1m^[[92m  Downloaded^[[0m option-ext v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.0941240Z ^[[1m^[[92m  Downloaded^[[0m proc-macro2 v1.0.107
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1027560Z ^[[1m^[[92m  Downloaded^[[0m schemars v0.8.22
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1430930Z ^[[1m^[[92m  Downloaded^[[0m raw-window-handle v0.6.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1480390Z ^[[1m^[[92m  Downloaded^[[0m serde-untagged v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1572340Z ^[[1m^[[92m  Downloaded^[[0m serde_derive_internals v0.29.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1605460Z ^[[1m^[[92m  Downloaded^[[0m serde_repr v0.1.21
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1662320Z ^[[1m^[[92m  Downloaded^[[0m serde_spanned v1.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1692290Z ^[[1m^[[92m  Downloaded^[[0m bitflags v2.13.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1829530Z ^[[1m^[[92m  Downloaded^[[0m combine v4.6.8
+video-macos	Build starter desktop app	2026-09-24T17:02:23.1937230Z ^[[1m^[[92m  Downloaded^[[0m flate2 v1.1.10
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2044660Z ^[[1m^[[92m  Downloaded^[[0m html5ever v0.38.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2121520Z ^[[1m^[[92m  Downloaded^[[0m jni v0.21.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2326870Z ^[[1m^[[92m  Downloaded^[[0m mio v1.2.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2581430Z ^[[1m^[[92m  Downloaded^[[0m muda v0.19.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2768470Z ^[[1m^[[92m  Downloaded^[[0m objc2-io-surface v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2845640Z ^[[1m^[[92m  Downloaded^[[0m plist v1.10.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.2983580Z ^[[1m^[[92m  Downloaded^[[0m schemars v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.3440680Z ^[[1m^[[92m  Downloaded^[[0m scopeguard v1.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.3471340Z ^[[1m^[[92m  Downloaded^[[0m base64 v0.21.7
+video-macos	Build starter desktop app	2026-09-24T17:02:23.3563500Z ^[[1m^[[92m  Downloaded^[[0m derive_more v2.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4025940Z ^[[1m^[[92m  Downloaded^[[0m dispatch2 v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4090990Z ^[[1m^[[92m  Downloaded^[[0m getrandom v0.4.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4212560Z ^[[1m^[[92m  Downloaded^[[0m icu_collections v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4402280Z ^[[1m^[[92m  Downloaded^[[0m unicode-ident v1.0.26
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4459620Z ^[[1m^[[92m  Downloaded^[[0m num-traits v0.2.19
+video-macos	Build starter desktop app	2026-09-24T17:02:23.4533190Z ^[[1m^[[92m  Downloaded^[[0m schemars v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5235740Z ^[[1m^[[92m  Downloaded^[[0m rustc-hash v2.1.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5302560Z ^[[1m^[[92m  Downloaded^[[0m socket2 v0.6.5
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5339410Z ^[[1m^[[92m  Downloaded^[[0m stable_deref_trait v1.2.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5367010Z ^[[1m^[[92m  Downloaded^[[0m serde_core v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5427840Z ^[[1m^[[92m  Downloaded^[[0m serde_derive v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5552280Z ^[[1m^[[92m  Downloaded^[[0m string_cache_codegen v0.6.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5564290Z ^[[1m^[[92m  Downloaded^[[0m quote v1.0.47
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5634890Z ^[[1m^[[92m  Downloaded^[[0m semver v1.0.28
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5698800Z ^[[1m^[[92m  Downloaded^[[0m derive_more-impl v2.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.5890940Z ^[[1m^[[92m  Downloaded^[[0m hashbrown v0.12.3
+video-macos	Build starter desktop app	2026-09-24T17:02:23.6012020Z ^[[1m^[[92m  Downloaded^[[0m icu_properties v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.6077490Z ^[[1m^[[92m  Downloaded^[[0m typenum v1.20.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.6178830Z ^[[1m^[[92m  Downloaded^[[0m objc2-foundation v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.6717340Z ^[[1m^[[92m  Downloaded^[[0m objc2-web-kit v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7306740Z ^[[1m^[[92m  Downloaded^[[0m cc v1.4.7
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7438160Z ^[[1m^[[92m  Downloaded^[[0m dunce v1.0.5
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7496890Z ^[[1m^[[92m  Downloaded^[[0m http v1.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7598810Z ^[[1m^[[92m  Downloaded^[[0m objc2-core-foundation v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7886800Z ^[[1m^[[92m  Downloaded^[[0m selectors v0.36.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.7944380Z ^[[1m^[[92m  Downloaded^[[0m icu_locale_core v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8310020Z ^[[1m^[[92m  Downloaded^[[0m serialize-to-javascript v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8423090Z ^[[1m^[[92m  Downloaded^[[0m serialize-to-javascript-impl v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8479460Z ^[[1m^[[92m  Downloaded^[[0m sha2 v0.10.9
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8549790Z ^[[1m^[[92m  Downloaded^[[0m string_cache v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8619640Z ^[[1m^[[92m  Downloaded^[[0m strsim v0.11.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8651310Z ^[[1m^[[92m  Downloaded^[[0m phf_generator v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8687080Z ^[[1m^[[92m  Downloaded^[[0m serde v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8776870Z ^[[1m^[[92m  Downloaded^[[0m aho-corasick v1.1.5
+video-macos	Build starter desktop app	2026-09-24T17:02:23.8964540Z ^[[1m^[[92m  Downloaded^[[0m time v0.3.55
+video-macos	Build starter desktop app	2026-09-24T17:02:23.9664670Z ^[[1m^[[92m  Downloaded^[[0m regex v1.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:23.9824800Z ^[[1m^[[92m  Downloaded^[[0m potential_utf v0.1.6
+video-macos	Build starter desktop app	2026-09-24T17:02:23.9854000Z ^[[1m^[[92m  Downloaded^[[0m brotli-decompressor v5.0.3
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0058940Z ^[[1m^[[92m  Downloaded^[[0m hashbrown v0.17.1
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0218770Z ^[[1m^[[92m  Downloaded^[[0m serde_with_macros v3.23.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0295390Z ^[[1m^[[92m  Downloaded^[[0m swift-rs v1.0.8
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0477660Z ^[[1m^[[92m  Downloaded^[[0m pin-project-lite v0.2.17
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0730400Z ^[[1m^[[92m  Downloaded^[[0m png v0.17.16
+video-macos	Build starter desktop app	2026-09-24T17:02:24.0860060Z ^[[1m^[[92m  Downloaded^[[0m icu_properties_data v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.1262130Z ^[[1m^[[92m  Downloaded^[[0m objc2-app-kit v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:02:24.2112310Z ^[[1m^[[92m  Downloaded^[[0m serde_json v1.0.151
+video-macos	Build starter desktop app	2026-09-24T17:02:24.2384810Z ^[[1m^[[92m  Downloaded^[[0m servo_arc v0.4.3
+video-macos	Build starter desktop app	2026-09-24T17:02:24.2409630Z ^[[1m^[[92m  Downloaded^[[0m chrono v0.4.45
+video-macos	Build starter desktop app	2026-09-24T17:02:24.2743780Z ^[[1m^[[92m  Downloaded^[[0m serde_with v3.23.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.3184280Z ^[[1m^[[92m  Downloaded^[[0m png v0.18.1
+video-macos	Build starter desktop app	2026-09-24T17:02:24.3304310Z ^[[1m^[[92m  Downloaded^[[0m brotli v8.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:24.3632520Z ^[[1m^[[92m  Downloaded^[[0m tao v0.35.3
+video-macos	Build starter desktop app	2026-09-24T17:02:24.3917640Z ^[[1m^[[92m  Downloaded^[[0m quick-xml v0.42.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.4068010Z ^[[1m^[[92m  Downloaded^[[0m syn v3.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:24.4435690Z ^[[1m^[[92m  Downloaded^[[0m syn v2.0.119
+video-macos	Build starter desktop app	2026-09-24T17:02:24.4692890Z ^[[1m^[[92m  Downloaded^[[0m tauri v2.11.6
+video-macos	Build starter desktop app	2026-09-24T17:02:24.5139240Z ^[[1m^[[92m  Downloaded^[[0m tokio v1.53.1
+video-macos	Build starter desktop app	2026-09-24T17:02:24.6755230Z ^[[1m^[[92m  Downloaded^[[0m regex-syntax v0.8.11
+video-macos	Build starter desktop app	2026-09-24T17:02:24.6965960Z ^[[1m^[[92m  Downloaded^[[0m libc v0.2.189
+video-macos	Build starter desktop app	2026-09-24T17:02:24.8348730Z ^[[1m^[[92m  Downloaded^[[0m icu_normalizer v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.8622950Z ^[[1m^[[92m  Downloaded^[[0m regex-automata v0.4.18
+video-macos	Build starter desktop app	2026-09-24T17:02:24.9176560Z ^[[1m^[[92m  Downloaded^[[0m window-vibrancy v0.6.0
+video-macos	Build starter desktop app	2026-09-24T17:02:24.9328810Z ^[[1m^[[92m  Downloaded^[[0m tinystr v0.8.4
+video-macos	Build starter desktop app	2026-09-24T17:02:24.9385430Z ^[[1m^[[92m  Downloaded^[[0m new_debug_unreachable v1.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:25.2046380Z ^[[1m^[[92m   Compiling^[[0m proc-macro2 v1.0.107
+video-macos	Build starter desktop app	2026-09-24T17:02:25.2155240Z ^[[1m^[[92m   Compiling^[[0m unicode-ident v1.0.26
+video-macos	Build starter desktop app	2026-09-24T17:02:25.2261540Z ^[[1m^[[92m   Compiling^[[0m quote v1.0.47
+video-macos	Build starter desktop app	2026-09-24T17:02:26.1340820Z ^[[1m^[[92m   Compiling^[[0m serde_core v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:31.4645720Z ^[[1m^[[92m   Compiling^[[0m memchr v2.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:33.0245790Z ^[[1m^[[92m   Compiling^[[0m libc v0.2.189
+video-macos	Build starter desktop app	2026-09-24T17:02:33.2014880Z ^[[1m^[[92m   Compiling^[[0m syn v3.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:33.4276320Z ^[[1m^[[92m   Compiling^[[0m syn v2.0.119
+video-macos	Build starter desktop app	2026-09-24T17:02:35.1941270Z ^[[1m^[[92m   Compiling^[[0m smallvec v1.16.1
+video-macos	Build starter desktop app	2026-09-24T17:02:38.4624750Z ^[[1m^[[92m   Compiling^[[0m synstructure v0.14.0
+video-macos	Build starter desktop app	2026-09-24T17:02:39.8976040Z ^[[1m^[[92m   Compiling^[[0m litemap v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:39.9919800Z ^[[1m^[[92m   Compiling^[[0m writeable v0.6.4
+video-macos	Build starter desktop app	2026-09-24T17:02:40.1777940Z ^[[1m^[[92m   Compiling^[[0m siphasher v1.0.3
+video-macos	Build starter desktop app	2026-09-24T17:02:40.2865410Z ^[[1m^[[92m   Compiling^[[0m zerofrom-derive v0.1.8
+video-macos	Build starter desktop app	2026-09-24T17:02:40.3170680Z ^[[1m^[[92m   Compiling^[[0m yoke-derive v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:40.4049750Z ^[[1m^[[92m   Compiling^[[0m zerovec-derive v0.11.6
+video-macos	Build starter desktop app	2026-09-24T17:02:41.4764840Z ^[[1m^[[92m   Compiling^[[0m serde_derive v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:41.5073810Z ^[[1m^[[92m   Compiling^[[0m displaydoc v0.2.7
+video-macos	Build starter desktop app	2026-09-24T17:02:41.6492080Z ^[[1m^[[92m   Compiling^[[0m zerofrom v0.1.8
+video-macos	Build starter desktop app	2026-09-24T17:02:41.7609350Z ^[[1m^[[92m   Compiling^[[0m cfg-if v1.0.5
+video-macos	Build starter desktop app	2026-09-24T17:02:41.8335930Z ^[[1m^[[92m   Compiling^[[0m phf_shared v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:42.0778540Z ^[[1m^[[92m   Compiling^[[0m itoa v1.0.18
+video-macos	Build starter desktop app	2026-09-24T17:02:42.3478590Z ^[[1m^[[92m   Compiling^[[0m utf8_iter v1.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:42.3623350Z ^[[1m^[[92m   Compiling^[[0m fastrand v2.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:42.5191140Z ^[[1m^[[92m   Compiling^[[0m icu_properties_data v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:42.5495410Z ^[[1m^[[92m   Compiling^[[0m phf_generator v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:42.7498010Z ^[[1m^[[92m   Compiling^[[0m icu_normalizer_data v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:42.7959200Z ^[[1m^[[92m   Compiling^[[0m stable_deref_trait v1.2.1
+video-macos	Build starter desktop app	2026-09-24T17:02:42.8771230Z ^[[1m^[[92m   Compiling^[[0m zmij v1.0.23
+video-macos	Build starter desktop app	2026-09-24T17:02:43.3406880Z ^[[1m^[[92m   Compiling^[[0m find-msvc-tools v0.1.13
+video-macos	Build starter desktop app	2026-09-24T17:02:43.5975440Z ^[[1m^[[92m   Compiling^[[0m serde v1.0.229
+video-macos	Build starter desktop app	2026-09-24T17:02:43.6500390Z ^[[1m^[[92m   Compiling^[[0m shlex v2.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:43.8267630Z ^[[1m^[[92m   Compiling^[[0m cc v1.4.7
+video-macos	Build starter desktop app	2026-09-24T17:02:43.9542860Z ^[[1m^[[92m   Compiling^[[0m yoke v0.8.3
+video-macos	Build starter desktop app	2026-09-24T17:02:44.1227750Z ^[[1m^[[92m   Compiling^[[0m zerovec v0.11.8
+video-macos	Build starter desktop app	2026-09-24T17:02:45.1350850Z ^[[1m^[[92m   Compiling^[[0m phf_macros v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:45.7155120Z ^[[1m^[[92m   Compiling^[[0m time-core v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:02:45.7800530Z ^[[1m^[[92m   Compiling^[[0m winnow v1.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:45.9070000Z ^[[1m^[[92m   Compiling^[[0m num-conv v0.2.2
+video-macos	Build starter desktop app	2026-09-24T17:02:45.9315830Z ^[[1m^[[92m   Compiling^[[0m tinystr v0.8.4
+video-macos	Build starter desktop app	2026-09-24T17:02:46.0663970Z ^[[1m^[[92m   Compiling^[[0m phf_codegen v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:46.1774270Z ^[[1m^[[92m   Compiling^[[0m typeid v1.0.3
+video-macos	Build starter desktop app	2026-09-24T17:02:46.1924030Z ^[[1m^[[92m   Compiling^[[0m toml_parser v1.1.3+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:46.2505400Z ^[[1m^[[92m   Compiling^[[0m ident_case v1.0.1
+video-macos	Build starter desktop app	2026-09-24T17:02:46.3938290Z ^[[1m^[[92m   Compiling^[[0m strsim v0.11.1
+video-macos	Build starter desktop app	2026-09-24T17:02:46.5422570Z ^[[1m^[[92m   Compiling^[[0m deranged v0.5.8
+video-macos	Build starter desktop app	2026-09-24T17:02:46.7764290Z ^[[1m^[[92m   Compiling^[[0m log v0.4.34
+video-macos	Build starter desktop app	2026-09-24T17:02:47.0428720Z ^[[1m^[[92m   Compiling^[[0m serde_json v1.0.151
+video-macos	Build starter desktop app	2026-09-24T17:02:47.3594760Z ^[[1m^[[92m   Compiling^[[0m powerfmt v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:47.3981400Z ^[[1m^[[92m   Compiling^[[0m toml_writer v1.1.2+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:02:47.5743670Z ^[[1m^[[92m   Compiling^[[0m darling_core v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:47.6887010Z ^[[1m^[[92m   Compiling^[[0m icu_locale_core v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:47.9195500Z ^[[1m^[[92m   Compiling^[[0m potential_utf v0.1.6
+video-macos	Build starter desktop app	2026-09-24T17:02:48.0685580Z ^[[1m^[[92m   Compiling^[[0m zerotrie v0.2.5
+video-macos	Build starter desktop app	2026-09-24T17:02:48.3918630Z ^[[1m^[[92m   Compiling^[[0m thiserror v2.0.20
+video-macos	Build starter desktop app	2026-09-24T17:02:48.7815840Z ^[[1m^[[92m   Compiling^[[0m thiserror v1.0.69
+video-macos	Build starter desktop app	2026-09-24T17:02:49.2108640Z ^[[1m^[[92m   Compiling^[[0m byteorder v1.5.0
+video-macos	Build starter desktop app	2026-09-24T17:02:49.2903790Z ^[[1m^[[92m   Compiling^[[0m parking_lot_core v0.9.12
+video-macos	Build starter desktop app	2026-09-24T17:02:49.4388620Z ^[[1m^[[92m   Compiling^[[0m erased-serde v0.4.10
+video-macos	Build starter desktop app	2026-09-24T17:02:49.5794990Z ^[[1m^[[92m   Compiling^[[0m bytes v1.12.1
+video-macos	Build starter desktop app	2026-09-24T17:02:50.1336930Z ^[[1m^[[92m   Compiling^[[0m icu_provider v2.3.1
+video-macos	Build starter desktop app	2026-09-24T17:02:50.2814500Z ^[[1m^[[92m   Compiling^[[0m icu_collections v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:50.8151110Z ^[[1m^[[92m   Compiling^[[0m thiserror-impl v2.0.20
+video-macos	Build starter desktop app	2026-09-24T17:02:51.2463040Z ^[[1m^[[92m   Compiling^[[0m darling_macro v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:51.6762450Z ^[[1m^[[92m   Compiling^[[0m thiserror-impl v1.0.69
+video-macos	Build starter desktop app	2026-09-24T17:02:51.9728420Z ^[[1m^[[92m   Compiling^[[0m aho-corasick v1.1.5
+video-macos	Build starter desktop app	2026-09-24T17:02:52.4781290Z ^[[1m^[[92m   Compiling^[[0m unic-common v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:52.6169160Z ^[[1m^[[92m   Compiling^[[0m new_debug_unreachable v1.0.6
+video-macos	Build starter desktop app	2026-09-24T17:02:52.6759770Z ^[[1m^[[92m   Compiling^[[0m scopeguard v1.2.0
+video-macos	Build starter desktop app	2026-09-24T17:02:52.7676720Z ^[[1m^[[92m   Compiling^[[0m fnv v1.0.7
+video-macos	Build starter desktop app	2026-09-24T17:02:52.8391640Z ^[[1m^[[92m   Compiling^[[0m regex-syntax v0.8.11
+video-macos	Build starter desktop app	2026-09-24T17:02:53.2840030Z ^[[1m^[[92m   Compiling^[[0m unic-char-range v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:53.3741970Z ^[[1m^[[92m   Compiling^[[0m unic-char-property v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:53.5656930Z ^[[1m^[[92m   Compiling^[[0m lock_api v0.4.14
+video-macos	Build starter desktop app	2026-09-24T17:02:53.8001980Z ^[[1m^[[92m   Compiling^[[0m unic-ucd-version v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:53.9643590Z ^[[1m^[[92m   Compiling^[[0m darling v0.24.1
+video-macos	Build starter desktop app	2026-09-24T17:02:54.2840250Z ^[[1m^[[92m   Compiling^[[0m phf v0.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:54.4276870Z ^[[1m^[[92m   Compiling^[[0m string_cache_codegen v0.6.1
+video-macos	Build starter desktop app	2026-09-24T17:02:54.6413680Z ^[[1m^[[92m   Compiling^[[0m precomputed-hash v0.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:54.7276200Z ^[[1m^[[92m   Compiling^[[0m equivalent v1.0.2
+video-macos	Build starter desktop app	2026-09-24T17:02:54.7867950Z ^[[1m^[[92m   Compiling^[[0m regex-automata v0.4.18
+video-macos	Build starter desktop app	2026-09-24T17:02:54.8890390Z ^[[1m^[[92m   Compiling^[[0m hashbrown v0.17.1
+video-macos	Build starter desktop app	2026-09-24T17:02:55.9689230Z ^[[1m^[[92m   Compiling^[[0m getrandom v0.4.3
+video-macos	Build starter desktop app	2026-09-24T17:02:56.3045330Z ^[[1m^[[92m   Compiling^[[0m alloc-no-stdlib v2.0.4
+video-macos	Build starter desktop app	2026-09-24T17:02:56.4102540Z ^[[1m^[[92m   Compiling^[[0m alloc-stdlib v0.2.4
+video-macos	Build starter desktop app	2026-09-24T17:02:56.5231160Z ^[[1m^[[92m   Compiling^[[0m indexmap v2.14.2
+video-macos	Build starter desktop app	2026-09-24T17:02:56.7715490Z ^[[1m^[[92m   Compiling^[[0m web_atoms v0.2.6
+video-macos	Build starter desktop app	2026-09-24T17:02:57.2090300Z ^[[1m^[[92m   Compiling^[[0m parking_lot v0.12.5
+video-macos	Build starter desktop app	2026-09-24T17:02:57.2697240Z ^[[1m^[[92m   Compiling^[[0m serde_with_macros v3.23.0
+video-macos	Build starter desktop app	2026-09-24T17:02:57.5566550Z ^[[1m^[[92m   Compiling^[[0m unic-ucd-ident v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:02:57.8204750Z ^[[1m^[[92m   Compiling^[[0m regex v1.13.1
+video-macos	Build starter desktop app	2026-09-24T17:02:58.3479870Z ^[[1m^[[92m   Compiling^[[0m icu_normalizer v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:58.4051780Z ^[[1m^[[92m   Compiling^[[0m icu_properties v2.3.0
+video-macos	Build starter desktop app	2026-09-24T17:02:59.5812180Z ^[[1m^[[92m   Compiling^[[0m objc2-exception-helper v0.1.1
+video-macos	Build starter desktop app	2026-09-24T17:02:59.9392130Z ^[[1m^[[92m   Compiling^[[0m serde_spanned v1.1.1
+video-macos	Build starter desktop app	2026-09-24T17:03:00.1320620Z ^[[1m^[[92m   Compiling^[[0m quick-xml v0.42.0
+video-macos	Build starter desktop app	2026-09-24T17:03:00.1868880Z ^[[1m^[[92m   Compiling^[[0m base64 v0.23.1
+video-macos	Build starter desktop app	2026-09-24T17:03:00.6684440Z ^[[1m^[[92m   Compiling^[[0m anyhow v1.0.104
+video-macos	Build starter desktop app	2026-09-24T17:03:01.6192260Z ^[[1m^[[92m   Compiling^[[0m idna_adapter v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:03:01.7885470Z ^[[1m^[[92m   Compiling^[[0m string_cache v0.9.0
+video-macos	Build starter desktop app	2026-09-24T17:03:02.4967730Z ^[[1m^[[92m   Compiling^[[0m brotli-decompressor v5.0.3
+video-macos	Build starter desktop app	2026-09-24T17:03:02.6371780Z ^[[1m^[[92m   Compiling^[[0m http v1.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:04.0573150Z ^[[1m^[[92m   Compiling^[[0m bitflags v2.13.2
+video-macos	Build starter desktop app	2026-09-24T17:03:04.3418880Z ^[[1m^[[92m   Compiling^[[0m semver v1.0.28
+video-macos	Build starter desktop app	2026-09-24T17:03:04.3641060Z ^[[1m^[[92m   Compiling^[[0m ctor-proc-macro v0.0.7
+video-macos	Build starter desktop app	2026-09-24T17:03:04.7230420Z ^[[1m^[[92m   Compiling^[[0m percent-encoding v2.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:04.7546690Z ^[[1m^[[92m   Compiling^[[0m version_check v0.9.5
+video-macos	Build starter desktop app	2026-09-24T17:03:04.8858390Z ^[[1m^[[92m   Compiling^[[0m autocfg v1.5.1
+video-macos	Build starter desktop app	2026-09-24T17:03:05.1417110Z ^[[1m^[[92m   Compiling^[[0m dtoa v1.0.11
+video-macos	Build starter desktop app	2026-09-24T17:03:05.3032030Z ^[[1m^[[92m   Compiling^[[0m same-file v1.0.6
+video-macos	Build starter desktop app	2026-09-24T17:03:05.4879600Z ^[[1m^[[92m   Compiling^[[0m dunce v1.0.5
+video-macos	Build starter desktop app	2026-09-24T17:03:05.4986070Z ^[[1m^[[92m   Compiling^[[0m indexmap v1.9.3
+video-macos	Build starter desktop app	2026-09-24T17:03:05.5720080Z ^[[1m^[[92m   Compiling^[[0m walkdir v2.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:05.6235700Z ^[[1m^[[92m   Compiling^[[0m dtoa-short v0.3.5
+video-macos	Build starter desktop app	2026-09-24T17:03:05.7597530Z ^[[1m^[[92m   Compiling^[[0m form_urlencoded v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:03:05.8015030Z ^[[1m^[[92m   Compiling^[[0m ctor v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:03:05.8819260Z ^[[1m^[[92m   Compiling^[[0m brotli v8.0.4
+video-macos	Build starter desktop app	2026-09-24T17:03:06.3115390Z ^[[1m^[[92m   Compiling^[[0m uuid v1.26.1
+video-macos	Build starter desktop app	2026-09-24T17:03:06.8980110Z ^[[1m^[[92m   Compiling^[[0m idna v1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:08.0548020Z ^[[1m^[[92m   Compiling^[[0m tendril v0.5.1
+video-macos	Build starter desktop app	2026-09-24T17:03:08.1875140Z ^[[1m^[[92m   Compiling^[[0m selectors v0.36.1
+video-macos	Build starter desktop app	2026-09-24T17:03:08.3306660Z ^[[1m^[[92m   Compiling^[[0m cssparser-macros v0.6.1
+video-macos	Build starter desktop app	2026-09-24T17:03:08.6795500Z ^[[1m^[[92m   Compiling^[[0m derive_more-impl v2.1.1
+video-macos	Build starter desktop app	2026-09-24T17:03:08.8024020Z ^[[1m^[[92m   Compiling^[[0m toml_datetime v1.1.1+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:09.1222660Z ^[[1m^[[92m   Compiling^[[0m camino v1.2.6
+video-macos	Build starter desktop app	2026-09-24T17:03:09.4948190Z ^[[1m^[[92m   Compiling^[[0m glob v0.3.4
+video-macos	Build starter desktop app	2026-09-24T17:03:09.6575740Z ^[[1m^[[92m   Compiling^[[0m objc2 v0.6.4
+video-macos	Build starter desktop app	2026-09-24T17:03:09.8323560Z ^[[1m^[[92m   Compiling^[[0m derive_more v2.1.1
+video-macos	Build starter desktop app	2026-09-24T17:03:09.9421410Z ^[[1m^[[92m   Compiling^[[0m toml v1.1.6+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:09.9773740Z ^[[1m^[[92m   Compiling^[[0m cssparser v0.36.0
+video-macos	Build starter desktop app	2026-09-24T17:03:10.0552460Z ^[[1m^[[92m   Compiling^[[0m markup5ever v0.38.0
+video-macos	Build starter desktop app	2026-09-24T17:03:10.2361220Z ^[[1m^[[92m   Compiling^[[0m url v2.5.8
+video-macos	Build starter desktop app	2026-09-24T17:03:10.9273770Z ^[[1m^[[92m   Compiling^[[0m swift-rs v1.0.8
+video-macos	Build starter desktop app	2026-09-24T17:03:11.0187190Z ^[[1m^[[92m   Compiling^[[0m servo_arc v0.4.3
+video-macos	Build starter desktop app	2026-09-24T17:03:11.1061980Z ^[[1m^[[92m   Compiling^[[0m serde_derive_internals v0.29.1
+video-macos	Build starter desktop app	2026-09-24T17:03:11.5166330Z ^[[1m^[[92m   Compiling^[[0m rustc-hash v2.1.3
+video-macos	Build starter desktop app	2026-09-24T17:03:11.6109610Z ^[[1m^[[92m   Compiling^[[0m objc2-encode v4.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:11.6718980Z ^[[1m^[[92m   Compiling^[[0m bit-vec v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:03:11.8997540Z ^[[1m^[[92m   Compiling^[[0m hashbrown v0.12.3
+video-macos	Build starter desktop app	2026-09-24T17:03:12.0103430Z ^[[1m^[[92m   Compiling^[[0m schemars v0.8.22
+video-macos	Build starter desktop app	2026-09-24T17:03:12.0380740Z ^[[1m^[[92m   Compiling^[[0m schemars_derive v0.8.22
+video-macos	Build starter desktop app	2026-09-24T17:03:12.1871590Z ^[[1m^[[92m   Compiling^[[0m bit-set v0.8.0
+video-macos	Build starter desktop app	2026-09-24T17:03:14.0445490Z ^[[1m^[[92m   Compiling^[[0m html5ever v0.38.0
+video-macos	Build starter desktop app	2026-09-24T17:03:14.6135370Z ^[[1m^[[92m   Compiling^[[0m cfb v0.7.3
+video-macos	Build starter desktop app	2026-09-24T17:03:14.9429850Z ^[[1m^[[92m   Compiling^[[0m jsonptr v0.6.3
+video-macos	Build starter desktop app	2026-09-24T17:03:15.8187960Z ^[[1m^[[92m   Compiling^[[0m time v0.3.55
+video-macos	Build starter desktop app	2026-09-24T17:03:16.0007830Z ^[[1m^[[92m   Compiling^[[0m cargo-platform v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:03:16.3491970Z ^[[1m^[[92m   Compiling^[[0m dyn-clone v1.0.20
+video-macos	Build starter desktop app	2026-09-24T17:03:16.4299380Z ^[[1m^[[92m   Compiling^[[0m foldhash v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:03:16.5220770Z ^[[1m^[[92m   Compiling^[[0m base64 v0.21.7
+video-macos	Build starter desktop app	2026-09-24T17:03:16.7758230Z ^[[1m^[[92m   Compiling^[[0m dom_query v0.27.0
+video-macos	Build starter desktop app	2026-09-24T17:03:18.9039150Z ^[[1m^[[92m   Compiling^[[0m cargo_metadata v0.19.2
+video-macos	Build starter desktop app	2026-09-24T17:03:19.4270820Z ^[[1m^[[92m   Compiling^[[0m plist v1.10.1
+video-macos	Build starter desktop app	2026-09-24T17:03:20.1718300Z ^[[1m^[[92m   Compiling^[[0m serde-untagged v0.1.9
+video-macos	Build starter desktop app	2026-09-24T17:03:20.4238940Z ^[[1m^[[92m   Compiling^[[0m json-patch v3.0.1
+video-macos	Build starter desktop app	2026-09-24T17:03:20.6538470Z ^[[1m^[[92m   Compiling^[[0m infer v0.19.0
+video-macos	Build starter desktop app	2026-09-24T17:03:21.0450460Z ^[[1m^[[92m   Compiling^[[0m urlpattern v0.3.0
+video-macos	Build starter desktop app	2026-09-24T17:03:21.1996900Z ^[[1m^[[92m   Compiling^[[0m serde_with v3.23.0
+video-macos	Build starter desktop app	2026-09-24T17:03:21.3118900Z ^[[1m^[[92m   Compiling^[[0m simd-adler32 v0.3.10
+video-macos	Build starter desktop app	2026-09-24T17:03:21.4677020Z ^[[1m^[[92m   Compiling^[[0m option-ext v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:03:21.5318150Z ^[[1m^[[92m   Compiling^[[0m dirs-sys v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:22.3461570Z ^[[1m^[[92m   Compiling^[[0m block2 v0.6.2
+video-macos	Build starter desktop app	2026-09-24T17:03:22.7034170Z ^[[1m^[[92m   Compiling^[[0m objc2-core-foundation v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:23.2363660Z ^[[1m^[[92m   Compiling^[[0m tauri-utils v2.9.3
+video-macos	Build starter desktop app	2026-09-24T17:03:23.5898780Z ^[[1m^[[92m   Compiling^[[0m crc32fast v1.5.2
+video-macos	Build starter desktop app	2026-09-24T17:03:23.6728850Z ^[[1m^[[92m   Compiling^[[0m adler2 v2.0.1
+video-macos	Build starter desktop app	2026-09-24T17:03:23.7630460Z ^[[1m^[[92m   Compiling^[[0m objc2-foundation v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:24.0510420Z ^[[1m^[[92m   Compiling^[[0m dirs v6.0.0
+video-macos	Build starter desktop app	2026-09-24T17:03:24.1302710Z ^[[1m^[[92m   Compiling^[[0m generic-array v0.14.7
+video-macos	Build starter desktop app	2026-09-24T17:03:24.2924690Z ^[[1m^[[92m   Compiling^[[0m rustc_version v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:03:24.4935430Z ^[[1m^[[92m   Compiling^[[0m toml_datetime v0.7.5+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:25.1042060Z ^[[1m^[[92m   Compiling^[[0m winnow v0.7.15
+video-macos	Build starter desktop app	2026-09-24T17:03:26.5729920Z ^[[1m^[[92m   Compiling^[[0m toml v0.9.12+spec-1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:03:28.7184370Z ^[[1m^[[92m   Compiling^[[0m objc2-app-kit v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:34.0597650Z ^[[1m^[[92m   Compiling^[[0m embed-resource v3.0.11
+video-macos	Build starter desktop app	2026-09-24T17:03:36.0759040Z ^[[1m^[[92m   Compiling^[[0m miniz_oxide v0.9.1
+video-macos	Build starter desktop app	2026-09-24T17:03:36.8706780Z ^[[1m^[[92m   Compiling^[[0m time-macros v0.2.32
+video-macos	Build starter desktop app	2026-09-24T17:03:38.0788050Z ^[[1m^[[92m   Compiling^[[0m heck v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:38.2511100Z ^[[1m^[[92m   Compiling^[[0m typenum v1.20.1
+video-macos	Build starter desktop app	2026-09-24T17:03:39.3129480Z ^[[1m^[[92m   Compiling^[[0m flate2 v1.1.10
+video-macos	Build starter desktop app	2026-09-24T17:03:40.5899760Z ^[[1m^[[92m   Compiling^[[0m tauri-winres v0.3.6
+video-macos	Build starter desktop app	2026-09-24T17:03:41.3889470Z ^[[1m^[[92m   Compiling^[[0m cargo_toml v0.22.3
+video-macos	Build starter desktop app	2026-09-24T17:03:41.4507400Z ^[[1m^[[92m   Compiling^[[0m miniz_oxide v0.8.9
+video-macos	Build starter desktop app	2026-09-24T17:03:42.2339500Z ^[[1m^[[92m   Compiling^[[0m fdeflate v0.3.7
+video-macos	Build starter desktop app	2026-09-24T17:03:42.5714050Z ^[[1m^[[92m   Compiling^[[0m crossbeam-utils v0.8.23
+video-macos	Build starter desktop app	2026-09-24T17:03:42.8032660Z ^[[1m^[[92m   Compiling^[[0m tauri-build v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:03:42.9062170Z ^[[1m^[[92m   Compiling^[[0m dpi v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:03:43.2676290Z ^[[1m^[[92m   Compiling^[[0m cookie v0.18.2
+video-macos	Build starter desktop app	2026-09-24T17:03:43.8411070Z ^[[1m^[[92m   Compiling^[[0m raw-window-handle v0.6.2
+video-macos	Build starter desktop app	2026-09-24T17:03:44.0309190Z ^[[1m^[[92m   Compiling^[[0m core-foundation-sys v0.8.7
+video-macos	Build starter desktop app	2026-09-24T17:03:44.2193120Z ^[[1m^[[92m   Compiling^[[0m core-foundation v0.10.1
+video-macos	Build starter desktop app	2026-09-24T17:03:44.8479750Z ^[[1m^[[92m   Compiling^[[0m block-buffer v0.10.4
+video-macos	Build starter desktop app	2026-09-24T17:03:44.8514020Z ^[[1m^[[92m   Compiling^[[0m crypto-common v0.1.7
+video-macos	Build starter desktop app	2026-09-24T17:03:45.1356980Z ^[[1m^[[92m   Compiling^[[0m foreign-types-macros v0.2.4
+video-macos	Build starter desktop app	2026-09-24T17:03:45.4586400Z ^[[1m^[[92m   Compiling^[[0m foreign-types-shared v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:03:45.5143600Z ^[[1m^[[92m   Compiling^[[0m once_cell v1.21.4
+video-macos	Build starter desktop app	2026-09-24T17:03:45.6246200Z ^[[1m^[[92m   Compiling^[[0m bitflags v1.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:45.6840130Z ^[[1m^[[92m   Compiling^[[0m png v0.17.16
+video-macos	Build starter desktop app	2026-09-24T17:03:45.8254000Z ^[[1m^[[92m   Compiling^[[0m foreign-types v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:46.2531680Z ^[[1m^[[92m   Compiling^[[0m digest v0.10.7
+video-macos	Build starter desktop app	2026-09-24T17:03:46.8905470Z ^[[1m^[[92m   Compiling^[[0m crossbeam-channel v0.5.17
+video-macos	Build starter desktop app	2026-09-24T17:03:47.4468600Z ^[[1m^[[92m   Compiling^[[0m core-graphics-types v0.2.0
+video-macos	Build starter desktop app	2026-09-24T17:03:47.5489920Z ^[[1m^[[92m   Compiling^[[0m tauri v2.11.6
+video-macos	Build starter desktop app	2026-09-24T17:03:49.7487060Z ^[[1m^[[92m   Compiling^[[0m objc2-web-kit v0.3.2
+video-macos	Build starter desktop app	2026-09-24T17:03:50.9062170Z ^[[1m^[[92m   Compiling^[[0m cpufeatures v0.2.17
+video-macos	Build starter desktop app	2026-09-24T17:03:51.0110390Z ^[[1m^[[92m   Compiling^[[0m wry v0.55.1
+video-macos	Build starter desktop app	2026-09-24T17:03:51.2759950Z ^[[1m^[[92m   Compiling^[[0m tauri-runtime v2.11.3
+video-macos	Build starter desktop app	2026-09-24T17:03:51.5223230Z ^[[1m^[[92m   Compiling^[[0m sha2 v0.10.9
+video-macos	Build starter desktop app	2026-09-24T17:03:51.8121840Z ^[[1m^[[92m   Compiling^[[0m core-graphics v0.25.0
+video-macos	Build starter desktop app	2026-09-24T17:03:51.8511110Z ^[[1m^[[92m   Compiling^[[0m ico v0.5.0
+video-macos	Build starter desktop app	2026-09-24T17:03:52.4200620Z ^[[1m^[[92m   Compiling^[[0m tauri-plugin v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:03:52.4845820Z ^[[1m^[[92m   Compiling^[[0m dispatch2 v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:03:52.8228450Z ^[[1m^[[92m   Compiling^[[0m jni-sys-macros v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:03:52.9151290Z ^[[1m^[[92m   Compiling^[[0m unicode-segmentation v1.13.3
+video-macos	Build starter desktop app	2026-09-24T17:03:53.3264740Z ^[[1m^[[92m   Compiling^[[0m getrandom v0.3.4
+video-macos	Build starter desktop app	2026-09-24T17:03:53.3958570Z ^[[1m^[[92m   Compiling^[[0m base64 v0.22.1
+video-macos	Build starter desktop app	2026-09-24T17:03:53.6032480Z ^[[1m^[[92m   Compiling^[[0m tauri-runtime-wry v2.11.4
+video-macos	Build starter desktop app	2026-09-24T17:03:53.7592680Z ^[[1m^[[92m   Compiling^[[0m jni-sys v0.3.1
+video-macos	Build starter desktop app	2026-09-24T17:03:53.8327460Z ^[[1m^[[92m   Compiling^[[0m tauri-codegen v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:03:53.9798430Z ^[[1m^[[92m   Compiling^[[0m jni-sys v0.4.1
+video-macos	Build starter desktop app	2026-09-24T17:03:54.2011250Z ^[[1m^[[92m   Compiling^[[0m keyboard-types v0.7.0
+video-macos	Build starter desktop app	2026-09-24T17:03:55.4346720Z ^[[1m^[[92m   Compiling^[[0m tao v0.35.3
+video-macos	Build starter desktop app	2026-09-24T17:03:55.7316370Z ^[[1m^[[92m   Compiling^[[0m tauri-plugin-orbitkit v0.1.0 (/Users/runner/work/orbitkit/orbitkit/crates/tauri-plugin-orbitkit)
+video-macos	Build starter desktop app	2026-09-24T17:03:59.1757870Z ^[[1m^[[92m   Compiling^[[0m png v0.18.1
+video-macos	Build starter desktop app	2026-09-24T17:03:59.2871440Z ^[[1m^[[92m   Compiling^[[0m serialize-to-javascript-impl v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:03:59.7540220Z ^[[1m^[[92m   Compiling^[[0m pin-project-lite v0.2.17
+video-macos	Build starter desktop app	2026-09-24T17:03:59.8498770Z ^[[1m^[[92m   Compiling^[[0m tokio v1.53.1
+video-macos	Build starter desktop app	2026-09-24T17:04:00.9599740Z ^[[1m^[[92m   Compiling^[[0m muda v0.19.3
+video-macos	Build starter desktop app	2026-09-24T17:04:02.5364380Z ^[[1m^[[92m   Compiling^[[0m serialize-to-javascript v0.1.2
+video-macos	Build starter desktop app	2026-09-24T17:04:03.6115570Z ^[[1m^[[92m   Compiling^[[0m tauri-macros v2.6.3
+video-macos	Build starter desktop app	2026-09-24T17:04:05.0774080Z ^[[1m^[[92m   Compiling^[[0m window-vibrancy v0.6.0
+video-macos	Build starter desktop app	2026-09-24T17:04:05.1315530Z ^[[1m^[[92m   Compiling^[[0m combine v4.6.8
+video-macos	Build starter desktop app	2026-09-24T17:04:05.3290350Z ^[[1m^[[92m   Compiling^[[0m serde_repr v0.1.21
+video-macos	Build starter desktop app	2026-09-24T17:04:05.3519090Z ^[[1m^[[92m   Compiling^[[0m mime v0.3.17
+video-macos	Build starter desktop app	2026-09-24T17:04:05.5921490Z ^[[1m^[[92m   Compiling^[[0m embed_plist v1.2.2
+video-macos	Build starter desktop app	2026-09-24T17:04:05.6404730Z ^[[1m^[[92m   Compiling^[[0m cesu8 v1.1.0
+video-macos	Build starter desktop app	2026-09-24T17:04:05.8419220Z ^[[1m^[[92m   Compiling^[[0m starter v0.1.0 (/Users/runner/work/orbitkit/orbitkit/examples/starter/src-tauri)
+video-macos	Build starter desktop app	2026-09-24T17:04:09.6980910Z ^[[1m^[[92m   Compiling^[[0m jni v0.21.1
+video-macos	Build starter desktop app	2026-09-24T17:04:26.7737650Z ^[[1m^[[92m    Finished^[[0m `dev` profile [unoptimized + debuginfo] target(s) in 2m 06s
+video-macos	Build starter desktop app	2026-09-24T17:04:27.0478230Z        Built application at: /Users/runner/work/orbitkit/orbitkit/target/debug/starter
+video-macos	Run probe	﻿2026-09-24T17:04:27.1346970Z ##[group]Run chmod +x scripts/ci/probe-macos.sh
+video-macos	Run probe	2026-09-24T17:04:27.1347680Z ^[[36;1mchmod +x scripts/ci/probe-macos.sh^[[0m
+video-macos	Run probe	2026-09-24T17:04:27.1348050Z ^[[36;1mscripts/ci/probe-macos.sh^[[0m
+video-macos	Run probe	2026-09-24T17:04:27.1744540Z shell: /bin/bash -e {0}
+video-macos	Run probe	2026-09-24T17:04:27.1744830Z env:
+video-macos	Run probe	2026-09-24T17:04:27.1745110Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Run probe	2026-09-24T17:04:27.1745360Z   CARGO_INCREMENTAL: 0
+video-macos	Run probe	2026-09-24T17:04:27.1745650Z   CARGO_TERM_COLOR: always
+video-macos	Run probe	2026-09-24T17:04:27.1745990Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Run probe	2026-09-24T17:04:27.1746300Z ##[endgroup]
+video-macos	Run probe	2026-09-24T17:04:27.3210310Z === macOS Probe: System & Display Info ===
+video-macos	Run probe	2026-09-24T17:04:27.3446590Z ProductName:		macOS
+video-macos	Run probe	2026-09-24T17:04:27.3447510Z ProductVersion:		26.6.2
+video-macos	Run probe	2026-09-24T17:04:27.3448480Z BuildVersion:		25G83
+video-macos	Run probe	2026-09-24T17:04:27.3500780Z Darwin sjc22-be109-41bc6419-e6e6-4cea-87bf-a5d04a25a6a3-4E3C32632749.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE arm64
+video-macos	Run probe	2026-09-24T17:04:27.8291640Z === Checking ffmpeg ===
+video-macos	Run probe	2026-09-24T17:04:27.8301260Z ffmpeg not found, installing via brew...
+video-macos	Run probe	2026-09-24T17:04:30.2644530Z ^[[32m==>^[[0m ^[[1mDownloading bottle manifests^[[0m
+video-macos	Run probe	2026-09-24T17:04:30.2827560Z ✔︎ Bottle Manifest ffmpeg (9.0.1_1)
+video-macos	Run probe	2026-09-24T17:04:30.2831070Z ^[[34m==>^[[0m ^[[1mWould install 1 formula:^[[0m
+video-macos	Run probe	2026-09-24T17:04:30.2831820Z ffmpeg
+video-macos	Run probe	2026-09-24T17:04:30.5438350Z ^[[34m==>^[[0m ^[[1mWould install 11 dependencies for ffmpeg:^[[0m
+video-macos	Run probe	2026-09-24T17:04:30.5440000Z dav1d
+video-macos	Run probe	2026-09-24T17:04:30.5441090Z mpg123
+video-macos	Run probe	2026-09-24T17:04:30.5442330Z lame
+video-macos	Run probe	2026-09-24T17:04:30.5443290Z libvmaf
+video-macos	Run probe	2026-09-24T17:04:30.5444070Z libvpx
+video-macos	Run probe	2026-09-24T17:04:30.5444870Z opus
+video-macos	Run probe	2026-09-24T17:04:30.5445670Z sdl3
+video-macos	Run probe	2026-09-24T17:04:30.5446730Z sdl2-compat
+video-macos	Run probe	2026-09-24T17:04:30.5454230Z svt-av1
+video-macos	Run probe	2026-09-24T17:04:30.5454630Z x264
+video-macos	Run probe	2026-09-24T17:04:30.5454950Z x265
+video-macos	Run probe	2026-09-24T17:04:30.6630500Z ^[[32m==>^[[0m ^[[1mFetching downloads for: ^[[32mffmpeg^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:31.7383340Z ✔︎ Bottle Manifest dav1d (1.5.4)
+video-macos	Run probe	2026-09-24T17:04:31.7483260Z ✔︎ Bottle Manifest mpg123 (1.33.7)
+video-macos	Run probe	2026-09-24T17:04:31.7590130Z ✔︎ Bottle Manifest lame (4.0)
+video-macos	Run probe	2026-09-24T17:04:31.8394970Z ✔︎ Bottle mpg123 (1.33.7)
+video-macos	Run probe	2026-09-24T17:04:31.8509950Z ✔︎ Bottle Manifest libvmaf (3.2.0)
+video-macos	Run probe	2026-09-24T17:04:31.8611850Z ✔︎ Bottle dav1d (1.5.4)
+video-macos	Run probe	2026-09-24T17:04:31.8736200Z ✔︎ Bottle Manifest libvpx (1.17.0)
+video-macos	Run probe	2026-09-24T17:04:31.8843460Z ✔︎ Bottle Manifest opus (1.6.1)
+video-macos	Run probe	2026-09-24T17:04:31.8946740Z ✔︎ Bottle lame (4.0)
+video-macos	Run probe	2026-09-24T17:04:31.9069840Z ✔︎ Bottle opus (1.6.1)
+video-macos	Run probe	2026-09-24T17:04:31.9175210Z ✔︎ Bottle Manifest sdl3 (3.4.16)
+video-macos	Run probe	2026-09-24T17:04:31.9281670Z ✔︎ Bottle Manifest sdl2-compat (2.32.72)
+video-macos	Run probe	2026-09-24T17:04:31.9390320Z ✔︎ Bottle libvpx (1.17.0)
+video-macos	Run probe	2026-09-24T17:04:31.9499760Z ✔︎ Bottle Manifest svt-av1 (4.2.0)
+video-macos	Run probe	2026-09-24T17:04:31.9585020Z ✔︎ Bottle Manifest x264 (r3222)
+video-macos	Run probe	2026-09-24T17:04:31.9844280Z ✔︎ Bottle svt-av1 (4.2.0)
+video-macos	Run probe	2026-09-24T17:04:32.0085610Z ✔︎ Bottle sdl3 (3.4.16)
+video-macos	Run probe	2026-09-24T17:04:32.0206000Z ✔︎ Bottle Manifest x265 (4.3)
+video-macos	Run probe	2026-09-24T17:04:32.0523040Z ✔︎ Bottle x264 (r3222)
+video-macos	Run probe	2026-09-24T17:04:32.0624800Z ✔︎ Bottle libvmaf (3.2.0)
+video-macos	Run probe	2026-09-24T17:04:32.0727060Z ✔︎ Bottle sdl2-compat (2.32.72)
+video-macos	Run probe	2026-09-24T17:04:32.0992460Z ✔︎ Bottle x265 (4.3)
+video-macos	Run probe	2026-09-24T17:04:32.1603790Z ✔︎ Bottle ffmpeg (9.0.1_1)
+video-macos	Run probe	2026-09-24T17:04:32.2089700Z ^[[32m==>^[[0m ^[[1mInstalling dependencies for ffmpeg:^[[0m ^[[32mdav1d^[[39m, ^[[32mmpg123^[[39m, ^[[32mlame^[[39m, ^[[32mlibvmaf^[[39m, ^[[32mlibvpx^[[39m, ^[[32mopus^[[39m, ^[[32msdl3^[[39m, ^[[32msdl2-compat^[[39m, ^[[32msvt-av1^[[39m, ^[[32mx264^[[39m and ^[[32mx265^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.2098380Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mdav1d^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.2187750Z ^[[34m==>^[[0m ^[[1mPouring dav1d--1.5.4.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.4739980Z 🍺  /opt/homebrew/Cellar/dav1d/1.5.4: 16 files, 959.6KB
+video-macos	Run probe	2026-09-24T17:04:32.4744760Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mmpg123^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.4794880Z ^[[34m==>^[[0m ^[[1mPouring mpg123--1.33.7.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.5391440Z 🍺  /opt/homebrew/Cellar/mpg123/1.33.7: 34 files, 1.9MB
+video-macos	Run probe	2026-09-24T17:04:32.5393400Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mlame^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.5471630Z ^[[34m==>^[[0m ^[[1mPouring lame--4.0.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.6012270Z 🍺  /opt/homebrew/Cellar/lame/4.0: 29 files, 1.9MB
+video-macos	Run probe	2026-09-24T17:04:32.6013860Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mlibvmaf^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.6119060Z ^[[34m==>^[[0m ^[[1mPouring libvmaf--3.2.0.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7022450Z 🍺  /opt/homebrew/Cellar/libvmaf/3.2.0: 243 files, 8.2MB
+video-macos	Run probe	2026-09-24T17:04:32.7025320Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mlibvpx^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7094190Z ^[[34m==>^[[0m ^[[1mPouring libvpx--1.17.0.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7369640Z 🍺  /opt/homebrew/Cellar/libvpx/1.17.0: 22 files, 4.4MB
+video-macos	Run probe	2026-09-24T17:04:32.7374270Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mopus^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7392420Z ^[[34m==>^[[0m ^[[1mPouring opus--1.6.1.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7652700Z 🍺  /opt/homebrew/Cellar/opus/1.6.1: 16 files, 1MB
+video-macos	Run probe	2026-09-24T17:04:32.7654540Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32msdl3^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.7690600Z ^[[34m==>^[[0m ^[[1mPouring sdl3--3.4.16.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.8242770Z 🍺  /opt/homebrew/Cellar/sdl3/3.4.16: 103 files, 6.3MB
+video-macos	Run probe	2026-09-24T17:04:32.8243730Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32msdl2-compat^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.8360110Z ^[[34m==>^[[0m ^[[1mPouring sdl2-compat--2.32.72.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.8807280Z 🍺  /opt/homebrew/Cellar/sdl2-compat/2.32.72: 117 files, 3.3MB
+video-macos	Run probe	2026-09-24T17:04:32.8818990Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32msvt-av1^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.8840130Z ^[[34m==>^[[0m ^[[1mPouring svt-av1--4.2.0.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.9531250Z 🍺  /opt/homebrew/Cellar/svt-av1/4.2.0: 23 files, 3.3MB
+video-macos	Run probe	2026-09-24T17:04:32.9533160Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mx264^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:32.9567660Z ^[[34m==>^[[0m ^[[1mPouring x264--r3222.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.0186990Z 🍺  /opt/homebrew/Cellar/x264/r3222: 12 files, 4.4MB
+video-macos	Run probe	2026-09-24T17:04:33.0187800Z ^[[32m==>^[[0m ^[[1mInstalling ffmpeg dependency: ^[[32mx265^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.0376950Z ^[[34m==>^[[0m ^[[1mPouring x265--4.3.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.1704820Z 🍺  /opt/homebrew/Cellar/x265/4.3: 12 files, 17.3MB
+video-macos	Run probe	2026-09-24T17:04:33.1706920Z ^[[32m==>^[[0m ^[[1mInstalling ^[[32mffmpeg^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.1709390Z ^[[34m==>^[[0m ^[[1mPouring ffmpeg--9.0.1_1.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.8734720Z 🍺  /opt/homebrew/Cellar/ffmpeg/9.0.1_1: 290 files, 53.8MB
+video-macos	Run probe	2026-09-24T17:04:33.8740570Z ^[[32m==>^[[0m ^[[1mCaveats^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.8742880Z ^[[34m==>^[[0m ^[[1mffmpeg^[[0m
+video-macos	Run probe	2026-09-24T17:04:33.8743750Z ffmpeg-full includes additional tools and libraries that are not included in the regular ffmpeg formula.
+video-macos	Run probe	2026-09-24T17:04:33.9657520Z ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers
+video-macos	Run probe	2026-09-24T17:04:33.9658830Z built with Apple clang version 21.0.0 (clang-2100.1.1.101)
+video-macos	Run probe	2026-09-24T17:04:33.9664030Z === Checking AVFoundation Devices ===
+video-macos	Run probe	2026-09-24T17:04:34.0071900Z ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers
+video-macos	Run probe	2026-09-24T17:04:34.0073610Z   built with Apple clang version 21.0.0 (clang-2100.1.1.101)
+video-macos	Run probe	2026-09-24T17:04:34.0078810Z   configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/9.0.1_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+video-macos	Run probe	2026-09-24T17:04:34.0083650Z   libavutil      61.  1.101 / 61.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0084060Z   libavcodec     63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0085400Z   libavformat    63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0085840Z   libavdevice    63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0086210Z   libavfilter    12.  1.101 / 12.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0086600Z   libswscale     10.  1.101 / 10.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.0086970Z   libswresample   7.  1.101 /  7.  1.101
+video-macos	Run probe	2026-09-24T17:04:34.3118360Z [AVFoundation indev @ 0xab6c10140] AVFoundation video devices:
+video-macos	Run probe	2026-09-24T17:04:34.3119110Z [AVFoundation indev @ 0xab6c10140] [0] Capture screen 0
+video-macos	Run probe	2026-09-24T17:04:34.3119740Z [AVFoundation indev @ 0xab6c10140] AVFoundation audio devices:
+video-macos	Run probe	2026-09-24T17:04:34.3120330Z [AVFoundation indev @ 0xab6c10140] [0] Null Audio Device
+video-macos	Run probe	2026-09-24T17:04:34.3120880Z [AVFoundation indev @ 0xab6c10140] [1] Apple Virtual Sound Device
+video-macos	Run probe	2026-09-24T17:04:34.3121670Z [in#0 @ 0xab6c10000] Error opening input: Input/output error
+video-macos	Run probe	2026-09-24T17:04:34.3122190Z Error opening input file .
+video-macos	Run probe	2026-09-24T17:04:34.3122680Z Error opening input files: Input/output error
+video-macos	Run probe	2026-09-24T17:04:34.3612790Z Detected screen device index: 0
+video-macos	Run probe	2026-09-24T17:04:34.3613830Z === Checking cliclick (Synthetic Input) ===
+video-macos	Run probe	2026-09-24T17:04:34.3616500Z cliclick not found, installing via brew...
+video-macos	Run probe	2026-09-24T17:04:35.7572080Z ^[[32m==>^[[0m ^[[1mDownloading bottle manifests^[[0m
+video-macos	Run probe	2026-09-24T17:04:35.7729950Z ✔︎ Bottle Manifest cliclick (5.1)
+video-macos	Run probe	2026-09-24T17:04:35.7733980Z ^[[34m==>^[[0m ^[[1mWould install 1 formula:^[[0m
+video-macos	Run probe	2026-09-24T17:04:35.7735330Z cliclick
+video-macos	Run probe	2026-09-24T17:04:35.7759180Z ^[[32m==>^[[0m ^[[1mFetching downloads for: ^[[32mcliclick^[[39m^[[0m
+video-macos	Run probe	2026-09-24T17:04:36.1689660Z ✔︎ Bottle cliclick (5.1)
+video-macos	Run probe	2026-09-24T17:04:36.2062340Z ^[[34m==>^[[0m ^[[1mPouring cliclick--5.1.arm64_tahoe.bottle.tar.gz^[[0m
+video-macos	Run probe	2026-09-24T17:04:36.4094340Z 🍺  /opt/homebrew/Cellar/cliclick/5.1: 6 files, 161.3KB
+video-macos	Run probe	2026-09-24T17:04:36.4355040Z cliclick 5.1, 2022-08-14
+video-macos	Run probe	2026-09-24T17:04:36.4555360Z Initial mouse position: 10,10
+video-macos	Run probe	2026-09-24T17:04:36.4877070Z cliclick move test: 
+video-macos	Run probe	2026-09-24T17:04:36.5266740Z Mouse position after move: 200,200
+video-macos	Run probe	2026-09-24T17:04:36.6481040Z cliclick click test: 
+video-macos	Run probe	2026-09-24T17:04:36.6482890Z === Preparing Swift Window Query Helper ===
+video-macos	Run probe	2026-09-24T17:04:36.6518800Z === Testing screencapture video recording ===
+video-macos	Run probe	2026-09-24T17:04:43.5656670Z === Testing ffmpeg avfoundation recording (5s) ===
+video-macos	Run probe	2026-09-24T17:04:43.6550980Z ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers
+video-macos	Run probe	2026-09-24T17:04:43.6552500Z   built with Apple clang version 21.0.0 (clang-2100.1.1.101)
+video-macos	Run probe	2026-09-24T17:04:43.6556710Z   configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/9.0.1_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+video-macos	Run probe	2026-09-24T17:04:43.6562110Z   libavutil      61.  1.101 / 61.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6581420Z   libavcodec     63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6581880Z   libavformat    63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6582300Z   libavdevice    63.  1.101 / 63.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6583290Z   libavfilter    12.  1.101 / 12.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6583790Z   libswscale     10.  1.101 / 10.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.6584190Z   libswresample   7.  1.101 /  7.  1.101
+video-macos	Run probe	2026-09-24T17:04:43.9323490Z objc[5748]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application
+video-macos	Run probe	2026-09-24T17:04:43.9326370Z objc[5748]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application
+video-macos	Run probe	2026-09-24T17:04:43.9328870Z objc[5748]: class `NSKVONotifying_AVCaptureScreenInput' not linked into application
+video-macos	Run probe	2026-09-24T17:04:43.9334640Z [AVFoundation indev @ 0x97b01c140] Configuration of video device failed, falling back to default.
+video-macos	Run probe	2026-09-24T17:04:43.9335820Z [in#0 @ 0x97ac18000] Selected pixel format (yuv420p) is not supported by the input device.
+video-macos	Run probe	2026-09-24T17:04:43.9336630Z [in#0 @ 0x97ac18000] Supported pixel formats:
+video-macos	Run probe	2026-09-24T17:04:43.9345630Z [in#0 @ 0x97ac18000]   uyvy422
+video-macos	Run probe	2026-09-24T17:04:43.9346050Z [in#0 @ 0x97ac18000]   yuyv422
+video-macos	Run probe	2026-09-24T17:04:43.9346330Z [in#0 @ 0x97ac18000]   nv12
+video-macos	Run probe	2026-09-24T17:04:43.9346700Z [in#0 @ 0x97ac18000]   0rgb
+video-macos	Run probe	2026-09-24T17:04:43.9347070Z [in#0 @ 0x97ac18000]   bgr0
+video-macos	Run probe	2026-09-24T17:04:43.9347600Z [in#0 @ 0x97ac18000] Overriding selected pixel format to use uyvy422 instead.
+video-macos	Run probe	2026-09-24T17:04:44.2978110Z IOServiceMatchingfailed for: AppleM2ScalerParavirtDriver
+video-macos	Run probe	2026-09-24T17:04:44.8799740Z Input #0, avfoundation, from '0:none':
+video-macos	Run probe	2026-09-24T17:04:44.8801800Z   Duration: N/A, start: 257.305500, bitrate: N/A
+video-macos	Run probe	2026-09-24T17:04:44.8803550Z   Stream #0:0: Video: rawvideo (UYVY / 0x59565955), uyvy422, 1024x768, 30 fps, 30 tbr, 1000k tbn, start 257.305500
+video-macos	Run probe	2026-09-24T17:04:44.8814300Z Stream mapping:
+video-macos	Run probe	2026-09-24T17:04:44.8814830Z   Stream #0:0 -> #0:0 (rawvideo (native) -> h264 (libx264))
+video-macos	Run probe	2026-09-24T17:04:44.8815410Z Press [q] to stop, [?] for help
+video-macos	Run probe	2026-09-24T17:04:44.8883840Z [libx264 @ 0x97ae50a80] using cpu capabilities: ARMv8 NEON DotProd
+video-macos	Run probe	2026-09-24T17:04:44.8900970Z [libx264 @ 0x97ae50a80] profile High, level 3.1, 4:2:0, 8-bit
+video-macos	Run probe	2026-09-24T17:04:44.8904520Z [libx264 @ 0x97ae50a80] 264 - core 165 r3222 b35605a - H.264/MPEG-4 AVC codec - Copyleft 2003-2025 - http://www.videolan.org/x264.html - options: cabac=1 ref=3 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=7 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=1 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=-2 threads=4 lookahead_threads=1 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=2 keyint=250 keyint_min=25 scenecut=40 intra_refresh=0 rc_lookahead=40 rc=crf mbtree=1 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+video-macos	Run probe	2026-09-24T17:04:44.8917720Z Output #0, mp4, to 'video-avfoundation.mp4':
+video-macos	Run probe	2026-09-24T17:04:44.8919070Z   Metadata:
+video-macos	Run probe	2026-09-24T17:04:44.8919620Z     encoder         : Lavf63.1.101
+video-macos	Run probe	2026-09-24T17:04:44.8920390Z   Stream #0:0: Video: h264 (avc1 / 0x31637661), yuv420p(tv, progressive), 1024x768, q=2-31, 30 fps, 15360 tbn
+video-macos	Run probe	2026-09-24T17:04:44.8920930Z     Metadata:
+video-macos	Run probe	2026-09-24T17:04:44.8921250Z       encoder         : Lavc63.1.101 libx264
+video-macos	Run probe	2026-09-24T17:04:44.8921640Z     Side data:
+video-macos	Run probe	2026-09-24T17:04:44.8922010Z       CPB properties: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
+video-macos	Run probe	2026-09-24T17:04:45.9562440Z frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.51    
+video-macos	Run probe	2026-09-24T17:04:46.4817920Z frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:01.07    
+video-macos	Run probe	2026-09-24T17:04:46.9939110Z frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:01.59    
+video-macos	Run probe	2026-09-24T17:04:47.5674310Z frame=    7 fps=3.3 q=29.0 size=       0KiB time=00:00:00.16 bitrate=   2.3kbits/s speed=0.0789x elapsed=0:00:02.11    
+video-macos	Run probe	2026-09-24T17:04:48.1405230Z frame=   20 fps=7.4 q=29.0 size=       0KiB time=00:00:00.66 bitrate=   0.6kbits/s speed=0.248x elapsed=0:00:02.68    
+video-macos	Run probe	2026-09-24T17:04:48.7158680Z frame=   34 fps= 10 q=29.0 size=       0KiB time=00:00:01.26 bitrate=   0.3kbits/s speed=0.389x elapsed=0:00:03.25    
+video-macos	Run probe	2026-09-24T17:04:49.2667340Z frame=   46 fps= 12 q=29.0 size=       0KiB time=00:00:01.73 bitrate=   0.2kbits/s speed=0.452x elapsed=0:00:03.83    
+video-macos	Run probe	2026-09-24T17:04:49.8410680Z frame=   60 fps= 14 q=29.0 size=       0KiB time=00:00:02.36 bitrate=   0.2kbits/s speed=0.54x elapsed=0:00:04.38    
+video-macos	Run probe	2026-09-24T17:04:49.8553740Z frame=  110 fps= 22 q=28.0 size=       0KiB time=00:00:04.50 bitrate=   0.1kbits/s speed=0.907x elapsed=0:00:04.95    
+video-macos	Run probe	2026-09-24T17:04:49.8555110Z [out#0/mp4 @ 0x97b19c600] video:28KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 9.439823%
+video-macos	Run probe	2026-09-24T17:04:49.8556370Z frame=  119 fps= 24 q=-1.0 Lsize=      31KiB time=00:00:04.86 bitrate=  52.1kbits/s speed=0.979x elapsed=0:00:04.97    
+video-macos	Run probe	2026-09-24T17:04:49.8557570Z [libx264 @ 0x97ae50a80] frame I:1     Avg QP:19.20  size: 21456
+video-macos	Run probe	2026-09-24T17:04:49.8559140Z [libx264 @ 0x97ae50a80] frame P:30    Avg QP:12.94  size:    80
+video-macos	Run probe	2026-09-24T17:04:49.8559820Z [libx264 @ 0x97ae50a80] frame B:88    Avg QP:13.07  size:    50
+video-macos	Run probe	2026-09-24T17:04:49.8560560Z [libx264 @ 0x97ae50a80] consecutive B-frames:  0.8%  1.7%  0.0% 97.5%
+video-macos	Run probe	2026-09-24T17:04:49.8561170Z [libx264 @ 0x97ae50a80] mb I  I16..4:  6.6% 81.2% 12.2%
+video-macos	Run probe	2026-09-24T17:04:49.8561840Z [libx264 @ 0x97ae50a80] mb P  I16..4:  0.0%  0.0%  0.0%  P16..4:  0.1%  0.0%  0.0%  0.0%  0.0%    skip:99.8%
+video-macos	Run probe	2026-09-24T17:04:49.8562730Z [libx264 @ 0x97ae50a80] mb B  I16..4:  0.0%  0.0%  0.0%  B16..8:  0.4%  0.0%  0.0%  direct: 0.0%  skip:99.6%  L0:55.6% L1:44.0% BI: 0.4%
+video-macos	Run probe	2026-09-24T17:04:49.8563620Z [libx264 @ 0x97ae50a80] 8x8 transform intra:80.2% inter:54.2%
+video-macos	Run probe	2026-09-24T17:04:49.8564430Z [libx264 @ 0x97ae50a80] coded y,uvDC,uvAC intra: 8.5% 4.4% 4.3% inter: 0.0% 0.0% 0.0%
+video-macos	Run probe	2026-09-24T17:04:49.8564960Z [libx264 @ 0x97ae50a80] i16 v,h,dc,p:  9% 89%  2%  0%
+video-macos	Run probe	2026-09-24T17:04:49.8566300Z [libx264 @ 0x97ae50a80] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 78% 17%  5%  0%  0%  0%  0%  0%  0%
+video-macos	Run probe	2026-09-24T17:04:49.8567140Z [libx264 @ 0x97ae50a80] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 27% 39% 14%  3%  3%  3%  5%  3%  4%
+video-macos	Run probe	2026-09-24T17:04:49.8567730Z [libx264 @ 0x97ae50a80] i8c dc,h,v,p: 95%  3%  2%  0%
+video-macos	Run probe	2026-09-24T17:04:49.8568220Z [libx264 @ 0x97ae50a80] Weighted P-Frames: Y:0.0% UV:0.0%
+video-macos	Run probe	2026-09-24T17:04:49.8568690Z [libx264 @ 0x97ae50a80] ref P L0: 75.0%  6.5% 18.5%
+video-macos	Run probe	2026-09-24T17:04:49.8569810Z [libx264 @ 0x97ae50a80] ref B L0: 53.9% 45.9%  0.2%
+video-macos	Run probe	2026-09-24T17:04:49.8571200Z [libx264 @ 0x97ae50a80] ref B L1: 96.4%  3.6%
+video-macos	Run probe	2026-09-24T17:04:49.8572870Z [libx264 @ 0x97ae50a80] kb/s:45.56
+video-macos	Run probe	2026-09-24T17:04:49.9015110Z === Launching starter desktop app ===
+video-macos	Run probe	2026-09-24T17:04:49.9345240Z App started with PID: 5760
+video-macos	Run probe	2026-09-24T17:04:54.0493620Z === Windows List via Swift ===
+video-macos	Run probe	2026-09-24T17:05:17.2258900Z PID: 161, Owner: 'Window Server', Name: 'Cursor', Bounds: (195.0, 195.0, 28.0, 40.0)
+video-macos	Run probe	2026-09-24T17:05:17.2260540Z PID: 322, Owner: 'Control Center', Name: 'Item-0', Bounds: (798.0, 0.0, 31.0, 30.0)
+video-macos	Run probe	2026-09-24T17:05:17.2261410Z PID: 322, Owner: 'Control Center', Name: 'BentoBox-0', Bounds: (829.0, 0.0, 42.0, 30.0)
+video-macos	Run probe	2026-09-24T17:05:17.2262160Z PID: 322, Owner: 'Control Center', Name: 'Clock', Bounds: (871.0, 0.0, 153.0, 30.0)
+video-macos	Run probe	2026-09-24T17:05:17.2262850Z PID: 161, Owner: 'Window Server', Name: 'Menubar', Bounds: (0.0, 0.0, 1024.0, 30.0)
+video-macos	Run probe	2026-09-24T17:05:17.2263520Z PID: 320, Owner: 'Dock', Name: 'Dock', Bounds: (0.0, 0.0, 1024.0, 768.0)
+video-macos	Run probe	2026-09-24T17:05:17.2264140Z PID: 5760, Owner: 'starter', Name: 'orbitkit', Bounds: (112.0, 50.0, 800.0, 600.0)
+video-macos	Run probe	2026-09-24T17:05:17.2303100Z === Capturing Screenshot ===
+video-macos	Run probe	2026-09-24T17:05:17.5620310Z Screenshot captured with screencapture
+video-macos	Run probe	2026-09-24T17:05:23.6498020Z === Stopping App ===
+video-macos	Run probe	2026-09-24T17:05:23.7076860Z === macOS Probe Summary ===
+video-macos	Run probe	2026-09-24T17:05:23.9987090Z === macOS Probe Summary ===
+video-macos	Run probe	2026-09-24T17:05:23.9990200Z Initial mouse position: 10,10
+video-macos	Run probe	2026-09-24T17:05:23.9991260Z Mouse position after move: 200,200
+video-macos	Run probe	2026-09-24T17:05:23.9992380Z cliclick click test result: 
+video-macos	Run probe	2026-09-24T17:05:23.9993160Z screencapture-test.mp4 size: 63216 bytes
+video-macos	Run probe	2026-09-24T17:05:23.9994450Z width=1024
+video-macos	Run probe	2026-09-24T17:05:23.9994860Z height=768
+video-macos	Run probe	2026-09-24T17:05:23.9995800Z r_frame_rate=60/1
+video-macos	Run probe	2026-09-24T17:05:23.9996290Z nb_frames=50
+video-macos	Run probe	2026-09-24T17:05:23.9996970Z duration=5.000000
+video-macos	Run probe	2026-09-24T17:05:23.9997900Z size=63216
+video-macos	Run probe	2026-09-24T17:05:23.9998260Z bit_rate=101145
+video-macos	Run probe	2026-09-24T17:05:23.9998680Z video-avfoundation.mp4 size: 31708 bytes
+video-macos	Run probe	2026-09-24T17:05:23.9999210Z width=1024
+video-macos	Run probe	2026-09-24T17:05:23.9999950Z height=768
+video-macos	Run probe	2026-09-24T17:05:24.0000560Z r_frame_rate=30/1
+video-macos	Run probe	2026-09-24T17:05:24.0000900Z nb_frames=119
+video-macos	Run probe	2026-09-24T17:05:24.0001700Z duration=4.933333
+video-macos	Run probe	2026-09-24T17:05:24.0004040Z size=31708
+video-macos	Run probe	2026-09-24T17:05:24.0004600Z bit_rate=51418
+video-macos	Run probe	2026-09-24T17:05:24.0005770Z probe-screenshot.png size: 507333 bytes
+video-macos	Run probe	2026-09-24T17:05:24.0006720Z --- Detected Windows ---
+video-macos	Run probe	2026-09-24T17:05:24.0007560Z PID: 5760, Owner: 'starter', Name: 'orbitkit', Bounds: (112.0, 50.0, 800.0, 600.0)
+video-macos	Run probe	2026-09-24T17:05:24.0008950Z === macOS Probe Finished ===
+video-macos	Upload probe artifacts	﻿2026-09-24T17:05:24.0333160Z ##[group]Run actions/upload-artifact@v4
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0333460Z with:
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0333730Z   name: probe-macos
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0334390Z   path: video-macos.mp4
+video-macos	Upload probe artifacts	screencapture-test.mp4
+video-macos	Upload probe artifacts	video-avfoundation.mp4
+video-macos	Upload probe artifacts	probe-screenshot.png
+video-macos	Upload probe artifacts	app.log
+video-macos	Upload probe artifacts	probe-summary.txt
+video-macos	Upload probe artifacts	avfoundation_devices.txt
+video-macos	Upload probe artifacts	windows-list.txt
+video-macos	Upload probe artifacts	
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0335100Z   retention-days: 14
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0335360Z   if-no-files-found: warn
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0335590Z   compression-level: 6
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0335850Z   overwrite: false
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0336050Z   include-hidden-files: false
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0336320Z env:
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0336500Z   CARGO_HOME: /Users/runner/.cargo
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0336840Z   CARGO_INCREMENTAL: 0
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0337080Z   CARGO_TERM_COLOR: always
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0337410Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+video-macos	Upload probe artifacts	2026-09-24T17:05:24.0337690Z ##[endgroup]
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3789200Z (node:6400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3792510Z (Use `node --trace-deprecation ...` to show where the warning was created)
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3898070Z Multiple search paths detected. Calculating the least common ancestor of all paths
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3924380Z The least common ancestor is /Users/runner/work/orbitkit/orbitkit. This will be the root directory of the artifact
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3925190Z With the provided path, there will be 8 files uploaded
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3925990Z Artifact name is valid!
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.3926360Z Root directory input is valid!
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.8212310Z Beginning upload of artifact content to blob storage
+video-macos	Upload probe artifacts	2026-09-24T17:05:25.8887060Z (node:6400) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.4571640Z Uploaded bytes 654680
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.5316980Z Finished uploading artifact content to blob storage!
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.5319300Z SHA256 digest of uploaded artifact zip is aa12c162b05bbcb71d84338353ce7e44173e85f7ff73c7a5139a2ae611284e60
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.5322650Z Finalizing artifact upload
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.8216270Z Artifact probe-macos.zip successfully finalized. Artifact ID 10823310569
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.8217280Z Artifact probe-macos has been successfully uploaded! Final size is 654680 bytes. Artifact ID is 10823310569
+video-macos	Upload probe artifacts	2026-09-24T17:05:26.8405650Z Artifact download URL: https://github.com/megastruktur/orbitkit/actions/runs/36031433300/artifacts/10823310569
+video-macos	Post Setup Node.js	﻿2026-09-24T17:05:26.9226170Z Post job cleanup.
+video-macos	Post Setup Node.js	2026-09-24T17:05:27.1575120Z (node:6415) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+video-macos	Post Setup Node.js	2026-09-24T17:05:27.1589530Z (Use `node --trace-deprecation ...` to show where the warning was created)
+video-macos	Post Setup pnpm	﻿2026-09-24T17:05:27.1809420Z Post job cleanup.
+video-macos	Post Setup pnpm	2026-09-24T17:05:27.3949060Z Pruning is unnecessary.
+video-macos	Post Checkout repository	﻿2026-09-24T17:05:27.4109750Z Post job cleanup.
+video-macos	Post Checkout repository	2026-09-24T17:05:27.5792900Z [command]/opt/homebrew/bin/git version
+video-macos	Post Checkout repository	2026-09-24T17:05:27.5892590Z git version 2.55.0
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6016360Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/d7a6bfbd-a943-4a89-a4f0-6bde38ba499d/.gitconfig'
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6027440Z Temporarily overriding HOME='/Users/runner/work/_temp/d7a6bfbd-a943-4a89-a4f0-6bde38ba499d' before making global git config changes
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6031710Z Adding repository directory to the temporary git global config as a safe directory
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6032850Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/orbitkit/orbitkit
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6127080Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+video-macos	Post Checkout repository	2026-09-24T17:05:27.6453260Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+video-macos	Post Checkout repository	2026-09-24T17:05:27.7780090Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+video-macos	Post Checkout repository	2026-09-24T17:05:27.7877720Z http.https://github.com/.extraheader
+video-macos	Post Checkout repository	2026-09-24T17:05:27.7885320Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+video-macos	Post Checkout repository	2026-09-24T17:05:27.8057160Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+video-macos	Post Checkout repository	2026-09-24T17:05:27.9970920Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+video-macos	Post Checkout repository	2026-09-24T17:05:27.9988980Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+video-macos	Complete job	﻿2026-09-24T17:05:28.1652980Z Cleaning up orphan processes
+video-macos	Complete job	2026-09-24T17:05:30.6607720Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+EXIT_CODE=0

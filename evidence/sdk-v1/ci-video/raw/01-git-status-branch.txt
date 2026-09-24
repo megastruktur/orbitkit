@@ -1,0 +1,8 @@
+$ git status && git branch -a
+* oks/ci-video
+  main
+  remotes/origin/main
+  remotes/origin/oks/ci
+?? .github/workflows/desktop-video.yml
+?? scripts/ci/
+EXIT_CODE=0

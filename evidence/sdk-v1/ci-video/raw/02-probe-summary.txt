@@ -1,0 +1,36 @@
+=== probe-windows/probe-summary.txt ===
+=== Windows Probe Summary ===
+Screen bounds: 1024x768
+Synthetic input test: SetCursorPos result=True, final pos=(150, 150)
+Video file: D:\a\orbitkit\orbitkit\video-windows.mp4, Size: 642016 bytes
+Screenshot file: D:\a\orbitkit\orbitkit\probe-screenshot.png, Size: 267037 bytes
+Found windows count: 2
+Window: 'orbitkit' at (156, 129) size 816x639
+Window: 'D:\a\orbitkit\orbitkit\target\debug\starter.exe' at (122, 130) size 1044x635
+
+=== probe-macos/probe-summary.txt ===
+=== macOS Probe Summary ===
+Initial mouse position: 10,10
+Mouse position after move: 200,200
+cliclick click test result: 
+screencapture-test.mp4 size: 63216 bytes
+width=1024
+height=768
+r_frame_rate=60/1
+nb_frames=50
+duration=5.000000
+size=63216
+bit_rate=101145
+video-avfoundation.mp4 size: 31708 bytes
+width=1024
+height=768
+r_frame_rate=30/1
+nb_frames=119
+duration=4.933333
+size=31708
+bit_rate=51418
+probe-screenshot.png size: 507333 bytes
+--- Detected Windows ---
+PID: 5760, Owner: 'starter', Name: 'orbitkit', Bounds: (112.0, 50.0, 800.0, 600.0)
+
+EXIT_CODE=0

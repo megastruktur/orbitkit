@@ -35,12 +35,12 @@
     processPid: number;
     lastAction: string;
   }
+
   interface JniActionRecord {
     receiptId: number;
     id: string;
     source: string;
   }
-
 
   let permissionGranted = $state<boolean | null>(null);
   let statusMessage = $state<string>("Ready");
@@ -149,29 +149,25 @@
 
   async function pollRecorderState() {
     try {
-      lastError = null;
       const res = await invoke<RecorderState>("plugin:orbitkit-recorder|state");
       recState = res.state;
       recSpoolPath = res.spoolPath;
       recBytesRecorded = res.bytesRecorded;
       recIsForeground = res.isForeground;
-      statusMessage = `Recorder state: ${res.state} | ${res.bytesRecorded} bytes`;
     } catch (err: unknown) {
       lastError = formatError(err);
-      statusMessage = "recorderState query failed";
     }
   }
 
   async function startRecordingS1() {
     try {
       lastError = null;
-      statusMessage = "Starting mic-FGS from visible Activity...";
-      await invoke("plugin:orbitkit-recorder|start_foreground");
-      statusMessage = "recorderStartForeground invoked successfully";
+      statusMessage = "Starting recorder...";
+      await invoke("plugin:orbitkit-recorder|start");
       await pollRecorderState();
     } catch (err: unknown) {
       lastError = formatError(err);
-      statusMessage = "recorderStartForeground failed";
+      statusMessage = "recorderStart failed";
     }
   }
 
@@ -262,6 +258,11 @@
     }
   }
 
+  function clearLogs() {
+    actionLogs = [];
+    statusMessage = "Event logs cleared";
+  }
+
   onMount(() => {
     checkPermission();
     if (isAndroid) {
@@ -277,7 +278,7 @@
       };
       actionLogs = [entry, ...actionLogs.slice(0, 49)];
       statusMessage = `Menu action received: ${payload.id} (${payload.source})`;
-    }).then((fn) => {
+    }).then((fn: (() => void) | undefined) => {
       unlisten = fn;
     });
 
@@ -287,101 +288,142 @@
   });
 </script>
 
-<main>
-  <div class="header">
+<main class="main-container">
+  <!-- Hero Section with Mascot, Orbit Rings, and Tagline -->
+  <header class="hero">
+    <div class="hero-orbit">
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="hero-planet">
+        {@html config.mascot.src}
+      </div>
+    </div>
     <h1>OrbitKit Starter</h1>
-    <p class="subtitle">Floating mascot overlay & radial menu companion app</p>
-  </div>
+    <p class="subtitle">Planetary floating mascot overlay & radial companion app</p>
+  </header>
 
-  <div class="controls-card">
-    <div class="section-title">Overlay Controls</div>
-    <div class="button-grid">
-      <button class="primary" id="btn-show-overlay" onclick={handleShowOverlay}>
-        Show Overlay
-      </button>
-      <button class="secondary" id="btn-hide-overlay" onclick={handleHideOverlay}>
-        Hide Overlay
-      </button>
-    </div>
+  <div class="cards-column">
+    <!-- Card 1: Overlay Controls -->
+    <section class="glass-card">
+      <div class="section-title">Overlay Controls</div>
+      <div class="button-grid">
+        <button class="btn btn-primary" id="btn-show-overlay" onclick={handleShowOverlay}>
+          Show Overlay
+        </button>
+        <button class="btn btn-secondary" id="btn-hide-overlay" onclick={handleHideOverlay}>
+          Hide Overlay
+        </button>
+      </div>
+    </section>
 
+    <!-- Card 2: Mascot State -->
+    <section class="glass-card">
+      <div class="section-title">Mascot State</div>
+      <div class="button-grid">
+        <button class="btn btn-idle" onclick={() => handleSetState("idle")}>
+          <span class="dot dot-idle"></span>
+          Set Idle
+        </button>
+        <button class="btn btn-busy" onclick={() => handleSetState("busy")}>
+          <span class="dot dot-busy"></span>
+          Set Busy
+        </button>
+      </div>
+    </section>
+
+    <!-- Card 3: Android Overlay Permission (Conditional) -->
     {#if isAndroid}
-      <div class="section-title">Android Overlay Permission</div>
-      <div class="status-row">
-        <span class="label">Permission:</span>
-        <span class="val {permissionGranted ? 'granted' : 'denied'}">
-          {permissionGranted === null ? "..." : permissionGranted ? "GRANTED" : "NOT GRANTED"}
-        </span>
-      </div>
-      <div class="button-grid">
-        <button onclick={checkPermission}>Check Permission</button>
-        <button onclick={requestPermission}>Request Permission</button>
-      </div>
-    {/if}
-
-    <div class="section-title">Mascot State</div>
-    <div class="button-grid">
-      <button onclick={() => handleSetState("idle")}>Set Idle</button>
-      <button onclick={() => handleSetState("busy")}>Set Busy</button>
-    </div>
-
-    {#if isAndroid && hasRecorderPlugin}
-      <div class="section-title">Recorder Extension (Android)</div>
-      <div class="status-row">
-        <span class="label">Rec State:</span>
-        <span class="val highlight">{recState} {recIsForeground ? "(FGS)" : ""}</span>
-      </div>
-      <div class="status-row">
-        <span class="label">Bytes:</span>
-        <span class="val">{recBytesRecorded}</span>
-      </div>
-      {#if recSpoolPath}
+      <section class="glass-card">
+        <div class="section-title">Android Overlay Permission</div>
         <div class="status-row">
-          <span class="label">Spool:</span>
-          <span class="val">{recSpoolPath}</span>
+          <span class="label">Permission Status:</span>
+          <span class="val {permissionGranted ? 'granted' : 'denied'}">
+            {permissionGranted === null ? "CHECKING..." : permissionGranted ? "GRANTED" : "NOT GRANTED"}
+          </span>
         </div>
-      {/if}
-      <div class="button-grid">
-        <button class="rec-start" onclick={startRecordingS1}>Start FGS</button>
-        <button onclick={pollRecorderState}>Poll</button>
-        <button class="rec-pause" onclick={pauseRecording}>Pause</button>
-        <button class="rec-resume" onclick={resumeRecording}>Resume</button>
-        <button class="rec-stop" onclick={stopRecording}>Stop</button>
-        <button class="rec-standby" onclick={postStandbyNotificationS3b}>Standby Notif</button>
-      </div>
-      <div class="button-grid" style="margin-top: 0.5rem;">
-        <button onclick={queryPersistedState}>Query Persistence</button>
-        <button onclick={recoverStateManually}>Recover</button>
-        <button onclick={queryJniLog}>JNI Log ({jniActionCount})</button>
-      </div>
-      {#if persistedState}
-        <div class="status-subrow">
-          <span class="sublabel">Persisted:</span>
-          <span class="subval">{persistedState.state} ({persistedState.bytesRecorded}B)</span>
+        <div class="button-grid">
+          <button class="btn btn-secondary" onclick={checkPermission}>Check Permission</button>
+          <button class="btn btn-secondary" onclick={requestPermission}>Request Permission</button>
         </div>
-      {/if}
+      </section>
     {/if}
 
-    <div class="section-title">Menu Action Log</div>
-    <div class="log-container">
-      {#if actionLogs.length === 0}
-        <div class="empty-log">No menu actions received yet</div>
-      {:else}
-        {#each actionLogs as log}
-          <div class="log-item">
-            <span class="log-time">{log.time}</span>
-            <span class="log-id">{log.id}</span>
-            <span class="log-source">[{log.source}]</span>
+    <!-- Card 4: Recorder Extension (Conditional) -->
+    {#if isAndroid && hasRecorderPlugin}
+      <section class="glass-card">
+        <div class="section-title">Recorder Extension (Android)</div>
+        <div class="status-row">
+          <span class="label">Rec State:</span>
+          <span class="val highlight">{recState} {recIsForeground ? "(FGS)" : ""}</span>
+        </div>
+        <div class="status-row">
+          <span class="label">Bytes Recorded:</span>
+          <span class="val">{recBytesRecorded} B</span>
+        </div>
+        {#if recSpoolPath}
+          <div class="status-row">
+            <span class="label">Spool Path:</span>
+            <span class="val truncate">{recSpoolPath}</span>
           </div>
-        {/each}
-      {/if}
-    </div>
+        {/if}
+        <div class="button-grid">
+          <button class="btn btn-rec-start" onclick={startRecordingS1}>Start FGS</button>
+          <button class="btn btn-secondary" onclick={pollRecorderState}>Poll</button>
+          <button class="btn btn-rec-pause" onclick={pauseRecording}>Pause</button>
+          <button class="btn btn-rec-resume" onclick={resumeRecording}>Resume</button>
+          <button class="btn btn-rec-stop" onclick={stopRecording}>Stop</button>
+          <button class="btn btn-rec-standby" onclick={postStandbyNotificationS3b}>Standby Notif</button>
+        </div>
+        <div class="button-grid button-grid-mt">
+          <button class="btn btn-secondary" onclick={queryPersistedState}>Query Persistence</button>
+          <button class="btn btn-secondary" onclick={recoverStateManually}>Recover</button>
+          <button class="btn btn-secondary" onclick={queryJniLog}>JNI Log ({jniActionCount})</button>
+        </div>
+        {#if persistedState}
+          <div class="status-subrow">
+            <span class="label">Persisted:</span>
+            <span class="val">{persistedState.state} ({persistedState.bytesRecorded}B)</span>
+          </div>
+        {/if}
+      </section>
+    {/if}
 
-    <div class="status-box">
-      <div class="status-text">{statusMessage}</div>
+    <!-- Card 5: Live Event Log -->
+    <section class="glass-card">
+      <div class="card-header-row">
+        <div class="section-title">Live Event Log</div>
+        <div class="header-actions">
+          <span class="badge">{actionLogs.length} events</span>
+          {#if actionLogs.length > 0}
+            <button class="clear-link" onclick={clearLogs}>Clear</button>
+          {/if}
+        </div>
+      </div>
+      <div class="log-container">
+        {#if actionLogs.length === 0}
+          <div class="empty-log">Awaiting menu action events...</div>
+        {:else}
+          {#each actionLogs as log (log.time + log.id + log.source)}
+            <div class="log-item">
+              <span class="log-time">{log.time}</span>
+              <span class="log-id">{log.id}</span>
+              <span class="log-source">({log.source})</span>
+            </div>
+          {/each}
+        {/if}
+      </div>
+    </section>
+
+    <!-- Telemetry & Status Bar -->
+    <footer class="telemetry-bar">
+      <div class="telemetry-status">
+        <span class="status-prefix">System:</span>
+        <span class="status-text">{statusMessage}</span>
+      </div>
       {#if lastError}
-        <div class="error-text">{lastError}</div>
+        <div class="telemetry-error">{lastError}</div>
       {/if}
-    </div>
+    </footer>
   </div>
 </main>
 
@@ -389,61 +431,166 @@
   :global(body) {
     margin: 0;
     padding: 0;
-    background: #0f172a;
-    color: #f8fafc;
+    background: #070b1a;
+    color: #e6f6ff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  main {
+  .main-container {
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 1.25rem 1rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 1.5rem;
-    box-sizing: border-box;
+    background:
+      radial-gradient(1px 1px at 30px 40px, rgba(230, 246, 255, 0.45), transparent),
+      radial-gradient(1.5px 1.5px at 150px 90px, rgba(56, 189, 248, 0.4), transparent),
+      radial-gradient(1px 1px at 280px 160px, rgba(167, 139, 250, 0.35), transparent),
+      radial-gradient(1.5px 1.5px at 420px 80px, rgba(230, 246, 255, 0.3), transparent),
+      radial-gradient(1px 1px at 80px 280px, rgba(56, 189, 248, 0.35), transparent),
+      radial-gradient(circle at 50% 15%, #0e1433 0%, #070b1a 100%);
+    background-repeat: repeat, repeat, repeat, repeat, repeat, no-repeat;
+    background-size: 320px 260px, 380px 300px, 450px 350px, 500px 400px, 300px 300px, 100% 100%;
   }
 
-  .header {
+  .hero {
     text-align: center;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-orbit {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .orbit-ring-1 {
+    width: 72px;
+    height: 26px;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    transform: rotate(-20deg);
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+  }
+
+  .orbit-ring-2 {
+    width: 78px;
+    height: 30px;
+    border: 1px dashed rgba(167, 139, 250, 0.3);
+    transform: rotate(25deg);
+  }
+
+  .hero-planet {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.5));
+  }
+
+  .hero-planet :global(svg) {
+    width: 44px;
+    height: 44px;
   }
 
   h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 0.25rem;
-    color: #38bdf8;
+    font-size: 1.4rem;
+    margin: 0 0 0.2rem;
+    color: #e6f6ff;
+    letter-spacing: 0.02em;
   }
 
   .subtitle {
-    font-size: 0.875rem;
-    color: #94a3b8;
+    font-size: 0.8rem;
+    color: #9fb3d9;
     margin: 0;
+    line-height: 1.3;
   }
 
-  .controls-card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 1.25rem;
-    max-width: 440px;
+  .cards-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     width: 100%;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    max-width: 440px;
+  }
+
+  .glass-card {
+    background: rgba(14, 20, 51, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(230, 246, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-sizing: border-box;
   }
 
   .section-title {
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #94a3b8;
-    margin: 1rem 0 0.5rem;
+    letter-spacing: 0.06em;
+    color: #38bdf8;
+    margin-bottom: 0.5rem;
     font-weight: 700;
   }
 
-  .section-title:first-child {
-    margin-top: 0;
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-header-row .section-title {
+    margin-bottom: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+  }
+
+  .clear-link {
+    background: transparent;
+    border: none;
+    color: #9fb3d9;
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+
+  .clear-link:hover {
+    color: #e6f6ff;
   }
 
   .button-grid {
@@ -452,119 +599,212 @@
     gap: 0.5rem;
   }
 
-  button {
-    background: #334155;
-    color: #f8fafc;
-    border: 1px solid #475569;
-    border-radius: 6px;
+  .button-grid-mt {
+    margin-top: 0.5rem;
+  }
+
+  .btn {
+    border-radius: 7px;
     padding: 0.55rem 0.75rem;
     font-size: 0.8125rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+    text-align: center;
   }
 
-  button:hover {
-    background: #475569;
-    border-color: #64748b;
+  .btn:active {
+    transform: scale(0.98);
   }
 
-  button.primary {
-    background: #0284c7;
-    border-color: #0369a1;
-  }
-
-  button.primary:hover {
+  .btn-primary {
     background: #0369a1;
+    color: #e6f6ff;
+    border: 1px solid #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
   }
 
-  button.secondary {
-    background: #475569;
-    border-color: #64748b;
+  .btn-primary:hover {
+    background: #0284c7;
+    border-color: #7dd3fc;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
   }
 
-  button.rec-start {
+  .btn-secondary {
+    background: rgba(14, 20, 51, 0.85);
+    color: #e6f6ff;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: #38bdf8;
+  }
+
+  .btn-idle {
+    background: rgba(14, 20, 51, 0.85);
+    color: #e6f6ff;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+  }
+
+  .btn-idle:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  }
+
+  .btn-busy {
+    background: rgba(14, 20, 51, 0.85);
+    color: #e6f6ff;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+  }
+
+  .btn-busy:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .dot-idle {
+    background: #38bdf8;
+    box-shadow: 0 0 6px #38bdf8;
+  }
+
+  .dot-busy {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+  }
+
+  .btn-rec-start {
     background: #dc2626;
-    border-color: #b91c1c;
+    color: #ffffff;
+    border: 1px solid #ef4444;
   }
 
-  button.rec-pause {
-    background: #d97706;
-    border-color: #b45309;
+  .btn-rec-start:hover {
+    background: #ef4444;
   }
 
-  button.rec-resume {
-    background: #16a34a;
-    border-color: #15803d;
+  .btn-rec-pause {
+    background: #b45309;
+    color: #ffffff;
+    border: 1px solid #d97706;
   }
 
-  button.rec-stop {
-    background: #475569;
+  .btn-rec-resume {
+    background: #15803d;
+    color: #ffffff;
+    border: 1px solid #22c55e;
   }
 
-  button.rec-standby {
+  .btn-rec-stop {
+    background: rgba(14, 20, 51, 0.85);
+    color: #e6f6ff;
+    border: 1px solid #64748b;
+  }
+
+  .btn-rec-standby {
     background: #7c3aed;
-    border-color: #6d28d9;
+    color: #ffffff;
+    border: 1px solid #a78bfa;
   }
 
   .status-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 0.8125rem;
     margin: 0.35rem 0;
   }
 
   .status-subrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.75rem;
-    color: #94a3b8;
     margin-top: 0.35rem;
+    padding-top: 0.25rem;
+    border-top: 1px dashed rgba(56, 189, 248, 0.15);
   }
 
   .label {
-    color: #94a3b8;
+    color: #9fb3d9;
+  }
+
+  .val {
+    color: #e6f6ff;
+    font-weight: 500;
   }
 
   .val.granted {
-    color: #4ade80;
+    color: #38bdf8;
     font-weight: 600;
   }
 
   .val.denied {
-    color: #f87171;
+    color: #fca5a5;
     font-weight: 600;
   }
 
   .val.highlight {
     color: #38bdf8;
-    font-weight: 600;
+  }
+
+  .truncate {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .log-container {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 6px;
-    padding: 0.5rem;
+    background: rgba(7, 11, 26, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
     max-height: 120px;
     overflow-y: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: monospace;
     font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .empty-log {
-    color: #64748b;
+    color: #9fb3d9;
+    font-style: italic;
+    font-size: 0.75rem;
+    padding: 0.25rem 0;
     text-align: center;
-    padding: 0.75rem;
   }
 
   .log-item {
     display: flex;
-    gap: 0.5rem;
-    padding: 0.2rem 0;
-    border-bottom: 1px solid #1e293b;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.15rem 0;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+  }
+
+  .log-item:last-child {
+    border-bottom: none;
   }
 
   .log-time {
-    color: #64748b;
+    color: #9fb3d9;
+    font-size: 0.7rem;
   }
 
   .log-id {
@@ -573,25 +813,38 @@
   }
 
   .log-source {
-    color: #a855f7;
+    color: #a78bfa;
+    font-size: 0.7rem;
   }
 
-  .status-box {
-    margin-top: 1rem;
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 6px;
+  .telemetry-bar {
+    background: rgba(7, 11, 26, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 8px;
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
     min-height: 2rem;
+    box-sizing: border-box;
+  }
+
+  .telemetry-status {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .status-prefix {
+    color: #38bdf8;
+    font-weight: 600;
   }
 
   .status-text {
-    color: #94a3b8;
+    color: #9fb3d9;
   }
 
-  .error-text {
-    color: #f87171;
+  .telemetry-error {
+    color: #fca5a5;
     margin-top: 0.25rem;
+    font-weight: 500;
   }
 </style>

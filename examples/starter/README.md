@@ -6,12 +6,13 @@ A minimal, compilable, and runnable consumer application showcasing `@orbitkit/u
 
 - **Configuration (`src/orbitkit.config.json` & `src/orbitkit.config.ts`)**:
   Single source of truth configuration defining the floating mascot (SVG with `idle` and `busy` states), 5 radial menu actions (`notes`, `timer`, `settings`, `about`, `quit`), popups (`notes`: 320x420, `settings`: 360x300), and window styling defaults (`transparent: true`, `alwaysOnTop: true`, `decorations: false`).
-- **Routing (`src/main.ts`)**:
+- **Routing & Screens (`src/main.ts` & `src/views/`)**:
   Inspects URL parameters on window startup:
-  - `?orbitkit=mascot` → `MascotView.svelte` (floating mascot + radial menu; click mascot toggles menu; selecting item emits `emitMenuAction(id)`).
-  - `?popup=notes` → `NotesPopup.svelte` (quick notes textarea persisted to `localStorage`).
-  - `?popup=settings` → `SettingsPopup.svelte` (controls mascot animation state via `setMascotState`).
-  - Default (no query params) → `MainView.svelte` (main dashboard to show/hide overlay, inspect Android permission, and view `onMenuAction` event log).
+  - `?orbitkit=mascot` → `MascotView.svelte`: Planetary companion overlay hosting the interactive blue planet mascot and radial menu. Radial items are rendered as round glass discs (`#0E1433` @ 85%) with cyan 1.5px rings and bright Lucide line icons (`notes`, `timer`, `settings`, `about`, `quit`), featuring hover/focus glow and desktop tooltips.
+  - `?popup=notes` → `NotesPopup.svelte`: Planetary glass card popup for quick notes, persisted to `localStorage`.
+  - `?popup=settings` → `SettingsPopup.svelte`: Planetary settings popup controlling mascot animation state (`idle` cyan / `busy` amber) via `setMascotState`.
+  - `?popup=<id>` (unregistered) → `UnknownPopup.svelte`: Planetary fallback glass card for unregistered popup identifiers.
+  - Default (no query params) → `MainView.svelte`: Sleek mission control dashboard featuring a hero mascot with orbital rings, tagline, and glass cards for overlay controls, Android permission status, mascot state toggles, and live event telemetry log.
 - **Backend (`src-tauri/src/lib.rs`)**:
   Initializes `tauri_plugin_orbitkit::init(config)` with parsed `orbitkit.config.json`. Handles native menu events via `OrbitkitExt::on_menu_action`:
   - `about` → logs action.

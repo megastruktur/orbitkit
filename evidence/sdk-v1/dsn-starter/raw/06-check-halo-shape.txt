@@ -1,0 +1,76 @@
+Analyzing mascot halo geometry in: evidence/sdk-v1/dsn-starter/03-radial-menu.png
+====================================================================
+
+--- Upper Halo Boundary: Row Pixel Counts (x in 1050..1166) ---
+  y=565 :   0 px
+  y=567 :   0 px
+  y=569 :   0 px
+  y=571 :   0 px
+  y=573 :   0 px
+  y=575 :   0 px
+  y=577 :  28 px
+  y=579 :  38 px
+  y=581 :  48 px
+  y=583 :  54 px
+  y=585 :  60 px
+  y=587 :  66 px
+  y=589 :  70 px
+  y=591 :  74 px
+  y=593 :  78 px
+
+--- Left Halo Boundary: Column Pixel Counts (y in 565..610) ---
+  x=1048 : 15 px
+  x=1049 :  9 px
+  x=1050 :  0 px
+  x=1051 :  0 px
+  x=1052 :  0 px
+  x=1053 :  0 px
+  x=1054 :  0 px
+  x=1055 :  0 px
+  x=1056 :  0 px
+  x=1057 :  0 px
+  x=1058 :  0 px
+  x=1059 :  1 px
+  x=1060 :  4 px
+  x=1061 :  6 px
+  x=1062 :  8 px
+  x=1063 : 10 px
+  x=1064 : 11 px
+  x=1065 : 13 px
+  x=1066 : 14 px
+  x=1067 : 16 px
+  x=1068 : 17 px
+  x=1069 : 18 px
+
+--- Right Halo Boundary: Column Pixel Counts (y in 565..610) ---
+  x=1150 : 13 px
+  x=1151 : 11 px
+  x=1152 : 10 px
+  x=1153 :  8 px
+  x=1154 :  6 px
+  x=1155 :  4 px
+  x=1156 :  1 px
+  x=1157 :  0 px
+  x=1158 :  0 px
+  x=1159 :  0 px
+  x=1160 :  0 px
+  x=1161 :  0 px
+  x=1162 :  0 px
+  x=1163 :  0 px
+  x=1164 :  0 px
+  x=1165 :  0 px
+  x=1166 :  9 px
+  x=1167 : 16 px
+  x=1168 : 22 px
+  x=1169 : 26 px
+  x=1170 : 28 px
+
+====================================================================
+--- Geometric Curvature Assessment ---
+  Row count dynamic range (max - min):  78 px (min=0, max=78)
+  Left col dynamic range (max - min):   18 px (min=0, max=18)
+  Right col dynamic range (max - min):  28 px (min=0, max=28)
+
+[PASS] Halo tapers smoothly with non-constant curvature on all boundaries.
+       Machine Spirit satisfied: no square clipping artifact present.
+EXIT_CODE=0

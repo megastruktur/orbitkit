@@ -1,0 +1,24 @@
+Launching scenario container for /home/megastruktur/orca/workspaces/orbitkit/oks-dsn-starter/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/oks-dsn-starter/examples/starter/src-tauri/target-linux/scenario-app.log
+=== OrbitKit Desktop Full Flow Scenario ===
+Display: :77, App PID: 54
+--- Step 1: Main window ready ---
+0x00400003  0 241  127  800  600  65d592760952 orbitkit
+Captured 01-main-window.png
+--- Step 2: Click Show Overlay ---
+0x00400003  0 241  127  800  600  65d592760952 orbitkit
+0x00400028  0 960  479  296  296  65d592760952 orbitkit-mascot
+Captured 02-mascot-overlay.png
+--- Step 3: Click Mascot to open Radial Menu ---
+0x00400003  0 241  127  800  600  65d592760952 orbitkit
+0x00400028  0 960  479  296  296  65d592760952 orbitkit-mascot
+Captured 03-radial-menu.png
+--- Step 4: Click Notes menu item ---
+0x00400003  0 241  127  800  600  65d592760952 orbitkit
+0x00400028  0 960  479  296  296  65d592760952 orbitkit-mascot
+0x004000cf  0 2    395  320  420  65d592760952 Notes
+Captured 04-notes-popup.png
+--- Step 5: Click Mascot again and select Quit ---
+Clicking Quit menu item at (1017, 597)...
+=== Scenario Successful: App exited 0 on quit ===
+EXIT_CODE=0

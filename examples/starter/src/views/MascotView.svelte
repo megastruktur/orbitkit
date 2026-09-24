@@ -48,11 +48,23 @@
 <div class="mascot-window-root" data-testid="mascot-window">
   <div class="mascot-center-anchor">
     <!-- Click mascot toggles menu -->
-    <div class="mascot-clickable">
+    <div
+      class="mascot-clickable"
+      class:busy={mascotState === "busy"}
+      role="button"
+      tabindex="0"
+      aria-label="OrbitKit Mascot"
+      onclick={toggleMenu}
+      onkeydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleMenu();
+        }
+      }}
+    >
       <Mascot
         config={config.mascot}
         state={mascotState}
-        onclick={toggleMenu}
       />
     </div>
 
@@ -100,15 +112,40 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s ease;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+  }
+
+  .mascot-clickable :global(.orbitkit-mascot) {
+    border-radius: 50%;
+  }
+
+  .mascot-clickable :global(.orbitkit-mascot-img) {
+    border-radius: 50%;
+    transition: filter 0.2s ease;
+    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.35));
+  }
+
+  .mascot-clickable.busy :global(.orbitkit-mascot-img) {
+    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.45));
   }
 
   .mascot-clickable:hover {
-    transform: scale(1.05);
+    transform: scale(1.06);
+  }
+
+  .mascot-clickable:hover :global(.orbitkit-mascot-img) {
+    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.65));
+  }
+
+  .mascot-clickable.busy:hover :global(.orbitkit-mascot-img) {
+    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.7));
   }
 
   .mascot-clickable:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
   .radial-anchor {
@@ -122,5 +159,50 @@
 
   .radial-anchor :global(*) {
     pointer-events: auto;
+  }
+
+  /* Radial item discs: glass disc (#0E1433 @ 85%), cyan 1.5px ring, icon centred, hover/focus glow; tooltip = label (title attr) on desktop */
+  :global(.orbitkit-radial-item) {
+    background: rgba(14, 20, 51, 0.85) !important;
+    border: 1.5px solid #38bdf8 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s ease,
+                border-color 0.2s ease,
+                background-color 0.2s ease !important;
+  }
+
+  :global(.orbitkit-radial-item:hover:not(:disabled)),
+  :global(.orbitkit-radial-item:focus-visible:not(:disabled)) {
+    background: rgba(14, 20, 51, 0.95) !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.75), 0 0 8px #38bdf8 !important;
+    transform: translate(-50%, -50%) scale(1.12) !important;
+    outline: none !important;
+  }
+
+  :global(.orbitkit-radial-item:active:not(:disabled)) {
+    transform: translate(-50%, -50%) scale(0.96) !important;
+  }
+
+  :global(.orbitkit-radial-icon-img) {
+    width: 24px !important;
+    height: 24px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
+  :global(.orbitkit-radial-label) {
+    display: none !important; /* Hide text label; tooltip provided by title={item.label} */
   }
 </style>

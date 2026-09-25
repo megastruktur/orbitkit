@@ -13,9 +13,10 @@
     open: boolean;
     onselect: (id: string) => void;
     onclose: () => void;
+    label?: string;
   }
 
-  let { config, open, onselect, onclose }: Props = $props();
+  let { config, open, onselect, onclose, label }: Props = $props();
 
   let menuEl: HTMLElement | null = $state(null);
   let itemSize = $derived(config.itemSize ?? 44);
@@ -151,26 +152,13 @@
   }
 
   function handleItemClick(itemId: string, disabled?: boolean) {
-    if (disabled) return;
-    if (
-      animPhase !== "open" &&
-      config.animation !== "none" &&
-      !checkReducedMotion()
-    ) {
-      return;
-    }
+    if (disabled || animPhase === "closing") return;
     onselect(itemId);
   }
 
   function handleItemMouseEnter(itemId: string, disabled?: boolean) {
-    if (
-      animPhase !== "open" &&
-      config.animation !== "none" &&
-      !checkReducedMotion()
-    ) {
-      return;
-    }
-    if (config.trigger === "hover" && !disabled) {
+    if (disabled || animPhase === "closing") return;
+    if (config.trigger === "hover") {
       onselect(itemId);
     }
   }
@@ -315,7 +303,7 @@
       : undefined}
     role="menu"
     tabindex="-1"
-    aria-label="Radial Menu"
+    aria-label={label ?? "Radial Menu"}
   >
     {#each config.items as item, i (item.id)}
       {@const pos = positions[i] ?? { x: 0, y: 0, angle: 0 }}
@@ -329,6 +317,8 @@
       <button
         type="button"
         role="menuitem"
+        data-radial-sector={i}
+        data-orbitkit-radial-item={item.id}
         class="orbitkit-radial-item"
         class:animating={animPhase !== "open" && config.animation !== "none"}
         disabled={item.disabled}

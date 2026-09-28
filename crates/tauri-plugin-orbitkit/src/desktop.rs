@@ -1,10 +1,13 @@
-use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewUrl, WebviewWindowBuilder};
+use std::collections::{HashMap, HashSet};
+use std::sync::{Arc, Mutex};
+use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
 use crate::{
-    lookup_popup, selector_inputs, MascotMonitorResponse, monitor_for_point,
-    OverlayPermissionResponse, PhysRect, ShowOverlayMascotArgs,
+    lookup_popup, monitor_for_point, popup_label, resolve_popup_spec, resolve_popup_url,
+    selector_inputs, substitute_popup_params, MascotMonitorResponse, OverlayPermissionResponse,
+    PhysRect, POPUP_LABEL_PREFIX, ResolvedPopupUrl, ShowOverlayMascotArgs,
 };
 
 /// tao on Windows reports true physical virtual-screen coordinates; on
@@ -103,6 +106,9 @@ fn should_run_selftest() -> bool {
 pub struct Orbitkit<R: Runtime> {
     app: AppHandle<R>,
     pub config: OrbitKitConfig,
+    /// Labels whose `popup-closed` event was already emitted by `close_popup`;
+    /// consumed by the window `Destroyed` handler to avoid double emission.
+    pending_close: Arc<Mutex<HashSet<String>>>,
 }
 
 impl<R: Runtime> Orbitkit<R> {
@@ -137,7 +143,11 @@ impl<R: Runtime> Orbitkit<R> {
             config
         };
 
-        let orbitkit = Self { app, config };
+        let orbitkit = Self {
+            app,
+            config,
+            pending_close: Arc::new(Mutex::new(HashSet::new())),
+        };
         #[cfg(debug_assertions)]
         orbitkit.spawn_selftest_if_enabled();
 
@@ -158,7 +168,7 @@ impl<R: Runtime> Orbitkit<R> {
                 let orbitkit = app_clone.state::<Orbitkit<R>>();
                 let _ = orbitkit.show_overlay(None, None);
                 if let Some(id) = popup_id {
-                    let _ = orbitkit.open_popup(id);
+                    let _ = orbitkit.open_popup(id, None, None);
                 }
             });
         });
@@ -250,45 +260,131 @@ impl<R: Runtime> Orbitkit<R> {
         Ok(())
     }
 
-    pub fn open_popup(&self, id: String) -> Result<()> {
+    /// K11: opens the configured popup `id`, optionally substituting `{param}`
+    /// placeholders with URL-encoded `params` values and keying the window by
+    /// `instance_key` (`orbitkit-popup-{id}-{instanceKey}`). Idempotent: an
+    /// existing label is shown + focused, never duplicated. Emits
+    /// `orbitkit://popup-shown {label}` on create and re-show.
+    pub fn open_popup(
+        &self,
+        id: String,
+        params: Option<HashMap<String, String>>,
+        instance_key: Option<String>,
+    ) -> Result<()> {
         let popup = lookup_popup(&self.config.windows.popups, &id)?;
-        let label = format!("orbitkit-popup-{}", popup.id);
+        let label = popup_label(&popup.id, instance_key.as_deref())?;
+
         if let Some(window) = self.app.get_webview_window(&label) {
             window.show().map_err(|e| Error::unsupported(e.to_string()))?;
             let _ = window.set_focus();
+            let _ = self
+                .app
+                .emit("orbitkit://popup-shown", serde_json::json!({ "label": label }));
             return Ok(());
         }
 
-        let url = if popup.url.starts_with("http://") || popup.url.starts_with("https://") {
-            let parsed = popup
-                .url
-                .parse::<tauri::Url>()
-                .map_err(|e| Error::invalid_config(e.to_string()))?;
-            WebviewUrl::External(parsed)
-        } else {
-            WebviewUrl::App(popup.url.clone().into())
+        let template = substitute_popup_params(&popup.url, params.as_ref())?;
+        let allowed_origins = self
+            .config
+            .app
+            .as_ref()
+            .map(|app| app.allowed_origins.as_slice())
+            .unwrap_or(&[]);
+        let resolved_url = resolve_popup_url(&template, allowed_origins)?;
+        let spec = resolve_popup_spec(popup);
+
+        let url = match resolved_url {
+            ResolvedPopupUrl::App(path) => WebviewUrl::App(path.into()),
+            ResolvedPopupUrl::External(url) => WebviewUrl::External(url),
         };
 
-        let resizable = popup.resizable.unwrap_or(true);
-        let always_on_top = popup.always_on_top.unwrap_or(false);
+        let mut builder = WebviewWindowBuilder::new(&self.app, &label, url)
+            .title(&spec.title)
+            .inner_size(spec.width, spec.height)
+            .resizable(spec.resizable)
+            .always_on_top(spec.always_on_top)
+            .decorations(spec.decorations)
+            .transparent(spec.transparent)
+            .skip_taskbar(spec.skip_taskbar);
 
-        let _window = WebviewWindowBuilder::new(&self.app, &label, url)
-            .title(&popup.title)
-            .inner_size(popup.width, popup.height)
-            .resizable(resizable)
-            .always_on_top(always_on_top)
+        if spec.min_width.is_some() || spec.min_height.is_some() {
+            builder = builder.min_inner_size(
+                spec.min_width.unwrap_or(0.0),
+                spec.min_height.unwrap_or(0.0),
+            );
+        }
+
+        let window = builder
             .build()
             .map_err(|e| Error::unsupported(e.to_string()))?;
 
+        // User-initiated closes (title-bar X, WM close) emit `popup-closed`
+        // too; `pending_close` dedupes against `close_popup`'s direct emission.
+        let app = self.app.clone();
+        let pending_close = Arc::clone(&self.pending_close);
+        let destroyed_label = label.clone();
+        window.on_window_event(move |event| {
+            if matches!(event, WindowEvent::Destroyed) {
+                let already_emitted = pending_close
+                    .lock()
+                    .unwrap_or_else(|poisoned| poisoned.into_inner())
+                    .remove(&destroyed_label);
+                if !already_emitted {
+                    let _ = app.emit(
+                        "orbitkit://popup-closed",
+                        serde_json::json!({ "label": destroyed_label }),
+                    );
+                }
+            }
+        });
+
+        let _ = self
+            .app
+            .emit("orbitkit://popup-shown", serde_json::json!({ "label": label }));
         Ok(())
     }
 
-    pub fn close_popup(&self, id: String) -> Result<()> {
-        let label = format!("orbitkit-popup-{}", id);
+    /// K11: closes the popup window with the full `label`. Only OrbitKit
+    /// popup labels are accepted (unknown prefix is `not_found`); closing an
+    /// already-closed popup label is a no-op. Emits
+    /// `orbitkit://popup-closed {label}` once.
+    pub fn close_popup(&self, label: String) -> Result<()> {
+        if !label.starts_with(POPUP_LABEL_PREFIX) {
+            return Err(Error::not_found(format!(
+                "no orbitkit popup with label '{label}'"
+            )));
+        }
         if let Some(window) = self.app.get_webview_window(&label) {
-            window.close().map_err(|e| Error::unsupported(e.to_string()))?;
+            self.pending_close
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner())
+                .insert(label.clone());
+            if let Err(e) = window.close() {
+                self.pending_close
+                    .lock()
+                    .unwrap_or_else(|poisoned| poisoned.into_inner())
+                    .remove(&label);
+                return Err(Error::unsupported(e.to_string()));
+            }
+            let _ = self
+                .app
+                .emit("orbitkit://popup-closed", serde_json::json!({ "label": label }));
         }
         Ok(())
+    }
+
+    /// K11: labels of all currently open OrbitKit popup windows, sorted.
+    /// `Result` so the desktop and mobile (`unsupported`) arms share one
+    /// command signature (K13).
+    pub fn list_popups(&self) -> Result<Vec<String>> {
+        let mut labels: Vec<String> = self
+            .app
+            .webview_windows()
+            .into_keys()
+            .filter(|label| label.starts_with(POPUP_LABEL_PREFIX))
+            .collect();
+        labels.sort();
+        Ok(labels)
     }
 
     pub fn set_mascot_state(&self, state: String) -> Result<()> {
@@ -401,7 +497,194 @@ impl<R: Runtime> Orbitkit<R> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{monitor_for_point, selector_inputs, MonitorInfo, PhysRect};
+    use crate::config::WindowsConfig;
+    use crate::error::ErrorCode;
+    use crate::{
+        monitor_for_point, selector_inputs, OrbitKitConfig, Orbitkit, PopupConfig, MonitorInfo,
+        PhysRect,
+    };
+    use std::collections::HashMap;
+    use std::sync::{Arc, Mutex};
+    use tauri::test::MockRuntime;
+    use tauri::{test, Listener, Manager};
+
+    /// Rule rs-parking-lot compliance without a new dependency: never unwrap
+    /// lock results — recover from poisoning instead.
+    fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
+        mutex.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    fn popup(id: &str, url: &str) -> PopupConfig {
+        PopupConfig {
+            id: id.to_string(),
+            url: url.to_string(),
+            title: format!("Title {id}"),
+            width: 320.0,
+            height: 480.0,
+            resizable: None,
+            always_on_top: None,
+            anchor: None,
+            decorations: None,
+            transparent: None,
+            skip_taskbar: None,
+            min_width: None,
+            min_height: None,
+        }
+    }
+
+    fn app_with_popups(popups: Vec<PopupConfig>) -> tauri::App<MockRuntime> {
+        let app = test::mock_app();
+        let config = OrbitKitConfig {
+            windows: WindowsConfig {
+                mascot_window: None,
+                popups,
+            },
+            ..Default::default()
+        };
+        app.manage(Orbitkit::new(app.handle().clone(), config));
+        app
+    }
+
+    fn popup_labels(app: &tauri::App<MockRuntime>) -> Vec<String> {
+        let mut labels: Vec<String> = app
+            .webview_windows()
+            .into_keys()
+            .filter(|label| label.starts_with(crate::POPUP_LABEL_PREFIX))
+            .collect();
+        labels.sort();
+        labels
+    }
+
+    /// K11 AC1: `open_popup` creates exactly one window per label; a second
+    /// call with the same label takes the show+focus path instead of
+    /// duplicating (mutation-sensitive: pre-change code duplicated nothing
+    /// because it had no instance keys, but a regression to "always build"
+    /// fails this assertion via the duplicate window).
+    #[test]
+    fn test_open_popup_creates_window_idempotently() {
+        let app = app_with_popups(vec![popup("chat", "chat.html")]);
+        let ok = app.state::<Orbitkit<MockRuntime>>();
+
+        ok.open_popup("chat".into(), None, None).unwrap();
+        ok.open_popup("chat".into(), None, None).unwrap();
+
+        assert_eq!(
+            popup_labels(&app),
+            vec!["orbitkit-popup-chat".to_string()]
+        );
+    }
+
+    /// K11 AC1: instance keys give one window per key with exact labels
+    /// `orbitkit-popup-{id}-{instanceKey}` (mirrors one-popup-per-chat).
+    #[test]
+    fn test_open_popup_instance_keys_create_distinct_windows() {
+        let app = app_with_popups(vec![popup("chat", "chat.html")]);
+        let ok = app.state::<Orbitkit<MockRuntime>>();
+
+        ok.open_popup("chat".into(), None, Some("chat-1".into()))
+            .unwrap();
+        ok.open_popup("chat".into(), None, Some("chat_2".into()))
+            .unwrap();
+        ok.open_popup("chat".into(), None, Some("chat-1".into()))
+            .unwrap();
+
+        assert_eq!(
+            popup_labels(&app),
+            vec![
+                "orbitkit-popup-chat-chat-1".to_string(),
+                "orbitkit-popup-chat-chat_2".to_string(),
+            ]
+        );
+    }
+
+    /// K11 AC2/AC3: unknown id is `not_found`; bad instanceKey, unknown
+    /// `{param}` and disallowed URL schemes are `invalid_config` — and none
+    /// of them leave a window behind.
+    #[test]
+    fn test_open_popup_rejects_invalid_requests() {
+        let app = app_with_popups(vec![
+            popup("chat", "chat.html?q={q}"),
+            popup("evil", "javascript:alert(1)"),
+        ]);
+        let ok = app.state::<Orbitkit<MockRuntime>>();
+
+        assert_eq!(
+            ok.open_popup("nope".into(), None, None)
+                .unwrap_err()
+                .code,
+            ErrorCode::NotFound
+        );
+        assert_eq!(
+            ok.open_popup("chat".into(), None, Some("BAD".into()))
+                .unwrap_err()
+                .code,
+            ErrorCode::InvalidConfig
+        );
+        let mut wrong_param = HashMap::new();
+        wrong_param.insert("other".to_string(), "1".to_string());
+        assert_eq!(
+            ok.open_popup("chat".into(), Some(wrong_param), None)
+                .unwrap_err()
+                .code,
+            ErrorCode::InvalidConfig
+        );
+        assert_eq!(
+            ok.open_popup("evil".into(), None, None).unwrap_err().code,
+            ErrorCode::InvalidConfig
+        );
+
+        assert!(popup_labels(&app).is_empty());
+    }
+
+    /// K11 AC5: `popup-shown`/`popup-closed` carry the full label;
+    /// `list_popups` reports open popup labels; `close_popup` takes the full
+    /// label and refuses non-popup labels (mutation-sensitive: pre-change
+    /// code emitted no lifecycle events at all).
+    #[test]
+    fn test_popup_events_and_list() {
+        let app = app_with_popups(vec![popup("chat", "chat.html")]);
+
+        let shown: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+        let closed: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+        let shown_listener = Arc::clone(&shown);
+        let closed_listener = Arc::clone(&closed);
+        app.listen("orbitkit://popup-shown", move |event| {
+            lock(&shown_listener).push(event.payload().to_string());
+        });
+        app.listen("orbitkit://popup-closed", move |event| {
+            lock(&closed_listener).push(event.payload().to_string());
+        });
+
+        let ok = app.state::<Orbitkit<MockRuntime>>();
+        ok.open_popup("chat".into(), None, None).unwrap();
+
+        assert_eq!(
+            *lock(&shown),
+            vec![r#"{"label":"orbitkit-popup-chat"}"#.to_string()]
+        );
+        assert_eq!(
+            ok.list_popups().unwrap(),
+            vec!["orbitkit-popup-chat".to_string()]
+        );
+
+        ok.close_popup("orbitkit-popup-chat".into()).unwrap();
+        assert_eq!(
+            *lock(&closed),
+            vec![r#"{"label":"orbitkit-popup-chat"}"#.to_string()]
+        );
+
+        // Already-closed label: no error (idempotent close).
+        ok.close_popup("orbitkit-popup-chat".into()).unwrap();
+        // Non-popup labels are refused outright.
+        assert_eq!(
+            ok.close_popup("orbitkit-mascot".into()).unwrap_err().code,
+            ErrorCode::NotFound
+        );
+        assert_eq!(
+            ok.close_popup("main".into()).unwrap_err().code,
+            ErrorCode::NotFound
+        );
+    }
 
     fn monitor(x: i32, y: i32, width: u32, height: u32, scale_factor: f64) -> MonitorInfo {
         let rect = PhysRect {

@@ -1,4 +1,5 @@
 #![cfg_attr(not(target_os = "android"), allow(dead_code))]
+use std::collections::HashMap;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tauri::plugin::{PluginApi, PluginHandle};
@@ -6,7 +7,7 @@ use tauri::{AppHandle, Emitter, Runtime};
 use crate::config::{MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
-use crate::{lookup_popup, MascotMonitorResponse, popup_open_payload, OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{lookup_popup, popup_label, MascotMonitorResponse, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 #[cfg(target_os = "android")]
 const PLUGIN_IDENTIFIER: &str = "dev.orbitkit.native";
@@ -97,18 +98,60 @@ impl<R: Runtime> Orbitkit<R> {
         self.run_mobile_plugin::<()>("overlayHide", ())
     }
 
-    pub fn open_popup(&self, id: String) -> Result<()> {
+    /// K11/K13: mobile arm — brings the popup sheet to front and emits the
+    /// contract `orbitkit://popup-shown {label}` plus the legacy
+    /// `orbitkit://popup-open {id,title,url,width,height}` the Android sheet
+    /// and native Kotlin layer consume. `{param}` substitution and window
+    /// specs are desktop-only.
+    pub fn open_popup(
+        &self,
+        id: String,
+        _params: Option<HashMap<String, String>>,
+        instance_key: Option<String>,
+    ) -> Result<()> {
         let popup = lookup_popup(&self.config.windows.popups, &id)?;
-        let payload = popup_open_payload(popup);
+        let label = popup_label(&popup.id, instance_key.as_deref())?;
+        let legacy = serde_json::json!({
+            "id": popup.id,
+            "title": popup.title,
+            "url": popup.url,
+            "width": popup.width,
+            "height": popup.height,
+        });
         self.run_mobile_plugin::<()>("bringToFront", ())?;
-        let _ = self.handle.app().emit("orbitkit://popup-open", payload);
+        let _ = self
+            .handle
+            .app()
+            .emit("orbitkit://popup-shown", serde_json::json!({ "label": label }));
+        let _ = self.handle.app().emit("orbitkit://popup-open", legacy);
         Ok(())
     }
 
-    pub fn close_popup(&self, id: String) -> Result<()> {
-        let payload = serde_json::json!({ "id": id });
-        let _ = self.handle.app().emit("orbitkit://popup-close", payload);
+    /// K11/K13: mobile arm — emits the contract `orbitkit://popup-closed
+    /// {label}` with the FULL label (a bare id from legacy sheet callers is
+    /// normalized via the K11 label rule) plus the legacy
+    /// `orbitkit://popup-close {id}` sheet event echoing the raw argument.
+    pub fn close_popup(&self, label: String) -> Result<()> {
+        let full_label = if label.starts_with(crate::POPUP_LABEL_PREFIX) {
+            label.clone()
+        } else {
+            format!("{}{label}", crate::POPUP_LABEL_PREFIX)
+        };
+        let _ = self
+            .handle
+            .app()
+            .emit("orbitkit://popup-closed", serde_json::json!({ "label": full_label }));
+        let _ = self
+            .handle
+            .app()
+            .emit("orbitkit://popup-close", serde_json::json!({ "id": label }));
         Ok(())
+    }
+
+    /// K11/K13: not supported on mobile — desktop-native window labels do not
+    /// exist there (popups are in-app sheets).
+    pub fn list_popups(&self) -> Result<Vec<String>> {
+        Err(Error::unsupported("list_popups is not supported on mobile"))
     }
 
     pub fn set_mascot_state(&self, state: String) -> Result<()> {

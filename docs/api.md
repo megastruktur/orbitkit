@@ -288,8 +288,9 @@ Commands are registered under the plugin prefix `plugin:orbitkit|<cmd>`:
 | `request_overlay_permission` | *None* | `()` | No-op (returns Ok) | Opens Android SAW settings intent |
 | `show_overlay` | `menu?: MenuConfig`, `mascot?: ShowOverlayMascotArgs` | `()` | Shows `orbitkit-mascot` window | Displays native overlay view |
 | `hide_overlay` | *None* | `()` | Hides `orbitkit-mascot` window | Removes native overlay view |
-| `open_popup` | `id: String` | `()` | Creates or focuses popup `WebviewWindow` | Returns error `unsupported` |
-| `close_popup` | `id: String` | `()` | Closes popup window if open | Returns error `unsupported` |
+| `open_popup` | `id: String`, `params?: Record<string,string>`, `instanceKey?: string` | `()` | Creates/focuses popup `WebviewWindow` (`orbitkit-popup-{id}[-{instanceKey}]`); `{param}` URL-encoded substitution, loopback/allowedOrigins URL policy, emits `orbitkit://popup-shown {label}` | Brings popup sheet to front; emits `orbitkit://popup-shown {label}` + legacy `orbitkit://popup-open` |
+| `close_popup` | `label: String` | `()` | Closes popup window by full label; emits `orbitkit://popup-closed {label}` | Emits `orbitkit://popup-closed {label}` + legacy `orbitkit://popup-close {id}` |
+| `list_popups` | *None* | `string[]` | Labels of open popup windows | Returns error `unsupported` |
 | `set_mascot_state` | `state: String` | `()` | Emits `orbitkit://mascot-state` | Updates native overlay state & emits |
 | `emit_menu_action` | `id: String` | `()` | Emits menu action event & calls Rust handlers | Emits menu action event & calls Rust handlers |
 

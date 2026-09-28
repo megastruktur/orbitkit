@@ -8,6 +8,7 @@ permissions = [
     "allow-hide-overlay",
     "allow-open-popup",
     "allow-close-popup",
+    "allow-list-popups",
     "allow-set-mascot-state",
     "allow-emit-menu-action",
     "allow-start-mascot-drag",

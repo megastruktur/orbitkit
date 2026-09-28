@@ -5,13 +5,16 @@ import {
   emitMenuAction,
   hideOverlay,
   isTauri,
+  listPopups,
   mascotMonitor,
   normalizeError,
   onBadge,
   onMascotState,
   onMenuAction,
   onPopupClose,
+  onPopupClosed,
   onPopupOpen,
+  onPopupShown,
   onScaleChange,
   openPopup,
   OrbitKitError,
@@ -22,6 +25,8 @@ import {
   showOverlay,
   startMascotDrag,
   type MenuConfig,
+  type PopupClosePayload,
+  type PopupLifecyclePayload,
   type PopupOpenPayload,
 } from "./index";
 
@@ -185,7 +190,7 @@ describe("bridge", () => {
       expect(recordedCmd).toBe("plugin:orbitkit|hide_overlay");
     });
 
-    it("5. openPopup invokes plugin:orbitkit|open_popup with id payload", async () => {
+    it("5a. openPopup invokes plugin:orbitkit|open_popup with id payload (backward-compatible)", async () => {
       let recordedCmd = "";
       let recordedArgs: unknown = null;
 
@@ -200,7 +205,39 @@ describe("bridge", () => {
       expect(recordedArgs).toEqual({ id: "settings" });
     });
 
-    it("6. closePopup invokes plugin:orbitkit|close_popup with id payload", async () => {
+    it("5b. openPopup forwards params and instanceKey options", async () => {
+      let recordedArgs: unknown = null;
+
+      mockIPC((_cmd, args) => {
+        recordedArgs = args;
+        return null;
+      });
+
+      await openPopup("notes", {
+        params: { chat: "a b&c" },
+        instanceKey: "chat-1",
+      });
+      expect(recordedArgs).toEqual({
+        id: "notes",
+        params: { chat: "a b&c" },
+        instanceKey: "chat-1",
+      });
+    });
+
+    it("5c. openPopup omits option keys when no options given", async () => {
+      let recordedArgs: unknown = null;
+
+      mockIPC((_cmd, args) => {
+        recordedArgs = args;
+        return null;
+      });
+
+      await openPopup("notes", {});
+      expect(recordedArgs).toEqual({ id: "notes" });
+      expect(Object.keys(recordedArgs as object).sort()).toEqual(["id"]);
+    });
+
+    it("6. closePopup invokes plugin:orbitkit|close_popup with full label payload", async () => {
       let recordedCmd = "";
       let recordedArgs: unknown = null;
 
@@ -210,9 +247,25 @@ describe("bridge", () => {
         return null;
       });
 
-      await closePopup("palette");
+      await closePopup("orbitkit-popup-notes-chat-1");
       expect(recordedCmd).toBe("plugin:orbitkit|close_popup");
-      expect(recordedArgs).toEqual({ id: "palette" });
+      expect(recordedArgs).toEqual({ label: "orbitkit-popup-notes-chat-1" });
+    });
+
+    it("6b. listPopups invokes plugin:orbitkit|list_popups and returns labels", async () => {
+      let recordedCmd = "";
+
+      mockIPC((cmd) => {
+        recordedCmd = cmd;
+        if (cmd === "plugin:orbitkit|list_popups") {
+          return ["orbitkit-popup-a", "orbitkit-popup-b"];
+        }
+        return null;
+      });
+
+      const labels = await listPopups();
+      expect(recordedCmd).toBe("plugin:orbitkit|list_popups");
+      expect(labels).toEqual(["orbitkit-popup-a", "orbitkit-popup-b"]);
     });
 
     it("7. setMascotState invokes plugin:orbitkit|set_mascot_state with state payload", async () => {
@@ -482,7 +535,103 @@ describe("bridge", () => {
       expect(unlistened).toBe(true);
     });
 
-    it("subscribes to orbitkit://popup-open and delivers payload to callback", async () => {
+    it("subscribes to orbitkit://popup-shown and delivers label payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 103;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupShown(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-shown");
+      expect(eventHandlerId).not.toBeNull();
+
+      const payload: PopupLifecyclePayload = {
+        label: "orbitkit-popup-notes-chat-1",
+      };
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-shown",
+        payload,
+      });
+
+      expect(callback).toHaveBeenCalledWith(payload);
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("subscribes to orbitkit://popup-closed and delivers label payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 104;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupClosed(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-closed");
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-closed",
+        payload: { label: "orbitkit-popup-notes" },
+      });
+
+      expect(callback).toHaveBeenCalledWith({ label: "orbitkit-popup-notes" });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("subscribes to legacy orbitkit://popup-open (Android sheet) and delivers payload to callback", async () => {
       let eventHandlerId: number | null = null;
       let listenedEvent = "";
 
@@ -536,7 +685,7 @@ describe("bridge", () => {
       expect(unlistened).toBe(true);
     });
 
-    it("subscribes to orbitkit://popup-close and delivers payload to callback", async () => {
+    it("subscribes to legacy orbitkit://popup-close (Android sheet) and delivers payload to callback", async () => {
       let eventHandlerId: number | null = null;
       let listenedEvent = "";
 
@@ -563,12 +712,14 @@ describe("bridge", () => {
       expect(listenedEvent).toBe("orbitkit://popup-close");
       expect(eventHandlerId).not.toBeNull();
 
+      const payload: PopupClosePayload = { id: "notes" };
+
       triggerTauriCallback(eventHandlerId!, {
         event: "orbitkit://popup-close",
-        payload: { id: "notes" },
+        payload,
       });
 
-      expect(callback).toHaveBeenCalledWith({ id: "notes" });
+      expect(callback).toHaveBeenCalledWith(payload);
 
       let unlistened = false;
       mockIPC((cmd) => {
@@ -762,10 +913,28 @@ describe("bridge", () => {
       expect(cb).not.toHaveBeenCalled();
     });
 
+    it("onPopupShown returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupShown(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
     it("onBadge returns a no-op unlisten function outside Tauri without throwing", async () => {
       expect(isTauri()).toBe(false);
       const cb = vi.fn();
       const unlisten = await onBadge(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onPopupClosed returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupClosed(cb);
       expect(typeof unlisten).toBe("function");
       expect(() => unlisten()).not.toThrow();
       expect(cb).not.toHaveBeenCalled();

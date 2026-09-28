@@ -74,10 +74,10 @@ describe("PopupSheet component", () => {
         cmd === "plugin:orbitkit|close_popup" &&
         args &&
         typeof args === "object" &&
-        "id" in args &&
-        typeof args.id === "string"
+        "label" in args &&
+        typeof args.label === "string"
       ) {
-        closePopupMock(args.id);
+        closePopupMock(args.label);
         return null;
       }
       return null;

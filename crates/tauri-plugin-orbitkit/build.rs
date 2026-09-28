@@ -5,6 +5,7 @@ const COMMANDS: &[&str] = &[
     "hide_overlay",
     "open_popup",
     "close_popup",
+    "list_popups",
     "set_mascot_state",
     "emit_menu_action",
     "start_mascot_drag",

@@ -1,0 +1,5 @@
+rust-gate-final.log EXIT=0 (48 tests, clippy -D warnings, OKC_RUST_GATE_OK) — merged tree @ campaign 6f16dbb
+pnpm-build.log EXIT=0 (merged tree)
+pnpm-test.log EXIT=0 (303/303, merged tree)
+pnpm-check.log EXIT=0 (merged tree)
+rust-gate-attempt1-errors.log EXIT=101 (round 1 first run, fixed)

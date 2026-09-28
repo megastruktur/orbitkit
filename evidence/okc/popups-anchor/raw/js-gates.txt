@@ -1,0 +1,19 @@
+# pnpm -r build
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/.pnpm/@tauri-apps+api@2.11.1/node_modules/@tauri-apps/api/window.js is dynamically imported by ../../packages/orbitkit/dist/passthrough.js but also statically imported by ../../packages/orbitkit/dist/bridge.js, dynamic import will not move module into another chunk.
+
+✓ built in 375ms
+EXIT=0
+
+# pnpm -r test
+
+ Test Files  15 passed (15)
+      Tests  303 passed (303)
+   Start at  18:58:27
+   Duration  2.67s (environment 78%, transform 14%, tests 5%, import 3%)
+
+EXIT=0
+
+# pnpm -r check
+$ tsc --noEmit
+$ tsc --noEmit
+EXIT=0

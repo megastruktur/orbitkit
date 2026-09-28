@@ -1,13 +1,14 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, WindowEvent};
-use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig};
+use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig, PopupAnchor};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
+use crate::placement::{center_in, place_popup, PhysPos, PhysSize, POPUP_GAP};
 use crate::{
     lookup_popup, monitor_for_point, popup_label, resolve_popup_spec, resolve_popup_url,
     selector_inputs, substitute_popup_params, MascotMonitorResponse, OverlayPermissionResponse,
-    PhysRect, POPUP_LABEL_PREFIX, ResolvedPopupUrl, ShowOverlayMascotArgs,
+    PhysRect, ResolvedPopupSpec, POPUP_LABEL_PREFIX, ResolvedPopupUrl, ShowOverlayMascotArgs,
 };
 
 /// tao on Windows reports true physical virtual-screen coordinates; on
@@ -36,6 +37,51 @@ pub struct MonitorBounds {
     pub y: f64,
     pub width: f64,
     pub height: f64,
+}
+
+/// K11: resolved popup placement — physical window position plus the
+/// monitor scale factor used to compute it (for logical conversions).
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct PopupPlacement {
+    pos: PhysPos,
+    scale_factor: f64,
+}
+
+/// K11: pure anchor decision, shared by `open_popup` create and re-open
+/// paths. `mascot_rect: None` (window absent, or anchor "center") →
+/// centred in the work area; the caller passes `None` for the mascot rect
+/// whenever the mascot window does not exist (AC: fall back to centre on
+/// primary, no error). `anchor: "none"` → no placement (platform default).
+fn popup_placement_for(
+    anchor: PopupAnchor,
+    spec: &ResolvedPopupSpec,
+    mascot_rect: Option<PhysRect>,
+    work: PhysRect,
+    scale_factor: f64,
+) -> Option<PopupPlacement> {
+    match anchor {
+        PopupAnchor::None => None,
+        PopupAnchor::Center => Some(PopupPlacement {
+            pos: center_in(work, phys_size(spec, scale_factor)),
+            scale_factor,
+        }),
+        PopupAnchor::Mascot => Some(PopupPlacement {
+            pos: mascot_rect
+                .map(|rect| place_popup(rect, phys_size(spec, scale_factor), work, POPUP_GAP))
+                .unwrap_or_else(|| center_in(work, phys_size(spec, scale_factor))),
+            scale_factor,
+        }),
+    }
+}
+
+/// Popup size in physical pixels: config sizes are logical, the placement
+/// math is physical (K11), the monitor hosting the popup provides the
+/// scale.
+fn phys_size(spec: &ResolvedPopupSpec, scale_factor: f64) -> PhysSize {
+    PhysSize::new(
+        (spec.width * scale_factor).round() as i32,
+        (spec.height * scale_factor).round() as i32,
+    )
 }
 
 impl MonitorBounds {
@@ -263,8 +309,8 @@ impl<R: Runtime> Orbitkit<R> {
     /// K11: opens the configured popup `id`, optionally substituting `{param}`
     /// placeholders with URL-encoded `params` values and keying the window by
     /// `instance_key` (`orbitkit-popup-{id}-{instanceKey}`). Idempotent: an
-    /// existing label is shown + focused, never duplicated. Emits
-    /// `orbitkit://popup-shown {label}` on create and re-show.
+    /// existing label is shown + re-anchored + focused, never duplicated.
+    /// Emits `orbitkit://popup-shown {label}` on create and re-show.
     pub fn open_popup(
         &self,
         id: String,
@@ -273,9 +319,18 @@ impl<R: Runtime> Orbitkit<R> {
     ) -> Result<()> {
         let popup = lookup_popup(&self.config.windows.popups, &id)?;
         let label = popup_label(&popup.id, instance_key.as_deref())?;
+        let spec = resolve_popup_spec(popup);
+        let placement = self.popup_placement(popup.anchor, &spec)?;
 
         if let Some(window) = self.app.get_webview_window(&label) {
             window.show().map_err(|e| Error::unsupported(e.to_string()))?;
+            // K11: re-open re-applies placement — the mascot may have moved
+            // since the popup was first shown.
+            if let Some(placement) = placement {
+                let _ = window.set_position(tauri::Position::Physical(
+                    tauri::PhysicalPosition::new(placement.pos.x, placement.pos.y),
+                ));
+            }
             let _ = window.set_focus();
             let _ = self
                 .app
@@ -291,7 +346,6 @@ impl<R: Runtime> Orbitkit<R> {
             .map(|app| app.allowed_origins.as_slice())
             .unwrap_or(&[]);
         let resolved_url = resolve_popup_url(&template, allowed_origins)?;
-        let spec = resolve_popup_spec(popup);
 
         let url = match resolved_url {
             ResolvedPopupUrl::App(path) => WebviewUrl::App(path.into()),
@@ -306,6 +360,15 @@ impl<R: Runtime> Orbitkit<R> {
             .decorations(spec.decorations)
             .transparent(spec.transparent)
             .skip_taskbar(spec.skip_taskbar);
+
+        if let Some(placement) = &placement {
+            // Builder positions are logical; convert from the physical
+            // placement using the target monitor's scale factor.
+            builder = builder.position(
+                placement.pos.x as f64 / placement.scale_factor,
+                placement.pos.y as f64 / placement.scale_factor,
+            );
+        }
 
         if spec.min_width.is_some() || spec.min_height.is_some() {
             builder = builder.min_inner_size(
@@ -373,8 +436,54 @@ impl<R: Runtime> Orbitkit<R> {
         Ok(())
     }
 
+    /// K11: resolved popup placement — physical position plus the monitor
+    /// scale factor it was computed against (for the builder's logical
+    /// conversion). `None` — `anchor: "none"`: the window opens at the
+    /// platform default position.
+    fn popup_placement(
+        &self,
+        anchor: Option<PopupAnchor>,
+        spec: &ResolvedPopupSpec,
+    ) -> Result<Option<PopupPlacement>> {
+        let Some(anchor) = anchor else {
+            return Ok(None);
+        };
+        // Monitor selection/work area shared with `mascot_monitor` (K9);
+        // falls back to the primary monitor, then to a headless default —
+        // never an error (AC: mascot absent → centre on primary).
+        let response = self.mascot_monitor()?;
+        let mascot_rect = if anchor == PopupAnchor::Mascot {
+            self.mascot_window_rect()
+        } else {
+            None
+        };
+        Ok(popup_placement_for(
+            anchor,
+            spec,
+            mascot_rect,
+            response.work_area,
+            response.scale_factor,
+        ))
+    }
+
+    /// K11: mascot window rect in the same raw windowing space as the
+    /// reported work area of its monitor (`mascot_monitor`), so both sides
+    /// of the placement math share one coordinate space. `None` — the
+    /// mascot window does not exist (yet).
+    fn mascot_window_rect(&self) -> Option<PhysRect> {
+        let window = self.app.get_webview_window("orbitkit-mascot")?;
+        let position = window.outer_position().ok()?;
+        let size = window.outer_size().ok()?;
+        Some(PhysRect {
+            x: position.x,
+            y: position.y,
+            width: size.width,
+            height: size.height,
+        })
+    }
+
     /// K11: labels of all currently open OrbitKit popup windows, sorted.
-    /// `Result` so the desktop and mobile (`unsupported`) arms share one
+    /// `Result` so desktop and mobile (`unsupported`) arms share one
     /// command signature (K13).
     pub fn list_popups(&self) -> Result<Vec<String>> {
         let mut labels: Vec<String> = self
@@ -497,11 +606,13 @@ impl<R: Runtime> Orbitkit<R> {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::WindowsConfig;
+    use crate::config::{PopupAnchor, WindowsConfig};
+    use crate::desktop::popup_placement_for;
     use crate::error::ErrorCode;
+    use crate::placement::PhysPos;
     use crate::{
-        monitor_for_point, selector_inputs, OrbitKitConfig, Orbitkit, PopupConfig, MonitorInfo,
-        PhysRect,
+        monitor_for_point, selector_inputs, OrbitKitConfig, Orbitkit, PopupConfig,
+        MonitorInfo, PhysRect, ResolvedPopupSpec,
     };
     use std::collections::HashMap;
     use std::sync::{Arc, Mutex};
@@ -553,6 +664,127 @@ mod tests {
             .collect();
         labels.sort();
         labels
+    }
+
+    /// Deterministic inputs for the pure `popup_placement_for`: no mock
+    /// app/monitor calls involved (MockRuntime panics on AppHandle monitor
+    /// queries, so — like K9's `selector_inputs` tests — the decision logic
+    /// is tested purely and the AppHandle glue stays one call deep).
+    const SPEC: ResolvedPopupSpec = ResolvedPopupSpec {
+        title: String::new(),
+        width: 320.0,
+        height: 480.0,
+        resizable: true,
+        always_on_top: false,
+        decorations: true,
+        transparent: false,
+        skip_taskbar: false,
+        min_width: None,
+        min_height: None,
+    };
+    /// Headless work area: `mascot_monitor`'s fallback when no monitors
+    /// (and no primary) exist — the same 0,0,1280×800 @ 1.0 it reports.
+    const WORK: PhysRect = PhysRect {
+        x: 0,
+        y: 0,
+        width: 1280,
+        height: 800,
+    };
+
+    /// K11 AC2: anchor "mascot" places the popup next to the mascot window
+    /// rect inside its monitor's work area — hand-computed BelowRight
+    /// (14,14) for mascot rect 0,0,0×0 inside 1280×800 with gap 14, pad 12
+    /// (mutation-sensitive: pre-change code placed nothing, and disabling
+    /// the flip clamps candidate #0 to (14,12) instead).
+    #[test]
+    fn test_popup_placement_mascot_uses_mascot_rect_and_work_area() {
+        let placement = popup_placement_for(
+            PopupAnchor::Mascot,
+            &SPEC,
+            Some(PhysRect {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            }),
+            WORK,
+            1.0,
+        )
+        .expect("mascot anchor yields placement");
+        assert_eq!(placement.pos, PhysPos::new(14, 14));
+        assert_eq!(placement.scale_factor, 1.0);
+    }
+
+    /// K11 AC2: anchor "center" centres the popup in the mascot monitor's
+    /// work area — hand-computed (480,160) for 320×480 inside 1280×800.
+    #[test]
+    fn test_popup_placement_center_centers_in_work_area() {
+        let placement = popup_placement_for(
+            PopupAnchor::Center,
+            &SPEC,
+            None,
+            WORK,
+            1.0,
+        )
+        .expect("center anchor yields placement");
+        assert_eq!(placement.pos, PhysPos::new(480, 160));
+    }
+
+    /// K11 AC: anchor "none" keeps the platform default — no placement.
+    /// (Mutation-sensitive: pre-change code placed nothing, so making
+    /// "none" compute a placement fails the `None` assertion, and the
+    /// anchored variants above pin the new behaviour.)
+    #[test]
+    fn test_popup_placement_none_keeps_default() {
+        assert_eq!(
+            popup_placement_for(PopupAnchor::None, &SPEC, None, WORK, 1.0),
+            None,
+            "anchor none must not place the popup"
+        );
+    }
+
+    /// K11 AC4: mascot window absent → anchored popup falls back to
+    /// centring on the primary monitor (headless work area here), no error.
+    #[test]
+    fn test_popup_placement_mascot_absent_falls_back_to_center() {
+        let placement = popup_placement_for(
+            PopupAnchor::Mascot,
+            &SPEC,
+            None,
+            WORK,
+            1.0,
+        )
+        .expect("fallback still yields a placement");
+        assert_eq!(placement.pos, PhysPos::new(480, 160));
+    }
+
+    /// K11 AC2: the popup's logical config size is scaled by the target
+    /// monitor's scale factor before placement — 320×480 logical @ 2× =
+    /// 640×960 physical: above-right of mascot (2000,1200,100×100) would
+    /// overflow the 2560-wide work area (2114+640 > 2548) → flip to
+    /// above-left, hand-computed (1346,226).
+    #[test]
+    fn test_popup_placement_scales_popup_size_by_monitor_scale() {
+        let placement = popup_placement_for(
+            PopupAnchor::Mascot,
+            &SPEC,
+            Some(PhysRect {
+                x: 2000,
+                y: 1200,
+                width: 100,
+                height: 100,
+            }),
+            PhysRect {
+                x: 0,
+                y: 0,
+                width: 2560,
+                height: 1440,
+            },
+            2.0,
+        )
+        .expect("mascot anchor yields placement");
+        assert_eq!(placement.pos, PhysPos::new(1346, 226));
+        assert_eq!(placement.scale_factor, 2.0);
     }
 
     /// K11 AC1: `open_popup` creates exactly one window per label; a second

@@ -1,0 +1,13 @@
+diff --git a/crates/tauri-plugin-orbitkit/src/lib.rs b/crates/tauri-plugin-orbitkit/src/lib.rs
+index caab91c..6fc3691 100644
+--- a/crates/tauri-plugin-orbitkit/src/lib.rs
++++ b/crates/tauri-plugin-orbitkit/src/lib.rs
+@@ -12,6 +12,8 @@ pub mod jni_bridge;
+ 
+ #[cfg(desktop)]
+ mod desktop;
++#[cfg(desktop)]
++mod placement;
+ #[cfg(any(mobile, test))]
+ mod mobile;
+ 

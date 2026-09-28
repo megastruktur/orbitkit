@@ -12,6 +12,8 @@ pub mod jni_bridge;
 
 #[cfg(desktop)]
 mod desktop;
+#[cfg(desktop)]
+mod placement;
 #[cfg(any(mobile, test))]
 mod mobile;
 

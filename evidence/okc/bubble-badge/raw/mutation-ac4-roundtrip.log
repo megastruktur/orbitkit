@@ -1,0 +1,6 @@
+mutation: setBadge emits renamed event orbitkit://badges
+vitest_exit=1
+suite success: False | failed: 2 | startTime: 1790615917661
+FAILED: bridge orbitkit://badge (bubble-badge) setBadge emits orbitkit://badge with {count} payload
+FAILED: bridge orbitkit://badge (bubble-badge) round-trips setBadge(count) → orbitkit://badge → onBadge handler
+MUTATION_SENSITIVITY: VERIFIED (round-trip test fails on rename)

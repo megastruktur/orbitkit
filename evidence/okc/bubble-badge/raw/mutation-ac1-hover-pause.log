@@ -1,0 +1,5 @@
+mutation: onPointerEnter hover-pause disabled (if (true) return;)
+vitest_exit=1
+suite success: False | failed: 1 | startTime: 1790615872071
+FAILED: Bubble component pauses the ttl while hovered and resumes with the remainder on leave
+MUTATION_SENSITIVITY: VERIFIED

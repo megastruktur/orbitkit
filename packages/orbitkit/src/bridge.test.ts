@@ -7,6 +7,7 @@ import {
   isTauri,
   mascotMonitor,
   normalizeError,
+  onBadge,
   onMascotState,
   onMenuAction,
   onPopupClose,
@@ -16,6 +17,7 @@ import {
   OrbitKitError,
   overlayPermission,
   requestOverlayPermission,
+  setBadge,
   setMascotState,
   showOverlay,
   startMascotDrag,
@@ -758,6 +760,114 @@ describe("bridge", () => {
       expect(typeof unlisten).toBe("function");
       expect(() => unlisten()).not.toThrow();
       expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onBadge returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onBadge(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("setBadge resolves without emitting outside Tauri", async () => {
+      expect(isTauri()).toBe(false);
+      await expect(setBadge(3)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("orbitkit://badge (bubble-badge)", () => {
+    beforeEach(() => {
+      mockWindows("main");
+    });
+
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("setBadge emits orbitkit://badge with {count} payload", async () => {
+      let recordedCmd = "";
+      let recordedArgs: unknown = null;
+      mockIPC((cmd, args) => {
+        recordedCmd = cmd;
+        recordedArgs = args;
+        return null;
+      });
+
+      await setBadge(7);
+      expect(recordedCmd).toBe("plugin:event|emit");
+      expect(recordedArgs).toEqual({ event: "orbitkit://badge", payload: { count: 7 } });
+    });
+
+    it("onBadge subscribes to orbitkit://badge and delivers {count} to the callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      mockIPC((cmd, args) => {
+        if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 404;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onBadge(callback);
+      expect(listenedEvent).toBe("orbitkit://badge");
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://badge",
+        payload: { count: 42 },
+      });
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith({ count: 42 });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("round-trips setBadge(count) → orbitkit://badge → onBadge handler", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      mockIPC((cmd, args) => {
+        if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 77;
+        }
+        // Mocked transport: an emit redelivers to matching listeners only,
+        // including the emitting webview — that is the badge round trip.
+        if (cmd === "plugin:event|emit") {
+          const { event, payload } = args as { event: string; payload: unknown };
+          if (event === listenedEvent) {
+            triggerTauriCallback(eventHandlerId!, { event, payload });
+          }
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      await onBadge(callback);
+      await setBadge(12);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith({ count: 12 });
     });
   });
 });

@@ -1,0 +1,5 @@
+mutation: built-in literal <span>Bubble</span> injected into Bubble markup
+vitest_exit=1
+suite success: False | failed: 1 | startTime: 1790615876935
+FAILED: Bubble component renders exactly the prop text (no built-in strings)
+MUTATION_SENSITIVITY: VERIFIED

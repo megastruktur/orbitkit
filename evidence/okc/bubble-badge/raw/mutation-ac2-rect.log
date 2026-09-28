@@ -1,0 +1,5 @@
+mutation: Bubble measure() never publishes rect
+vitest_exit=1
+suite success: False | failed: 1 | startTime: 1790615873206
+FAILED: Bubble component exposes its logical rect via onrectchange so fitWindow can cover it
+MUTATION_SENSITIVITY: VERIFIED

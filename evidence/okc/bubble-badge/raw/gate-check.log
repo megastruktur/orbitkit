@@ -1,0 +1,2 @@
+$ pnpm -r check
+exit=0

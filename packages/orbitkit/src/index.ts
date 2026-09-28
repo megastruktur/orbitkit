@@ -21,3 +21,5 @@ export type {
   MascotMachineSnapshot,
   MascotRnd,
 } from "./mascotMachine.js";
+export { default as Bubble } from "./Bubble.svelte";
+export { default as Badge } from "./Badge.svelte";

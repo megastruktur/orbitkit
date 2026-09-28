@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { listen, emit, type UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { MenuConfig } from "./config";
 
@@ -293,6 +293,45 @@ export async function onScaleChange(
     return await getCurrentWindow().onScaleChanged((event) => {
       cb(event.payload);
     });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** Payload of the `orbitkit://badge` event: current unread-badge count. */
+export type BadgePayload = {
+  count: number;
+};
+
+export type BadgeCallback = (payload: BadgePayload) => void;
+
+/**
+ * Subscribes to `orbitkit://badge` count events; returns an unlisten function.
+ * Outside Tauri, resolves to a no-op unlisten without subscribing.
+ */
+export async function onBadge(cb: BadgeCallback): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<BadgePayload>("orbitkit://badge", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/**
+ * Emits `orbitkit://badge {count}` (broadcast to every listener, including the
+ * emitting webview). Outside Tauri, resolves without emitting.
+ */
+export async function setBadge(count: number): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  try {
+    await emit("orbitkit://badge", { count });
   } catch (err) {
     throw normalizeError(err);
   }

@@ -1,0 +1,1 @@
+rust gate: OKC_RUST_GATE_OK (docker okc-rust-gate:1, cargo test -p tauri-plugin-orbitkit --lib + clippy -D warnings), exit=0; ran before bridge.test.ts mock-fidelity change (TS-only, no Rust source touched)

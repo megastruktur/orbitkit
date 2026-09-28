@@ -1,0 +1,24 @@
+   Compiling tauri-plugin-orbitkit v0.2.0-dev (/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix2/crates/tauri-plugin-orbitkit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.15s
+     Running unittests src/lib.rs (target-linux/debug/deps/tauri_plugin_orbitkit-9ab4a598c2ad22a3)
+
+running 1 test
+test config::tests::test_starter_config_compat_k7 ... FAILED
+
+failures:
+
+---- config::tests::test_starter_config_compat_k7 stdout ----
+
+thread 'config::tests::test_starter_config_compat_k7' (176) panicked at crates/tauri-plugin-orbitkit/src/config.rs:910:9:
+assertion `left == right` failed
+  left: Sheets
+ right: Svg
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    config::tests::test_starter_config_compat_k7
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p tauri-plugin-orbitkit --lib`

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 // JSON loaded via vite's native JSON import.
-import starterConfigJson from "../../../examples/starter/src/orbitkit.config.json";
+import starterConfigJson from "./test-fixtures/starter-0.1.0.json";
 import k7FullJson from "./test-fixtures/k7-full.json";
 import {
   MENU_ITEM_ID_REGEX,

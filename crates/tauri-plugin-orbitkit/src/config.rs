@@ -903,8 +903,8 @@ mod tests {
 
     #[test]
     fn test_starter_config_compat_k7() {
-        // AC3: the 0.1.0 starter config deserializes and validates unchanged.
-        let json = include_str!("../../../examples/starter/src/orbitkit.config.json");
+        // AC3: the frozen 0.1.0 starter config fixture deserializes and validates unchanged.
+        let json = include_str!("../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json");
         let parsed: OrbitKitConfig = serde_json::from_str(json).expect("deserialize starter config");
         assert!(parsed.validate().is_ok(), "starter config must validate: {:?}", parsed.validate());
         assert_eq!(parsed.mascot.kind, MascotKind::Svg);

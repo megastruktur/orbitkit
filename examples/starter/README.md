@@ -5,20 +5,21 @@ A minimal, compilable, and runnable consumer application showcasing `@orbitkit/u
 ## Architecture
 
 - **Configuration (`src/orbitkit.config.json` & `src/orbitkit.config.ts`)**:
-  Single source of truth configuration defining the floating mascot (SVG with `idle` and `busy` states), 5 radial menu actions (`notes`, `timer`, `settings`, `about`, `quit`), popups (`notes`: 320x420, `settings`: 360x300), and window styling defaults (`transparent: true`, `alwaysOnTop: true`, `decorations: false`).
+  Single source of truth configuration defining the floating mascot (sprite-sheet kind `sheets`: "Glim", a 32x32 frame, integer-upscaled 3x, with `idle` / `alert` (8s TTL) / `sleep` state pools), 6 dotted-id radial menu actions (`app.notes`, `app.timer`, `app.alert`, `app.settings`, `app.about`, `app.quit`) in the `arc-anchor` layout with inline `{svg}` icons and centre-first stagger, popups (`notes`: 320x420, `settings`: 360x300), and window styling defaults (`transparent: true`, `alwaysOnTop: true`, `decorations: false`, `passthrough: true`, `fitContent: true`).
 - **Routing & Screens (`src/main.ts` & `src/views/`)**:
   Inspects URL parameters on window startup:
-  - `?orbitkit=mascot` → `MascotView.svelte`: Planetary companion overlay hosting the interactive blue planet mascot and radial menu. Radial items are rendered as round glass discs (`#0E1433` @ 85%) with cyan 1.5px rings and bright Lucide line icons (`notes`, `timer`, `settings`, `about`, `quit`), featuring hover/focus glow and desktop tooltips.
+  - `?orbitkit=mascot` → `MascotView.svelte`: Glim the pixel-art blob overlay with its arc-anchor radial menu (glass discs `#0E1433` @ 85%, cyan 1.5px rings, inline-SVG icons, hover/focus glow, desktop tooltips). The window content-fits the sprite (idle: sprite + transparent side padding) and grows above the mascot for the menu; clicks on transparent areas pass through to the app underneath (`src/lib/windowFit.ts` holds the pure fit math).
   - `?popup=notes` → `NotesPopup.svelte`: Planetary glass card popup for quick notes, persisted to `localStorage`.
-  - `?popup=settings` → `SettingsPopup.svelte`: Planetary settings popup controlling mascot animation state (`idle` cyan / `busy` amber) via `setMascotState`.
+  - `?popup=settings` → `SettingsPopup.svelte`: Planetary settings popup controlling the mascot state pools (`idle` / `alert` / `sleep`) via `setMascotState`.
   - `?popup=<id>` (unregistered) → `UnknownPopup.svelte`: Planetary fallback glass card for unregistered popup identifiers.
-  - Default (no query params) → `MainView.svelte`: Sleek mission control dashboard featuring a hero mascot with orbital rings, tagline, and glass cards for overlay controls, Android permission status, mascot state toggles, and live event telemetry log.
+  - Default (no query params) → `MainView.svelte`: Sleek mission control dashboard featuring a hero mascot with orbital rings, tagline, and glass cards for overlay controls (the overlay auto-shows on desktop startup), Android permission status, mascot state toggles, and live event telemetry log.
 - **Backend (`src-tauri/src/lib.rs`)**:
   Initializes `tauri_plugin_orbitkit::init(config)` with parsed `orbitkit.config.json`. Handles native menu events via `OrbitkitExt::on_menu_action`:
-  - `about` → logs action.
-  - `quit` → exits process (`app.exit(0)`).
-  - `notes` / `settings` → opens popup window (`open_popup(id)`).
-  - `timer` → sets mascot state to `busy` for 5s then reverts to `idle`.
+  - `app.about` → logs action.
+  - `app.quit` → exits process (`app.exit(0)`).
+  - `app.notes` / `app.settings` → opens popup window (`open_popup(id)`).
+  - `app.timer` → sets mascot state to `sleep` for 5s then reverts to `idle`.
+  - `app.alert` → sets mascot state to `alert` (state pool TTL auto-reverts after ~8s).
 
 ---
 

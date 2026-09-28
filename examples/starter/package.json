@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types tests/*.test.mjs",
     "tauri": "tauri"
   },
   "dependencies": {

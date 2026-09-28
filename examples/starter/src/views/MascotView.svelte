@@ -5,12 +5,42 @@
     RadialMenu,
     createDragGesture,
     emitMenuAction,
+    mascotMonitor,
     onMascotState,
     startMascotDrag,
+    startPassthrough,
+    type AnchorRect,
     type MascotStateName,
     type MenuConfig,
+    type PassthroughController,
+    type RectEdges,
   } from "@orbitkit/ui";
+  import {
+    getCurrentWindow,
+    LogicalPosition,
+    LogicalSize,
+  } from "@tauri-apps/api/window";
+  import { demoWindowFit } from "../lib/windowFit";
   import config from "../orbitkit.config";
+
+  // --- demo-b1 wiring --------------------------------------------------------
+  const mascotWindowCfg = config.windows.mascotWindow;
+  const passthroughEnabled = mascotWindowCfg?.passthrough === true;
+  const fitContentEnabled = mascotWindowCfg?.fitContent === true;
+  const mascotSize = config.mascot.size; // rendered box = frame * scale (96)
+  const menuRadius = config.menu.radius;
+  const menuItemSize = config.menu.itemSize ?? 44;
+  const headGap = config.menu.arc?.headGap ?? 12;
+
+  /** Horizontal idle padding: the content-fit window keeps transparent strips
+   *  beside Glim so the K10 passthrough can be exercised next to the mascot. */
+  const IDLE_PAD_X = 24;
+  /** Padding grown above + beside the content union while the menu is open.
+   *  Never below: the mascot stays exactly bottom-pinned in both states. */
+  const MENU_PAD = 8;
+  /** Shrink delay after an animated close: stagger closeMs + stepMs*(n-1) =
+   *  180 + 40*5 = 380 ms for the 6-item menu. */
+  const SHRINK_DELAY_MS = 480;
 
   let mascotState = $state<MascotStateName>(config.mascot.initialState ?? "idle");
   const isDebug = import.meta.env.VITE_ORBITKIT_DEBUG === "1";
@@ -22,25 +52,111 @@
 
   let menuOpen = $state<boolean>(false);
   let activeMenuConfig = $state<MenuConfig>(config.menu);
+  /** K7 arc-anchor: mascot bounds in window coordinates (post-fit). */
+  let anchorRect = $state<AnchorRect | null>(null);
+  /** Work-area-clamp compensation translate (logical px); zero unless the
+   *  work area forces the window off its ideal position. */
+  let contentShift = $state<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  function toggleMenu() {
-    activeMenuConfig = config.menu;
-    menuOpen = !menuOpen;
+  let menuWrapEl: HTMLElement | undefined = $state();
+  let mascotEl: HTMLElement | undefined = $state();
+
+  let shrinkTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function cancelShrink(): void {
+    if (shrinkTimer) {
+      clearTimeout(shrinkTimer);
+      shrinkTimer = null;
+    }
   }
 
-  const gesture = createDragGesture({
-    isMenuOpen: () => menuOpen,
-    closeMenuInstant: () => {
+  /**
+   * K9 fitContent, single consistent model (see src/lib/windowFit.ts):
+   * the mascot is bottom-centre-pinned by CSS, the window rect is computed so
+   * the mascot's screen position never changes across idle/open transitions,
+   * and only a work-area clamp produces a compensating content shift.
+   */
+  async function applyWindowFit(state: "idle" | "open"): Promise<void> {
+    const win = getCurrentWindow();
+    try {
+      const [pos, inner, scale, monitor] = await Promise.all([
+        win.outerPosition(),
+        win.innerSize(),
+        win.scaleFactor(),
+        mascotMonitor(),
+      ]);
+      const wa = monitor.workArea;
+      const fit = demoWindowFit(
+        {
+          window: {
+            x: pos.x / scale,
+            y: pos.y / scale,
+            width: inner.width / scale,
+            height: inner.height / scale,
+          },
+          workArea: {
+            x: wa.x / monitor.scaleFactor,
+            y: wa.y / monitor.scaleFactor,
+            width: wa.width / monitor.scaleFactor,
+            height: wa.height / monitor.scaleFactor,
+          },
+          mascot: mascotSize,
+          headGap,
+          radius: menuRadius,
+          itemSize: menuItemSize,
+          idlePadX: IDLE_PAD_X,
+          menuPad: MENU_PAD,
+        },
+        state
+      );
+      await win.setSize(new LogicalSize(fit.window.width, fit.window.height));
+      await win.setPosition(new LogicalPosition(fit.window.x, fit.window.y));
+      contentShift = fit.shift;
+      // AnchorRect in the NEW window coords (post-shift) so the arc hovers
+      // above the mascot exactly as positioned.
+      anchorRect = fit.anchor;
+    } catch (err: unknown) {
+      console.error("[MascotView] window fit failed:", err);
+    }
+  }
+
+  function scheduleShrink(): void {
+    if (!fitContentEnabled) return;
+    cancelShrink();
+    // Re-fit at the live window position: safe after drags.
+    shrinkTimer = setTimeout(() => {
+      shrinkTimer = null;
+      void applyWindowFit("idle");
+    }, SHRINK_DELAY_MS);
+  }
+
+  async function toggleMenu() {
+    if (!menuOpen) {
+      cancelShrink();
+      // Fit BEFORE mounting the menu: anchorRect describes the new geometry,
+      // so the arc opens in place and the mascot never jumps.
+      if (fitContentEnabled) await applyWindowFit("open");
+      activeMenuConfig = config.menu;
+      menuOpen = true;
+    } else {
+      closeMenu(false);
+    }
+  }
+
+  function closeMenu(instant: boolean) {
+    if (!menuOpen) return;
+    if (instant) {
       activeMenuConfig = { ...config.menu, animation: "none" };
       menuOpen = false;
-    },
-    onDragStart: async () => {
-      await startMascotDrag();
-    },
-    onToggle: toggleMenu,
-  });
+      if (fitContentEnabled) void applyWindowFit("idle");
+    } else {
+      menuOpen = false;
+      scheduleShrink();
+    }
+  }
+
   async function handleSelect(id: string) {
-    menuOpen = false;
+    closeMenu(false);
     try {
       await emitMenuAction(id);
     } catch (err: unknown) {
@@ -49,10 +165,44 @@
   }
 
   function handleClose() {
-    menuOpen = false;
+    closeMenu(false);
+  }
+
+  const gesture = createDragGesture({
+    isMenuOpen: () => menuOpen,
+    closeMenuInstant: () => closeMenu(true),
+    onDragStart: async () => {
+      await startMascotDrag();
+    },
+    onToggle: () => {
+      void toggleMenu();
+    },
+  });
+
+  let passthrough: PassthroughController | null = null;
+
+  /** K10 hit region following the rendered menu discs; empty while closed.
+   *  Returns the DOMRects directly: hit regions are RectEdges
+   *  ({left,top,right,bottom}), NOT {x,y,width,height}. */
+  function menuHitRegion(): RectEdges[] {
+    const el = menuWrapEl;
+    if (!el) return [];
+    return Array.from(
+      el.querySelectorAll<Element>(".orbitkit-radial-item")
+    ).map((item) => item.getBoundingClientRect());
   }
 
   onMount(() => {
+    if (fitContentEnabled) void applyWindowFit("idle");
+    if (passthroughEnabled) {
+      passthrough = startPassthrough({
+        getWindow: () => getCurrentWindow(),
+        isDragging: () => gesture.isDragged,
+      });
+      if (mascotEl) passthrough.registerHitRegion(mascotEl);
+      passthrough.registerHitRegion(menuHitRegion);
+    }
+
     let unlisten: (() => void) | undefined;
     onMascotState((payload) => {
       if (payload && payload.state) {
@@ -64,63 +214,82 @@
 
     return () => {
       if (unlisten) unlisten();
+      passthrough?.stop();
+      if (shrinkTimer) clearTimeout(shrinkTimer);
     };
   });
 </script>
+
 <svelte:window
   onfocus={() => {
     debugLog("[MascotView:window:focus]");
     gesture.onwindowfocus?.();
   }}
-  onblur={() => debugLog("[MascotView:window:blur]")}
+  onblur={() => {
+    debugLog("[MascotView:window:blur]");
+    // With K10 passthrough a click-away lands on the app underneath, so the
+    // window blur is the signal that closes the menu (edges-first wave).
+    if (menuOpen) closeMenu(false);
+  }}
 />
 
-
 <div class="mascot-window-root" data-testid="mascot-window">
-  <div class="mascot-center-anchor">
-    <!-- Click mascot toggles menu -->
-    <div
-      class="mascot-clickable"
-      class:busy={mascotState === "busy"}
-      role="button"
-      tabindex="0"
-      aria-label="OrbitKit Mascot"
-      data-orbitkit-menu-toggle
-      onpointerdown={(e) => {
-        debugLog("[MascotView:dom:pointerdown]", { button: e.button, clientX: e.clientX, clientY: e.clientY });
-        gesture.onpointerdown(e);
-      }}
-      onpointermove={gesture.onpointermove}
-      onpointerup={(e) => {
-        debugLog("[MascotView:dom:pointerup]", { button: e.button });
-        gesture.onpointerup(e);
-      }}
-      onpointercancel={() => {
-        debugLog("[MascotView:dom:pointercancel]");
-        gesture.onpointercancel();
-      }}
-      onclick={(e) => {
-        debugLog("[MascotView:dom:click]", { menuOpenBefore: menuOpen });
-        gesture.onclick(e);
-        debugLog("[MascotView:dom:click:done]", { menuOpenAfter: menuOpen });
-      }}
-      onkeydown={gesture.onkeydown}
-    >
-      <Mascot
-        config={config.mascot}
-        state={mascotState}
-      />
+  <!-- Bottom-centre pin point: the mascot's window-local position is a pure
+       function of the window size (never re-centred on resize). The translate
+       carries only the work-area clamp compensation. -->
+  <div
+    class="fit-shift"
+    style:transform={`translate(${contentShift.x}px, ${contentShift.y}px)`}
+  >
+    <div class="mascot-center-anchor">
+      <!-- Click mascot toggles menu -->
+      <div
+        class="mascot-clickable"
+        role="button"
+        tabindex="0"
+        aria-label="OrbitKit Mascot"
+        data-orbitkit-menu-toggle
+        bind:this={mascotEl}
+        onpointerdown={(e) => {
+          debugLog("[MascotView:dom:pointerdown]", {
+            button: e.button,
+            clientX: e.clientX,
+            clientY: e.clientY,
+          });
+          gesture.onpointerdown(e);
+        }}
+        onpointermove={gesture.onpointermove}
+        onpointerup={(e) => {
+          debugLog("[MascotView:dom:pointerup]", { button: e.button });
+          gesture.onpointerup(e);
+        }}
+        onpointercancel={() => {
+          debugLog("[MascotView:dom:pointercancel]");
+          gesture.onpointercancel();
+        }}
+        onclick={(e) => {
+          debugLog("[MascotView:dom:click]", { menuOpenBefore: menuOpen });
+          gesture.onclick(e);
+          debugLog("[MascotView:dom:click:done]", { menuOpenAfter: menuOpen });
+        }}
+        onkeydown={gesture.onkeydown}
+      >
+        <Mascot config={config.mascot} state={mascotState} />
+      </div>
     </div>
+  </div>
 
-    <!-- Radial menu anchored to the center of the mascot -->
-    <div class="radial-anchor">
-      <RadialMenu
-        config={activeMenuConfig}
-        open={menuOpen}
-        onselect={handleSelect}
-        onclose={handleClose}
-      />
-    </div>
+  <!-- K7 arc-anchor: RadialMenu translates its container by the arc origin in
+       window coordinates, so the wrapper sits at the window origin. It is
+       OUTSIDE .fit-shift because fit.anchor already encodes the shift. -->
+  <div class="radial-anchor" bind:this={menuWrapEl}>
+    <RadialMenu
+      config={activeMenuConfig}
+      open={menuOpen}
+      {anchorRect}
+      onselect={handleSelect}
+      onclose={handleClose}
+    />
   </div>
 </div>
 
@@ -137,65 +306,45 @@
   .mascot-window-root {
     width: 100vw;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
     user-select: none;
     -webkit-user-select: none;
   }
 
+  /* Bottom-centre pin point (see src/lib/windowFit.ts): 0x0 at (50%, 100%);
+     the translate is the clamp compensation only. */
+  .fit-shift {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 0;
+  }
+
   .mascot-center-anchor {
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-50%);
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
   }
 
+  /* No hover/active scaling: Glim is an integer-upscaled sprite sheet and any
+     interpolation blur is a smoke failure (pixel-crisp idle). */
   .mascot-clickable {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
   }
 
-  .mascot-clickable :global(.orbitkit-mascot) {
-    border-radius: 50%;
-  }
-
-  .mascot-clickable :global(.orbitkit-mascot-img) {
-    border-radius: 50%;
-    transition: filter 0.2s ease;
-    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.35));
-  }
-
-  .mascot-clickable.busy :global(.orbitkit-mascot-img) {
-    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.45));
-  }
-
-  .mascot-clickable:hover {
-    transform: scale(1.06);
-  }
-
-  .mascot-clickable:hover :global(.orbitkit-mascot-img) {
-    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.65));
-  }
-
-  .mascot-clickable.busy:hover :global(.orbitkit-mascot-img) {
-    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.7));
-  }
-
-  .mascot-clickable:active {
-    transform: scale(0.96);
-  }
-
   .radial-anchor {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 0;
     height: 0;
     pointer-events: none;

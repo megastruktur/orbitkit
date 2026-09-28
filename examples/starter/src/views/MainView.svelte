@@ -269,6 +269,10 @@
     checkPermission();
     if (isAndroid) {
       checkRecorderPlugin();
+    } else {
+      // demo-b1: show the overlay immediately on desktop so the batch smoke
+      // sees the mascot without a manual click.
+      void handleShowOverlay();
     }
 
     let unlisten: (() => void) | undefined;
@@ -297,7 +301,13 @@
       <div class="orbit-ring orbit-ring-1"></div>
       <div class="orbit-ring orbit-ring-2"></div>
       <div class="hero-planet">
-        {@html config.mascot.src}
+        <!-- demo-b1: mascot is a sprite sheet now; render the sheet PNG. -->
+        <img
+          class="hero-planet-img"
+          src={config.mascot.src}
+          alt="OrbitKit mascot"
+          draggable="false"
+        />
       </div>
     </div>
     <h1>OrbitKit Starter</h1>
@@ -326,9 +336,13 @@
           <span class="dot dot-idle"></span>
           Set Idle
         </button>
-        <button class="btn btn-busy" onclick={() => handleSetState("busy")}>
+        <button class="btn btn-busy" onclick={() => handleSetState("alert")}>
           <span class="dot dot-busy"></span>
-          Set Busy
+          Set Alert
+        </button>
+        <button class="btn btn-sleep" onclick={() => handleSetState("sleep")}>
+          <span class="dot dot-sleep"></span>
+          Set Sleep
         </button>
       </div>
     </section>
@@ -512,6 +526,15 @@
     height: 44px;
   }
 
+  .hero-planet-img {
+    width: 44px;
+    height: 44px;
+    /* The sheet src is a 128x32 4-frame strip: crop to frame 0. */
+    object-fit: cover;
+    object-position: left center;
+    image-rendering: pixelated;
+  }
+
   h1 {
     font-size: 1.4rem;
     margin: 0 0 0.2rem;
@@ -688,6 +711,23 @@
   .dot-busy {
     background: #f59e0b;
     box-shadow: 0 0 6px #f59e0b;
+  }
+
+  .btn-sleep {
+    background: rgba(14, 20, 51, 0.85);
+    color: #e6f6ff;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+  }
+
+  .btn-sleep:hover {
+    background: rgba(167, 139, 250, 0.15);
+    border-color: #a78bfa;
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+  }
+
+  .dot-sleep {
+    background: #a78bfa;
+    box-shadow: 0 0 6px #a78bfa;
   }
 
   .btn-rec-start {

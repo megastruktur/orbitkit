@@ -1,0 +1,11 @@
+Launching exec container for /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux/exec-app.log
+0x00400003  0 241  127  800  600  c8695992f248 orbitkit
+0x0040001e  0 1036 579  144  96   c8695992f248 orbitkit-mascot
+MID=4194334
+Window 4194334
+  Position: 1036,579 (screen: 0)
+  Geometry: 144x96
+_NET_WM_STATE(ATOM) = _NET_WM_STATE_SKIP_TASKBAR, _NET_WM_STATE_SKIP_PAGER, _NET_WM_STATE_ABOVE
+_NET_WM_WINDOW_OPACITY:  not found.
+DIAG_DONE

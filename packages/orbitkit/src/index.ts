@@ -12,3 +12,10 @@ export type { MenuStaggerSpec } from "./menuAnimation.js";
 export * from "./bridge.js";
 export { frameAt, sheetFrameStyle, sheetGeometry } from "./mascot/sheets.js";
 export type { SheetGeometry } from "./mascot/sheets.js";
+export { createMachine, hint, tick } from "./mascotMachine.js";
+export type {
+  MascotMachine,
+  MascotMachineOptions,
+  MascotMachineSnapshot,
+  MascotRnd,
+} from "./mascotMachine.js";

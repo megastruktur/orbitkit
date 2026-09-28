@@ -3,6 +3,9 @@
   import { resolveSvgSrc } from "./mascot/svg";
   import { resolveSpriteMetrics } from "./mascot/sprite";
   import { frameAt, sheetFrameStyle, sheetGeometry } from "./mascot/sheets";
+  import { createMachine, hint, tick } from "./mascotMachine";
+  import type { MascotMachine } from "./mascotMachine";
+  import { onMascotState } from "./bridge";
 
   interface Props {
     config: MascotConfig;
@@ -35,6 +38,82 @@
 
   // Resolved state: explicit prop -> config.initialState -> "idle"
   const currentState = $derived(stateProp ?? config?.initialState ?? "idle");
+
+  // K8 state machine (kind="sheets" with pool states): an explicit `sheet` prop
+  // keeps manual control; otherwise the machine resolves the sheet from pools.
+  const machineDriven = $derived(
+    config?.kind === "sheets" && config.states != null && !sheet,
+  );
+
+  let machine: MascotMachine | null = $state.raw(null);
+  let machineState = $state("");
+  let machineSheet = $state("");
+
+  // (Re)create the machine whenever the pool config changes.
+  $effect(() => {
+    if (!machineDriven) {
+      machine = null;
+      machineState = "";
+      machineSheet = "";
+      return;
+    }
+    const m = createMachine(config?.states ?? {});
+    machine = m;
+    const snap = tick(m, Date.now());
+    machineState = snap.state;
+    machineSheet = snap.sheet;
+  });
+
+  // Feed the resolved `state` prop into the machine; staying is a no-op there.
+  $effect(() => {
+    const m = machine;
+    if (!m) return;
+    hint(m, currentState, Date.now());
+    const snap = tick(m, Date.now());
+    machineState = snap.state;
+    machineSheet = snap.sheet;
+  });
+
+  // K8 ttl expiry polling: machine clock is Date.now(), so tests use fake timers.
+  $effect(() => {
+    if (!machine) return;
+    const id = setInterval(() => {
+      const m = machine;
+      if (!m) return;
+      const snap = tick(m, Date.now());
+      if (snap.state !== machineState) machineState = snap.state;
+      if (snap.sheet !== machineSheet) machineSheet = snap.sheet;
+    }, 100);
+    return () => clearInterval(id);
+  });
+
+  // K4 `onMascotState` events feed `hint` (highest priority wins).
+  $effect(() => {
+    const m = machine;
+    if (!m) return;
+    let disposed = false;
+    let unlisten: (() => void) | undefined;
+    onMascotState((payload) => {
+      if (disposed) return;
+      const live = machine;
+      if (!live) return;
+      hint(live, payload.state, Date.now());
+      const snap = tick(live, Date.now());
+      machineState = snap.state;
+      machineSheet = snap.sheet;
+    })
+      .then((un) => {
+        if (disposed) un();
+        else unlisten = un;
+      })
+      .catch((err) => {
+        console.error("[orbitkit] Mascot: onMascotState subscription failed.", err);
+      });
+    return () => {
+      disposed = true;
+      unlisten?.();
+    };
+  });
 
   // Effective aria-label
   const effectiveAriaLabel = $derived(
@@ -87,7 +166,12 @@
   const firstSheet = $derived(sheetNames[0] ?? "");
   const activeSheet = $derived.by(() => {
     if (config?.kind !== "sheets") return "";
-    if (!sheet) return firstSheet;
+    if (!sheet) {
+      if (machineDriven && machineSheet && sheetNames.includes(machineSheet)) {
+        return machineSheet;
+      }
+      return firstSheet;
+    }
     return sheetNames.includes(sheet) ? sheet : firstSheet;
   });
   const sheetDef = $derived(
@@ -101,6 +185,19 @@
     if (config?.kind === "sheets" && sheet && !sheetNames.includes(sheet)) {
       console.error(
         `[orbitkit] Mascot: unknown sheet "${sheet}", falling back to "${firstSheet}".`,
+      );
+    }
+  });
+
+  $effect(() => {
+    if (
+      machineDriven &&
+      currentState &&
+      config?.states != null &&
+      !(currentState in config.states)
+    ) {
+      console.error(
+        `[orbitkit] Mascot: unknown state "${currentState}", staying on "${machineState}".`,
       );
     }
   });
@@ -141,7 +238,7 @@
 <button
   type="button"
   class="orbitkit-mascot {isReducedMotion ? 'reduced-motion orbitkit-mascot--reduced-motion' : ''} {customClass}"
-  data-state={currentState}
+  data-state={machineDriven && machineState ? machineState : currentState}
   aria-label={effectiveAriaLabel}
   style={rootStyle}
   {onclick}

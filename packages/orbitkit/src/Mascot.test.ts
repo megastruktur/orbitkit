@@ -470,7 +470,10 @@ describe("Mascot kind=sheets (K7)", () => {
       });
 
       expect(sheetEl(container).style.backgroundPositionX).toBe("0px");
-      vi.advanceTimersByTime(2000);
+      // 1500 ms = 3 frames of "small" (500 ms/frame): without the reduced-motion
+      // freeze the frame would advance to 3 (-96px), so this assert is
+      // mutation-sensitive (2000 ms was a full period and wrapped to frame 0).
+      vi.advanceTimersByTime(1500);
       await tick();
       expect(sheetEl(container).style.backgroundPositionX).toBe("0px");
     } finally {
@@ -489,6 +492,55 @@ describe("Mascot kind=sheets (K7)", () => {
       vi.advanceTimersByTime(1500); // 3 ticks -> elapsed 1500ms -> frame 3
       await tick(); // flush Svelte's microtask DOM update
       expect(sheetEl(container).style.backgroundPositionX).toBe("-96px"); // -3 * 16 * 2
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("resets the frame to 0 when the sheet changes mid-animation", async () => {
+    vi.useFakeTimers();
+    try {
+      const { container, rerender } = render(Mascot, {
+        props: { config: sheetsConfig, sheet: "small" },
+      });
+
+      vi.advanceTimersByTime(1500); // mid-animation: frame 3 of "small"
+      await tick();
+      expect(sheetEl(container).style.backgroundPositionX).toBe("-96px");
+
+      await rerender({ props: { config: sheetsConfig, sheet: "tall" } });
+      expect(sheetEl(container).style.backgroundPositionX).toBe("0px");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("resolves the sheet via the K8 state machine and returns to idle after ttl", async () => {
+    const statesConfig: MascotConfig = {
+      ...sheetsConfig,
+      faceByVelocity: false,
+      states: {
+        idle: { pool: ["small"], priority: 0 },
+        alert: { pool: ["tall"], priority: 10, ttlMs: 600 },
+      },
+    };
+
+    vi.useFakeTimers();
+    try {
+      const { container } = render(Mascot, {
+        props: { config: statesConfig, state: "alert" },
+      });
+      await tick();
+      await tick();
+
+      // alert pool -> tall sheet, machine-resolved data-state
+      expect(sheetEl(container).style.backgroundImage).toContain('url("tall.png")');
+      expect(container.querySelector("button")?.dataset.state).toBe("alert");
+
+      vi.advanceTimersByTime(700); // > ttlMs 600, expiry poll fires
+      await tick();
+      expect(sheetEl(container).style.backgroundImage).toContain('url("small.png")');
+      expect(container.querySelector("button")?.dataset.state).toBe("idle");
     } finally {
       vi.useRealTimers();
     }

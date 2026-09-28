@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { MenuConfig } from "./config";
 
 export type OrbitKitErrorCode =
@@ -243,6 +244,53 @@ export async function onPopupClose(
   }
   try {
     return await listen<PopupClosePayload>("orbitkit://popup-close", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** Physical-pixel rectangle in global screen space (K9). */
+export type PhysRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/** Payload of the `mascot_monitor` command (K9). */
+export type MascotMonitorPayload = {
+  workArea: PhysRect;
+  scaleFactor: number;
+};
+
+/**
+ * Returns work area + scale factor of the monitor containing the mascot window
+ * centre (K9). Unsupported on mobile (rejects with `OrbitKitError` code
+ * `"unsupported"`).
+ */
+export async function mascotMonitor(): Promise<MascotMonitorPayload> {
+  return callPlugin<MascotMonitorPayload>("plugin:orbitkit|mascot_monitor");
+}
+
+/** Payload of the `tauri://scale-change` window event. */
+export type ScaleChangePayload = {
+  scaleFactor: number;
+  size: { width: number; height: number };
+};
+
+export type ScaleChangeCallback = (payload: ScaleChangePayload) => void;
+
+/** Subscribes to this window's `tauri://scale-change`; returns an unlisten function. */
+export async function onScaleChange(
+  cb: ScaleChangeCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await getCurrentWindow().onScaleChanged((event) => {
       cb(event.payload);
     });
   } catch (err) {

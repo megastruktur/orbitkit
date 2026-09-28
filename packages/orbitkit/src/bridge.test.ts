@@ -5,11 +5,13 @@ import {
   emitMenuAction,
   hideOverlay,
   isTauri,
+  mascotMonitor,
   normalizeError,
   onMascotState,
   onMenuAction,
   onPopupClose,
   onPopupOpen,
+  onScaleChange,
   openPopup,
   OrbitKitError,
   overlayPermission,
@@ -258,6 +260,117 @@ describe("bridge", () => {
       });
 
       await expect(startMascotDrag()).rejects.toThrow(OrbitKitError);
+    });
+  });
+
+  describe("K9 mascot_monitor + scale-change", () => {
+    beforeEach(() => {
+      mockWindows("main");
+    });
+
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("11. mascotMonitor invokes plugin:orbitkit|mascot_monitor and returns payload", async () => {
+      let recordedCmd = "";
+      let recordedArgs: unknown = null;
+      mockIPC((cmd, args) => {
+        recordedCmd = cmd;
+        recordedArgs = args ?? null;
+        return {
+          workArea: { x: -1920, y: 0, width: 1920, height: 1080 },
+          scaleFactor: 1.5,
+        };
+      });
+
+      const payload = await mascotMonitor();
+
+      expect(recordedCmd).toBe("plugin:orbitkit|mascot_monitor");
+      expect(recordedArgs).toEqual({});
+      expect(payload).toEqual({
+        workArea: { x: -1920, y: 0, width: 1920, height: 1080 },
+        scaleFactor: 1.5,
+      });
+    });
+
+    it("12. mascotMonitor maps mobile 'unsupported' rejection to OrbitKitError", async () => {
+      mockIPC(() => {
+        throw {
+          code: "unsupported",
+          message: "mascot_monitor is not supported on this platform",
+        };
+      });
+
+      const err = await mascotMonitor().catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(OrbitKitError);
+      if (err instanceof OrbitKitError) {
+        expect(err.code).toBe("unsupported");
+      }
+    });
+
+    it("13. onScaleChange subscribes to tauri://scale-change on the current window and delivers payload", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      let listenTarget: unknown = null;
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          if ("target" in args) {
+            listenTarget = args.target;
+          }
+          return 202;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onScaleChange(callback);
+
+      expect(listenedEvent).toBe("tauri://scale-change");
+      // Scoped to the current window — not a global Any-target listen.
+      expect(listenTarget).toEqual({ kind: "Window", label: "main" });
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "tauri://scale-change",
+        payload: { scaleFactor: 2, size: { width: 2560, height: 1440 } },
+      });
+
+      expect(callback).toHaveBeenCalledWith({
+        scaleFactor: 2,
+        size: { width: 2560, height: 1440 },
+      });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("14. onScaleChange returns a no-op unlisten function outside Tauri without throwing", async () => {
+      clearTauriInternals();
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onScaleChange(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
     });
   });
 

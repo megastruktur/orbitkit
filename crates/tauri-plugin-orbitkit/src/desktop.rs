@@ -2,7 +2,19 @@ use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewUrl, WebviewWindowBuild
 use crate::config::{MascotWindowConfig, MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
-use crate::{lookup_popup, OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{
+    lookup_popup, selector_inputs, MascotMonitorResponse, monitor_for_point,
+    OverlayPermissionResponse, PhysRect, ShowOverlayMascotArgs,
+};
+
+/// tao on Windows reports true physical virtual-screen coordinates; on
+/// macOS/Linux the reported monitor rects are per-monitor-scaled logical
+/// points, so selection runs in the shared logical space there (see
+/// `selector_inputs`).
+#[cfg(windows)]
+const SELECTION_LOGICAL_SPACE: bool = false;
+#[cfg(not(windows))]
+const SELECTION_LOGICAL_SPACE: bool = true;
 
 /// Calculates the square dimension of the mascot overlay window.
 /// Formula: max(mascot_size, 2 * (menu_radius + menu_item_size)) + 16
@@ -305,5 +317,238 @@ impl<R: Runtime> Orbitkit<R> {
             .start_dragging()
             .map_err(|e| Error::unsupported(e.to_string()))?;
         Ok(())
+    }
+
+    /// K9: work area + scale factor of the monitor containing the mascot window
+    /// centre. Selection runs in one consistent coordinate space via the
+    /// unit-tested pure `selector_inputs` + `monitor_for_point` pair, falling
+    /// back to the primary monitor.
+    pub fn mascot_monitor(&self) -> Result<MascotMonitorResponse> {
+        let window = self
+            .app
+            .get_webview_window("orbitkit-mascot")
+            .and_then(|window| {
+                let pos = window.outer_position().ok()?;
+                let size = window.outer_size().ok()?;
+                let scale = window.scale_factor().ok()?;
+                Some(((pos.x, pos.y), (size.width, size.height), scale))
+            });
+
+        let selected = window.and_then(|(win_pos, win_size, win_scale)| {
+            let mut monitors = self.app.available_monitors().ok()?;
+            let tuples: Vec<(i32, i32, u32, u32, f64)> = monitors
+                .iter()
+                .map(|m| {
+                    (
+                        m.position().x,
+                        m.position().y,
+                        m.size().width,
+                        m.size().height,
+                        m.scale_factor(),
+                    )
+                })
+                .collect();
+            let (infos, centre) = selector_inputs(
+                &tuples,
+                win_pos,
+                win_size,
+                win_scale,
+                SELECTION_LOGICAL_SPACE,
+            );
+            let idx = monitor_for_point(&infos, centre)?;
+            Some(monitors.swap_remove(idx))
+        });
+
+        let response = match selected {
+            Some(monitor) => Self::monitor_response(&monitor),
+            None => self
+                .app
+                .primary_monitor()
+                .ok()
+                .flatten()
+                .as_ref()
+                .map(Self::monitor_response)
+                .unwrap_or_else(Self::headless_response),
+        };
+        Ok(response)
+    }
+
+    fn monitor_response(monitor: &tauri::Monitor) -> MascotMonitorResponse {
+        let work = monitor.work_area();
+        MascotMonitorResponse {
+            work_area: PhysRect {
+                x: work.position.x,
+                y: work.position.y,
+                width: work.size.width,
+                height: work.size.height,
+            },
+            scale_factor: monitor.scale_factor(),
+        }
+    }
+
+    fn headless_response() -> MascotMonitorResponse {
+        MascotMonitorResponse {
+            work_area: PhysRect {
+                x: 0,
+                y: 0,
+                width: 1280,
+                height: 800,
+            },
+            scale_factor: 1.0,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{monitor_for_point, selector_inputs, MonitorInfo, PhysRect};
+
+    fn monitor(x: i32, y: i32, width: u32, height: u32, scale_factor: f64) -> MonitorInfo {
+        let rect = PhysRect {
+            x,
+            y,
+            width,
+            height,
+        };
+        MonitorInfo {
+            bounds: rect,
+            work_area: rect,
+            scale_factor,
+        }
+    }
+
+    /// K9 AC3: three-monitor fixture including negative coordinates.
+    /// Left: -1920..0, Main: 0..2560, Right: 2560..3640.
+    fn fixture() -> Vec<MonitorInfo> {
+        vec![
+            monitor(-1920, 0, 1920, 1080, 1.0),
+            monitor(0, 0, 2560, 1440, 1.5),
+            monitor(2560, 0, 1080, 1920, 2.0),
+        ]
+    }
+
+    #[test]
+    fn test_monitor_for_point_selects_monitor_containing_point() {
+        let monitors = fixture();
+        assert_eq!(monitor_for_point(&monitors, (-1000, 500)), Some(0));
+        assert_eq!(monitor_for_point(&monitors, (1280, 720)), Some(1));
+        assert_eq!(monitor_for_point(&monitors, (3000, 1500)), Some(2));
+    }
+
+    #[test]
+    fn test_monitor_for_point_edges_and_boundaries() {
+        let monitors = fixture();
+        // Top-left corner and bottom-right corner of the left monitor.
+        assert_eq!(monitor_for_point(&monitors, (-1920, 0)), Some(0));
+        assert_eq!(monitor_for_point(&monitors, (-1, 1079)), Some(0));
+        // Left monitor's bottom-right boundary is exclusive.
+        assert_eq!(monitor_for_point(&monitors, (0, 1080)), Some(1));
+        // Main/right boundary at x = 2560 belongs to the right monitor.
+        assert_eq!(monitor_for_point(&monitors, (2560, 0)), Some(2));
+        assert_eq!(monitor_for_point(&monitors, (3639, 1919)), Some(2));
+    }
+
+    #[test]
+    fn test_monitor_for_point_outside_returns_none() {
+        let monitors = fixture();
+        assert_eq!(monitor_for_point(&monitors, (5000, 0)), None);
+        assert_eq!(monitor_for_point(&monitors, (-1920, -1)), None);
+        assert_eq!(monitor_for_point(&monitors, (-5000, 20000)), None);
+    }
+
+    /// F2 (a): macOS mixed-scale layout exactly as tao reports it — Retina
+    /// 1512x982pt @2x + external 1920x1080pt @1x placed at pt x=1512. The
+    /// per-monitor-scaled rects OVERLAP (primary 0..3024, external
+    /// 1512..3432); only dividing back into logical space makes the mascot on
+    /// the external select the external.
+    #[test]
+    fn test_selector_inputs_logical_space_macos_mixed_scale() {
+        let monitors = [(0, 0, 3024, 1964, 2.0), (1512, 0, 1920, 1080, 1.0)];
+        let (infos, centre) = selector_inputs(&monitors, (2300, 300), (200, 200), 1.0, true);
+        assert_eq!(centre, (2400, 400));
+        assert_eq!(monitor_for_point(&infos, centre), Some(1));
+    }
+
+    /// F2 (b): same layout, window on the primary at pt (1300,300) 100x100
+    /// with win_scale 2.0 — tauri reports pos (2600,600) size (200,200); the
+    /// centre must be divided by the WINDOW's scale, not a monitor's.
+    #[test]
+    fn test_selector_inputs_logical_space_primary_window() {
+        let monitors = [(0, 0, 3024, 1964, 2.0), (1512, 0, 1920, 1080, 1.0)];
+        let (infos, centre) = selector_inputs(&monitors, (2600, 600), (200, 200), 2.0, true);
+        assert_eq!(centre, (1350, 350));
+        assert_eq!(monitor_for_point(&infos, centre), Some(0));
+    }
+
+    /// F2 (c): Linux mixed-scale layout as tao reports it — 3840x2160 @2x +
+    /// 1920x1080 @1x at reported x=1920 (rects overlap: primary 0..3840).
+    #[test]
+    fn test_selector_inputs_logical_space_linux_layout() {
+        let monitors = [(0, 0, 3840, 2160, 2.0), (1920, 0, 1920, 1080, 1.0)];
+        let (infos, centre) = selector_inputs(&monitors, (2600, 300), (100, 100), 1.0, true);
+        assert_eq!(centre, (2650, 350));
+        assert_eq!(monitor_for_point(&infos, centre), Some(1));
+    }
+
+    /// F2 (d): Windows-style true physical virtual-screen coordinates pass
+    /// through unchanged (no division of monitors or of the window centre).
+    #[test]
+    fn test_selector_inputs_physical_space_passthrough() {
+        let monitors = [(0, 0, 3840, 2160, 2.0), (3840, 0, 1920, 1080, 1.0)];
+        let (infos, centre) = selector_inputs(&monitors, (3840, 0), (200, 200), 1.5, false);
+        assert_eq!(centre, (3940, 100));
+        assert_eq!(infos[0].bounds, PhysRect { x: 0, y: 0, width: 3840, height: 2160 });
+        assert_eq!(infos[1].bounds, PhysRect { x: 3840, y: 0, width: 1920, height: 1080 });
+        assert_eq!(monitor_for_point(&infos, centre), Some(1));
+    }
+
+    /// R2: selection uses full monitor bounds, not the work area — a centre
+    /// over the menu bar (top) or dock (bottom) must still select that monitor.
+    #[test]
+    fn test_monitor_for_point_selects_on_bounds_not_work_area() {
+        let mut primary = monitor(0, 0, 2560, 1440, 2.0);
+        primary.work_area = PhysRect {
+            x: 0,
+            y: 74,
+            width: 2560,
+            height: 1366,
+        };
+        let mut secondary = monitor(2560, 0, 1920, 1080, 1.0);
+        secondary.work_area = PhysRect {
+            x: 2560,
+            y: 0,
+            width: 1920,
+            height: 1042,
+        };
+        let monitors = vec![primary, secondary];
+        // Above the menu bar: inside bounds, outside the work area.
+        assert_eq!(monitor_for_point(&monitors, (1280, 40)), Some(0));
+        // Over the dock: inside bounds, below the work area bottom (1042).
+        assert_eq!(monitor_for_point(&monitors, (3000, 1060)), Some(1));
+    }
+
+    #[test]
+    fn test_monitor_for_point_first_match_wins_on_overlap() {
+        let monitors = vec![
+            monitor(0, 0, 1920, 1080, 1.0),
+            monitor(0, 0, 3840, 2160, 2.0),
+        ];
+        assert_eq!(monitor_for_point(&monitors, (100, 100)), Some(0));
+    }
+
+    #[test]
+    fn test_phys_rect_contains_excludes_right_bottom_edges() {
+        let rect = PhysRect {
+            x: -10,
+            y: -20,
+            width: 30,
+            height: 40,
+        };
+        assert!(rect.contains(-10, -20));
+        assert!(rect.contains(19, 19));
+        assert!(!rect.contains(20, 0));
+        assert!(!rect.contains(0, 20));
+        assert!(!rect.contains(-11, 0));
+        assert!(!rect.contains(0, -21));
     }
 }

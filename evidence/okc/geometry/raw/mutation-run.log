@@ -1,0 +1,388 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-geometry/packages/orbitkit
+
+ ❯ src/windowFit.test.ts (17 tests | 11 failed) 12ms
+   ❯ fitWindow (K9 AC1) (8)
+     × rounds fractional edges outwards at scale 1.5 4ms
+     × grows by ceil(padding * scale) on every side 1ms
+     × unions rects with fractional edges off the origin 1ms
+   ❯ clampToWorkArea (K9 AC2) (9)
+     × pushes a rect overflowing the left edge inside 0ms
+     × pulls a rect overflowing the right edge inside 0ms
+     × pushes a rect overflowing the top edge inside 0ms
+     × pulls a rect overflowing the bottom edge inside 0ms
+     × clamps a top-left corner overflow 0ms
+     × clamps a bottom-right corner overflow 0ms
+     × aligns an oversized rect to the work area top-left 0ms
+     × clamps against an offset work area with negative origin 0ms
+ ❯ src/bridge.test.ts (33 tests | 2 failed) 14ms
+   ❯ bridge (33)
+     ❯ K9 mascot_monitor + scale-change (4)
+       × 11. mascotMonitor invokes plugin:orbitkit|mascot_monitor and returns payload 4ms
+       × 13. onScaleChange subscribes to tauri://scale-change and delivers payload 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/bridge.test.ts > bridge > K9 mascot_monitor + scale-change > 11. mascotMonitor invokes plugin:orbitkit|mascot_monitor and returns payload
+AssertionError: expected 'plugin:orbitkit|mascotMoniter' to be 'plugin:orbitkit|mascot_monitor' // Object.is equality
+
+Expected: "plugin:orbitkit|mascot_monitor"
+Received: "plugin:orbitkit|mascotMoniter"
+
+ ❯ src/bridge.test.ts:289:27
+    287|       const payload = await mascotMonitor();
+    288|
+    289|       expect(recordedCmd).toBe("plugin:orbitkit|mascot_monitor");
+       |                           ^
+    290|       expect(recordedArgs).toEqual({});
+    291|       expect(payload).toEqual({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  src/bridge.test.ts > bridge > K9 mascot_monitor + scale-change > 13. onScaleChange subscribes to tauri://scale-change and delivers payload
+AssertionError: expected 'tauri://scale-changed' to be 'tauri://scale-change' // Object.is equality
+
+Expected: "tauri://scale-change"
+Received: "tauri://scale-changed"
+
+ ❯ src/bridge.test.ts:336:29
+    334|       const unlisten = await onScaleChange(callback);
+    335|
+    336|       expect(listenedEvent).toBe("tauri://scale-change");
+       |                             ^
+    337|       expect(eventHandlerId).not.toBeNull();
+    338|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  src/windowFit.test.ts > fitWindow (K9 AC1) > rounds fractional edges outwards at scale 1.5
+AssertionError: expected { w: 4, h: 4, offset: { x: 3, y: 3 } } to deeply equal { w: 6, h: 6, offset: { x: 2, y: 2 } }
+
+- Expected
++ Received
+
+  {
+-   "h": 6,
++   "h": 4,
+    "offset": {
+-     "x": 2,
+-     "y": 2,
++     "x": 3,
++     "y": 3,
+    },
+-   "w": 6,
++   "w": 4,
+  }
+
+ ❯ src/windowFit.test.ts:22:35
+     20|     // min edge 1.5 * 1.5 = 2.25 -> floor 2; max edge (1.5 + 3.3) * 1.…
+     21|     const rects: LogicalRect[] = [{ x: 1.5, y: 1.5, width: 3.3, height…
+     22|     expect(fitWindow(rects, 1.5)).toEqual({
+       |                                   ^
+     23|       w: 6,
+     24|       h: 6,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  src/windowFit.test.ts > fitWindow (K9 AC1) > grows by ceil(padding * scale) on every side
+AssertionError: expected { w: 8, h: 8, offset: { x: 1, y: 1 } } to deeply equal { w: 10, h: 10, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "h": 10,
++   "h": 8,
+    "offset": {
+-     "x": 0,
+-     "y": 0,
++     "x": 1,
++     "y": 1,
+    },
+-   "w": 10,
++   "w": 8,
+  }
+
+ ❯ src/windowFit.test.ts:32:38
+     30|     const rects: LogicalRect[] = [{ x: 1.5, y: 1.5, width: 3.3, height…
+     31|     // pad = ceil(1 * 1.5) = 2; x0 = 2 - 2 = 0; w = 8 + 2 - 0 = 10
+     32|     expect(fitWindow(rects, 1.5, 1)).toEqual({
+       |                                      ^
+     33|       w: 10,
+     34|       h: 10,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  src/windowFit.test.ts > fitWindow (K9 AC1) > unions rects with fractional edges off the origin
+AssertionError: expected { w: 19, h: 19, …(1) } to deeply equal { w: 21, h: 21, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "h": 21,
++   "h": 19,
+    "offset": {
+-     "x": 20,
+-     "y": 41,
++     "x": 21,
++     "y": 42,
+    },
+-   "w": 21,
++   "w": 19,
+  }
+
+ ❯ src/windowFit.test.ts:56:33
+     54|     ];
+     55|     // x: 20.8 -> 20, right 40.8 -> 41 => w 21; y: 41.2 -> 41, bottom …
+     56|     expect(fitWindow(rects, 2)).toEqual({
+       |                                 ^
+     57|       w: 21,
+     58|       h: 21,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > pushes a rect overflowing the left edge inside
+AssertionError: expected { x: -30, y: 500, width: 100, …(2) } to deeply equal { x: +0, y: 500, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": 30,
++     "dx": 0,
+      "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+-   "x": 0,
++   "x": -30,
+    "y": 500,
+  }
+
+ ❯ src/windowFit.test.ts:103:41
+    101|   it("pushes a rect overflowing the left edge inside", () => {
+    102|     const rect: PhysicalRect = { x: -30, y: 500, width: 100, height: 1…
+    103|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    104|       x: 0,
+    105|       y: 500,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > pulls a rect overflowing the right edge inside
+AssertionError: expected { x: 1900, y: 500, width: 100, …(2) } to deeply equal { x: 1820, y: 500, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": -80,
++     "dx": 0,
+      "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+-   "x": 1820,
++   "x": 1900,
+    "y": 500,
+  }
+
+ ❯ src/windowFit.test.ts:114:41
+    112|   it("pulls a rect overflowing the right edge inside", () => {
+    113|     const rect: PhysicalRect = { x: 1900, y: 500, width: 100, height: …
+    114|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    115|       x: 1820,
+    116|       y: 500,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > pushes a rect overflowing the top edge inside
+AssertionError: expected { x: 500, y: -10, width: 100, …(2) } to deeply equal { x: 500, y: +0, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+      "dx": 0,
+-     "dy": 10,
++     "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+    "x": 500,
+-   "y": 0,
++   "y": -10,
+  }
+
+ ❯ src/windowFit.test.ts:125:41
+    123|   it("pushes a rect overflowing the top edge inside", () => {
+    124|     const rect: PhysicalRect = { x: 500, y: -10, width: 100, height: 1…
+    125|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    126|       x: 500,
+    127|       y: 0,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > pulls a rect overflowing the bottom edge inside
+AssertionError: expected { x: 500, y: 1050, width: 100, …(2) } to deeply equal { x: 500, y: 980, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+      "dx": 0,
+-     "dy": -70,
++     "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+    "x": 500,
+-   "y": 980,
++   "y": 1050,
+  }
+
+ ❯ src/windowFit.test.ts:136:41
+    134|   it("pulls a rect overflowing the bottom edge inside", () => {
+    135|     const rect: PhysicalRect = { x: 500, y: 1050, width: 100, height: …
+    136|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    137|       x: 500,
+    138|       y: 980,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > clamps a top-left corner overflow
+AssertionError: expected { x: -5, y: -7, width: 100, …(2) } to deeply equal { x: +0, y: +0, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": 5,
+-     "dy": 7,
++     "dx": 0,
++     "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+-   "x": 0,
+-   "y": 0,
++   "x": -5,
++   "y": -7,
+  }
+
+ ❯ src/windowFit.test.ts:147:41
+    145|   it("clamps a top-left corner overflow", () => {
+    146|     const rect: PhysicalRect = { x: -5, y: -7, width: 100, height: 100…
+    147|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    148|       x: 0,
+    149|       y: 0,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > clamps a bottom-right corner overflow
+AssertionError: expected { x: 1900, y: 1070, width: 100, …(2) } to deeply equal { x: 1820, y: 980, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": -80,
+-     "dy": -90,
++     "dx": 0,
++     "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+-   "x": 1820,
+-   "y": 980,
++   "x": 1900,
++   "y": 1070,
+  }
+
+ ❯ src/windowFit.test.ts:158:41
+    156|   it("clamps a bottom-right corner overflow", () => {
+    157|     const rect: PhysicalRect = { x: 1900, y: 1070, width: 100, height:…
+    158|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    159|       x: 1820,
+    160|       y: 980,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > aligns an oversized rect to the work area top-left
+AssertionError: expected { x: 100, y: 200, width: 2000, …(2) } to deeply equal { x: +0, y: +0, width: 2000, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": -100,
+-     "dy": -200,
++     "dx": 0,
++     "dy": 0,
+    },
+    "height": 1200,
+    "width": 2000,
+-   "x": 0,
+-   "y": 0,
++   "x": 100,
++   "y": 200,
+  }
+
+ ❯ src/windowFit.test.ts:169:41
+    167|   it("aligns an oversized rect to the work area top-left", () => {
+    168|     const rect: PhysicalRect = { x: 100, y: 200, width: 2000, height: …
+    169|     expect(clampToWorkArea(rect, work)).toEqual({
+       |                                         ^
+    170|       x: 0,
+    171|       y: 0,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+ FAIL  src/windowFit.test.ts > clampToWorkArea (K9 AC2) > clamps against an offset work area with negative origin
+AssertionError: expected { x: -2000, y: 500, width: 100, …(2) } to deeply equal { x: -1920, y: 500, width: 100, …(2) }
+
+- Expected
++ Received
+
+  {
+    "compensation": {
+-     "dx": 80,
++     "dx": 0,
+      "dy": 0,
+    },
+    "height": 100,
+    "width": 100,
+-   "x": -1920,
++   "x": -2000,
+    "y": 500,
+  }
+
+ ❯ src/windowFit.test.ts:181:41
+    179|     const left: PhysicalRect = { x: -1920, y: 0, width: 1920, height: …
+    180|     const rect: PhysicalRect = { x: -2000, y: 500, width: 100, height:…
+    181|     expect(clampToWorkArea(rect, left)).toEqual({
+       |                                         ^
+    182|       x: -1920,
+    183|       y: 500,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  13 failed | 37 passed (50)
+   Start at  12:45:25
+   Duration  927ms (environment 47%, transform 44%, import 7%, tests 2%)
+

@@ -6,7 +6,7 @@ use tauri::{AppHandle, Emitter, Runtime};
 use crate::config::{MenuConfig, OrbitKitConfig};
 use crate::error::{Error, Result};
 use crate::jni_bridge::{notify_menu_action, MenuAction};
-use crate::{lookup_popup, popup_open_payload, OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{lookup_popup, MascotMonitorResponse, popup_open_payload, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 #[cfg(target_os = "android")]
 const PLUGIN_IDENTIFIER: &str = "dev.orbitkit.native";
@@ -130,6 +130,12 @@ impl<R: Runtime> Orbitkit<R> {
 
     pub fn start_mascot_drag(&self) -> Result<()> {
         Ok(())
+    }
+
+    pub fn mascot_monitor(&self) -> Result<MascotMonitorResponse> {
+        Err(Error::unsupported(
+            "mascot_monitor is not supported on this platform",
+        ))
     }
 }
 

@@ -8,6 +8,7 @@ const COMMANDS: &[&str] = &[
     "set_mascot_state",
     "emit_menu_action",
     "start_mascot_drag",
+    "mascot_monitor",
 ];
 
 fn main() {

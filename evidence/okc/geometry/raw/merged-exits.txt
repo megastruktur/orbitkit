@@ -1,0 +1,5 @@
+pnpm install --frozen-lockfile;0
+pnpm -r build;0
+pnpm -r test;0 [256 passed / 12 files]
+pnpm -r check;0
+OKC_RUST_GATE;0 [36 passed; OKC_RUST_GATE_OK]

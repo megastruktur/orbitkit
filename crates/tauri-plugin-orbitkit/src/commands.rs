@@ -1,7 +1,7 @@
 use tauri::{command, AppHandle, Runtime};
 use crate::config::MenuConfig;
 use crate::error::Result;
-use crate::{OrbitkitExt, OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{MascotMonitorResponse, OrbitkitExt, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 #[command]
 pub(crate) async fn overlay_permission<R: Runtime>(
@@ -70,4 +70,11 @@ pub(crate) async fn start_mascot_drag<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<()> {
     app.orbitkit().start_mascot_drag()
+}
+
+#[command]
+pub(crate) async fn mascot_monitor<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<MascotMonitorResponse> {
+    app.orbitkit().mascot_monitor()
 }

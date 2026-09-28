@@ -1,0 +1,9 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-geometry/packages/orbitkit
+
+
+ Test Files  2 passed (2)
+      Tests  50 passed (50)
+   Start at  12:45:26
+   Duration  823ms (environment 51%, transform 40%, import 7%, tests 2%)
+

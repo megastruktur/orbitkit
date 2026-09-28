@@ -9,6 +9,7 @@ export { resolveMenuOrigin } from "./geometry.js";
 export type { AnchorRect, MenuOrigin } from "./geometry.js";
 export { sanitizeMenuIconSvg, sanitizeMenuIconToDataUrl } from "./iconSanitize.js";
 export type { MenuStaggerSpec } from "./menuAnimation.js";
+export * from "./windowFit.js";
 export * from "./bridge.js";
 export { frameAt, sheetFrameStyle, sheetGeometry } from "./mascot/sheets.js";
 export type { SheetGeometry } from "./mascot/sheets.js";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layoutItems, resolveMenuAngles } from "./geometry";
+import { layoutItems, resolveMenuAngles, resolveMenuOrigin } from "./geometry";
 import arcVectors from "./arc-vectors.json";
 
 describe("layoutItems geometry", () => {
@@ -217,5 +217,72 @@ describe("resolveMenuAngles geometry", () => {
       const positions = layoutItems(vector.n, 96, resolved.startAngle, resolved.endAngle);
       expect(positions).toEqual(vector.positions);
     }
+  });
+});
+
+describe("resolveMenuAngles arc-anchor (K7)", () => {
+  it("resolves arc-anchor to the top-centred arc with default span 180 (-180..0)", () => {
+    const angles = resolveMenuAngles({ layout: "arc-anchor" });
+    expect(angles).toEqual({ startAngle: -180, endAngle: 0 });
+  });
+
+  it("resolves arc-anchor with custom span 120 (-150..-30)", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc-anchor",
+      arc: { span: 120 },
+    });
+    expect(angles).toEqual({ startAngle: -150, endAngle: -30 });
+  });
+
+  it("accepts arc.headGap without changing angles", () => {
+    const angles = resolveMenuAngles({
+      layout: "arc-anchor",
+      arc: { headGap: 30 },
+    });
+    expect(angles).toEqual({ startAngle: -180, endAngle: 0 });
+  });
+});
+
+describe("resolveMenuOrigin (K7 arc-anchor)", () => {
+  it("centres the arc origin on the mascot bounds, headGap above the mascot top edge", () => {
+    expect(resolveMenuOrigin({ x: 100, y: 200, width: 60, height: 80 }, 12)).toEqual({
+      x: 130,
+      y: 188,
+    });
+  });
+
+  it("uses the supplied headGap rather than a hard-coded gap", () => {
+    expect(resolveMenuOrigin({ x: 0, y: 500, width: 200, height: 100 }, 30)).toEqual({
+      x: 100,
+      y: 470,
+    });
+  });
+
+  it("returns a zero origin when no anchorRect is available", () => {
+    expect(resolveMenuOrigin(null, 12)).toEqual({ x: 0, y: 0 });
+    expect(resolveMenuOrigin(undefined, 12)).toEqual({ x: 0, y: 0 });
+  });
+
+  it("places 6 arc-anchor items symmetrically with a centre pair straddling the top", () => {
+    // 6 items over -180..0 at radius 50: angles -180, -144, -108, -72, -36, 0
+    const origin = resolveMenuOrigin({ x: 100, y: 200, width: 60, height: 80 }, 12);
+    const points = layoutItems(6, 50, -180, 0);
+
+    // Mirror symmetry about the origin's vertical axis
+    for (let i = 0; i < 3; i += 1) {
+      const left = points[i].x + origin.x;
+      const right = points[5 - i].x + origin.x;
+      expect(left + right).toBeCloseTo(2 * origin.x, 5);
+      expect(points[i].y).toBeCloseTo(points[5 - i].y, 5);
+    }
+
+    // Centre pair (indices 2, 3) straddles the origin: x < origin.x < x
+    expect(points[2].x + origin.x).toBeLessThan(origin.x);
+    expect(points[3].x + origin.x).toBeGreaterThan(origin.x);
+
+    // The pair shares the highest arc position; edges sit on the origin line
+    expect(points[2].y).toBe(points[3].y);
+    expect(points[2].y).toBeLessThan(points[1].y);
+    expect(points[0].y).toBe(0);
   });
 });

@@ -82,10 +82,12 @@ export function layoutItems(
 }
 
 export interface MenuAngleResolutionInput {
-  layout?: "orbit" | "arc";
+  layout?: "orbit" | "arc" | "arc-anchor";
   arc?: {
     position?: "top" | "bottom" | "left" | "right";
     span?: number;
+    /** K7 arc-anchor only: px gap above the mascot's top edge (geometry, not angles). */
+    headGap?: number;
   };
   startAngle?: number;
   endAngle?: number;
@@ -104,6 +106,9 @@ export interface ResolvedMenuAngles {
  * For `layout: "arc"`:
  *   startAngle = centre - span/2
  *   endAngle = centre + span/2
+ * For `layout: "arc-anchor"` (K7): same top-centred arc as `"arc"` with
+ * `position: "top"`; the anchor placement itself is handled by
+ * `resolveMenuOrigin` against the mascot bounds.
  * Defaults:
  *   position: "top" (-90)
  *   span: 180
@@ -115,8 +120,8 @@ export interface ResolvedMenuAngles {
 export function resolveMenuAngles(
   menu?: MenuAngleResolutionInput | null
 ): ResolvedMenuAngles {
-  if (menu?.layout === "arc") {
-    const position = menu.arc?.position ?? "top";
+  if (menu?.layout === "arc" || menu?.layout === "arc-anchor") {
+    const position = menu.layout === "arc-anchor" ? "top" : menu.arc?.position ?? "top";
     const span = menu.arc?.span ?? 180;
 
     let centre: number;
@@ -146,5 +151,39 @@ export function resolveMenuAngles(
   return {
     startAngle: menu?.startAngle ?? -90,
     endAngle: menu?.endAngle ?? 270,
+  };
+}
+
+/** K7: mascot bounds in window coordinates (RadialMenu `anchorRect` prop). */
+export interface AnchorRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** K7 arc-anchor: window-coordinate origin of the arc's centre point. */
+export interface MenuOrigin {
+  x: number;
+  y: number;
+}
+
+/**
+ * K7 layout "arc-anchor": the arc's centre point sits horizontally centred on
+ * the mascot bounds and `headGap` px above the mascot's top edge.
+ * Items are positioned relative to this origin, so the component shifts the
+ * menu container by the returned offset. `headGap` comes from
+ * `menu.arc.headGap` (config default 12).
+ */
+export function resolveMenuOrigin(
+  anchorRect: AnchorRect | null | undefined,
+  headGap: number
+): MenuOrigin {
+  if (!anchorRect) {
+    return { x: 0, y: 0 };
+  }
+  return {
+    x: anchorRect.x + anchorRect.width / 2,
+    y: anchorRect.y - headGap,
   };
 }

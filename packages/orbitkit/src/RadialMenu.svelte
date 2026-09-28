@@ -1,13 +1,26 @@
 <script lang="ts">
   import { untrack } from "svelte";
-  import type { MenuConfig } from "./config";
-  import { validateConfig } from "./config";
-  import { layoutItems, resolveMenuAngles } from "./geometry";
+  import type { MenuConfig, MenuItem } from "./config";
+  import {
+    DEFAULT_ARC_HEAD_GAP,
+    DEFAULT_STAGGER,
+    validateConfig,
+  } from "./config";
+  import {
+    type AnchorRect,
+    layoutItems,
+    resolveMenuAngles,
+    resolveMenuOrigin,
+  } from "./geometry";
   import {
     type MenuAnimPhase,
+    type MenuStaggerSpec,
     getItemAnimationStyle,
+    getItemDelay,
+    getMaxItemDelay,
     getTotalAnimationDuration,
   } from "./menuAnimation";
+  import { sanitizeMenuIconToDataUrl } from "./iconSanitize";
 
   interface Props {
     config: MenuConfig;
@@ -15,9 +28,12 @@
     onselect: (id: string) => void;
     onclose: () => void;
     label?: string;
+    /** K7 arc-anchor: mascot window bounds the arc hovers above. */
+    anchorRect?: AnchorRect | null;
   }
 
-  let { config, open, onselect, onclose, label }: Props = $props();
+  let { config, open, onselect, onclose, label, anchorRect = null }: Props =
+    $props();
 
   let menuEl: HTMLElement | null = $state(null);
   let itemSize = $derived(config.itemSize ?? 44);
@@ -30,6 +46,51 @@
       angles.endAngle
     )
   );
+
+  // K7 stagger engages only for layout "arc-anchor"; legacy orbit/arc keeps
+  // the un-parameterized index-linear timing (0/20/40 ms, 220/180 ms).
+  let stagger = $derived<MenuStaggerSpec | undefined>(
+    config.layout === "arc-anchor"
+      ? {
+          openMs: config.stagger?.openMs ?? DEFAULT_STAGGER.openMs,
+          closeMs: config.stagger?.closeMs ?? DEFAULT_STAGGER.closeMs,
+          stepMs: config.stagger?.stepMs ?? DEFAULT_STAGGER.stepMs,
+        }
+      : undefined
+  );
+
+  // K7 arc-anchor: shift the container so the arc centre sits headGap px above
+  // the mascot's top edge, centred on the mascot bounds.
+  let origin = $derived(
+    config.layout === "arc-anchor"
+      ? resolveMenuOrigin(
+          anchorRect,
+          config.arc?.headGap ?? DEFAULT_ARC_HEAD_GAP
+        )
+      : { x: 0, y: 0 }
+  );
+
+  let containerStyle = $derived(
+    `${origin.x !== 0 || origin.y !== 0 ? `transform: translate(${origin.x}px, ${origin.y}px); ` : ""}${config.animation === "none" ? "animation: none !important; transition: none !important;" : ""}`
+  );
+
+  type IconRender = { kind: "img"; src: string } | { kind: "text"; text: string };
+
+  function resolveIcon(icon: MenuItem["icon"]): IconRender | null {
+    if (!icon) return null;
+    if (typeof icon === "object") {
+      // K12: { svg } icons pass through the allowlist sanitizer and render as
+      // a data-URL <img>; unsanitizable markup renders nothing.
+      const src = sanitizeMenuIconToDataUrl(icon.svg);
+      return src ? { kind: "img", src } : null;
+    }
+    if (isUrl(icon)) {
+      return { kind: "img", src: icon };
+    }
+    return { kind: "text", text: icon };
+  }
+
+  let icons = $derived(config.items.map((item) => resolveIcon(item.icon)));
 
   function checkReducedMotion(): boolean {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -117,7 +178,11 @@
               rafId2 = null;
               if (!open) return;
               animPhase = "opening";
-              const duration = getTotalAnimationDuration(itemsCount, "open");
+              const duration = getTotalAnimationDuration(
+                itemsCount,
+                "open",
+                stagger
+              );
               openTimer = setTimeout(() => {
                 animPhase = "open";
                 openTimer = null;
@@ -135,7 +200,11 @@
           animPhase = "closed";
         } else {
           animPhase = "closing";
-          const duration = getTotalAnimationDuration(itemsCount, "close");
+          const duration = getTotalAnimationDuration(
+            itemsCount,
+            "close",
+            stagger
+          );
           closeTimer = setTimeout(() => {
             isMounted = false;
             animPhase = "closed";
@@ -180,10 +249,16 @@
     }
   }
 
-  function handleItemAnimationEnd(e: AnimationEvent, index: number) {
+  function finishItemAnimation(e: Event, index: number) {
     if (e.target !== e.currentTarget) return;
     if (animPhase === "closing") {
-      if (index === 0) {
+      // The closing wave must finish before the menu unmounts: only the item
+      // (or centre pair) scheduled last may complete the close.
+      const total = config.items.length;
+      if (
+        getItemDelay(index, total, "close", stagger) ===
+        getMaxItemDelay(total, "close", stagger)
+      ) {
         isMounted = false;
         animPhase = "closed";
         if (closeTimer) {
@@ -191,29 +266,9 @@
           closeTimer = null;
         }
       }
-    } else if (animPhase === "opening") {
-      if (index === config.items.length - 1) {
-        animPhase = "open";
-        if (openTimer) {
-          clearTimeout(openTimer);
-          openTimer = null;
-        }
-      }
+      return;
     }
-  }
-
-  function handleItemTransitionEnd(e: TransitionEvent, index: number) {
-    if (e.target !== e.currentTarget) return;
-    if (animPhase === "closing") {
-      if (index === 0) {
-        isMounted = false;
-        animPhase = "closed";
-        if (closeTimer) {
-          clearTimeout(closeTimer);
-          closeTimer = null;
-        }
-      }
-    } else if (animPhase === "opening") {
+    if (animPhase === "opening") {
       if (index === config.items.length - 1) {
         animPhase = "open";
         if (openTimer) {
@@ -315,21 +370,21 @@
     class="orbitkit-radial-menu"
     class:no-animation={config.animation === "none"}
     class:animating={animPhase !== "open" && config.animation !== "none"}
-    style={config.animation === "none"
-      ? "animation: none !important; transition: none !important;"
-      : undefined}
+    style={containerStyle}
     role="menu"
     tabindex="-1"
     aria-label={label ?? "Radial Menu"}
   >
     {#each config.items as item, i (item.id)}
       {@const pos = positions[i] ?? { x: 0, y: 0, angle: 0 }}
+      {@const icon = icons[i]}
       {@const animStyle = getItemAnimationStyle(
         i,
         config.items.length,
         animPhase,
         pos,
-        config.animation
+        config.animation,
+        stagger
       )}
       <button
         type="button"
@@ -345,15 +400,15 @@
         style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px;{animStyle ? ` ${animStyle};` : ''}"
         onclick={() => handleItemClick(item.id, item.disabled)}
         onmouseenter={() => handleItemMouseEnter(item.id, item.disabled)}
-        onanimationend={(e) => handleItemAnimationEnd(e, i)}
-        ontransitionend={(e) => handleItemTransitionEnd(e, i)}
+        onanimationend={(e) => finishItemAnimation(e, i)}
+        ontransitionend={(e) => finishItemAnimation(e, i)}
       >
-        {#if item.icon}
-          {#if isUrl(item.icon)}
-            <img src={item.icon} alt="" class="orbitkit-radial-icon-img" />
+        {#if icon}
+          {#if icon.kind === "img"}
+            <img src={icon.src} alt="" class="orbitkit-radial-icon-img" />
           {:else}
             <span class="orbitkit-radial-icon-text" aria-hidden="true"
-              >{item.icon}</span
+              >{icon.text}</span
             >
           {/if}
         {/if}

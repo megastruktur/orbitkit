@@ -11,6 +11,7 @@ export { sanitizeMenuIconSvg, sanitizeMenuIconToDataUrl } from "./iconSanitize.j
 export type { MenuStaggerSpec } from "./menuAnimation.js";
 export * from "./windowFit.js";
 export * from "./bridge.js";
+export * from "./passthrough.js";
 export { frameAt, sheetFrameStyle, sheetGeometry } from "./mascot/sheets.js";
 export type { SheetGeometry } from "./mascot/sheets.js";
 export { createMachine, hint, tick } from "./mascotMachine.js";

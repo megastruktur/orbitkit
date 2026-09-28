@@ -1,0 +1,10 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-passthrough/packages/orbitkit
+
+
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+   Start at  15:28:05
+   Duration  520ms (environment 79%, transform 13%, tests 4%, import 2%, worker 1%)
+
+passthrough-tests-exit:0

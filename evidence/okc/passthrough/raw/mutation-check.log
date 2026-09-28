@@ -1,0 +1,49 @@
+# mutation check: static '@tauri-apps/api/window' import injected at passthrough.ts:1
+# expected: suite FAILS via 'passthrough module load imports no @tauri-apps API at module load'
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-passthrough/packages/orbitkit
+
+ ❯ src/passthrough.test.ts (18 tests | 1 failed) 21ms
+   ❯ passthrough module load (1)
+     × imports no @tauri-apps API at module load 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/passthrough.test.ts > passthrough module load > imports no @tauri-apps API at module load
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "import { cursorPosition } from \"@tauri-apps/api/window\";",
++ ]
+
+ ❯ src/passthrough.test.ts:334:23
+    332|       .split("\n")
+    333|       .filter((line) => /^(import|export)\b/.test(line.trim()) && line…
+    334|     expect(offenders).toEqual([]);
+       |                       ^
+    335|   });
+    336| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  12:53:06
+   Duration  455ms (environment 82%, transform 9%, tests 5%, import 2%, worker 1%)
+
+mutated-exit:1
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-passthrough/packages/orbitkit
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  12:53:06
+   Duration  403ms (environment 83%, transform 10%, tests 4%, import 3%, worker 1%)
+
+reverted-exit:0

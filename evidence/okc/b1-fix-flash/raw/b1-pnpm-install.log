@@ -1,0 +1,10 @@
+Scope: all 3 workspace projects
+✓ Lockfile passes supply-chain policies (verified 5d ago)
+Lockfile is up to date, resolution step is skipped
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /home/megastruktur/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +123
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 123, reused 123, downloaded 0, added 123, done
+Done in 116ms using pnpm v12.4.1

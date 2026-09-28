@@ -1,0 +1,176 @@
+TAP version 13
+# Subtest: mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 0.883909
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.374662
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+ok 3 - menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.29625
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 4 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.067733
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 5 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.106668
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 6 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.132018
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 7 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.224419
+  type: 'test'
+  ...
+# Subtest: window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+ok 8 - window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+  ---
+  duration_ms: 0.239579
+  type: 'test'
+  ...
+# Subtest: Design B: no setSize/setPosition reachable from menu open/close
+not ok 9 - Design B: no setSize/setPosition reachable from menu open/close
+  ---
+  duration_ms: 1.416962
+  type: 'test'
+  location: '/tmp/okc-r2-red/examples/starter/tests/demo-b1.test.mjs:216:1'
+  failureType: 'testCodeFailure'
+  error: 'reClampWindow must not write contentShift'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/okc-r2-red/examples/starter/tests/demo-b1.test.mjs:259:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Design B: idle and open states share ONE fixed window rect
+ok 10 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 0.900752
+  type: 'test'
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+ok 11 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.151797
+  type: 'test'
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 12 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.079516
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+ok 13 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.094044
+  type: 'test'
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+ok 14 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.129303
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 15 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.065047
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+not ok 16 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.155174
+  type: 'test'
+  location: '/tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:105:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'x')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    clampFixedWindow (file:///tmp/okc-r2-red/examples/starter/src/lib/windowFit.ts:160:23)
+    TestContext.<anonymous> (file:///tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:107:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+not ok 17 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.082512
+  type: 'test'
+  location: '/tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:110:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'x')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    clampFixedWindow (file:///tmp/okc-r2-red/examples/starter/src/lib/windowFit.ts:160:23)
+    TestContext.<anonymous> (file:///tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:116:15)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+not ok 18 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.202185
+  type: 'test'
+  location: '/tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:127:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'x')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    clampFixedWindow (file:///tmp/okc-r2-red/examples/starter/src/lib/windowFit.ts:160:23)
+    TestContext.<anonymous> (file:///tmp/okc-r2-red/examples/starter/tests/windowFit.test.mjs:137:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 14
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 61.07074

@@ -1,0 +1,283 @@
+TAP version 13
+# Subtest: mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 0.77925
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.303492
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+ok 3 - menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.258304
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 4 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.060849
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 5 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.082471
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 6 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.118371
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 7 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.175382
+  type: 'test'
+  ...
+# Subtest: window-fit helper keeps the mascot screen-fixed across idle/open
+ok 8 - window-fit helper keeps the mascot screen-fixed across idle/open
+  ---
+  duration_ms: 0.790111
+  type: 'test'
+  ...
+# Subtest: Design B: no setSize/setPosition reachable from menu open/close
+not ok 9 - Design B: no setSize/setPosition reachable from menu open/close
+  ---
+  duration_ms: 0.724994
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/demo-b1.test.mjs:215:1'
+  failureType: 'testCodeFailure'
+  error: 'applyWindowFit must not resize/move the window (Design B: content-only transitions)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/demo-b1.test.mjs:227:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Design B: idle and open states share ONE fixed window rect
+not ok 10 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 1.897682
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:50:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    window rect must be identical in idle and open states (no setSize/setPosition per toggle)
+    + actual - expected
+    
+      {
+    +   height: 96,
+    +   width: NaN,
+    +   x: NaN,
+    +   y: 680
+    -   height: 234,
+    -   width: 252,
+    -   x: 982,
+    -   y: 542
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    x: 982
+    y: 542
+    width: 252
+    height: 234
+  actual:
+    x: NaN
+    y: 680
+    width: NaN
+    height: 96
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:55:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+not ok 11 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.371084
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:65:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   height: 226,
+    +   width: 236,
+    +   x: 990,
+    +   y: 550
+    -   height: 234,
+    -   width: 252,
+    -   x: 982,
+    -   y: 542
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    x: 982
+    y: 542
+    width: 252
+    height: 234
+  actual:
+    x: 990
+    y: 550
+    width: 236
+    height: 226
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:69:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 12 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.158659
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+not ok 13 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.160873
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:83:1'
+  failureType: 'testCodeFailure'
+  error: 'left discs inside window'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:88:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+not ok 14 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.205941
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:93:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    shift is exactly ideal - clamped
+    
+    1060 !== 934
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 934
+  actual: 1060
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:101:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 15 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.125905
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+not ok 16 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.123571
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:113:1'
+  failureType: 'testCodeFailure'
+  error: 'clampFixedWindow is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:115:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: clampFixedWindow re-enters the right edge, compensating content 1:1
+not ok 17 - clampFixedWindow re-enters the right edge, compensating content 1:1
+  ---
+  duration_ms: 0.105937
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:121:1'
+  failureType: 'testCodeFailure'
+  error: 'clampFixedWindow is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:125:15)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: clampFixedWindow clamps both axes at a corner
+not ok 18 - clampFixedWindow clamps both axes at a corner
+  ---
+  duration_ms: 0.230389
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:136:1'
+  failureType: 'testCodeFailure'
+  error: 'clampFixedWindow is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/examples/starter/tests/windowFit.test.mjs:139:15)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 10
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67.489683

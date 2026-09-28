@@ -56,7 +56,7 @@ pub fn run() {
                         let _ = app_popup.orbitkit().open_popup(popup_id, None, None);
                     });
                 }
-                // Demo-b1: timer mutes Glim into the sleep pool for 5s.
+                // Demo-b1: timer mutes the planet into the sleep pool for 5s.
                 "app.timer" => {
                     log::info!("Menu action: timer");
                     eprintln!("[starter] Menu action: app.timer (sleep for 5s then idle)");

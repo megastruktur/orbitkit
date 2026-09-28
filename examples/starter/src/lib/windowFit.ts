@@ -1,16 +1,25 @@
 /**
  * demo-b1 pure window-fit math (starter-local; no library changes).
  *
- * Model (single source of truth for MascotView):
- * - The mascot is pinned bottom-centre inside its window by CSS
-   (`.fit-shift` at left:50%/bottom:0), so its window-local position is a pure
-   function of the window size — the DOM never re-centres on resize.
- * - For each state ("idle" content fit, "open" menu fit) the target window
-   rect is chosen so the mascot's SCREEN position is bit-identical across
-   transitions (SMOKE B1.2/B1.4: feet never move).
- * - Only a work-area clamp may move the window away from the ideal position;
-   that clamp delta is compensated 1:1 by a content translate (`shift`),
-   so the mascot still stays put (rare edge case).
+ * Model (Design B, single source of truth for MascotView):
+ * - The mascot window is sized and positioned ONCE (at boot) to the largest
+ *   content union — the open-menu union (mascot + arc + pad). The idle
+ *   content (the mascot only) fits inside it; the extra area is transparent
+ *   and click-through under K10 passthrough.
+ * - Menu open/close therefore never calls setSize/setPosition: transitions
+ *   are content-only inside the fixed transparent surface. This removes the
+ *   macOS blink by construction: no per-toggle native resize/move pair can
+ *   be composited as NEW size at OLD origin.
+ * - The mascot is pinned bottom-centre inside the window by CSS
+ *   (`.fit-shift` at left:50%/bottom:0), so its window-local position is a
+ *   pure function of the window size — identical in both states.
+ * - The one-time fit chooses the window rect so the mascot's SCREEN position
+ *   is identical before and after it. Only a work-area clamp may move the
+ *   window away from the ideal position; that clamp delta is compensated 1:1
+ *   by a content translate (`shift`) that likewise never changes on
+ *   open/close. After a native drag or a monitor/scale change the window is
+ *   re-clamped ONCE via `clampFixedWindow` (again content-compensated), not
+ *   per menu toggle.
  *
  * All coordinates are LOGICAL px. Angles/geometry follow K7 arc-anchor: the
  * arc centre sits `headGap` px above the mascot's top edge, centred.
@@ -41,22 +50,18 @@ export interface DemoFitInput {
   radius: number;
   /** Menu disc size. */
   itemSize: number;
-  /** Horizontal transparent padding kept beside the mascot in the idle fit. */
-  idlePadX: number;
-  /** Padding grown around the content union while the menu is open. */
+  /** Transparent padding kept around the open-menu content union. */
   menuPad: number;
 }
 
-export type DemoFitState = "idle" | "open";
-
 export interface DemoFitResult {
-  /** Target window rect (logical screen coords). */
+  /** Fixed window rect (logical screen coords); identical in both states. */
   window: Rect;
   /** Content compensation translate (logical px); zero unless clamped. */
   shift: Point;
-  /** Mascot bounds in the TARGET window coords (post-shift). */
+  /** Mascot bounds in the fixed window coords (post-shift). */
   anchor: Rect;
-  /** Mascot top-left in the target window (post-shift). */
+  /** Mascot top-left in the fixed window (post-shift). */
   mascotLocal: Point;
 }
 
@@ -69,11 +74,15 @@ function clampRange(pos: number, size: number, areaPos: number, areaSize: number
 }
 
 /**
- * Computes the target window rect for `state` that keeps the mascot's screen
- * position fixed, the work-area-compensating content shift, and the mascot
- * bounds the RadialMenu needs as `anchorRect` (post-shift window coords).
+ * Computes the FIXED window rect that fits the open-menu content union,
+ * keeping the mascot's screen position identical to its position inside
+ * `input.window` (the CSS bottom-centre pin derives that from the current
+ * window rect). The result does not depend on any open/close state: the
+ * starter applies it once at boot; `anchor` is then constant for the
+ * RadialMenu across menu transitions. A work-area clamp is compensated 1:1
+ * by `shift` so the mascot still stays put.
  */
-export function demoWindowFit(input: DemoFitInput, state: DemoFitState): DemoFitResult {
+export function demoWindowFit(input: DemoFitInput): DemoFitResult {
   const m = input.mascot;
   // CSS pins the mascot bottom-centre: local position is pure in the size.
   const mascotLocalNow: Point = {
@@ -89,36 +98,26 @@ export function demoWindowFit(input: DemoFitInput, state: DemoFitState): DemoFit
   // Content union bounds relative to the mascot's top-left. The arc spans
   // angles -180..0 (upper half): discs sit at or above the arc centre line.
   // reach = disc-centre radius + half a disc → bound of the outermost disc box.
-  let minX: number;
-  let minY: number;
-  let maxX: number;
-  let maxY: number;
-  if (state === "idle") {
-    minX = -input.idlePadX;
-    minY = 0;
-    maxX = m + input.idlePadX;
-    maxY = m;
-  } else {
-    const reach = input.radius + input.itemSize / 2;
-    minX = m / 2 - reach;
-    maxX = m / 2 + reach;
-    minY = -(input.headGap + reach);
-    maxY = Math.max(m, input.itemSize / 2 - input.headGap);
-  }
-  // Padding: open state grows above + sides only — the bottom edge stays
-  // exactly at the mascot's bottom so the CSS bottom-centre pin is exact in
-  // both states (bottom padding would make the pinned mascot jump by menuPad).
-  const padX = state === "open" ? input.menuPad : 0;
-  const padTop = state === "open" ? input.menuPad : 0;
-  const minXp = minX - padX;
-  const minYp = minY - padTop;
-  const maxXp = maxX + padX;
+  // This is the LARGEST content state (menu open); the fixed window always
+  // uses it so the idle content fits with room to spare.
+  const reach = input.radius + input.itemSize / 2;
+  const minX = m / 2 - reach;
+  const maxX = m / 2 + reach;
+  const minY = -(input.headGap + reach);
+  const maxY = Math.max(m, input.itemSize / 2 - input.headGap);
+
+  // Padding grows above + sides only — the bottom edge stays exactly at the
+  // mascot's bottom so the CSS bottom-centre pin is exact (bottom padding
+  // would displace the pinned mascot by menuPad).
+  const minXp = minX - input.menuPad;
+  const minYp = minY - input.menuPad;
+  const maxXp = maxX + input.menuPad;
   const maxYp = maxY;
 
   const width = Math.ceil(maxXp - minXp);
   const height = Math.ceil(maxYp - minYp);
-  // Where the mascot must sit inside the new window so the content union
-  // starts at (0,0): the CSS pin then places it exactly there.
+  // Where the mascot must sit inside the window so the content union starts
+  // at (0,0): the CSS pin then places it exactly there.
   const gNew: Point = { x: -minXp, y: -minYp };
 
   // Ideal window position keeps the mascot's screen position exactly.
@@ -136,4 +135,23 @@ export function demoWindowFit(input: DemoFitInput, state: DemoFitState): DemoFit
     anchor: { x: mascotLocal.x, y: mascotLocal.y, width: m, height: m },
     mascotLocal,
   };
+}
+
+/**
+ * Re-clamps a fixed-size window into the work area after a native drag or a
+ * monitor/scale change. Returns the clamped rect — the caller moves the
+ * WINDOW only (setPosition); the mascot stays pinned at its constant
+ * window-local position and moves with it (the accepted behaviour near
+ * edges). The window SIZE is untouched, so the mascot's local position — a
+ * pure function of the size — and with it the arc anchorRect never change.
+ * Deliberately stateless: no content shift is produced or consumed
+ * (contentShift/anchorRect are boot-constant; a shift update here is what
+ * desynced the arc from the mascot in the round-1 design). Identity when
+ * the window is already inside. Called ONCE per settle — never per menu
+ * open/close.
+ */
+export function clampFixedWindow(window: Rect, workArea: Rect): Rect {
+  const cx = clampRange(window.x, window.width, workArea.x, workArea.width);
+  const cy = clampRange(window.y, window.height, workArea.y, workArea.height);
+  return { ...window, x: cx, y: cy };
 }

@@ -39,7 +39,7 @@ function decodePng(path) {
   return { w, h };
 }
 
-test("mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL", () => {
+test("mascot is a kind=sheets planet with idle/alert/sleep pools and TTL", () => {
   const m = config.mascot;
   assert.equal(m.kind, "sheets");
   assert.equal(m.scale, 3, "integer upscale 3 (32px frames -> 96px)");
@@ -68,6 +68,17 @@ test("sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)", () =
     const { w, h } = decodePng(join(root, "public/sheets", `${name}.png`));
     assert.equal(w, 128, `${name}: 4 frames side by side`);
     assert.equal(h, 32);
+  }
+});
+
+test("every sheet the config references has width = 32 * frames, height = 32", () => {
+  // Owner-request planet swap guard: whatever the config lists under
+  // mascot.sheets must exist as a generated strip with the exact per-sheet
+  // frame layout (kind=sheets renders frameWidth x frameHeight cells).
+  for (const [name, sheet] of Object.entries(config.mascot.sheets)) {
+    const { w, h } = decodePng(join(root, "public/sheets", `${name}.png`));
+    assert.equal(w, sheet.frameWidth * sheet.frames, `${name}: width = frameWidth * frames`);
+    assert.equal(h, sheet.frameHeight, `${name}: height = frameHeight`);
   }
 });
 
@@ -143,45 +154,47 @@ test("MascotView wires passthrough, fitContent and arc-anchor", () => {
     "menu hit region returns DOMRects directly"
   );
   assert.ok(!/x:\s*r\.x/.test(regionFn[0]), "no {x,y,width,height} re-mapping in hit region");
-  // K9 fitContent runs through the pure, unit-tested helper (round-2 model:
-  // bottom-centre pin + clamp-only compensation; no pos-clamped double-count).
+  // K9 fitContent under Design B runs through the pure, unit-tested helper:
+  // the window is fitted ONCE at boot (applyFixedWindowFit); menu open/close
+  // never touches native geometry (enforced by the source-guard test).
   assert.ok(view.includes("demoWindowFit"), "pure window-fit helper drives the fit");
   assert.ok(
-    /await\s+applyWindowFit\("open"\)[\s\S]*?menuOpen = true/.test(view),
-    "open fit is awaited before the menu mounts (anchor matches new geometry)"
+    view.includes("applyFixedWindowFit") && !view.includes("applyWindowFit("),
+    "fit is boot-only (no per-state applyWindowFit left)"
+  );
+  assert.ok(
+    !/scheduleShrink|SHRINK_DELAY_MS/.test(view),
+    "per-toggle shrink machinery removed (no idle re-fit needed)"
   );
   assert.ok(view.includes("mascotMonitor"), "K9 mascot monitor used for work area");
   assert.ok(view.includes("anchorRect"), "arc-anchor rect comes from the fit");
   assert.ok(view.includes("contentShift"), "clamp compensation applied to content");
+  assert.ok(
+    view.includes("reClampWindow") && view.includes("clampFixedWindow"),
+    "post-drag/monitor-change one-shot clamp wired"
+  );
   // Pixel-crisp guarantee: no CSS scaling of the sprite container.
   assert.ok(!/\.mascot-clickable[^}]*scale\(/.test(view), "mascot is never CSS-scaled");
 });
 
-test("window-fit helper keeps the mascot screen-fixed across idle/open", () => {
+test("window-fit helper keeps the mascot screen-fixed (Design B fixed window)", () => {
   // Mirrors the dedicated windowFit.test.mjs invariants with a compact case:
-  // reviewer repro from c1fff75 (296x296 overlay at 960x480) must not move
-  // Glim and must produce zero shift when unclamped.
+  // reviewer repro from c1fff75 (296x296 overlay at 960x480): the one-time
+  // fixed fit must not move the planet and must produce zero shift when unclamped.
   const src = readFileSync(join(root, "src/lib/windowFit.ts"), "utf8");
   assert.ok(src.includes("export function demoWindowFit"), "helper exported");
-  const idle = demoWindowFit(base, "idle");
-  const open = demoWindowFit({ ...base, window: idle.window }, "open");
-  assert.deepEqual(open.shift, { x: 0, y: 0 }, "no compensation without a clamp");
-  for (const r of [idle, open]) {
-    assert.equal(
-      r.window.x + r.mascotLocal.x,
-      1060,
-      "mascot screen x invariant"
-    );
-    assert.equal(
-      r.window.y + r.mascotLocal.y,
-      680,
-      "mascot screen y invariant (feet stay put)"
-    );
-  }
-  // Old-formula regression: a clamped fit shifts content by ideal - clamped,
-  // never by the old-position delta.
+  assert.ok(src.includes("export function clampFixedWindow"), "clamp helper exported");
+  const fit = demoWindowFit(base);
+  assert.deepEqual(fit.shift, { x: 0, y: 0 }, "no compensation without a clamp");
+  assert.equal(fit.window.x + fit.mascotLocal.x, 1060, "mascot screen x invariant");
+  assert.equal(fit.window.y + fit.mascotLocal.y, 680, "mascot screen y invariant (feet stay put)");
+  // Same fixed rect again from the fitted window (no drift across boot).
+  const again = demoWindowFit({ ...base, window: fit.window });
+  assert.deepEqual(again.window, fit.window);
+  // A clamped boot fit shifts content by ideal - clamped, never by the
+  // old-position delta; the mascot screen position stays invariant.
   const tight = { ...base, workArea: { x: 0, y: 0, width: 1100, height: 800 } };
-  const clamped = demoWindowFit({ ...tight, window: idle.window }, "open");
+  const clamped = demoWindowFit(tight);
   assert.equal(clamped.window.x + clamped.mascotLocal.x, 1060);
 });
 
@@ -192,6 +205,70 @@ const base = {
   headGap: 12,
   radius: 96,
   itemSize: 44,
-  idlePadX: 24,
   menuPad: 8,
 };
+
+/** Body of a `function NAME` declaration (brace-matched) or null. */
+function functionBody(src, name) {
+  const start = src.indexOf(`function ${name}`);
+  if (start === -1) return null;
+  const open = src.indexOf("{", start);
+  let depth = 0;
+  for (let i = open; i < src.length; i++) {
+    if (src[i] === "{") depth++;
+    else if (src[i] === "}") {
+      depth--;
+      if (depth === 0) return src.slice(start, i + 1);
+    }
+  }
+  return src.slice(start);
+}
+
+test("Design B: no setSize/setPosition reachable from menu open/close", () => {
+  const view = readFileSync(join(root, "src/views/MascotView.svelte"), "utf8");
+  // Transitive closure over functions declared in the view, starting from the
+  // menu open/close paths (scheduleShrink is optional: the fix deletes it).
+  const seen = new Set();
+  const queue = ["toggleMenu", "closeMenu", "scheduleShrink"];
+  while (queue.length > 0) {
+    const name = queue.pop();
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const body = functionBody(view, name);
+    if (body === null) continue;
+    assert.ok(
+      !/\b(setSize|setPosition)\s*\(/.test(body),
+      `${name} must not resize/move the window (Design B: content-only transitions)`
+    );
+    for (const m of body.matchAll(/\b([a-zA-Z_$][\w$]*)\s*\(/g)) {
+      const callee = m[1];
+      if (
+        callee !== name &&
+        new RegExp(`(async\\s+)?function\\s+${callee}\\b`).test(view)
+      ) {
+        queue.push(callee);
+      }
+    }
+  }
+  // The window setters exist only in the boot-time fixed fit and the
+  // post-drag/monitor-change one-shot clamp.
+  const fitBody = functionBody(view, "applyFixedWindowFit");
+  assert.ok(fitBody, "boot-time applyFixedWindowFit exists");
+  const clampBody = functionBody(view, "reClampWindow") ?? "";
+  const nativesIn = (body) => body.match(/\b(setSize|setPosition)\s*\(/g)?.length ?? 0;
+  assert.equal(
+    nativesIn(view),
+    nativesIn(fitBody) + nativesIn(clampBody),
+    "setSize/setPosition appear only in applyFixedWindowFit / reClampWindow"
+  );
+  // Round-2 design: the re-clamp is setPosition-ONLY. The mascot stays
+  // pinned at its constant window-local position (contentShift/anchorRect
+  // are boot-constant); a content-shift update here desyncs the arc anchor
+  // from the mascot (F1) and accumulates across drags (F2); updating the
+  // DOM before the native move shows a stray frame (F3).
+  assert.ok(clampBody, "reClampWindow exists");
+  assert.ok(!/contentShift\s*=/.test(clampBody), "reClampWindow must not write contentShift");
+  assert.ok(!/anchorRect\s*=/.test(clampBody), "reClampWindow must not write anchorRect");
+  assert.ok(/\bsetPosition\s*\(/.test(clampBody), "reClampWindow clamps via setPosition");
+  assert.ok(!/\bsetSize\s*\(/.test(clampBody), "reClampWindow never resizes");
+});

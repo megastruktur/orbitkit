@@ -20,7 +20,7 @@
     LogicalPosition,
     LogicalSize,
   } from "@tauri-apps/api/window";
-  import { demoWindowFit } from "../lib/windowFit";
+  import { demoWindowFit, clampFixedWindow } from "../lib/windowFit";
   import config from "../orbitkit.config";
 
   // --- demo-b1 wiring --------------------------------------------------------
@@ -32,15 +32,14 @@
   const menuItemSize = config.menu.itemSize ?? 44;
   const headGap = config.menu.arc?.headGap ?? 12;
 
-  /** Horizontal idle padding: the content-fit window keeps transparent strips
-   *  beside Glim so the K10 passthrough can be exercised next to the mascot. */
-  const IDLE_PAD_X = 24;
-  /** Padding grown above + beside the content union while the menu is open.
-   *  Never below: the mascot stays exactly bottom-pinned in both states. */
+  /** Padding grown above + beside the open-menu content union; the fixed
+   *  Design-B window is sized once from this union. Never below: the mascot
+   *  stays exactly bottom-pinned inside the fixed window. */
   const MENU_PAD = 8;
-  /** Shrink delay after an animated close: stagger closeMs + stepMs*(n-1) =
-   *  180 + 40*5 = 380 ms for the 6-item menu. */
-  const SHRINK_DELAY_MS = 480;
+  /** Settle delay before a post-drag/monitor-change one-shot re-clamp. Must
+   *  exceed the gesture's dragClearDelay (400 ms) so a native drag is fully
+   *  finished (and not merely paused) before the clamp may move the window. */
+  const SETTLE_DELAY_MS = 500;
 
   let mascotState = $state<MascotStateName>(config.mascot.initialState ?? "idle");
   const isDebug = import.meta.env.VITE_ORBITKIT_DEBUG === "1";
@@ -61,22 +60,23 @@
   let menuWrapEl: HTMLElement | undefined = $state();
   let mascotEl: HTMLElement | undefined = $state();
 
-  let shrinkTimer: ReturnType<typeof setTimeout> | null = null;
+  let settleTimer: ReturnType<typeof setTimeout> | null = null;
 
-  function cancelShrink(): void {
-    if (shrinkTimer) {
-      clearTimeout(shrinkTimer);
-      shrinkTimer = null;
+  function cancelSettle(): void {
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+      settleTimer = null;
     }
   }
 
   /**
-   * K9 fitContent, single consistent model (see src/lib/windowFit.ts):
-   * the mascot is bottom-centre-pinned by CSS, the window rect is computed so
-   * the mascot's screen position never changes across idle/open transitions,
-   * and only a work-area clamp produces a compensating content shift.
+   * K9 fitContent under Design B (see src/lib/windowFit.ts): applied ONCE at
+   * boot. Sizes and positions the window to the fixed open-menu content rect
+   * (mascot screen position preserved), records the work-area clamp
+   * compensation and the — from then on constant — arc anchor. Menu
+   * open/close never calls this: transitions are content-only.
    */
-  async function applyWindowFit(state: "idle" | "open"): Promise<void> {
+  async function applyFixedWindowFit(): Promise<void> {
     const win = getCurrentWindow();
     try {
       const [pos, inner, scale, monitor] = await Promise.all([
@@ -86,56 +86,96 @@
         mascotMonitor(),
       ]);
       const wa = monitor.workArea;
-      const fit = demoWindowFit(
-        {
-          window: {
-            x: pos.x / scale,
-            y: pos.y / scale,
-            width: inner.width / scale,
-            height: inner.height / scale,
-          },
-          workArea: {
-            x: wa.x / monitor.scaleFactor,
-            y: wa.y / monitor.scaleFactor,
-            width: wa.width / monitor.scaleFactor,
-            height: wa.height / monitor.scaleFactor,
-          },
-          mascot: mascotSize,
-          headGap,
-          radius: menuRadius,
-          itemSize: menuItemSize,
-          idlePadX: IDLE_PAD_X,
-          menuPad: MENU_PAD,
+      const fit = demoWindowFit({
+        window: {
+          x: pos.x / scale,
+          y: pos.y / scale,
+          width: inner.width / scale,
+          height: inner.height / scale,
         },
-        state
-      );
+        workArea: {
+          x: wa.x / monitor.scaleFactor,
+          y: wa.y / monitor.scaleFactor,
+          width: wa.width / monitor.scaleFactor,
+          height: wa.height / monitor.scaleFactor,
+        },
+        mascot: mascotSize,
+        headGap,
+        radius: menuRadius,
+        itemSize: menuItemSize,
+        menuPad: MENU_PAD,
+      });
       await win.setSize(new LogicalSize(fit.window.width, fit.window.height));
       await win.setPosition(new LogicalPosition(fit.window.x, fit.window.y));
       contentShift = fit.shift;
-      // AnchorRect in the NEW window coords (post-shift) so the arc hovers
-      // above the mascot exactly as positioned.
+      // AnchorRect in the fixed window coords (post-shift); constant across
+      // open/close because the window never changes again.
       anchorRect = fit.anchor;
     } catch (err: unknown) {
-      console.error("[MascotView] window fit failed:", err);
+      console.error("[MascotView] fixed window fit failed:", err);
     }
   }
 
-  function scheduleShrink(): void {
+  /**
+   * One-shot work-area re-clamp after a native drag or a monitor/scale
+   * change (never on menu open/close, and skipped while the menu is open):
+   * moves the WINDOW (setPosition only) so the fixed rect is fully inside
+   * the work area. The mascot is pinned at its constant window-local
+   * position and moves with the window — the accepted behaviour near edges.
+   * contentShift/anchorRect are boot-constant and are deliberately NOT
+   * touched here (a shift update desyncs the arc anchor from the mascot and
+   * accumulates across drags).
+   */
+  async function reClampWindow(): Promise<void> {
+    if (menuOpen) return;
+    const win = getCurrentWindow();
+    try {
+      const [pos, inner, scale, monitor] = await Promise.all([
+        win.outerPosition(),
+        win.innerSize(),
+        win.scaleFactor(),
+        mascotMonitor(),
+      ]);
+      const wa = monitor.workArea;
+      const clamped = clampFixedWindow(
+        {
+          x: pos.x / scale,
+          y: pos.y / scale,
+          width: inner.width / scale,
+          height: inner.height / scale,
+        },
+        {
+          x: wa.x / monitor.scaleFactor,
+          y: wa.y / monitor.scaleFactor,
+          width: wa.width / monitor.scaleFactor,
+          height: wa.height / monitor.scaleFactor,
+        }
+      );
+      if (clamped.x === pos.x / scale && clamped.y === pos.y / scale) return;
+      await win.setPosition(new LogicalPosition(clamped.x, clamped.y));
+    } catch (err: unknown) {
+      console.error("[MascotView] window re-clamp failed:", err);
+    }
+  }
+
+  /** Debounced settle: resets on every window move/scale event, so during a
+   *  native drag (continuous moves) it only fires after the LAST move — the
+   *  drop. A mid-drag pause is skipped via the gesture's dragged flag. */
+  function scheduleReClamp(): void {
     if (!fitContentEnabled) return;
-    cancelShrink();
-    // Re-fit at the live window position: safe after drags.
-    shrinkTimer = setTimeout(() => {
-      shrinkTimer = null;
-      void applyWindowFit("idle");
-    }, SHRINK_DELAY_MS);
+    cancelSettle();
+    settleTimer = setTimeout(() => {
+      settleTimer = null;
+      if (gesture.isDragged) return;
+      void reClampWindow();
+    }, SETTLE_DELAY_MS);
   }
 
   async function toggleMenu() {
+    // Design B: content-only transition. The fixed window already fits the
+    // open menu; no setSize/setPosition on either path (no compositor
+    // size/origin race, no mascot blink).
     if (!menuOpen) {
-      cancelShrink();
-      // Fit BEFORE mounting the menu: anchorRect describes the new geometry,
-      // so the arc opens in place and the mascot never jumps.
-      if (fitContentEnabled) await applyWindowFit("open");
       activeMenuConfig = config.menu;
       menuOpen = true;
     } else {
@@ -147,12 +187,10 @@
     if (!menuOpen) return;
     if (instant) {
       activeMenuConfig = { ...config.menu, animation: "none" };
-      menuOpen = false;
-      if (fitContentEnabled) void applyWindowFit("idle");
-    } else {
-      menuOpen = false;
-      scheduleShrink();
     }
+    // The RadialMenu plays its close wave inside the fixed transparent
+    // window; the window itself never moves or resizes.
+    menuOpen = false;
   }
 
   async function handleSelect(id: string) {
@@ -193,7 +231,15 @@
   }
 
   onMount(() => {
-    if (fitContentEnabled) void applyWindowFit("idle");
+    const unlisteners: Array<() => void> = [];
+    if (fitContentEnabled) {
+      void applyFixedWindowFit();
+      const win = getCurrentWindow();
+      // Post-drag / monitor-change one-shot re-clamp (Design B: clamped ONCE
+      // at a settle point, never per menu toggle).
+      void win.onMoved(() => scheduleReClamp()).then((fn) => unlisteners.push(fn));
+      void win.onScaleChanged(() => scheduleReClamp()).then((fn) => unlisteners.push(fn));
+    }
     if (passthroughEnabled) {
       passthrough = startPassthrough({
         getWindow: () => getCurrentWindow(),
@@ -213,9 +259,16 @@
     });
 
     return () => {
+      for (const fn of unlisteners) {
+        try {
+          fn();
+        } catch {
+          // window may already be gone during teardown
+        }
+      }
       if (unlisten) unlisten();
       passthrough?.stop();
-      if (shrinkTimer) clearTimeout(shrinkTimer);
+      cancelSettle();
     };
   });
 </script>
@@ -262,10 +315,14 @@
         onpointerup={(e) => {
           debugLog("[MascotView:dom:pointerup]", { button: e.button });
           gesture.onpointerup(e);
+          // Native drag can swallow the terminating events; on pointerup we
+          // can still schedule the one-shot settle re-clamp.
+          scheduleReClamp();
         }}
         onpointercancel={() => {
           debugLog("[MascotView:dom:pointercancel]");
           gesture.onpointercancel();
+          scheduleReClamp();
         }}
         onclick={(e) => {
           debugLog("[MascotView:dom:click]", { menuOpenBefore: menuOpen });
@@ -331,7 +388,7 @@
     justify-content: center;
   }
 
-  /* No hover/active scaling: Glim is an integer-upscaled sprite sheet and any
+  /* No hover/active scaling: the planet is an integer-upscaled sprite sheet and any
      interpolation blur is a smoke failure (pixel-crisp idle). */
   .mascot-clickable {
     display: flex;

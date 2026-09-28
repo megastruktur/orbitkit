@@ -14,7 +14,10 @@ mod desktop;
 #[cfg(any(mobile, test))]
 mod mobile;
 
-pub use config::{MascotWindowConfig, OrbitKitConfig, PopupConfig};
+pub use config::{
+    AppConfig, MascotAnchor, MascotPoolState, MascotRoamConfig, MascotRoamCorner, MascotSheetDef,
+    MascotWindowConfig, MenuItemIcon, MenuStaggerConfig, OrbitKitConfig, PopupAnchor, PopupConfig,
+};
 pub use error::{Error, ErrorCode, Result};
 pub use jni_bridge::MenuAction;
 
@@ -120,6 +123,12 @@ mod tests {
             height: 300.0,
             resizable: Some(true),
             always_on_top: Some(false),
+            anchor: None,
+            decorations: None,
+            transparent: None,
+            skip_taskbar: None,
+            min_width: None,
+            min_height: None,
         };
 
         let payload = popup_open_payload(&popup);
@@ -146,6 +155,12 @@ mod tests {
                 height: 480.0,
                 resizable: None,
                 always_on_top: None,
+                anchor: None,
+                decorations: None,
+                transparent: None,
+                skip_taskbar: None,
+                min_width: None,
+                min_height: None,
             },
             PopupConfig {
                 id: "quick-note".to_string(),
@@ -155,6 +170,12 @@ mod tests {
                 height: 200.0,
                 resizable: Some(false),
                 always_on_top: Some(true),
+                anchor: None,
+                decorations: None,
+                transparent: None,
+                skip_taskbar: None,
+                min_width: None,
+                min_height: None,
             },
         ];
 

@@ -9,6 +9,35 @@ fn default_initial_state() -> String {
     "idle".to_string()
 }
 
+/// K7: sheets mascot integer upscale default.
+fn default_scale() -> u32 {
+    1
+}
+
+/// K7: arc-anchor head gap default (px).
+fn default_head_gap() -> f64 {
+    12.0
+}
+
+/// K7: stagger timing defaults (260/180/40 ms).
+fn default_stagger() -> MenuStaggerConfig {
+    MenuStaggerConfig {
+        open_ms: 260.0,
+        close_ms: 180.0,
+        step_ms: 40.0,
+    }
+}
+
+/// K7: mascot window label default.
+fn default_mascot_window_label() -> String {
+    "orbitkit-mascot".to_string()
+}
+
+/// K7: mascot window URL default.
+fn default_mascot_window_url() -> String {
+    "index.html?orbitkit=mascot".to_string()
+}
+
 fn default_menu_radius() -> f64 {
     96.0
 }
@@ -39,6 +68,40 @@ pub enum MascotKind {
     Svg,
     Image,
     Sprite,
+    Sheets,
+}
+
+/// K7: one sprite-sheet animation definition (kind="sheets").
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MascotSheetDef {
+    pub src: String,
+    pub frame_width: u32,
+    pub frame_height: u32,
+    pub frames: u32,
+    pub fps: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub r#loop: Option<bool>,
+}
+
+/// K7: anchor within the mascot window (sheets kind).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum MascotAnchor {
+    #[default]
+    BottomCenter,
+    Center,
+}
+
+/// K7 (kind="sheets"): state pool definition.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MascotPoolState {
+    pub pool: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priority: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ttl_ms: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -56,6 +119,7 @@ pub struct MascotSpriteState {
 #[serde(untagged)]
 pub enum MascotStateDefinition {
     Sprite(MascotSpriteState),
+    Pool(MascotPoolState),
     Source { src: String },
 }
 
@@ -74,6 +138,18 @@ pub struct MascotConfig {
     pub states: Option<HashMap<String, MascotStateDefinition>>,
     #[serde(default = "default_initial_state")]
     pub initial_state: String,
+    /// K7 (kind="sheets"): sheet definitions by name.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub sheets: HashMap<String, MascotSheetDef>,
+    /// K7 (kind="sheets"): integer upscale factor, default 1.
+    #[serde(default = "default_scale")]
+    pub scale: u32,
+    /// K7 (kind="sheets"): default "bottom-center".
+    #[serde(default)]
+    pub anchor: MascotAnchor,
+    /// K7 (kind="sheets"): mirror sheet horizontally when vx < 0, default false.
+    #[serde(default)]
+    pub face_by_velocity: bool,
 }
 
 impl Default for MascotConfig {
@@ -86,6 +162,10 @@ impl Default for MascotConfig {
             frame_height: None,
             states: None,
             initial_state: default_initial_state(),
+            sheets: HashMap::new(),
+            scale: default_scale(),
+            anchor: MascotAnchor::default(),
+            face_by_velocity: false,
         }
     }
 }
@@ -98,20 +178,29 @@ pub enum MenuTrigger {
     Hover,
 }
 
+/// K7: menu item icon — URL/data-URL string or inline SVG object.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum MenuItemIcon {
+    Text(String),
+    Svg { svg: String },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuItem {
     pub id: String,
     pub label: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub icon: Option<String>,
+    pub icon: Option<MenuItemIcon>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
 }
 
 impl MenuItem {
+    /// K7: `^[a-z0-9][a-z0-9_.:-]{0,63}$` — identical to TS `MENU_ITEM_ID_REGEX`.
     pub fn is_valid_id(id: &str) -> bool {
-        if id.is_empty() || id.len() > 32 {
+        if id.is_empty() || id.len() > 64 {
             return false;
         }
         let mut chars = id.chars();
@@ -119,7 +208,9 @@ impl MenuItem {
         if !first.is_ascii_lowercase() && !first.is_ascii_digit() {
             return false;
         }
-        chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-')
+        chars.all(|c| {
+            c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '.' || c == ':' || c == '-'
+        })
     }
 }
 
@@ -130,6 +221,24 @@ pub struct MenuArcConfig {
     pub position: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub span: Option<f64>,
+    /// K7 (layout "arc-anchor"): gap in px above mascot's top edge, default 12.
+    #[serde(default = "default_head_gap")]
+    pub head_gap: f64,
+}
+
+/// K7: per-item open/close stagger timing.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuStaggerConfig {
+    pub open_ms: f64,
+    pub close_ms: f64,
+    pub step_ms: f64,
+}
+
+impl Default for MenuStaggerConfig {
+    fn default() -> Self {
+        default_stagger()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -152,6 +261,9 @@ pub struct MenuConfig {
     pub arc: Option<MenuArcConfig>,
     #[serde(default = "default_menu_animation", skip_serializing_if = "Option::is_none")]
     pub animation: Option<String>,
+    /// K7: defaults 260/180/40.
+    #[serde(default = "default_stagger")]
+    pub stagger: MenuStaggerConfig,
 }
 
 impl Default for MenuConfig {
@@ -166,6 +278,7 @@ impl Default for MenuConfig {
             layout: None,
             arc: None,
             animation: default_menu_animation(),
+            stagger: default_stagger(),
         }
     }
 }
@@ -221,8 +334,8 @@ impl MenuConfig {
         let mut errors = Vec::new();
 
         if let Some(layout) = &self.layout {
-            if layout != "orbit" && layout != "arc" {
-                errors.push("menu.layout: must be 'orbit' or 'arc'".to_string());
+            if layout != "orbit" && layout != "arc" && layout != "arc-anchor" {
+                errors.push("menu.layout: must be 'orbit', 'arc', or 'arc-anchor'".to_string());
             }
         }
         if let Some(arc) = &self.arc {
@@ -235,6 +348,29 @@ impl MenuConfig {
                 if span.is_nan() || span < 30.0 || span > 300.0 {
                     errors.push("menu.arc.span: must be between 30 and 300".to_string());
                 }
+            }
+            // K7 (layout "arc-anchor")
+            if arc.head_gap.is_nan() || arc.head_gap < 0.0 {
+                errors.push("menu.arc.headGap: must be a number >= 0".to_string());
+            }
+        }
+        // K7: item ids must match the shared id pattern
+        for (i, item) in self.items.iter().enumerate() {
+            if !MenuItem::is_valid_id(&item.id) {
+                errors.push(format!(
+                    "menu.items[{}].id: must match ^[a-z0-9][a-z0-9_.:-]{{0,63}}$",
+                    i
+                ));
+            }
+        }
+        // K7: stagger timing
+        for (field, value) in [
+            ("openMs", self.stagger.open_ms),
+            ("closeMs", self.stagger.close_ms),
+            ("stepMs", self.stagger.step_ms),
+        ] {
+            if value.is_nan() || value < 0.0 {
+                errors.push(format!("menu.stagger.{}: must be a number >= 0", field));
             }
         }
 
@@ -258,18 +394,25 @@ impl OrbitKitConfig {
     }
 }
 
+/// K7: mascot window roam behaviour.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum MascotRoamCorner {
+    BottomRight,
+    BottomLeft,
+    TopRight,
+    TopLeft,
+}
+
+/// K7: mascot window roam behaviour settings.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PopupConfig {
-    pub id: String,
-    pub url: String,
-    pub title: String,
+pub struct MascotRoamConfig {
     pub width: f64,
     pub height: f64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub resizable: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub always_on_top: Option<bool>,
+    pub margin: f64,
+    pub corner: MascotRoamCorner,
+    pub speed: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -282,6 +425,66 @@ pub struct MascotWindowConfig {
     pub x: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub y: Option<f64>,
+    /// K7: window label, default "orbitkit-mascot".
+    #[serde(default = "default_mascot_window_label")]
+    pub label: String,
+    /// K7: window URL, default "index.html?orbitkit=mascot".
+    #[serde(default = "default_mascot_window_url")]
+    pub url: String,
+    /// K10: click-through outside hit regions, default false.
+    #[serde(default)]
+    pub passthrough: bool,
+    /// K7: roam behaviour.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub roam: Option<MascotRoamConfig>,
+    /// K7: size window to content, default false.
+    #[serde(default)]
+    pub fit_content: bool,
+}
+
+/// K11: popup placement anchor, default none.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum PopupAnchor {
+    Mascot,
+    Center,
+    #[default]
+    None,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PopupConfig {
+    pub id: String,
+    pub url: String,
+    pub title: String,
+    pub width: f64,
+    pub height: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resizable: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub always_on_top: Option<bool>,
+    /// K11: default "none".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor: Option<PopupAnchor>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decorations: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub transparent: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub skip_taskbar: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_width: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_height: Option<f64>,
+}
+
+/// K11: app-level popup/origin settings.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct AppConfig {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub allowed_origins: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
@@ -299,6 +502,9 @@ pub struct OrbitKitConfig {
     pub mascot: MascotConfig,
     pub menu: MenuConfig,
     pub windows: WindowsConfig,
+    /// K11: app-level settings.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<AppConfig>,
 }
 
 #[cfg(test)]
@@ -308,12 +514,19 @@ mod tests {
 
     #[test]
     fn test_menu_item_id_validation() {
+        // K7 regex ^[a-z0-9][a-z0-9_.:-]{0,63}$
         assert!(MenuItem::is_valid_id("act1"));
         assert!(MenuItem::is_valid_id("menu-item_2"));
+        assert!(MenuItem::is_valid_id("chat.new"));
+        assert!(MenuItem::is_valid_id("page.open:settings"));
+        assert!(MenuItem::is_valid_id("a".repeat(64).as_str()));
+        assert!(!MenuItem::is_valid_id(".x"));
+        assert!(!MenuItem::is_valid_id("A"));
         assert!(!MenuItem::is_valid_id("-bad"));
-        assert!(!MenuItem::is_valid_id("Bad"));
+        assert!(!MenuItem::is_valid_id(":lead"));
         assert!(!MenuItem::is_valid_id(""));
-        assert!(!MenuItem::is_valid_id("a".repeat(33).as_str()));
+        assert!(!MenuItem::is_valid_id("a".repeat(65).as_str()));
+        assert!(MenuItem::is_valid_id("a".repeat(33).as_str()));
     }
 
     #[test]
@@ -400,7 +613,7 @@ mod tests {
         assert_eq!(parsed.menu.items.len(), 1);
         assert_eq!(parsed.menu.items[0].id, "action_1");
         assert_eq!(parsed.menu.items[0].label, "Action 1");
-        assert_eq!(parsed.menu.items[0].icon, Some("🚀".into()));
+        assert_eq!(parsed.menu.items[0].icon, Some(MenuItemIcon::Text("🚀".into())));
         assert_eq!(parsed.menu.items[0].disabled, Some(false));
         assert_eq!(parsed.menu.radius, 120.0);
         assert_eq!(parsed.menu.start_angle, 45.0);
@@ -519,7 +732,8 @@ mod tests {
         m_top.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_top), ResolvedMenuAngles { start_angle: -180.0, end_angle: 0.0 });
 
         // 2. arc bottom default span
@@ -528,7 +742,8 @@ mod tests {
         m_bot.arc = Some(MenuArcConfig {
             position: Some("bottom".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_bot), ResolvedMenuAngles { start_angle: 0.0, end_angle: 180.0 });
 
         // 3. arc left default span
@@ -537,7 +752,8 @@ mod tests {
         m_left.arc = Some(MenuArcConfig {
             position: Some("left".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_left), ResolvedMenuAngles { start_angle: 90.0, end_angle: 270.0 });
 
         // 4. arc right default span
@@ -546,7 +762,8 @@ mod tests {
         m_right.arc = Some(MenuArcConfig {
             position: Some("right".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_right), ResolvedMenuAngles { start_angle: -90.0, end_angle: 90.0 });
 
         // 5. span default when omitted
@@ -555,7 +772,8 @@ mod tests {
         m_span_def.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: None,
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_span_def), ResolvedMenuAngles { start_angle: -180.0, end_angle: 0.0 });
 
         // 6. span custom 120
@@ -564,7 +782,8 @@ mod tests {
         m_span_custom.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(120.0),
-        });
+            head_gap: 12.0,
+});
         assert_eq!(resolve_menu_angles(&m_span_custom), ResolvedMenuAngles { start_angle: -150.0, end_angle: -30.0 });
     }
 
@@ -574,7 +793,7 @@ mod tests {
         let mut m1 = MenuConfig::default();
         m1.layout = Some("zigzag".into());
         let errs1 = m1.validate().unwrap_err();
-        assert!(errs1.contains(&"menu.layout: must be 'orbit' or 'arc'".to_string()));
+        assert!(errs1.contains(&"menu.layout: must be 'orbit', 'arc', or 'arc-anchor'".to_string()));
 
         // 2. Invalid arc position
         let mut m2 = MenuConfig::default();
@@ -582,7 +801,8 @@ mod tests {
         m2.arc = Some(MenuArcConfig {
             position: Some("diagonal".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         let errs2 = m2.validate().unwrap_err();
         assert!(errs2.contains(&"menu.arc.position: must be 'top', 'bottom', 'left', or 'right'".to_string()));
 
@@ -592,7 +812,8 @@ mod tests {
         m3.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(20.0),
-        });
+            head_gap: 12.0,
+});
         let errs3 = m3.validate().unwrap_err();
         assert!(errs3.contains(&"menu.arc.span: must be between 30 and 300".to_string()));
 
@@ -601,7 +822,8 @@ mod tests {
         m3_large.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(350.0),
-        });
+            head_gap: 12.0,
+});
         let errs3_large = m3_large.validate().unwrap_err();
         assert!(errs3_large.contains(&"menu.arc.span: must be between 30 and 300".to_string()));
 
@@ -611,7 +833,8 @@ mod tests {
         m4.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert!(m4.validate().is_ok());
 
         // 5. Arc without layout arc is allowed
@@ -620,7 +843,8 @@ mod tests {
         m5.arc = Some(MenuArcConfig {
             position: Some("top".into()),
             span: Some(180.0),
-        });
+            head_gap: 12.0,
+});
         assert!(m5.validate().is_ok());
 
         // 6. Invalid animation
@@ -663,16 +887,193 @@ mod tests {
             Some(MenuArcConfig {
                 position: Some("left".to_string()),
                 span: Some(120.0),
-            })
+                head_gap: 12.0,
+})
         );
         assert_eq!(parsed.animation.as_deref(), Some("none"));
 
         let serialized = serde_json::to_string(&parsed).expect("serialize menu layout arc");
         assert!(serialized.contains(r#""layout":"arc""#));
-        assert!(serialized.contains(r#""arc":{"position":"left","span":120.0}"#));
+        assert!(serialized.contains(r#""arc":{"position":"left","span":120.0,"headGap":12.0}"#));
         assert!(serialized.contains(r#""animation":"none""#));
 
         let roundtrip: MenuConfig = serde_json::from_str(&serialized).expect("deserialize roundtrip");
         assert_eq!(parsed, roundtrip);
+    }
+
+    #[test]
+    fn test_starter_config_compat_k7() {
+        // AC3: the 0.1.0 starter config deserializes and validates unchanged.
+        let json = include_str!("../../../examples/starter/src/orbitkit.config.json");
+        let parsed: OrbitKitConfig = serde_json::from_str(json).expect("deserialize starter config");
+        assert!(parsed.validate().is_ok(), "starter config must validate: {:?}", parsed.validate());
+        assert_eq!(parsed.mascot.kind, MascotKind::Svg);
+        assert_eq!(parsed.mascot.size, 96);
+        assert_eq!(parsed.mascot.sheets.len(), 0);
+        assert_eq!(parsed.mascot.scale, 1);
+        assert_eq!(parsed.mascot.anchor, MascotAnchor::BottomCenter);
+        assert!(!parsed.mascot.face_by_velocity);
+        assert_eq!(parsed.menu.items.len(), 5);
+        assert_eq!(parsed.menu.layout.as_deref(), Some("orbit"));
+        assert_eq!(parsed.menu.stagger.open_ms, 260.0);
+        assert_eq!(parsed.windows.mascot_window.as_ref().expect("mascotWindow").label, "orbitkit-mascot");
+        assert!(!parsed.windows.mascot_window.as_ref().unwrap().passthrough);
+        assert!(parsed.windows.popups.iter().all(|p| p.anchor.is_none()));
+        assert!(parsed.app.is_none());
+    }
+
+    #[test]
+    fn test_k7_full_fixture_roundtrip() {
+        // AC4: full-featured K7 config — Rust reads the same file the TS tests validate.
+        let json = include_str!("../../../packages/orbitkit/src/test-fixtures/k7-full.json");
+        let parsed: OrbitKitConfig = serde_json::from_str(json).expect("deserialize K7 full fixture");
+        assert!(parsed.validate().is_ok(), "K7 fixture must validate: {:?}", parsed.validate());
+
+        // mascot (sheets kind)
+        assert_eq!(parsed.mascot.kind, MascotKind::Sheets);
+        assert_eq!(parsed.mascot.size, 64);
+        assert_eq!(parsed.mascot.scale, 2);
+        assert_eq!(parsed.mascot.anchor, MascotAnchor::Center);
+        assert!(parsed.mascot.face_by_velocity);
+        let walk = parsed.mascot.sheets.get("walk").expect("walk sheet");
+        assert_eq!(walk.src, "walk.png");
+        assert_eq!(walk.frame_width, 32);
+        assert_eq!(walk.frame_height, 32);
+        assert_eq!(walk.frames, 6);
+        assert_eq!(walk.fps, 10.0);
+        assert_eq!(walk.r#loop, Some(true));
+        let cheer = parsed.mascot.sheets.get("cheer").expect("cheer sheet");
+        assert_eq!(cheer.frames, 4);
+        assert_eq!(cheer.r#loop, None);
+        let states = parsed.mascot.states.as_ref().expect("states");
+        match states.get("idle").expect("idle state") {
+            MascotStateDefinition::Pool(p) => {
+                assert_eq!(p.pool, vec!["walk".to_string()]);
+                assert_eq!(p.priority, Some(2.0));
+                assert_eq!(p.ttl_ms, Some(5000));
+            }
+            other => panic!("expected pool state, got {:?}", other),
+        }
+        match states.get("alert").expect("alert state") {
+            MascotStateDefinition::Pool(p) => {
+                assert_eq!(p.pool, vec!["cheer".to_string(), "walk".to_string()]);
+                assert_eq!(p.priority, None);
+                assert_eq!(p.ttl_ms, None);
+            }
+            other => panic!("expected pool state, got {:?}", other),
+        }
+
+        // menu (arc-anchor, stagger, svg icon)
+        assert_eq!(parsed.menu.layout.as_deref(), Some("arc-anchor"));
+        assert_eq!(parsed.menu.items.len(), 2);
+        assert!(MenuItem::is_valid_id("chat.new"));
+        assert!(MenuItem::is_valid_id("page.open:settings"));
+        match &parsed.menu.items[0].icon {
+            Some(MenuItemIcon::Svg { svg }) => assert!(svg.starts_with("<svg")),
+            other => panic!("expected svg icon, got {:?}", other),
+        }
+        match &parsed.menu.items[1].icon {
+            Some(MenuItemIcon::Text(t)) => assert!(t.starts_with("data:image/svg+xml")),
+            other => panic!("expected text icon, got {:?}", other),
+        }
+        let arc = parsed.menu.arc.as_ref().expect("arc");
+        assert_eq!(arc.position.as_deref(), Some("top"));
+        assert_eq!(arc.span, Some(180.0));
+        assert_eq!(arc.head_gap, 16.0);
+        assert_eq!(parsed.menu.stagger.open_ms, 200.0);
+        assert_eq!(parsed.menu.stagger.close_ms, 120.0);
+        assert_eq!(parsed.menu.stagger.step_ms, 30.0);
+
+        // windows (mascotWindow K7 + popup K11)
+        let mw = parsed.windows.mascot_window.as_ref().expect("mascotWindow");
+        assert_eq!(mw.label, "my-mascot");
+        assert_eq!(mw.url, "index.html?orbitkit=mascot");
+        assert!(mw.passthrough);
+        assert!(mw.fit_content);
+        let roam = mw.roam.as_ref().expect("roam");
+        assert_eq!(roam.width, 64.0);
+        assert_eq!(roam.height, 64.0);
+        assert_eq!(roam.margin, 24.0);
+        assert_eq!(roam.corner, MascotRoamCorner::BottomRight);
+        assert_eq!(roam.speed, 2.5);
+        let popup = &parsed.windows.popups[0];
+        assert_eq!(popup.anchor, Some(PopupAnchor::Mascot));
+        assert_eq!(popup.decorations, Some(false));
+        assert_eq!(popup.transparent, Some(true));
+        assert_eq!(popup.skip_taskbar, Some(true));
+        assert_eq!(popup.min_width, Some(200.0));
+        assert_eq!(popup.min_height, Some(160.0));
+        assert!(popup.url.contains("{ref}"), "popup url keeps K11 placeholder");
+
+        // app (K11)
+        let app = parsed.app.as_ref().expect("app");
+        assert_eq!(
+            app.allowed_origins,
+            vec!["https://example.com".to_string(), "http://localhost:1420".to_string()]
+        );
+
+        // roundtrip
+        let serialized = serde_json::to_string(&parsed).expect("serialize K7 fixture");
+        assert!(serialized.contains(r#""faceByVelocity":true"#));
+        assert!(serialized.contains(r#""headGap":16.0"#));
+        assert!(serialized.contains(r#""openMs":200.0"#));
+        assert!(serialized.contains(r#""skipTaskbar":true"#));
+        assert!(serialized.contains(r#""allowedOrigins":["#));
+        let roundtrip: OrbitKitConfig = serde_json::from_str(&serialized).expect("deserialize roundtrip");
+        assert_eq!(parsed, roundtrip);
+    }
+
+    #[test]
+    fn test_k7_defaults_applied_on_deserialize() {
+        // AC1: all optional K7 fields carry contract defaults.
+        let json = r#"{"mascot":{"kind":"sheets","src":"m.png","size":64,"sheets":{}},"menu":{"items":[{"id":"a","label":"A"}],"arc":{}},"windows":{"mascotWindow":{"transparent":true,"alwaysOnTop":true,"decorations":false},"popups":[]}}"#;
+        let parsed: OrbitKitConfig = serde_json::from_str(json).expect("deserialize defaults config");
+        assert_eq!(parsed.mascot.scale, 1);
+        assert_eq!(parsed.mascot.anchor, MascotAnchor::BottomCenter);
+        assert!(!parsed.mascot.face_by_velocity);
+        let arc = parsed.menu.arc.as_ref().expect("arc default");
+        assert_eq!(arc.head_gap, 12.0);
+        assert_eq!(parsed.menu.stagger.open_ms, 260.0);
+        assert_eq!(parsed.menu.stagger.close_ms, 180.0);
+        assert_eq!(parsed.menu.stagger.step_ms, 40.0);
+        let mw = parsed.windows.mascot_window.as_ref().expect("mascotWindow");
+        assert_eq!(mw.label, "orbitkit-mascot");
+        assert_eq!(mw.url, "index.html?orbitkit=mascot");
+        assert!(!mw.passthrough);
+        assert!(!mw.fit_content);
+        assert!(mw.roam.is_none());
+    }
+
+    #[test]
+    fn test_k7_validate_rejects_invalid() {
+        // layout arc-anchor accepted; ids validated via shared pattern
+        let mut ok = MenuConfig::default();
+        ok.layout = Some("arc-anchor".into());
+        ok.items = vec![MenuItem { id: "page.open:settings".into(), label: "S".into(), icon: None, disabled: None }];
+        assert!(ok.validate().is_ok());
+
+        let mut bad_id = MenuConfig::default();
+        bad_id.items = vec![MenuItem { id: ".x".into(), label: "B".into(), icon: None, disabled: None }];
+        assert!(bad_id
+            .validate()
+            .unwrap_err()
+            .iter()
+            .any(|e| e.contains("must match ^[a-z0-9][a-z0-9_.:-]{0,63}$")));
+
+        let mut bad_stagger = MenuConfig::default();
+        bad_stagger.stagger.step_ms = -1.0;
+        assert!(bad_stagger
+            .validate()
+            .unwrap_err()
+            .iter()
+            .any(|e| e.contains("menu.stagger.stepMs")));
+
+        let mut bad_gap = MenuConfig::default();
+        bad_gap.arc = Some(MenuArcConfig { head_gap: -1.0, ..Default::default() });
+        assert!(bad_gap
+            .validate()
+            .unwrap_err()
+            .iter()
+            .any(|e| e.contains("menu.arc.headGap")));
     }
 }

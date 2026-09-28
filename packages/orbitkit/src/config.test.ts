@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
+// JSON loaded via vite's native JSON import.
+import starterConfigJson from "../../../examples/starter/src/orbitkit.config.json";
+import k7FullJson from "./test-fixtures/k7-full.json";
 import {
+  MENU_ITEM_ID_REGEX,
   defineConfig,
   validateConfig,
   withDefaults,
+  type MascotConfig,
   type MenuConfig,
+  type MenuItem,
   type OrbitKitConfig,
 } from "./config";
 
@@ -458,7 +464,7 @@ describe("validateConfig", () => {
     });
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.errors).toContain("menu.layout: must be 'orbit' or 'arc'");
+      expect(res.errors).toContain("menu.layout: must be 'orbit', 'arc', or 'arc-anchor'");
     }
   });
 
@@ -542,7 +548,7 @@ describe("validateConfig", () => {
       },
     });
     expect(def.menu.layout).toBe("arc");
-    expect(def.menu.arc).toEqual({ position: "top", span: 180 });
+    expect(def.menu.arc).toEqual({ position: "top", span: 180, headGap: 12 });
     expect(def.menu.startAngle).toBe(-180);
     expect(def.menu.endAngle).toBe(0);
   });
@@ -586,5 +592,403 @@ describe("validateConfig", () => {
     if (!invalidRes.ok) {
       expect(invalidRes.errors).toContain("menu.animation: must be one of spawn, none");
     }
+  });
+});
+
+const k7Base: OrbitKitConfig = {
+  mascot: { kind: "svg", src: "<svg viewBox='0 0 100 100'></svg>", size: 96, initialState: "idle" },
+  menu: {
+    items: [{ id: "item1", label: "Item 1" }],
+    radius: 96,
+    startAngle: -90,
+    endAngle: 270,
+    itemSize: 44,
+    trigger: "click",
+  },
+  windows: { popups: [] },
+};
+
+describe("MENU_ITEM_ID_REGEX (K7/AC2)", () => {
+  it("accepts K7 ids with dot, colon, dash, underscore", () => {
+    expect(MENU_ITEM_ID_REGEX.test("chat.new")).toBe(true);
+    expect(MENU_ITEM_ID_REGEX.test("page.open:settings")).toBe(true);
+    expect(MENU_ITEM_ID_REGEX.test("menu-item_2")).toBe(true);
+    expect(MENU_ITEM_ID_REGEX.test("a")).toBe(true);
+    expect(MENU_ITEM_ID_REGEX.test("a".repeat(64))).toBe(true);
+  });
+
+  it("rejects leading dot, uppercase, 65-char and empty ids", () => {
+    expect(MENU_ITEM_ID_REGEX.test(".x")).toBe(false);
+    expect(MENU_ITEM_ID_REGEX.test("A")).toBe(false);
+    expect(MENU_ITEM_ID_REGEX.test("a".repeat(65))).toBe(false);
+    expect(MENU_ITEM_ID_REGEX.test("")).toBe(false);
+    expect(MENU_ITEM_ID_REGEX.test(":lead")).toBe(false);
+  });
+
+  it("validateConfig error message reflects the K7 pattern", () => {
+    const res = validateConfig({
+      ...k7Base,
+      menu: { ...k7Base.menu, items: [{ id: ".x", label: "Bad" }] },
+    });
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.errors).toContain(
+        "menu.items[0].id: must match ^[a-z0-9][a-z0-9_.:-]{0,63}$"
+      );
+    }
+  });
+});
+
+describe("validateConfig K7 additions", () => {
+  it("accepts a sheets-kind mascot with pools", () => {
+    const res = validateConfig({
+      ...k7Base,
+      mascot: {
+        kind: "sheets",
+        src: "mascot.png",
+        size: 64,
+        sheets: {
+          walk: { src: "walk.png", frameWidth: 32, frameHeight: 32, frames: 6, fps: 10, loop: true },
+        },
+        scale: 2,
+        anchor: "center",
+        faceByVelocity: true,
+        states: { idle: { pool: ["walk"], priority: 1, ttlMs: 5000 } },
+      },
+    });
+    expect(res.ok).toBe(true);
+  });
+
+  it("rejects sheets kind without sheets record and bad sheet fields", () => {
+    const missing = validateConfig({
+      ...k7Base,
+      mascot: { kind: "sheets", src: "mascot.png", size: 64 },
+    });
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) {
+      expect(missing.errors).toContain("mascot.sheets: required object when kind is 'sheets'");
+    }
+
+    const badSheet = validateConfig({
+      ...k7Base,
+      mascot: {
+        kind: "sheets",
+        src: "mascot.png",
+        size: 64,
+        sheets: { walk: { src: "", frameWidth: 0, frameHeight: 32, frames: 6, fps: 10 } },
+      },
+    });
+    expect(badSheet.ok).toBe(false);
+    if (!badSheet.ok) {
+      expect(badSheet.errors).toContain("mascot.sheets['walk'].src: must be a non-empty string");
+      expect(badSheet.errors).toContain("mascot.sheets['walk'].frameWidth: must be a positive number");
+    }
+  });
+
+  it("rejects invalid scale, anchor, faceByVelocity", () => {
+    for (const mascot of [
+      { ...k7Base.mascot, scale: 0 },
+      { ...k7Base.mascot, scale: 1.5 },
+      { ...k7Base.mascot, anchor: "top" },
+      { ...k7Base.mascot, faceByVelocity: "yes" },
+    ] as MascotConfig[]) {
+      const res = validateConfig({ ...k7Base, mascot });
+      expect(res.ok).toBe(false);
+    }
+  });
+
+  it("rejects empty pool, bad priority and ttlMs", () => {
+    for (const states of [
+      { idle: { pool: [] } },
+      { idle: { pool: [""] } },
+      { idle: { pool: ["walk"], priority: "high" } },
+      { idle: { pool: ["walk"], ttlMs: 0 } },
+    ] as MascotConfig["states"][]) {
+      const res = validateConfig({
+        ...k7Base,
+        mascot: { ...k7Base.mascot, states },
+      });
+      expect(res.ok).toBe(false);
+    }
+  });
+
+  it("accepts arc-anchor layout, headGap and stagger", () => {
+    const res = validateConfig({
+      ...k7Base,
+      menu: {
+        ...k7Base.menu,
+        layout: "arc-anchor",
+        arc: { position: "top", span: 180, headGap: 16 },
+        stagger: { openMs: 200, closeMs: 120, stepMs: 30 },
+      },
+    });
+    expect(res.ok).toBe(true);
+  });
+
+  it("rejects bad headGap and stagger", () => {
+    const badGap = validateConfig({
+      ...k7Base,
+      menu: {
+        ...k7Base.menu,
+        layout: "arc-anchor",
+        arc: { position: "top", span: 180, headGap: -1 },
+      },
+    });
+    expect(badGap.ok).toBe(false);
+    if (!badGap.ok) {
+      expect(badGap.errors).toContain("menu.arc.headGap: must be a number >= 0");
+    }
+
+    const badStagger = validateConfig({
+      ...k7Base,
+      menu: {
+        ...k7Base.menu,
+        stagger: { openMs: -5, closeMs: 180, stepMs: 40 },
+      },
+    });
+    expect(badStagger.ok).toBe(false);
+    if (!badStagger.ok) {
+      expect(badStagger.errors).toContain("menu.stagger.openMs: must be a number >= 0");
+    }
+  });
+
+  it("accepts inline svg icon and rejects malformed icon", () => {
+    const ok = validateConfig({
+      ...k7Base,
+      menu: {
+        ...k7Base.menu,
+        items: [{ id: "chat.new", label: "Chat", icon: { svg: "<svg></svg>" } }],
+      },
+    });
+    expect(ok.ok).toBe(true);
+
+    for (const icon of [{}, { svg: "" }, { nope: 1 }, 42] as unknown[]) {
+      const res = validateConfig({
+        ...k7Base,
+        menu: {
+          ...k7Base.menu,
+          items: [{ id: "chat.new", label: "Chat", icon } as MenuItem],
+        },
+      });
+      expect(res.ok).toBe(false);
+    }
+  });
+
+  it("accepts K7/K11 mascotWindow and popup fields, rejects invalid ones", () => {
+    const ok = validateConfig({
+      ...k7Base,
+      windows: {
+        mascotWindow: {
+          transparent: true,
+          alwaysOnTop: true,
+          decorations: false,
+          label: "my-mascot",
+          url: "index.html?orbitkit=mascot",
+          passthrough: true,
+          fitContent: true,
+          roam: { width: 64, height: 64, margin: 24, corner: "bottom-right", speed: 2.5 },
+        },
+        popups: [
+          {
+            id: "notes",
+            url: "index.html?popup=notes&ref={ref}",
+            title: "Notes",
+            width: 360,
+            height: 420,
+            anchor: "mascot",
+            decorations: false,
+            transparent: true,
+            skipTaskbar: true,
+            minWidth: 200,
+            minHeight: 160,
+          },
+        ],
+      },
+    });
+    expect(ok.ok).toBe(true);
+
+    const badMw = validateConfig({
+      ...k7Base,
+      windows: {
+        popups: [],
+        mascotWindow: {
+          transparent: true,
+          alwaysOnTop: true,
+          decorations: false,
+          label: "",
+          passthrough: "yes",
+          roam: { width: 0, height: 64, margin: 24, corner: "middle", speed: 2.5 },
+        },
+      },
+    });
+    expect(badMw.ok).toBe(false);
+    if (!badMw.ok) {
+      expect(badMw.errors).toContain("windows.mascotWindow.label: must be a non-empty string");
+      expect(badMw.errors).toContain("windows.mascotWindow.passthrough: must be a boolean");
+      expect(badMw.errors).toContain("windows.mascotWindow.roam.width: must be a positive number");
+      expect(badMw.errors).toContain(
+        "windows.mascotWindow.roam.corner: must be 'bottom-right', 'bottom-left', 'top-right', or 'top-left'"
+      );
+    }
+
+    const badPopup = validateConfig({
+      ...k7Base,
+      windows: {
+        popups: [
+          {
+            id: "notes",
+            url: "index.html",
+            title: "Notes",
+            width: 360,
+            height: 420,
+            anchor: "diagonal",
+            skipTaskbar: "no",
+            minWidth: 0,
+          },
+        ],
+      },
+    });
+    expect(badPopup.ok).toBe(false);
+    if (!badPopup.ok) {
+      expect(badPopup.errors).toContain(
+        "windows.popups[0].anchor: must be 'mascot', 'center', or 'none'"
+      );
+      expect(badPopup.errors).toContain("windows.popups[0].skipTaskbar: must be a boolean");
+      expect(badPopup.errors).toContain("windows.popups[0].minWidth: must be a positive number");
+    }
+  });
+
+  it("accepts app.allowedOrigins and rejects invalid ones", () => {
+    const ok = validateConfig({
+      ...k7Base,
+      app: { allowedOrigins: ["https://example.com"] },
+    });
+    expect(ok.ok).toBe(true);
+
+    for (const app of [
+      { allowedOrigins: "https://example.com" },
+      { allowedOrigins: [42] },
+      { allowedOrigins: [""] },
+      "nope",
+    ] as unknown[]) {
+      const res = validateConfig({ ...k7Base, app });
+      expect(res.ok).toBe(false);
+    }
+  });
+});
+
+describe("K7 withDefaults (AC1)", () => {
+  it("fills sheets defaults on mascot", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+    });
+    expect(def.mascot.scale).toBe(1);
+    expect(def.mascot.anchor).toBe("bottom-center");
+    expect(def.mascot.faceByVelocity).toBe(false);
+  });
+
+  it("fills stagger, arc headGap and layout defaults", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: {
+        items: [{ id: "act", label: "Act" }],
+        layout: "arc-anchor",
+      },
+    });
+    expect(def.menu.stagger).toEqual({ openMs: 260, closeMs: 180, stepMs: 40 });
+    expect(def.menu.arc).toEqual({ headGap: 12 });
+
+    const custom = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: {
+        items: [{ id: "act", label: "Act" }],
+        layout: "arc-anchor",
+        arc: { position: "top", span: 180, headGap: 24 },
+        stagger: { openMs: 100, closeMs: 90, stepMs: 10 },
+      },
+    });
+    expect(custom.menu.arc?.headGap).toBe(24);
+    expect(custom.menu.stagger).toEqual({ openMs: 100, closeMs: 90, stepMs: 10 });
+  });
+
+  it("fills mascotWindow and popup defaults", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: { items: [{ id: "act", label: "Act" }] },
+      windows: {
+        mascotWindow: { transparent: true, alwaysOnTop: true, decorations: false },
+        popups: [{ id: "notes", url: "index.html", title: "Notes", width: 320, height: 420 }],
+      },
+    });
+    expect(def.windows.mascotWindow?.label).toBe("orbitkit-mascot");
+    expect(def.windows.mascotWindow?.url).toBe("index.html?orbitkit=mascot");
+    expect(def.windows.mascotWindow?.passthrough).toBe(false);
+    expect(def.windows.mascotWindow?.fitContent).toBe(false);
+    expect(def.windows.popups[0]?.anchor).toBe("none");
+  });
+
+  it("copies app.allowedOrigins", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: { items: [{ id: "act", label: "Act" }] },
+      app: { allowedOrigins: ["https://example.com"] },
+    });
+    expect(def.app?.allowedOrigins).toEqual(["https://example.com"]);
+    expect(def.app?.allowedOrigins).not.toBe(def.windows); // new array, not aliased
+  });
+});
+
+describe("compat: 0.1.0 starter config (AC3)", () => {
+  const starterConfig = starterConfigJson as OrbitKitConfig;
+
+  it("validates the starter config unchanged", () => {
+    const res = validateConfig(starterConfig);
+    expect(res.ok).toBe(true);
+  });
+
+  it("survives withDefaults round-trip validation", () => {
+    const res = validateConfig(withDefaults(starterConfig));
+    expect(res.ok).toBe(true);
+  });
+});
+
+describe("K7 full fixture (AC4)", () => {
+  const fixture: any = k7FullJson;
+
+  it("validates the full K7 config", () => {
+    const res = validateConfig(fixture);
+    expect(res.ok).toBe(true);
+  });
+
+  it("parses every K7 field value", () => {
+    expect(fixture.mascot.kind).toBe("sheets");
+    expect(fixture.mascot.scale).toBe(2);
+    expect(fixture.mascot.anchor).toBe("center");
+    expect(fixture.mascot.faceByVelocity).toBe(true);
+    expect(fixture.mascot.sheets?.walk).toEqual({
+      src: "walk.png",
+      frameWidth: 32,
+      frameHeight: 32,
+      frames: 6,
+      fps: 10,
+      loop: true,
+    });
+    expect(fixture.mascot.states?.idle).toEqual({ pool: ["walk"], priority: 2, ttlMs: 5000 });
+    expect(fixture.menu.items[0]?.icon).toEqual({ svg: "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>" });
+    expect(fixture.menu.layout).toBe("arc-anchor");
+    expect(fixture.menu.arc?.headGap).toBe(16);
+    expect(fixture.menu.stagger).toEqual({ openMs: 200, closeMs: 120, stepMs: 30 });
+    expect(fixture.windows.mascotWindow?.label).toBe("my-mascot");
+    expect(fixture.windows.mascotWindow?.passthrough).toBe(true);
+    expect(fixture.windows.mascotWindow?.roam).toEqual({
+      width: 64,
+      height: 64,
+      margin: 24,
+      corner: "bottom-right",
+      speed: 2.5,
+    });
+    expect(fixture.windows.popups[0]?.anchor).toBe("mascot");
+    expect(fixture.windows.popups[0]?.skipTaskbar).toBe(true);
+    expect(fixture.app?.allowedOrigins).toEqual(["https://example.com", "http://localhost:1420"]);
   });
 });

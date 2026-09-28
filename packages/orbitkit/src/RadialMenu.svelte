@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from "svelte";
   import type { MenuConfig } from "./config";
+  import { validateConfig } from "./config";
   import { layoutItems, resolveMenuAngles } from "./geometry";
   import {
     type MenuAnimPhase,
@@ -39,6 +40,20 @@
 
   let isMounted = $state(false);
   let animPhase = $state<MenuAnimPhase>("closed");
+
+  // K7: dev-only config validation — report invalid item configs without throwing.
+  $effect(() => {
+    if (import.meta.env?.DEV) {
+      const result = validateConfig({
+        mascot: { kind: "svg", src: "orbitkit-dev-stub", size: 1 },
+        menu: config,
+        windows: { popups: [] },
+      });
+      if (!result.ok) {
+        console.error("[orbitkit] RadialMenu config invalid:", result.errors);
+      }
+    }
+  });
 
   let openTimer: ReturnType<typeof setTimeout> | null = null;
   let closeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -152,12 +167,14 @@
   }
 
   function handleItemClick(itemId: string, disabled?: boolean) {
-    if (disabled || animPhase === "closing") return;
+    // Items are not interactive until the open animation completes (K2/K7;
+    // restored guard — regression from 098f969 removed the pre-open check).
+    if (disabled || animPhase !== "open") return;
     onselect(itemId);
   }
 
   function handleItemMouseEnter(itemId: string, disabled?: boolean) {
-    if (disabled || animPhase === "closing") return;
+    if (disabled || animPhase !== "open") return;
     if (config.trigger === "hover") {
       onselect(itemId);
     }

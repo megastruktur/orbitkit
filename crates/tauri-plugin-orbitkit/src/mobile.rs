@@ -152,7 +152,7 @@ pub(crate) fn build_overlay_payload(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{MascotConfig, MascotKind, MascotStateDefinition, MenuConfig};
+    use crate::config::{MascotAnchor, MascotConfig, MascotKind, MascotStateDefinition, MenuConfig};
     use std::collections::HashMap;
 
     #[test]
@@ -179,6 +179,10 @@ mod tests {
             frame_height: None,
             states: Some(states),
             initial_state: "idle".to_string(),
+            sheets: HashMap::new(),
+            scale: 1,
+            anchor: MascotAnchor::BottomCenter,
+            face_by_velocity: false,
         };
 
         let menu = MenuConfig::default();

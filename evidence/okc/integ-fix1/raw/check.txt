@@ -1,0 +1,4 @@
+$ tsc --noEmit
+$ tsc --noEmit
+
+exit_code=0

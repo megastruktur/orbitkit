@@ -1,9 +1,8 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 
-// Vite `?raw` compile-time import; no bundled types (no vite/client under
-// pnpm strict + frozen lockfile), hence the expect-error.
-// @ts-expect-error vite ?raw import has no type declarations in this package
+// Vite `?raw` compile-time import; the ambient `declare module "*?raw"` in
+// src/raw.d.ts supplies its typing (no vite/client under pnpm strict).
 import mascotSource from "./mascotMachine.ts?raw";
 import { createMachine, hint, tick } from "./mascotMachine";
 import type { MascotPoolState } from "./config";

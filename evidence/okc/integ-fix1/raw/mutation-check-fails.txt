@@ -1,0 +1,8 @@
+$ tsc --noEmit
+src/mascotMachine.test.ts(6,1): error TS2578: Unused '@ts-expect-error' directive.
+[ELIFECYCLE] Command failed with exit code 2.
+Error: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+
+  × "pnpm recursive run" failed in /home/megastruktur/orca/workspaces/
+  │ orbitkit/okc-integ-fix1/packages/orbitkit
+

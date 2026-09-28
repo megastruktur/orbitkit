@@ -11,6 +11,7 @@ import {
   onBadge,
   onMascotState,
   onMenuAction,
+  onPark,
   onPopupClose,
   onPopupClosed,
   onPopupOpen,
@@ -22,12 +23,14 @@ import {
   requestOverlayPermission,
   setBadge,
   setMascotState,
+  setParked,
   showOverlay,
   startMascotDrag,
   type MenuConfig,
   type PopupClosePayload,
   type PopupLifecyclePayload,
   type PopupOpenPayload,
+  type ParkPayload,
 } from "./index";
 
 const sampleMenu: MenuConfig = {
@@ -1037,6 +1040,116 @@ describe("bridge", () => {
       await setBadge(12);
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith({ count: 12 });
+    });
+  });
+
+  describe("orbitkit://park (park)", () => {
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("onPark returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPark(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("setParked resolves without emitting outside Tauri", async () => {
+      expect(isTauri()).toBe(false);
+      await expect(setParked(true)).resolves.toBeUndefined();
+    });
+
+    describe("with Tauri mocks", () => {
+      beforeEach(() => {
+        mockWindows("main");
+      });
+
+      it("setParked emits orbitkit://park with {parked} payload", async () => {
+        let recordedCmd = "";
+        let recordedArgs: unknown = null;
+        mockIPC((cmd, args) => {
+          recordedCmd = cmd;
+          recordedArgs = args;
+          return null;
+        });
+
+        await setParked(true);
+        expect(recordedCmd).toBe("plugin:event|emit");
+        expect(recordedArgs).toEqual({ event: "orbitkit://park", payload: { parked: true } });
+      });
+
+      it("onPark subscribes to orbitkit://park and delivers {parked} to the callback", async () => {
+        let eventHandlerId: number | null = null;
+        let listenedEvent = "";
+        mockIPC((cmd, args) => {
+          if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+            if ("event" in args && typeof args.event === "string") {
+              listenedEvent = args.event;
+            }
+            if ("handler" in args && typeof args.handler === "number") {
+              eventHandlerId = args.handler;
+            }
+            return 88;
+          }
+          return null;
+        });
+
+        const callback = vi.fn();
+        const unlisten = await onPark(callback);
+        expect(listenedEvent).toBe("orbitkit://park");
+        expect(eventHandlerId).not.toBeNull();
+
+        triggerTauriCallback(eventHandlerId!, {
+          event: "orbitkit://park",
+          payload: { parked: false } satisfies ParkPayload,
+        });
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith({ parked: false });
+
+        let unlistened = false;
+        mockIPC((cmd) => {
+          if (cmd === "plugin:event|unlisten") {
+            unlistened = true;
+          }
+          return null;
+        });
+        unlisten();
+        expect(unlistened).toBe(true);
+      });
+
+      it("round-trips setParked(false) → orbitkit://park → onPark handler", async () => {
+        let eventHandlerId: number | null = null;
+        let listenedEvent = "";
+        mockIPC((cmd, args) => {
+          if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+            if ("event" in args && typeof args.event === "string") {
+              listenedEvent = args.event;
+            }
+            if ("handler" in args && typeof args.handler === "number") {
+              eventHandlerId = args.handler;
+            }
+            return 89;
+          }
+          // Mocked transport: an emit redelivers to matching listeners only,
+          // including the emitting webview — that is the park round trip.
+          if (cmd === "plugin:event|emit") {
+            const { event, payload } = args as { event: string; payload: unknown };
+            if (event === listenedEvent) {
+              triggerTauriCallback(eventHandlerId!, { event, payload });
+            }
+          }
+          return null;
+        });
+
+        const callback = vi.fn();
+        await onPark(callback);
+        await setParked(false);
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith({ parked: false });
+      });
     });
   });
 });

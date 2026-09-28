@@ -46,3 +46,12 @@ export type {
 } from "./roam.js";
 export { default as Bubble } from "./Bubble.svelte";
 export { default as Badge } from "./Badge.svelte";
+export { createPark, parkCornerPosition } from "./park.js";
+export type {
+  CreateParkOptions,
+  ParkCorner,
+  ParkHandle,
+  ParkWindowSize,
+  ParkWindowSizeSource,
+  ParkWindow,
+} from "./park.js";

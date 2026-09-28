@@ -426,4 +426,43 @@ export async function setBadge(count: number): Promise<void> {
   }
 }
 
+/** Payload of the `orbitkit://park` event: park (do-not-disturb) mode state. */
+export type ParkPayload = {
+  parked: boolean;
+};
+
+export type ParkCallback = (payload: ParkPayload) => void;
+
+/**
+ * Subscribes to `orbitkit://park` state events; returns an unlisten function.
+ * Outside Tauri, resolves to a no-op unlisten without subscribing.
+ */
+export async function onPark(cb: ParkCallback): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<ParkPayload>("orbitkit://park", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/**
+ * Emits `orbitkit://park {parked}` (broadcast to every listener, including the
+ * emitting webview). Outside Tauri, resolves without emitting.
+ */
+export async function setParked(parked: boolean): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  try {
+    await emit("orbitkit://park", { parked });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
 export * from "./dragGesture.js";

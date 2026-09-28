@@ -28,3 +28,6 @@ secrets/
 
 # Campaign working state (kept local; evidence copied into worktrees manually)
 plans/
+
+# Vitest harness JSON reports (RTK passthrough writer; never commit)
+packages/orbitkit/.vitest/

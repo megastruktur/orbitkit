@@ -21,5 +21,28 @@ export type {
   MascotMachineSnapshot,
   MascotRnd,
 } from "./mascotMachine.js";
+export {
+  MAX_STEP_MS,
+  MIN_ROAM_INTERVAL_MS,
+  aimRoamVelocity,
+  createRoam,
+  createRoamDrag,
+  rebaseRoamBounds,
+  roamBounds,
+  startRoam,
+  stepRoam,
+} from "./roam.js";
+export type {
+  CreateRoamOptions,
+  RoamController,
+  RoamDragBinding,
+  RoamDragOptions,
+  RoamHandle,
+  RoamState,
+  RoamWindowSize,
+  RoamWindowSizeSource,
+  RoamWindow,
+  StartRoamOptions,
+} from "./roam.js";
 export { default as Bubble } from "./Bubble.svelte";
 export { default as Badge } from "./Badge.svelte";

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
+import { tick } from "svelte";
 import Mascot from "./Mascot.svelte";
 import type { MascotConfig } from "./config";
 
@@ -354,5 +355,142 @@ describe("Mascot Component", () => {
     expect(button.style.width).toBe("120px");
     expect(button.style.height).toBe("120px");
     expect(button.style.getPropertyValue("--mascot-size")).toBe("120px");
+  });
+});
+
+describe("Mascot kind=sheets (K7)", () => {
+  const sheetsConfig: MascotConfig = {
+    kind: "sheets",
+    src: "mascot.png",
+    size: 32,
+    scale: 2,
+    anchor: "bottom-center",
+    faceByVelocity: true,
+    sheets: {
+      small: {
+        src: "small.png",
+        frameWidth: 16,
+        frameHeight: 12,
+        frames: 4,
+        fps: 2,
+        loop: true,
+      },
+      tall: {
+        src: "tall.png",
+        frameWidth: 16,
+        frameHeight: 18,
+        frames: 2,
+        fps: 1,
+      },
+    },
+  };
+
+  const sheetEl = (container: HTMLElement) =>
+    container.querySelector(".orbitkit-mascot-sheet") as HTMLElement;
+
+  it("renders the named sheet with scaled frame geometry", () => {
+    const { container } = render(Mascot, {
+      props: { config: sheetsConfig, sheet: "tall" },
+    });
+
+    const el = sheetEl(container);
+    expect(el).toBeTruthy();
+    // 2 frames * 16px * scale 2 = 64px strip; 18px * 2 = 36px frame height.
+    expect(el.style.backgroundImage).toContain('url("tall.png")');
+    expect(el.style.backgroundSize).toBe("64px 36px");
+    expect(el.style.width).toBe("32px");
+    expect(el.style.height).toBe("36px");
+    expect(el.style.getPropertyValue("image-rendering")).toBe("pixelated");
+  });
+
+  it("falls back to the first sheet with console.error for an unknown sheet name", () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const { container } = render(Mascot, {
+        props: { config: sheetsConfig, sheet: "does-not-exist" },
+      });
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('unknown sheet "does-not-exist"'),
+      );
+      expect(sheetEl(container).style.backgroundImage).toContain('url("small.png")');
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it("keeps the bottom edge constant when swapping between sheets of different heights", async () => {
+    const { container, rerender } = render(Mascot, {
+      props: { config: sheetsConfig, sheet: "small" },
+    });
+
+    const small = sheetEl(container);
+    expect(small.style.height).toBe("24px"); // 12px * 2
+    expect(small.style.bottom).toBe("0px");
+
+    await rerender({ config: sheetsConfig, sheet: "tall" });
+
+    const tall = sheetEl(container);
+    expect(tall.style.height).toBe("36px"); // 18px * 2
+    expect(tall.style.bottom).toBe("0px"); // same baseline as small
+  });
+
+  it("mirrors only while faceByVelocity and vx < 0, retaining facing at vx == 0", async () => {
+    const { container, rerender } = render(Mascot, {
+      props: { config: sheetsConfig, sheet: "small", velocityX: 1 },
+    });
+
+    const transform = () => sheetEl(container).style.transform;
+    expect(transform()).not.toContain("scaleX(-1)");
+
+    await rerender({ config: sheetsConfig, sheet: "small", velocityX: -1 });
+    expect(transform()).toContain("scaleX(-1)");
+
+    await rerender({ config: sheetsConfig, sheet: "small", velocityX: 0 });
+    expect(transform()).toContain("scaleX(-1)"); // last facing retained
+
+    await rerender({ config: sheetsConfig, sheet: "small", velocityX: 1 });
+    expect(transform()).not.toContain("scaleX(-1)");
+  });
+
+  it("never mirrors when faceByVelocity is off", () => {
+    const noFace: MascotConfig = { ...sheetsConfig, faceByVelocity: false };
+    const { container } = render(Mascot, {
+      props: { config: noFace, sheet: "small", velocityX: -5 },
+    });
+
+    expect(sheetEl(container).style.transform).not.toContain("scaleX(-1)");
+  });
+
+  it("freezes on frame 0 under reduced motion even as time passes", async () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(Mascot, {
+        props: { config: sheetsConfig, sheet: "small", reducedMotion: true },
+      });
+
+      expect(sheetEl(container).style.backgroundPositionX).toBe("0px");
+      vi.advanceTimersByTime(2000);
+      await tick();
+      expect(sheetEl(container).style.backgroundPositionX).toBe("0px");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("hard-swaps frames over time via frameAt without reduced motion", async () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(Mascot, {
+        props: { config: sheetsConfig, sheet: "small" },
+      });
+
+      // small: 4 frames @ 2 fps -> 500 ms per frame.
+      vi.advanceTimersByTime(1500); // 3 ticks -> elapsed 1500ms -> frame 3
+      await tick(); // flush Svelte's microtask DOM update
+      expect(sheetEl(container).style.backgroundPositionX).toBe("-96px"); // -3 * 16 * 2
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

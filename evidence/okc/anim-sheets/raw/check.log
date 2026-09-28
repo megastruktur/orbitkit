@@ -1,0 +1,3 @@
+$ tsc --noEmit
+$ tsc --noEmit
+check_exit=0

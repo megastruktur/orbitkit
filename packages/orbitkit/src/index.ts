@@ -6,3 +6,5 @@ export { layoutItems } from "./geometry.js";
 export type { ItemPosition } from "./geometry.js";
 export { resolveMenuAngles } from "./geometry.js";
 export * from "./bridge.js";
+export { frameAt, sheetFrameStyle, sheetGeometry } from "./mascot/sheets.js";
+export type { SheetGeometry } from "./mascot/sheets.js";

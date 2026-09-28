@@ -17,7 +17,7 @@ A minimal, compilable, and runnable consumer application showcasing `@orbitkit/u
   Initializes `tauri_plugin_orbitkit::init(config)` with parsed `orbitkit.config.json`. Handles native menu events via `OrbitkitExt::on_menu_action`:
   - `app.about` → logs action.
   - `app.quit` → exits process (`app.exit(0)`).
-  - `app.notes` / `app.settings` → opens popup window (`open_popup(id)`).
+  - `app.notes` / `app.settings` → opens popup window (`open_popup(id, None, None)` — no params, single instance per id; re-open focuses/re-anchors).
   - `app.timer` → sets mascot state to `sleep` for 5s then reverts to `idle`.
   - `app.alert` → sets mascot state to `alert` (state pool TTL auto-reverts after ~8s).
 

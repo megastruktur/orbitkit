@@ -53,7 +53,7 @@ pub fn run() {
                     let app_popup = app_clone.clone();
                     let popup_id = action_id.trim_start_matches("app.").to_string();
                     let _ = app_clone.run_on_main_thread(move || {
-                        let _ = app_popup.orbitkit().open_popup(popup_id);
+                        let _ = app_popup.orbitkit().open_popup(popup_id, None, None);
                     });
                 }
                 // Demo-b1: timer mutes Glim into the sleep pool for 5s.

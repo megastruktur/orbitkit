@@ -9,7 +9,12 @@
 #   bottom-centre INSIDE the window, so the window centre is NOT the mascot:
 #   every click point below is derived from the real orbitkit.config.json +
 #   windowFit/geometry math, and the window rect is re-read from the OS right
-#   before every click (the mascot roams at ~24 px/s).
+#   before every click. The app CAPS the boot-fit y shift at the mascot's
+#   bottom edge (mirrored in Get-Content-Shift): the bottom-pinned mascot is
+#   never pushed past the window bottom — near work-area edges it moves up
+#   WITH the window. The mascot is STATIC by default (no roam in the starter
+#   config; roaming is an opt-in library feature), so the rect only changes
+#   on drags and one-shot re-clamps.
 # - The K7 arc-anchor menu arc centre sits headGap px above the mascot's top
 #   edge; discs are centred at origin + radius*(cos, sin) for angle
 #   -180 + i * span/(n-1)  (RadialMenu translates its container by the origin
@@ -338,13 +343,18 @@ Write-Timeline "Geometry: mascot=$MascotSize window=${WinW}x${WinH} pin=($PinX,$
 # max(mascot, 2*(radius+itemSize)) + 16) at the PRIMARY MONITOR BOTTOM-RIGHT
 # (calculate_overlay_position default, margin 24, config x/y override), then
 # MascotView's demoWindowFit sizes it to the content union (360x288), keeps
-# the mascot's screen position, clamps the ideal window position into the
-# WORK AREA and compensates the content by the clamp delta (contentShift).
+# WORK AREA and compensates the content by the clamp delta (contentShift) —
+# EXCEPT downward: the app caps the y shift at the mascot's bottom edge
+# (windowFit.ts: shift.y = min(idealY - cY, WinH - MascotSize - PinY), the
+# padding slack below the pinned mascot — 0 with the starter numbers), so
+# the mascot never moves past the window bottom; near work-area edges it
+# moves up WITH the window. (Run 36573470644 failed because this script
+# modelled the OLD uncapped shift and aimed every disc 24 px too low.)
 # The mascot's window-local position is gNew + shift, NOT the raw pin —
-# ignoring the shift moves every click point up by the clamp delta.
-# The shift is boot-constant: roam placement and post-drag re-clamps move
-# the WINDOW only, never the content shift (MascotView).
-# ---------------------------------------------------------------------------
+# ignoring the shift moves every click point by the clamp delta.
+# The shift is boot-constant: the mascot is STATIC by default (no roam in
+# the starter config) and post-drag re-clamps move the WINDOW only, never
+# the content shift (MascotView).
 $MonitorBounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 $WorkArea = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
 Write-Timeline "Monitor $($MonitorBounds.Width)x$($MonitorBounds.Height); work area ($($WorkArea.X),$($WorkArea.Y)) $($WorkArea.Width)x$($WorkArea.Height)"
@@ -359,7 +369,10 @@ Write-Timeline "Pre-fit mascot window model: ${PrefitSize}x${PrefitSize} at ($Pr
 function Get-Content-Shift($preX, $preY, $preSize) {
     # demoWindowFit: mascot screen pos = pre-fit rect + CSS bottom-centre pin;
     # ideal window pos = mascotScreen - gNew (= PinX,PinY); clamp into the
-    # work area; shift = ideal - clamped.
+    # work area; shift = ideal - clamped, EXCEPT the y component is capped
+    # at the mascot's bottom edge (the padding slack below the pinned
+    # mascot) — mirrors the windowFit.ts cap so the model can never aim
+    # below the window bottom.
     $gX = $preX + ($preSize - $MascotSize) / 2
     $gY = $preY + $preSize - $MascotSize
     $idealX = $gX - $PinX
@@ -374,7 +387,11 @@ function Get-Content-Shift($preX, $preY, $preSize) {
         if ($idealY -lt $WorkArea.Y) { $cY = $WorkArea.Y }
         elseif ($idealY + $WinH -gt $WorkArea.Y + $WorkArea.Height) { $cY = $WorkArea.Y + $WorkArea.Height - $WinH }
     } else { $cY = $WorkArea.Y }
-    return @{ X = [int]($idealX - $cX); Y = [int]($idealY - $cY) }
+    # windowFit.ts y-cap. Equals the padding slack below the pinned mascot
+    # when maxY == mascot and MinYp is integral (the starter's numbers); in
+    # general it is WinH - mascot - pin (any ceil slack included).
+    $capY = $WinH - $MascotSize - $PinY
+    return @{ X = [int]($idealX - $cX); Y = [int][Math]::Min($idealY - $cY, $capY) }
 }
 
 $script:ContentShift = Get-Content-Shift $PrefitX $PrefitY $PrefitSize
@@ -417,8 +434,10 @@ function Get-App-Error-Tail {
 
 function Get-Mascot-Rect-Twice {
     # Two rect reads 60 ms apart -> per-tick velocity in px/s (r4: instrument,
-    # don't guess — the roam moves the window ~24 px/s, so any click computed
-    # from a single read drifts by velocity * click latency).
+    # don't guess — the static-by-default mascot reads v=(0,0), but drags and
+    # one-shot settle re-clamps move the window (and an opt-in roam would
+    # move it continuously); a click computed from a single read drifts by
+    # velocity * click latency).
     $a = Get-Window-Info "^orbitkit-mascot$"
     if (-not $a) { return $null }
     Start-Sleep -Milliseconds 60
@@ -498,8 +517,8 @@ function Click-Mascot-Anchored($localX, $localY, $label) {
 }
 
 function Get-Mascot-Point {
-    # Velocity-predicted mascot centre point (fresh read per call; roam moves
-    # the window ~24 px/s, never cache).
+    # Velocity-predicted mascot centre point (fresh read per call — the rect
+    # can change on drags/re-clamps; never cache).
     $t = Get-Mascot-Predicted
     return @{
         X = $t.PredX + $script:PinXEff + $MascotSize / 2
@@ -648,6 +667,30 @@ try {
         Write-Timeline "Step 2: pre-fit rect not captured (fit landed between polls); using model shift ($($ContentShift.X), $($ContentShift.Y))"
     }
     Write-Timeline "Step 2: mascot window $($mascotWin.Rect.Width)x$($mascotWin.Rect.Height) == derived ${WinW}x${WinH}; shift ($($ContentShift.X), $($ContentShift.Y)); effective pin ($PinXEff, $PinYEff), origin ($OriginXEff, $OriginYEff)"
+    # Post-fit ground truth (the script cannot see the DOM): the only APP
+    # truth observable here is the WINDOW rect. (1) It must sit fully inside
+    # the work area — a violation is an app regression, fail loudly.
+    # (2) Ground truth for the clamp the app applied: the ideal window pos
+    # is pure geometry from the pre-fit rect (mascot screen pos - pin), so
+    # the delta ideal -> OBSERVED final rect is the clamp the app ACTUALLY
+    # applied, logged next to the model shift. The mascot-bottom ==
+    # window-bottom relation is deliberately NOT asserted: the pin is
+    # model-derived (DOM invisible), so that check could only compare the
+    # model with itself — a model/app content-shift mismatch shows up only
+    # as missed discs, which the r4 miss diagnostics catch.
+    $pfL = $mascotWin.Rect.Left; $pfT = $mascotWin.Rect.Top
+    $pfR = $pfL + $mascotWin.Rect.Width; $pfB = $pfT + $mascotWin.Rect.Height
+    if ($pfL -lt $WorkArea.X -or $pfT -lt $WorkArea.Y -or $pfR -gt ($WorkArea.X + $WorkArea.Width) -or $pfB -gt ($WorkArea.Y + $WorkArea.Height)) {
+        Write-Error "Post-fit invariant broken: window rect ($pfL,$pfT)-($pfR,$pfB) outside the work area ($($WorkArea.X),$($WorkArea.Y)) $($WorkArea.Width)x$($WorkArea.Height) (app regression, not a script issue)!"
+        exit 1
+    }
+    $fitSrc = "model"
+    $fitRect = @{ Left = $PrefitX; Top = $PrefitY; Width = $PrefitSize; Height = $PrefitSize }
+    if ($prefitObserved) { $fitRect = $prefitObserved; $fitSrc = "observed" }
+    $fgX = $fitRect.Left + ($fitRect.Width - $MascotSize) / 2
+    $fgY = $fitRect.Top + $fitRect.Height - $MascotSize
+    $appliedX = [int](($fgX - $PinX) - $pfL); $appliedY = [int](($fgY - $PinY) - $pfT)
+    Write-Timeline "Step 2: post-fit ground truth: window ($pfL,$pfT)-($pfR,$pfB) inside work area; app applied clamp delta = ($appliedX, $appliedY) [$fitSrc pre-fit -> observed final]; model content shift = ($($ContentShift.X), $($ContentShift.Y)) (y capped at capY=$($WinH - $MascotSize - $PinY))"
     Park-Pointer
     Start-Sleep -Milliseconds 1500
     Capture-Still "02-overlay.png"
@@ -698,8 +741,9 @@ try {
     Click-Item "app.badge"
     Start-Sleep -Milliseconds 1500
 
-    # Step 7 (brief step 7): drag planet ~200 px. Roaming pauses during the
-    # drag and resumes around the drop point; log rects before/after.
+    # Step 7 (brief step 7): drag planet ~200 px. The window follows the
+    # drag; after the drop the one-shot settle re-clamp moves it (window
+    # only) back inside the work area; log rects before/after.
     # r5: the end point is chosen from the ACTUAL work area and must stay
     # >= $DragMargin px inside every work-area edge (r4 run dropped the
     # mascot 9 px from the right edge and the window came back 512x360).
@@ -734,7 +778,7 @@ try {
     Sample-Sleep 2000
     $dragHist = Stop-Rect-Watch
     Start-Sleep -Milliseconds 300
-    Log-Mascot-Rect "Step 7: after drop (roam resumed)"
+    Log-Mascot-Rect "Step 7: after drop (settle re-clamp done)"
     $afterDrag = Get-Window-Info "^orbitkit-mascot$"
     if (-not $afterDrag -or $afterDrag.Rect.Width -ne $WinW -or $afterDrag.Rect.Height -ne $WinH) {
         $got = "(window not found)"

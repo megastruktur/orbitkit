@@ -1,0 +1,8 @@
+PARSE OK
+extracted lines 369..392 (1-based, inclusive)
+new Get-Content-Shift: shift = (0, 0)
+effective pin = (132, 192); arc origin = (180, 180)
+app.notes disc local = (30, 180)
+old uncapped model: shift.y = 24 -> pin (132, 216), origin (180, 204) [24 px too low]
+post-fit invariant OK: mascot screen bottom 720 == window bottom 720; window inside work area
+SELFCHECK PASS

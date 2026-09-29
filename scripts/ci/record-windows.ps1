@@ -122,23 +122,92 @@ function Click-At($x, $y) {
     Start-Sleep -Milliseconds 150
 }
 
+# r5: mascot rect watch (proves/disproves the OS edge-snap hypothesis).
+# Sampled ~every 100 ms during the drag and the post-drop settle; a compact
+# line is logged whenever position OR size changes.
+$script:WatchOn = $false
+$script:WatchSw = $null
+$script:WatchLastSampleMs = -1000
+$script:WatchLast = ""
+$script:WatchHist = New-Object System.Collections.ArrayList
+
+function Start-Rect-Watch {
+    $script:WatchSw = [System.Diagnostics.Stopwatch]::StartNew()
+    $script:WatchLastSampleMs = -1000
+    $script:WatchLast = ""
+    $script:WatchHist = New-Object System.Collections.ArrayList
+    $script:WatchOn = $true
+    Watch-Sample
+}
+
+function Watch-Sample {
+    if (-not $script:WatchOn) { return }
+    $ms = $script:WatchSw.ElapsedMilliseconds
+    if (($ms - $script:WatchLastSampleMs) -lt 100) { return }
+    $script:WatchLastSampleMs = $ms
+    $w = Get-Window-Info "^orbitkit-mascot$"
+    if ($w) {
+        $r = $w.Rect
+        $cur = "($($r.Left),$($r.Top)) $($r.Width)x$($r.Height)"
+    } else {
+        $cur = "(window not found)"
+    }
+    if ($cur -ne $script:WatchLast) {
+        $line = "t+${ms}ms $cur"
+        [void]$script:WatchHist.Add($line)
+        Write-Timeline "Rect watch: $line"
+        $script:WatchLast = $cur
+    }
+}
+
+function Stop-Rect-Watch {
+    Watch-Sample
+    $script:WatchOn = $false
+    return @($script:WatchHist)
+}
+
+function Sample-Sleep($ms) {
+    # Sleep $ms, sampling the watch every ~100 ms (plain sleep when off).
+    if (-not $script:WatchOn) { Start-Sleep -Milliseconds $ms; return }
+    $end = (Get-Date).AddMilliseconds($ms)
+    while ((Get-Date) -lt $end) {
+        Watch-Sample
+        Start-Sleep -Milliseconds 20
+    }
+}
+
+function Test-App-Err-Log($needle) {
+    # Non-destructive read of the (possibly locked) redirected stderr log.
+    if (-not (Test-Path "app-err.log")) { return "no app-err.log" }
+    try {
+        $fs = [System.IO.File]::Open((Join-Path $PWD "app-err.log"), [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+        try {
+            $sr = New-Object System.IO.StreamReader($fs)
+            $txt = $sr.ReadToEnd()
+        } finally { $fs.Dispose() }
+        return [string]($txt.Contains($needle))
+    } catch {
+        return "unreadable ($($_.Exception.Message))"
+    }
+}
+
 function Drag-Mouse($startX, $startY, $endX, $endY, $steps = 15, $delayMs = 25) {
     $pt = New-Object POINT
     [Win32]::GetCursorPos([ref]$pt) | Out-Null
     Move-Mouse-Smooth $pt.X $pt.Y $startX $startY 10 15
-    Start-Sleep -Milliseconds 100
+    Sample-Sleep 100
     [Win32]::mouse_event(0x0002, 0, 0, 0, [UIntPtr]::Zero) # LEFTDOWN
-    Start-Sleep -Milliseconds 100
+    Sample-Sleep 100
     for ($i = 1; $i -le $steps; $i++) {
         $curX = [int]($startX + ($endX - $startX) * $i / $steps)
         $curY = [int]($startY + ($endY - $startY) * $i / $steps)
         [Win32]::SetCursorPos($curX, $curY) | Out-Null
         [Win32]::mouse_event(0x0001, 0, 0, 0, [UIntPtr]::Zero)
-        Start-Sleep -Milliseconds $delayMs
+        Sample-Sleep $delayMs
     }
-    Start-Sleep -Milliseconds 100
+    Sample-Sleep 100
     [Win32]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero) # LEFTUP
-    Start-Sleep -Milliseconds 200
+    Sample-Sleep 200
 }
 
 function Park-Pointer {
@@ -631,21 +700,80 @@ try {
 
     # Step 7 (brief step 7): drag planet ~200 px. Roaming pauses during the
     # drag and resumes around the drop point; log rects before/after.
+    # r5: the end point is chosen from the ACTUAL work area and must stay
+    # >= $DragMargin px inside every work-area edge (r4 run dropped the
+    # mascot 9 px from the right edge and the window came back 512x360).
     $mp = Get-Mascot-Point
-    $dragEndX = $mp.X + 200
-    $dragEndY = $mp.Y - 80
-    Write-Timeline "Step 7: Dragging mascot from ($($mp.X), $($mp.Y)) to ($dragEndX, $dragEndY)..."
+    $DragMargin = 150
+    $waL = $WorkArea.X; $waT = $WorkArea.Y
+    $waR = $WorkArea.X + $WorkArea.Width; $waB = $WorkArea.Y + $WorkArea.Height
+    $sx = [int]$mp.X; $sy = [int]$mp.Y
+    $dragEndX = $sx + 200
+    $dragEndY = $sy - 80
+    $inside = ($dragEndX -ge $waL + $DragMargin) -and ($dragEndX -le $waR - $DragMargin) -and ($dragEndY -ge $waT + $DragMargin) -and ($dragEndY -le $waB - $DragMargin)
+    $dragMode = "preferred (+200,-80)"
+    if (-not $inside) {
+        # Drag ~200 px toward the work-area centre instead.
+        $cxw = $waL + $WorkArea.Width / 2.0
+        $cyw = $waT + $WorkArea.Height / 2.0
+        $vx = $cxw - $sx; $vy = $cyw - $sy
+        $vlen = [Math]::Sqrt($vx * $vx + $vy * $vy)
+        if ($vlen -lt 1) { $vx = 200; $vy = 0; $vlen = 200 }
+        $travel = [Math]::Min(200.0, $vlen)
+        $dragEndX = [int][Math]::Round($sx + $vx / $vlen * $travel)
+        $dragEndY = [int][Math]::Round($sy + $vy / $vlen * $travel)
+        $dragMode = "toward work-area centre"
+    }
+    # Final clamp into the inset rectangle (never near an edge).
+    $dragEndX = [int][Math]::Max($waL + $DragMargin, [Math]::Min($waR - $DragMargin, $dragEndX))
+    $dragEndY = [int][Math]::Max($waT + $DragMargin, [Math]::Min($waB - $DragMargin, $dragEndY))
+    Write-Timeline "Step 7: drag geometry ($dragMode): start ($sx, $sy) end ($dragEndX, $dragEndY); end margins to work area L=$($dragEndX - $waL) R=$($waR - $dragEndX) T=$($dragEndY - $waT) B=$($waB - $dragEndY) (min required $DragMargin); work area ($waL,$waT)-($waR,$waB)"
     Log-Mascot-Rect "Step 7: drag start"
-    Drag-Mouse $mp.X $mp.Y $dragEndX $dragEndY 15 25
-    Start-Sleep -Milliseconds 1500
+    Start-Rect-Watch
+    Drag-Mouse $sx $sy $dragEndX $dragEndY 15 25
+    Sample-Sleep 2000
+    $dragHist = Stop-Rect-Watch
+    Start-Sleep -Milliseconds 300
     Log-Mascot-Rect "Step 7: after drop (roam resumed)"
+    $afterDrag = Get-Window-Info "^orbitkit-mascot$"
+    if (-not $afterDrag -or $afterDrag.Rect.Width -ne $WinW -or $afterDrag.Rect.Height -ne $WinH) {
+        $got = "(window not found)"
+        if ($afterDrag) { $got = "$($afterDrag.Rect.Width)x$($afterDrag.Rect.Height) at ($($afterDrag.Rect.Left),$($afterDrag.Rect.Top))" }
+        Write-Timeline "Step 7: FAIL mascot window is $got, expected ${WinW}x${WinH}; work area ($waL,$waT)-($waR,$waB); drag ($sx,$sy)->($dragEndX,$dragEndY); rect history (change lines): $($dragHist -join ' || ')"
+        Write-Timeline "Step 7: app-err.log 'Menu action' present: $(Test-App-Err-Log 'Menu action')"
+        Stop-Process -Id $appProc.Id -Force -ErrorAction SilentlyContinue
+        Write-Error "Mascot window size changed during drag: got $got, expected ${WinW}x${WinH} (see rect history in timeline)!"
+        exit 1
+    }
+    Write-Timeline "Step 7: post-drag size OK ${WinW}x${WinH}; $(@($dragHist).Count) rect change(s) logged"
 
     # Step 8 (brief step 8): open menu, click Quit -> app exits with code 0
     Write-Timeline "Step 8: Quit..."
     Open-Menu
+    # r5: fresh rect + derived local point right before the click (the size
+    # was asserted above; Click-Mascot-Anchored re-reads the rect itself).
+    $qIdx = $ItemIndex["app.quit"]
+    if ($null -ne $qIdx) {
+        $qRad = ($StartDeg + $qIdx * $StepDeg) * [Math]::PI / 180.0
+        $qLX = [int]($script:OriginXEff + $Radius * [Math]::Cos($qRad))
+        $qLY = [int]($script:OriginYEff + $Radius * [Math]::Sin($qRad))
+        $qw = Get-Window-Info "^orbitkit-mascot$"
+        if ($qw) {
+            Write-Timeline "Step 8: fresh mascot rect ($($qw.Rect.Left),$($qw.Rect.Top)) $($qw.Rect.Width)x$($qw.Rect.Height); quit local ($qLX, $qLY) -> screen ($($qw.Rect.Left + $qLX), $($qw.Rect.Top + $qLY))"
+            if ($qw.Rect.Width -ne $WinW -or $qw.Rect.Height -ne $WinH) {
+                Write-Timeline "Step 8: FAIL mascot window is $($qw.Rect.Width)x$($qw.Rect.Height), expected ${WinW}x${WinH}; refusing to aim with startup geometry"
+                Stop-Process -Id $appProc.Id -Force -ErrorAction SilentlyContinue
+                Write-Error "Mascot window size differs from ${WinW}x${WinH} before Quit click!"
+                exit 1
+            }
+        } else {
+            Write-Timeline "Step 8: fresh mascot rect: window not found"
+        }
+    }
     Click-Item "app.quit"
     Write-Timeline "Step 8: Waiting for app process to exit..."
     $exitedCleanly = $appProc.WaitForExit(6000)
+    Write-Timeline "Step 8: app-err.log 'Menu action: app.quit' present: $(Test-App-Err-Log 'Menu action: app.quit')"
     if ($exitedCleanly) {
         Write-Timeline "Step 8: App exited with code $($appProc.ExitCode)"
         if ($appProc.ExitCode -ne 0) {

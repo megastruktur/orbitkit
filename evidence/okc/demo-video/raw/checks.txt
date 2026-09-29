@@ -59,3 +59,9 @@ $ pwsh 7.4.6 -NoProfile -Command "[scriptblock]::Create((Get-Content -Raw
   click core: 60 ms double-read velocity, 350 ms lead, post-move offset check
   6 px / 3 attempts, per-click offset logs, 5 s miss retry with orbitkit titles
   + app liveness + app-err.log tail 30)
+
+--- Round 5 (2026-09-29) ---
+$ pwsh 7.4.2 -NoProfile -Command "[scriptblock]::Create((Get-Content -Raw scripts/ci/record-windows.ps1)) | Out-Null; 'PS-OK'" -> PS-OK
+$ pwsh geometry arithmetic (work area 1024x720, start 815,669) -> preferred inside=False; end=(675,526) L=675 R=349 T=526 B=194 travel=200.1
+$ pnpm -r test -> 17 files, 379 tests passed
+$ pnpm -r build && pnpm -r check -> exit 0 (check needs built dist in a fresh worktree)

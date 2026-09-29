@@ -181,4 +181,47 @@ verification showed:
 r2 set); `pnpm -r check` clean; Rust gate `OKC_RUST_GATE_OK` (67); `derive-geometry.mjs` exit 0; pwsh 7.4.6
 scriptblock parse → `PS-OK`. Evidence in `raw/checks.txt`.
 
-READY FOR REVIEW at 25d2167796172b9062a84fd90bc570fd29a038c3 (functional commit; the head commit adds only this sha line)
+## Round 5 (2026-09-29) — drag/Quit failure (run 36554786409 @ 1237f3e)
+
+**Verified facts (from the r4 run evidence):** Alert, Notes x2, Badge x2 fired. Only Step 7/8 failed. The drag
+ended (1015, 589), 9 px from the right screen edge. Mascot window before the drag: (629,405) 360x288; after:
+(594,383) **512x360** = exactly half the 1024x720 work area per axis (the Aero-Snap quarter size). The mascot
+window is built without `.resizable(false)`. Step 8 aimed with startup-derived local (330,204) at a 512x360 window
+-> no `Menu action: app.quit` in app-err.log -> forced kill.
+
+**Hypothesis status: UNPROVEN until the next run** (OS edge snap resized the window). No Windows runtime here.
+
+**Changes (`scripts/ci/record-windows.ps1` only):**
+1. Drag end point derived from `$WorkArea`, always >= 150 px inside every edge: preferred (+200,-80); if that
+   violates the inset, drag ~200 px toward the work-area centre; then clamp into the inset rectangle. Logs start,
+   end, margins L/R/T/B.
+2. Rect watch: polled ~every 100 ms from the drag start through 2 s after drop; logs `Rect watch: t+Nms (L,T) WxH`
+   whenever position OR size changes.
+3. Hard assertion after settling: window must be `${WinW}x${WinH}`; otherwise logs work area, drag, full change
+   history and `app-err.log` state, kills the app, `Write-Error`, exit 1.
+4. Quit: still a real menu click. Before it: fresh rect + derived local/screen point logged, and a second size
+   guard refuses to aim if the size differs. After it: existing `WaitForExit(6000)` + exit-code-0 requirement kept;
+   forced kill stays as failure cleanup with `App did not quit from menu!`, exit 1. Logs whether
+   `Menu action: app.quit` is in `app-err.log` (opened `FileShare.ReadWrite`, non-destructive).
+
+**Worked geometry check** (work area (0,0) 1024x720, margin 150 => end X in [150,874], Y in [150,570]).
+Start = (815,669) (mascot centre in the failed run). Preferred end (1015,589): X > 874 -> violates -> centre mode.
+Vector to centre (512,360) = (-303,-309), |v| = 433; end = (815,669) + 200*(-0.700,-0.714) = **(675,526)**
+(travel 200.1 px). Margins: L=675, R=349, T=526, B=194, all >= 150. Reproduced by running the same arithmetic
+in pwsh 7.4.2. Quit local point: Origin/radius formula is unchanged (`Click-Item`); the failed run's local point
+for a 360x288 window was (330,204), so with the window at (629,405) the screen target is (959,609). What matters
+is that the rect is re-read fresh and asserted 360x288 before aiming.
+
+**What the next run logs to decide the hypothesis:** the `Step 7: drag geometry` line (margins), `Rect watch:`
+lines through the drop + 2 s. If a size change to 512x360 still appears with >= 150 px margins, snap by edge
+proximity is disproved (look for a different resize cause, e.g. drag-to-top maximize/tiling, DPI); if size stays
+360x288 and Quit works, the edge-proximity snap is supported. If it fails, the Step 7 FAIL line has the history.
+
+**Out-of-scope findings:** the mascot window builder in `crates/tauri-plugin-orbitkit/src/desktop.rs` lacks
+`.resizable(false)`; if the next run proves OS snap, adding it (or snap prevention) is a product change and
+was NOT made here. Also: a fresh worktree needs `pnpm -r build` before `pnpm -r check` (`@orbitkit/ui` dist).
+
+**Gates (r5):** pwsh 7.4.2 scriptblock parse -> `PS-OK`; `pnpm install --frozen-lockfile`, `pnpm -r test`
+379/379, `pnpm -r build && pnpm -r check` clean. Runtime behaviour on Windows NOT verified.
+
+READY FOR REVIEW at dc7ac2139b55a395cd4e9f9aeaef1e2493ad1622 (functional commit; the head commit adds only this sha line)

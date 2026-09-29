@@ -39,10 +39,10 @@ On desktop platforms, OrbitKit manages three classes of windows:
    Created dynamically when `show_overlay` is invoked (or via router if pre-opened).
    - Loads: `index.html?orbitkit=mascot`.
    - Window properties: `transparent: true`, `decorations: false`, `alwaysOnTop: true`, `skipTaskbar: true`, `shadow: false`.
-3. **Popup Windows (`orbitkit-popup-<id>`)**:
-   Created dynamically when `open_popup(id)` is invoked.
+3. **Popup Windows (`orbitkit-popup-<id>[-<instanceKey>]`)**:
+   Created dynamically when `open_popup(id, params, instance_key)` is invoked (K11: `params` substitute `{param}` placeholders URL-encoded; `instance_key` enables multiple windows per popup id, label `orbitkit-popup-<id>-<instanceKey>`).
    - Loads URL configured in `windows.popups` (e.g. `index.html?popup=notes`).
-   - If already open, `open_popup(id)` restores focus.
+   - If already open, `open_popup` restores focus and re-anchors (idempotent, no duplicate).
 
 ---
 

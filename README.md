@@ -30,10 +30,12 @@
 | Feature | Description |
 |---|---|
 | **Unified K2 Configuration** | Configure mascot visuals, radial action menus, and popup targets once in `orbitkit.config.json` for all target platforms. |
-| **Reactive Mascot States** | Seamlessly toggle between `idle`, `busy`, and custom states. Supports sandboxed inline SVG data URLs, CSS sprite sheets, or static images. |
-| **Radial Menu Geometry & Animation** | Full circular `orbit` (360°) or directional `arc` (top, bottom, left, right) layouts with animated `spawn` / `none` radial transitions. |
-| **Vector Icon Action Discs** | Radial menu action items render sharp vector icons decoded directly from SVG data URLs, complete with labels and tooltips. |
-| **Adaptive Cross-Platform Popups** | Multi-window desktop popups via native `WebviewWindow` instances, adapting to a mobile bottom sheet (`PopupSheet`) on Android. |
+| **Reactive Mascot States** | Seamlessly toggle between `idle`, `busy`, and custom states. Supports sandboxed inline SVG data URLs, CSS sprite sheets, static images, and (0.2.0) pixel-art **sprite-sheet pools** (`kind: "sheets"`) with integer upscale, velocity mirroring, and `priority`/`ttlMs` state pools. |
+| **Radial Menu Geometry & Animation** | Full circular `orbit`, directional `arc`, or (0.2.0) `arc-anchor` layouts — the arc hovers `headGap` px above the mascot — with animated `spawn` / `none` radial transitions and per-item centre→edge stagger. |
+| **Vector Icon Action Discs** | Radial menu action items render sharp vector icons decoded from SVG data URLs or inline `{ svg }` markup (allowlist-sanitized, K12), complete with labels and tooltips. |
+| **Adaptive Cross-Platform Popups** | Multi-window desktop popups via native `WebviewWindow` instances — (0.2.0) anchored next to the mascot or centred on its monitor (`place_popup`), parameterised with `{param}` placeholders and multi-instance keys — adapting to a mobile bottom sheet (`PopupSheet`) on Android. |
+| **Roam, Park & Click-Through** | (0.2.0) The mascot roams a work-area corner zone (facing its walking direction), pauses on drag and resumes around the drop point; park (do-not-disturb) tucks it into a screen corner; opt-in passthrough keeps clicks outside hit regions click-through (K10). |
+| **Bubble & Badge** | (0.2.0) Speech-bubble notifications (`<Bubble />`) and an unread-count `<Badge />`, wired over the `orbitkit://badge` / `orbitkit://park` events. |
 | **Draggable Desktop Mascot** | Fluid desktop window dragging via `startMascotDrag` while preserving click-to-activate radial menu interactions. |
 | **Native Android System Overlay** | Floating `TYPE_APPLICATION_OVERLAY` running outside the app with direct JNI action dispatch (`OrbitkitJniBridge.onNativeAction`). |
 | **Typed TypeScript & Rust Bridge** | Pure Svelte 5 `@orbitkit/ui` package with a typed config (`defineConfig`), runtime schema validation (`validateConfig`) and safe Tauri IPC wrappers. |

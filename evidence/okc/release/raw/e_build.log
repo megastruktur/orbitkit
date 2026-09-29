@@ -1,0 +1,26 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+@sveltejs/package found the following issues while packaging your library:
+Avoid usage of `import.meta.env` in your code. It only works in apps bundled with Vite. Consider using packages like `esm-env` instead which works with all bundlers or without bundling.
+
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+12:46:39 AM [vite-plugin-svelte] src/views/MascotView.svelte:284:6 `gesture` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+282:   // binding: the same handler surface but pausing/resuming + re-basing roam
+283:   // around every drag. Handlers read `gesture` at call time.
+284:   let gesture = createDragGesture({
+                  ^
+285:     isMenuOpen: () => menuOpen,
+286:     closeMenuInstant: () => closeMenu(true),
+✓ 156 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:  0.30 kB
+dist/assets/index-Qu6hUnYO.css   21.69 kB │ gzip:  4.46 kB
+dist/assets/index-Cqjjz_o3.js   134.22 kB │ gzip: 44.17 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/.pnpm/@tauri-apps+api@2.11.1/node_modules/@tauri-apps/api/window.js is dynamically imported by ../../packages/orbitkit/dist/passthrough.js but also statically imported by src/views/MascotView.svelte, ../../packages/orbitkit/dist/bridge.js, dynamic import will not move module into another chunk.
+
+✓ built in 396ms

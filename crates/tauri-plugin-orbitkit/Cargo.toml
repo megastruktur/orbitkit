@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-orbitkit"
-version = "0.2.0-dev"
+version = "0.2.0"
 authors = ["OrbitKit Team"]
 edition = "2021"
 license = "MIT"

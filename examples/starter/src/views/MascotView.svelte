@@ -376,7 +376,9 @@
             roamCfg,
             physSize,
           );
-          await win.setPosition(new PhysicalPosition(zone.x, zone.y));
+          await win.setPosition(
+            new PhysicalPosition(Math.round(zone.x), Math.round(zone.y)),
+          );
         } catch (err: unknown) {
           console.error("[MascotView] demo-b2 roam placement failed:", err);
         }

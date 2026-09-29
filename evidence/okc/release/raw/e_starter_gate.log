@@ -1,0 +1,12 @@
+   Compiling tauri-runtime v2.11.3
+   Compiling wry v0.55.1
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling tauri-build v2.6.3
+   Compiling tauri-plugin-orbitkit v0.2.0 (/home/megastruktur/orca/workspaces/orbitkit/okc-release/crates/tauri-plugin-orbitkit)
+   Compiling tauri v2.11.6
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okc-release/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.59s
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okc-release/examples/starter/src-tauri)
+   Compiling tauri-plugin-orbitkit v0.2.0 (/home/megastruktur/orca/workspaces/orbitkit/okc-release/crates/tauri-plugin-orbitkit)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.17s
+OKC_STARTER_GATE_OK

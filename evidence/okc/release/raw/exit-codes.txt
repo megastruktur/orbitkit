@@ -1,0 +1,9 @@
+install=0
+build=0
+test=0
+check=0
+rust_gate=0
+starter_gate=0
+linux_build=0
+pack=0
+# Each gate ran in the foreground via bash tool; exit codes: pnpm install --frozen-lockfile=0, pnpm -r build=0, pnpm -r test=0 (376/376 + starter 30), pnpm -r check=0, rust_gate.sh=0 (67 passed, OKC_RUST_GATE_OK), starter_gate.sh=0 (OKC_STARTER_GATE_OK), linux-desktop.sh build=0 (Build successful), pnpm --filter @orbitkit/ui pack=0.

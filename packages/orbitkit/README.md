@@ -102,6 +102,26 @@ pnpm add @orbitkit/ui
 
 ---
 
+## Plugin Commands & Events (0.2.0)
+
+Rust plugin commands (`plugin:orbitkit|…`):
+
+| Command | Arguments | Notes |
+|---|---|---|
+| `overlay_permission` / `request_overlay_permission` | — | Android overlay permission check/request; always granted on desktop. |
+| `show_overlay` / `hide_overlay` | `menu?`, `mascot?` / — | Show/hide the mascot window or native overlay. |
+| `open_popup` | `id`, `params?`, `instanceKey?` | Idempotent create/show/focus/re-anchor; label `orbitkit-popup-{id}[-{instanceKey}]`; `{param}` URL-encoded substitution. |
+| `close_popup` | `label` | Closes by full window label. |
+| `list_popups` | — | Labels of open popup windows (`string[]`). |
+| `set_mascot_state` | `state` | Broadcasts `orbitkit://mascot-state`. |
+| `emit_menu_action` | `id` | Unified action pipeline (Rust handlers + event). |
+| `start_mascot_drag` | — | Native drag of `orbitkit-mascot`. |
+| `mascot_monitor` | — | `{ workArea, scaleFactor }` of the monitor containing the mascot centre (unsupported on mobile). |
+
+Events: `orbitkit://menu-action`, `orbitkit://mascot-state`, `orbitkit://popup-shown {label}`, `orbitkit://popup-closed {label}`, `orbitkit://badge {count}`, `orbitkit://park {parked}` (+ legacy Android `orbitkit://popup-open` / `orbitkit://popup-close`).
+
+---
+
 ## Documentation
 
 For full details, see the project documentation:

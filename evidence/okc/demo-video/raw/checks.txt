@@ -1,0 +1,29 @@
+okc-demo-video raw check log (2026-09-29, branch megastruktur/okc-demo-video)
+
+$ node evidence/okc/demo-video/raw/derive-geometry.mjs
+  -> exit 0 (twice; full output: geometry-derivation.json)
+$ command -v pwsh
+  -> absent on megaserver (brief expectation: "PowerShell not available").
+     Syntax review done manually; script reuses only 0.1.0-proven syntax
+     (same Add-Type block, EnumWindows delegate casts, Write-Error + exit 1,
+     $ErrorActionPreference="Continue" as the run-36035495949 script).
+$ grep -n '01-main|02-overlay|03-menu|04-notes' scripts/ci/record-macos.sh
+  -> macOS script already emits the numbered stills (12 matches);
+     macOS job upload list intentionally untouched (out of scope).
+$ git status --short
+  -> (after commit) clean
+
+--- Round 2 (2026-09-29) ---
+$ node evidence/okc/demo-video/raw/derive-geometry.mjs  (updated: prefit + contentShift)
+  -> exit 0; shift (0, +16) with sample work area 1920x1040 (40 px Server 2022
+     taskbar); (0, +24) with a 48 px taskbar. Non-zero either way.
+  -> full output: geometry-derivation.json
+Source chain for the Major: crates/tauri-plugin-orbitkit/src/desktop.rs
+  calculate_overlay_size = max(96, 2*(150+44)) + 16 = 404 (square),
+  calculate_overlay_position default = primary-monitor bottom-right, margin 24;
+  examples/starter/src/lib/windowFit.ts demoWindowFit clamps ideal (1514, 768)
+  into the work area -> shift. Script now models it AND captures the live
+  pre-fit rect (25 ms poll) to override the model, plus hard size assert
+  360x288 and title-bar click-away.
+demo-video-r2.md: absent (only demo-video.md in okc_briefs/) -> documented as
+  Contract questions in REPORT.md.

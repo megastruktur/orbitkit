@@ -60,10 +60,6 @@ jobs:
             02-overlay.png
             03-menu-open.png
             04-notes-popup.png
-            main.png
-            overlay.png
-            menu-open.png
-            notes-popup.png
             app.log
             app-err.log
             timeline.txt

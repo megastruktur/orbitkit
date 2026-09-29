@@ -1,0 +1,189 @@
+{
+  "config": "examples/starter/src/orbitkit.config.json",
+  "mascot": {
+    "kind": "sheets",
+    "frame": 32,
+    "scale": 3,
+    "renderedBox": 96
+  },
+  "fixedWindow": {
+    "width": 360,
+    "height": 288,
+    "pinLocal": {
+      "x": 132,
+      "y": 208
+    },
+    "arcOriginLocal": {
+      "x": 180,
+      "y": 196
+    }
+  },
+  "startupContentShift": {
+    "prefitWindow": {
+      "size": 404,
+      "x": 1492,
+      "y": 652
+    },
+    "mascotScreenAtBoot": {
+      "x": 1646,
+      "y": 960
+    },
+    "idealWindowPos": {
+      "x": 1514,
+      "y": 768
+    },
+    "clampedWindowPos": {
+      "x": 1514,
+      "y": 752
+    },
+    "shift": {
+      "x": 0,
+      "y": 16
+    },
+    "note": "boot-constant; roam placement and post-drag re-clamps move the WINDOW only"
+  },
+  "assumptions": {
+    "dpiScale": "runner at 100% -> logical == physical px (GetWindowRect)",
+    "workArea": "PrimaryScreen.WorkingArea at record time; derivation sample 1920x1040"
+  },
+  "sampleWindowRect": {
+    "x": 12,
+    "y": 548
+  },
+  "discs": [
+    {
+      "index": 0,
+      "id": "app.notes",
+      "label": "Notes",
+      "angleDeg": -180,
+      "window": {
+        "x": 30,
+        "y": 196
+      },
+      "screen": {
+        "x": 42,
+        "y": 744
+      }
+    },
+    {
+      "index": 1,
+      "id": "app.timer",
+      "label": "Timer",
+      "angleDeg": -157.5,
+      "window": {
+        "x": 41.42,
+        "y": 138.6
+      },
+      "screen": {
+        "x": 53.42,
+        "y": 686.6
+      }
+    },
+    {
+      "index": 2,
+      "id": "app.bubble",
+      "label": "Bubble",
+      "angleDeg": -135,
+      "window": {
+        "x": 73.93,
+        "y": 89.93
+      },
+      "screen": {
+        "x": 85.93,
+        "y": 637.9300000000001
+      }
+    },
+    {
+      "index": 3,
+      "id": "app.alert",
+      "label": "Alert",
+      "angleDeg": -112.5,
+      "window": {
+        "x": 122.6,
+        "y": 57.42
+      },
+      "screen": {
+        "x": 134.6,
+        "y": 605.42
+      }
+    },
+    {
+      "index": 4,
+      "id": "app.badge",
+      "label": "Badge +1",
+      "angleDeg": -90,
+      "window": {
+        "x": 180,
+        "y": 46
+      },
+      "screen": {
+        "x": 192,
+        "y": 594
+      }
+    },
+    {
+      "index": 5,
+      "id": "app.settings",
+      "label": "Settings",
+      "angleDeg": -67.5,
+      "window": {
+        "x": 237.4,
+        "y": 57.42
+      },
+      "screen": {
+        "x": 249.4,
+        "y": 605.42
+      }
+    },
+    {
+      "index": 6,
+      "id": "app.about",
+      "label": "About",
+      "angleDeg": -45,
+      "window": {
+        "x": 286.07,
+        "y": 89.93
+      },
+      "screen": {
+        "x": 298.07,
+        "y": 637.9300000000001
+      }
+    },
+    {
+      "index": 7,
+      "id": "app.park",
+      "label": "Park",
+      "angleDeg": -22.5,
+      "window": {
+        "x": 318.58,
+        "y": 138.6
+      },
+      "screen": {
+        "x": 330.58,
+        "y": 686.6
+      }
+    },
+    {
+      "index": 8,
+      "id": "app.quit",
+      "label": "Quit",
+      "angleDeg": 0,
+      "window": {
+        "x": 330,
+        "y": 196
+      },
+      "screen": {
+        "x": 342,
+        "y": 744
+      }
+    }
+  ],
+  "mascotCentreWindow": {
+    "x": 180,
+    "y": 256
+  },
+  "mascotCentreScreen": {
+    "x": 192,
+    "y": 804
+  }
+}

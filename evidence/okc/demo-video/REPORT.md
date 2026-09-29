@@ -225,3 +225,63 @@ was NOT made here. Also: a fresh worktree needs `pnpm -r build` before `pnpm -r 
 379/379, `pnpm -r build && pnpm -r check` clean. Runtime behaviour on Windows NOT verified.
 
 READY FOR REVIEW at dc7ac2139b55a395cd4e9f9aeaef1e2493ad1622 (functional commit; the head commit adds only this sha line)
+
+---
+
+## GIF + README (okc-gif-readme)
+
+**Source:** GitHub Actions "Desktop Video" run 36558460621, `windows-latest`, head `8dcd1fa8eb2c595eb569633803cedd0ba1fd93ee`, conclusion success.
+Flow (timeline): Alert, Notes x2, Badge x2, drag (28 rect changes, window size stayed 360x288), Quit -> app exit code 0.
+Source video `video-windows.mp4` sha256 `81a1c994e4639f850d12ad597e2d96d6b8a7f28756a6d9bb51be1c15e85bb8af` (re-checked here, matches).
+
+**Conversion (done before this card, not re-run; ffmpeg ran in container `transcripter-worker-1`):**
+`ffmpeg -ss 5.0 -t 39.4 -i video-windows.mp4 -vf "setpts=PTS/1.5,fps=12,scale=800:-1:flags=lanczos,palettegen=stats_mode=diff:max_colors=64"`
+then `paletteuse=dither=none:diff_mode=rectangle`. 12 fps, 800x600 (source 1024x768, 4:3 kept), 1.5x speed-up, no re-encode in this card.
+Previous recipe: commit 552f7fe.
+
+**Committed `docs/media/demo-desktop.gif`:** sha256 `92421b4733160d78b26df57bfba529c2ca9b283617c1ad384c95935e2cb8484f` (== expected, checked before and after copy),
+2 599 682 bytes (was 1 201 021), ffprobe: 800x600, r_frame_rate 12/1, 311 frames (counted), duration 25.91 s.
+
+**README:** only the alt text and `<sub>` provenance line of the hero block changed (`git diff README.md`: 2 lines).
+
+**Verification**
+- sha256/dims/fps: as above.
+- Frames: 9 evenly spaced frames (every 38th, n=0..304) extracted in the container and viewed as a 3x3 montage, plus a zoom on frames 258-281. I can view images; observed:
+  - n=0: window `orbitkit` is entirely **white** (webview not yet painted) - first frame only.
+  - n=38..76: dark app window with "OrbitKit Starter", mascot on the desktop, radial menu discs around the mascot (visible ring of icons), "Overlay displayed".
+  - n=114: mascot near "Set Sleep", event log shows `app.alert`.
+  - n=152..: first Notes popup ("Quick Notes") at top right, then second Notes popup on left; log shows `app.notes` x2.
+  - n=190..304: red badge counter ("1", then "2") on the mascot; radial menu reopened at bottom right; mascot moves toward bottom right (drag) in later frames.
+  - Background is the Windows Server desktop/taskbar and a terminal (runner), not transparent-over-clean-desktop; the mascot window itself has no black square.
+  - **Defect:** in the frame at about n=264 a **white-outlined rectangle** (~340x290 px in the 800x600 frame, the size of the mascot window) is drawn over the app for a single sampled frame (neighbours at stride 3 are clean). It looks like a transient capture/window-frame artifact from the drag; I cannot tell whether it is a real product glitch or a gdigrab artifact.
+  - **No visible Quit/clean-finish frame** in my sampled set: the last sampled frame (n=304) still shows the app running with the mascot bottom right; the ~7 frames after it were not inspected. I do not claim a clean finish.
+  - Only 9 + 8 frames inspected; ghost trails between them are not ruled out. Independent reviewer must check the full GIF.
+- Gates: `pnpm install --frozen-lockfile` ok; `pnpm -r test` 379/379 (17 files); `pnpm -r build && pnpm -r check` exit 0.
+- Scope: `git diff --name-only main..HEAD` = README.md, docs/media/demo-desktop.gif, evidence/okc/demo-video/REPORT.md.
+
+**Honest limits / out-of-scope findings**
+- The white first frame and the single white-rectangle frame are baked into the byte-identical GIF (no re-encode allowed here). Fix would be `-ss` a bit later and dropping the artifact frame(s) - needs a new card.
+- Windows runtime behaviour beyond what the recording shows is not verified.
+- Sha line convention: like the previous section, the READY sha is the functional commit; the head commit only adds that line.
+
+### Round 2 (supersedes the r1 GIF above)
+
+r1 GIF (sha `92421b47...484f`) is **superseded**: it began with an unpainted white frame (source t < 5.3 s) and contained a white-outlined 360x288 rectangle (drag-capture artifact, source ~37.73-38.30 s).
+An intermediate v5 GIF (sha `bf35853e...6448`, 270 frames) was **rejected** by me: frame n=229 still showed the outline (its cut window was on the wrong clock and its frame count was ~33 short). It was never committed.
+
+**Committed GIF (v6, coordinator-encoded, byte-identical):** `docs/media/demo-desktop.gif`, sha256 `5c0dda31586d50fadf75243d00fed77c72eed0d1154965857658fcdcf1a67d40` (checked before and after copy), 2 500 724 bytes, ffprobe 800x600, 12 fps, 303 frames (counted), 25.25 s.
+Source: run 36558460621 / head 8dcd1fa8eb2c595eb569633803cedd0ba1fd93ee, `video-windows.mp4` sha256 81a1c994e4639f850d12ad597e2d96d6b8a7f28756a6d9bb51be1c15e85bb8af, start at 5.4 s, 1.5x speed-up, 12 fps, 800px lanczos, palettegen stats_mode=diff max_colors=64 + paletteuse dither=none diff_mode=rectangle, ffmpeg in `transcripter-worker-1`.
+Cut: trim/concat removing input-relative 32.30-32.95 s (absolute source 37.70-38.35 s, 0.65 s) to drop the capture artifact. Exact ffmpeg command line was supplied by the coordinator and is not reproduced here; I did not run the encode.
+README `<sub>` line now also says "one 0.65 s drag-capture artifact cut"; alt text unchanged.
+
+**Visual verification (I viewed the images; contact sheets of the committed GIF):**
+- n=0: app window painted, "Overlay displayed" - no white first frame.
+- n=131..133: radial menu discs open around the mascot; n=134: the first Notes popup at top right is solid **white/unpainted** (title bar + controls visible), n=135..137: same popup painted ("Quick Notes"). This is real webview paint latency, ~1 frame, kept deliberately.
+- Sweep of every 6th frame n=150..300 (26 frames): second Notes popup also shows one unpainted white frame when it opens (same real behaviour); then two Notes popups, red badge 1 -> 2, radial menu reopening while the mascot is dragged toward bottom right.
+- Junction n=254..262: both Notes popups, badge, mascot mid-drag; the mascot position steps (expected, 0.65 s removed); **no white outline rectangle** in any inspected frame.
+- Last frames: n=298 menu open on the Quit path, n=299 app window shown with Notes closed (event log `app.badge`), n~300..302 only the terminal/desktop remains = app exited, clean finish.
+- Limits: not every one of the 303 frames was inspected individually (coordinator's full scan found 0 artifact frames; mine covered n=0, 131-137, 150-300 stride 6, 254-262, 298-302). Ghost trails between sampled frames not ruled out.
+
+**Gates:** docs-only change; `pnpm -r test` re-run below. `git diff --name-only main..HEAD` = README.md, docs/media/demo-desktop.gif, evidence/okc/demo-video/REPORT.md.
+
+READY FOR REVIEW at b2b96eb22b3ce8096211e1828fb920100f65130b

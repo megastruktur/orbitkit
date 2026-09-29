@@ -17,9 +17,9 @@
 
 <div align="center">
 
-![OrbitKit desktop demo on Windows: show overlay, radial menu spawns from the mascot, Notes popup, drag, quit](docs/media/demo-desktop.gif)
+![OrbitKit desktop demo on Windows: the mascot overlay is shown, its radial menu opens around the mascot, then Alert, two Notes popups and a Badge are triggered from the menu, the mascot is dragged across the window, and Quit exits the app](docs/media/demo-desktop.gif)
 
-<sub>Recorded automatically on a GitHub Actions <code>windows-latest</code> runner.</sub>
+<sub>Recorded automatically on a GitHub Actions <code>windows-latest</code> runner (Desktop Video run 36558460621, commit <code>8dcd1fa</code>); 1.5x speed-up, 12 fps, one 0.65 s drag-capture artifact cut.</sub>
 
 </div>
 

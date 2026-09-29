@@ -155,3 +155,92 @@ test("clamp is stateless: below-area, back-to-centre, left-edge sequence never m
     height: BASE.mascot,
   });
 });
+
+// --- okc-starter-defaults: the bottom-pinned mascot is never clipped -------
+// Root cause (CI run 36558460621, 1024x768 runner, 48px taskbar): the boot
+// fit's work-area clamp pushed the window 24px up and the 1:1 content
+// compensation (shift.y = 24) pushed the bottom-pinned mascot 24px PAST the
+// window's bottom edge — the recorded video showed ~11px of the sprite cut.
+// Fix rule: cap shift.y so mascotLocal.y + mascot <= height always; when the
+// cap binds, the mascot moves up WITH the window (yields to the work-area
+// edge like any OS window) instead of being clipped.
+
+test("CI boot case: upward clamp never clips the bottom-pinned mascot", () => {
+  // Rust boot placement used FULL-monitor bounds: initial 404x404 overlay at
+  // (596,340) while the work area is only 1024x720 (taskbar 48).
+  const ci = {
+    window: { x: 596, y: 340, width: 404, height: 404 },
+    workArea: { x: 0, y: 0, width: 1024, height: 720 },
+    mascot: 96,
+    headGap: 12,
+    radius: 150,
+    itemSize: 44,
+    menuPad: 8,
+  };
+  const r = demoWindowFit(ci);
+  // reach = 150 + 44/2 = 172 → union 360x288; ideal (618,456) → clamped to
+  // (618,432): the window moved UP by 24 (the clamp delta).
+  assert.deepEqual(r.window, { x: 618, y: 432, width: 360, height: 288 });
+  const clampDeltaY = 456 - 432;
+  assert.ok(r.shift.y <= clampDeltaY,
+    `shift.y ${r.shift.y} is capped at the clamp delta ${clampDeltaY}`);
+  // The cap: no padding below the mascot's bottom, so the whole 24px delta
+  // is absorbed by the mascot riding up with the window.
+  assert.deepEqual(r.shift, { x: 0, y: 0 });
+  assert.equal(r.mascotLocal.y + ci.mascot, r.window.height,
+    "mascot bottom exactly at the window bottom edge — NOT clipped");
+  assert.equal(mascotScreen(r).y, 624,
+    "mascot yields 24px to the taskbar (screen y 648 → 624), like any OS window");
+  // Arc anchor stays glued to the (capped) mascot position.
+  assert.equal(r.anchor.y, r.mascotLocal.y);
+  // Re-fit at the fixed rect stays idempotent under the cap (no drift).
+  assert.deepEqual(demoWindowFit({ ...ci, window: r.window }), r);
+});
+
+test("no-clamp case: zero shift, mascot bottom stays at the window bottom", () => {
+  const r = demoWindowFit(BASE); // work area 1280x800 fits the ideal rect
+  assert.deepEqual(r.shift, { x: 0, y: 0 }, "no clamp → no compensation");
+  assert.equal(r.mascotLocal.y + BASE.mascot, r.window.height,
+    "bottom-pinned mascot still ends exactly at the window bottom (unchanged)");
+});
+
+test("property: whenever the y-clamp binds, the mascot never passes the window bottom", () => {
+  const base = {
+    window: { x: 400, y: 300, width: 404, height: 404 },
+    workArea: { x: 0, y: 0, width: 1920, height: 2000 },
+    mascot: 96,
+    headGap: 12,
+    radius: 150,
+    itemSize: 44,
+    menuPad: 8,
+  };
+  // A work area so large it never clamps reveals the ideal rect per input.
+  const free = { x: -4000, y: -4000, width: 20000, height: 20000 };
+  let yClamps = 0;
+  for (let h = 480; h <= 1080; h += 79) {
+    for (let dy = -120; dy <= 120; dy += 40) {
+      for (const mascot of [64, 96, 128]) {
+        const input = {
+          ...base,
+          mascot,
+          window: { x: 400, y: Math.max(0, 300 + dy), width: 404, height: 404 },
+          workArea: { x: 0, y: 0, width: 1920, height: h },
+        };
+        const r = demoWindowFit(input);
+        const idealY = demoWindowFit({ ...input, workArea: free }).window.y;
+        const deltaY = idealY - r.window.y; // > 0 → window pushed up
+        if (deltaY > 0) {
+          yClamps++;
+          assert.ok(r.shift.y <= deltaY,
+            `h=${h} y=${input.window.y} m=${mascot}: shift.y ${r.shift.y} <= clamp delta ${deltaY}`);
+        }
+        assert.ok(r.mascotLocal.y + mascot <= r.window.height,
+          `h=${h} y=${input.window.y} m=${mascot}: mascot bottom ` +
+            `${r.mascotLocal.y + mascot} <= window height ${r.window.height}`);
+        assert.equal(r.anchor.y, r.mascotLocal.y,
+          "arc anchor derived from the same capped mascot position");
+      }
+    }
+  }
+  assert.ok(yClamps > 50, `sweep exercised the y-clamp (${yClamps} clamped cases)`);
+});

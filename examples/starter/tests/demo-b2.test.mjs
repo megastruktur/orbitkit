@@ -1,14 +1,16 @@
 // demo-b2 mutation-sensitive checks (run: `pnpm --filter starter test`).
 //
-// Every assertion here fails against the pre-demo-b2 starter (no roam block,
-// no popup anchors, 6 menu items, no demoB2 helpers), so a regression of the
-// B2 wiring logic is caught without a GUI.
+// Every assertion here fails against the pre-demo-b2 starter (no popup
+// anchors, 6 menu items, no demoB2 helpers), so a regression of the B2
+// wiring logic is caught without a GUI. Since okc-starter-defaults the
+// roam movement is OPT-IN (library: `roam?` optional) and the default
+// config ships WITHOUT a roam block — the bouncing default made the
+// mascot hard to click.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { demoWindowFit } from "../src/lib/windowFit.ts";
 import {
   gatedMascotState,
   nextBadgeCount,
@@ -56,16 +58,12 @@ test("mascot state requests are gated while parked (K8)", () => {
   assert.equal(gatedMascotState(false, "sleep"), "sleep", "unparked: request passes");
 });
 
-test("mascot window configures K7 roam with faceByVelocity", () => {
-  assert.equal(config.mascot.faceByVelocity, true, "mascot faces its walking direction");
-  const roam = config.windows.mascotWindow.roam;
-  assert.ok(roam, "mascot window has a roam block");
-  assert.ok(roam.width > 0 && roam.height > 0, "roam zone has positive extent");
-  assert.ok(roam.margin >= 0, "roam margin is non-negative");
-  assert.ok(roam.speed > 0, "roam speed is positive");
-  assert.ok(
-    ["top-left", "top-right", "bottom-left", "bottom-right"].includes(roam.corner),
-    "roam corner is one of the four work-area corners",
+test("mascot window is STATIC by default: no roam block (opt-in only)", () => {
+  assert.equal(config.mascot.faceByVelocity, true, "faceByVelocity kept for roam-enabled consumers (velocity stays 0 while static)");
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(config.windows.mascotWindow, "roam"),
+    false,
+    "default starter config must NOT opt into roam — static, draggable mascot",
   );
 });
 
@@ -87,31 +85,6 @@ test("menu has the demo-b2 items and a radius that fits 9 items", () => {
   assert.ok(
     chord >= menu.itemSize,
     `adjacent item chord ${chord.toFixed(1)}px fits itemSize ${menu.itemSize}px for ${n} items`,
-  );
-});
-
-test("roam zone exceeds the fixed window on a reference work area", () => {
-  // The fixed Design-B window is the largest content union; the roam zone
-  // (zone minus window) is degenerate unless the zone is bigger than the
-  // window on both axes — otherwise the mascot cannot walk at all.
-  const mascotSize = config.mascot.size;
-  const fit = demoWindowFit({
-    window: { x: 0, y: 0, width: 400, height: 400 },
-    workArea: { x: 0, y: 0, width: 1920, height: 1080 },
-    mascot: mascotSize,
-    headGap: config.menu.arc?.headGap ?? 12,
-    radius: config.menu.radius,
-    itemSize: config.menu.itemSize ?? 44,
-    menuPad: 8,
-  });
-  const roam = config.windows.mascotWindow.roam;
-  assert.ok(
-    roam.width > fit.window.width,
-    `roam width ${roam.width} exceeds fixed window width ${fit.window.width}`,
-  );
-  assert.ok(
-    roam.height > fit.window.height,
-    `roam height ${roam.height} exceeds fixed window height ${fit.window.height}`,
   );
 });
 

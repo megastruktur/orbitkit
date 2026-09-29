@@ -1,0 +1,204 @@
+$ node --test --experimental-strip-types tests/*.test.mjs
+TAP version 13
+# Subtest: mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 0.834861
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.272462
+  type: 'test'
+  ...
+# Subtest: every sheet the config references has width = 32 * frames, height = 32
+ok 3 - every sheet the config references has width = 32 * frames, height = 32
+  ---
+  duration_ms: 0.207686
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 9 dotted-id items, {svg} icons and K7 stagger
+ok 4 - menu is arc-anchor with 9 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.242704
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 5 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.059827
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 6 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.078563
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 7 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.115505
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 8 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.58895
+  type: 'test'
+  ...
+# Subtest: window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+ok 9 - window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+  ---
+  duration_ms: 0.298554
+  type: 'test'
+  ...
+# Subtest: Design B: no setSize/setPosition reachable from menu open/close
+ok 10 - Design B: no setSize/setPosition reachable from menu open/close
+  ---
+  duration_ms: 0.765866
+  type: 'test'
+  ...
+# Subtest: note instance keys are unique per click and K11-valid
+ok 11 - note instance keys are unique per click and K11-valid
+  ---
+  duration_ms: 0.63477
+  type: 'test'
+  ...
+# Subtest: badge counter increments by one and never goes negative
+ok 12 - badge counter increments by one and never goes negative
+  ---
+  duration_ms: 0.100496
+  type: 'test'
+  ...
+# Subtest: park menu label flips with the parked state
+ok 13 - park menu label flips with the parked state
+  ---
+  duration_ms: 0.050369
+  type: 'test'
+  ...
+# Subtest: mascot state requests are gated while parked (K8)
+ok 14 - mascot state requests are gated while parked (K8)
+  ---
+  duration_ms: 0.05125
+  type: 'test'
+  ...
+# Subtest: mascot window is STATIC by default: no roam block (opt-in only)
+ok 15 - mascot window is STATIC by default: no roam block (opt-in only)
+  ---
+  duration_ms: 0.084424
+  type: 'test'
+  ...
+# Subtest: popups are anchored: notes to the mascot, settings centred
+ok 16 - popups are anchored: notes to the mascot, settings centred
+  ---
+  duration_ms: 0.05601
+  type: 'test'
+  ...
+# Subtest: menu has the demo-b2 items and a radius that fits 9 items
+ok 17 - menu has the demo-b2 items and a radius that fits 9 items
+  ---
+  duration_ms: 0.109945
+  type: 'test'
+  ...
+# Subtest: starter backend opens a new notes instance per click
+ok 18 - starter backend opens a new notes instance per click
+  ---
+  duration_ms: 0.086859
+  type: 'test'
+  ...
+# Subtest: r2: roam/park window adapter rounds coordinates to integer physical px
+ok 19 - r2: roam/park window adapter rounds coordinates to integer physical px
+  ---
+  duration_ms: 0.24086
+  type: 'test'
+  ...
+# Subtest: r2: badge count tracks orbitkit://badge events
+ok 20 - r2: badge count tracks orbitkit://badge events
+  ---
+  duration_ms: 0.274036
+  type: 'test'
+  ...
+# Subtest: Design B: idle and open states share ONE fixed window rect
+ok 21 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 1.101963
+  type: 'test'
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+ok 22 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.127449
+  type: 'test'
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 23 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.077702
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+ok 24 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.0871
+  type: 'test'
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+ok 25 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.20972
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 26 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.081028
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+ok 27 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.098302
+  type: 'test'
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+ok 28 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.084104
+  type: 'test'
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+ok 29 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.18466
+  type: 'test'
+  ...
+# Subtest: CI boot case: upward clamp never clips the bottom-pinned mascot
+ok 30 - CI boot case: upward clamp never clips the bottom-pinned mascot
+  ---
+  duration_ms: 0.227775
+  type: 'test'
+  ...
+# Subtest: no-clamp case: zero shift, mascot bottom stays at the window bottom
+ok 31 - no-clamp case: zero shift, mascot bottom stays at the window bottom
+  ---
+  duration_ms: 0.08711
+  type: 'test'
+  ...
+# Subtest: property: whenever the y-clamp binds, the mascot never passes the window bottom
+ok 32 - property: whenever the y-clamp binds, the mascot never passes the window bottom
+  ---
+  duration_ms: 0.914255
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 56.617104
+EXIT=0

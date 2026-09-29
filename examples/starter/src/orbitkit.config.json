@@ -129,14 +129,7 @@
       "alwaysOnTop": true,
       "decorations": false,
       "passthrough": true,
-      "fitContent": true,
-      "roam": {
-        "width": 960,
-        "height": 480,
-        "margin": 12,
-        "corner": "bottom-left",
-        "speed": 24
-      }
+      "fitContent": true
     },
     "popups": [
       {

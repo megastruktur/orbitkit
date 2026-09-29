@@ -1,0 +1,128 @@
+TAP version 13
+# Subtest: Design B: idle and open states share ONE fixed window rect
+ok 1 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 1.120106
+  type: 'test'
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+ok 2 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.142929
+  type: 'test'
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 3 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.090677
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+ok 4 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.101348
+  type: 'test'
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+ok 5 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.164502
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 6 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.087601
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+ok 7 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.10772
+  type: 'test'
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+ok 8 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.094575
+  type: 'test'
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+ok 9 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.2099
+  type: 'test'
+  ...
+# Subtest: CI boot case: upward clamp never clips the bottom-pinned mascot
+not ok 10 - CI boot case: upward clamp never clips the bottom-pinned mascot
+  ---
+  duration_ms: 0.948652
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-starter-defaults/examples/starter/tests/windowFit.test.mjs:168:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        x: 0,
+    +   y: 24
+    -   y: 0
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    x: 0
+    y: 0
+  actual:
+    x: 0
+    y: 24
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-starter-defaults/examples/starter/tests/windowFit.test.mjs:189:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: no-clamp case: zero shift, mascot bottom stays at the window bottom
+ok 11 - no-clamp case: zero shift, mascot bottom stays at the window bottom
+  ---
+  duration_ms: 0.125906
+  type: 'test'
+  ...
+# Subtest: property: whenever the y-clamp binds, the mascot never passes the window bottom
+not ok 12 - property: whenever the y-clamp binds, the mascot never passes the window bottom
+  ---
+  duration_ms: 0.16928
+  type: 'test'
+  location: '/home/megastruktur/orca/workspaces/orbitkit/okc-starter-defaults/examples/starter/tests/windowFit.test.mjs:207:1'
+  failureType: 'testCodeFailure'
+  error: 'h=480 y=180 m=64: mascot bottom 360 <= window height 256'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/megastruktur/orca/workspaces/orbitkit/okc-starter-defaults/examples/starter/tests/windowFit.test.mjs:237:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 10
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 65.676729
+EXIT=1

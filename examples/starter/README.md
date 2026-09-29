@@ -34,10 +34,10 @@ A minimal, compilable, and runnable consumer application showcasing `@orbitkit/u
 | **Badge +1** (`app.badge`) | B2.6 — increments the unread count and broadcasts `orbitkit://badge`; `<Badge />` renders it on the mascot. |
 | **Settings** (`app.settings`) | B2.4 — singleton `center`-anchored popup: one window centred on the mascot's screen; a second click focuses it, no duplicate. |
 | **About** (`app.about`) | Backend menu-action plumbing (log line only). |
-| **Park** (`app.park`) | B2.7 — do-not-disturb toggle: parks the mascot at a screen corner (`parkCornerPosition`), stops roaming/passthrough polling, suppresses bubbles into the badge; unpark returns it to the roam zone. |
+| **Park** (`app.park`) | B2.7 — do-not-disturb toggle: parks the mascot at a screen corner (`parkCornerPosition`), stops roam/passthrough polling, suppresses bubbles into the badge; unpark makes it interactive again. |
 | **Quit** (`app.quit`) | Exits the app. |
 
-Non-menu demo behaviour (always on): the mascot **roams** inside its `bottom-left` zone and faces its walking direction (B2.1); **dragging** pauses the roam and resumes around the drop point while a plain click still opens the menu (B2.2); clicking a transparent non-hit area passes through to the app underneath (B1.3); the menu opens above the mascot with centre-first stagger, Esc/click-away closes it edges-first (B1.4/B1.5); ←/→ moves keyboard focus across items, Enter activates (B1.7).
+Non-menu demo behaviour (always on): the mascot is **static by default** — draggable, not self-moving; roaming is an optional library feature, enabled by setting `windows.mascotWindow.roam` in the consumer's own config (the starter no longer enables it), and with it enabled **dragging** pauses the roam and resumes around the drop point while a plain click still opens the menu (B2.2); clicking a transparent non-hit area passes through to the app underneath (B1.3); the menu opens above the mascot with centre-first stagger, Esc/click-away closes it edges-first (B1.4/B1.5); ←/→ moves keyboard focus across items, Enter activates (B1.7).
 
 ---
 

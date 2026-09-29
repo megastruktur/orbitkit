@@ -44,7 +44,9 @@ test("mascot is a kind=sheets planet with idle/alert/sleep pools and TTL", () =>
   assert.equal(m.kind, "sheets");
   assert.equal(m.scale, 3, "integer upscale 3 (32px frames -> 96px)");
   assert.equal(m.anchor, "bottom-center");
-  assert.equal(m.faceByVelocity, false);
+  // demo-b2: faceByVelocity flipped to true (mascot faces its walking
+  // direction while roaming — smoke B2.1).
+  assert.equal(m.faceByVelocity, true);
   assert.equal(m.initialState, "idle");
   for (const name of ["glim-idle", "glim-alert", "glim-sleep"]) {
     const s = m.sheets[name];
@@ -82,7 +84,7 @@ test("every sheet the config references has width = 32 * frames, height = 32", (
   }
 });
 
-test("menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger", () => {
+test("menu is arc-anchor with 9 dotted-id items, {svg} icons and K7 stagger", () => {
   const menu = config.menu;
   assert.equal(menu.layout, "arc-anchor");
   assert.equal(menu.arc?.position, "top");
@@ -90,16 +92,23 @@ test("menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger", ()
   assert.equal(menu.arc?.headGap, 12);
   assert.deepEqual(menu.stagger, { openMs: 260, closeMs: 180, stepMs: 40 });
   assert.equal(menu.animation, "spawn");
-  assert.equal(menu.items.length, 6);
+  assert.equal(menu.items.length, 9);
   const ids = menu.items.map((i) => i.id);
   for (const id of ids) {
     assert.match(id, MENU_ITEM_ID_REGEX, `id ${id} matches K7 regex`);
     assert.ok(id.includes("."), `id ${id} is dotted`);
   }
-  assert.deepEqual(
-    ids,
-    ["app.notes", "app.timer", "app.alert", "app.settings", "app.about", "app.quit"]
-  );
+  assert.deepEqual(ids, [
+    "app.notes",
+    "app.timer",
+    "app.bubble",
+    "app.alert",
+    "app.badge",
+    "app.settings",
+    "app.about",
+    "app.park",
+    "app.quit",
+  ]);
   for (const item of menu.items) {
     assert.equal(typeof item.icon?.svg, "string", `${item.id}: inline {svg} icon`);
     assert.ok(item.icon.svg.includes("<path") || item.icon.svg.includes("<circle"));
@@ -251,13 +260,18 @@ test("Design B: no setSize/setPosition reachable from menu open/close", () => {
     }
   }
   // The window setters exist only in the boot-time fixed fit and the
-  // post-drag/monitor-change one-shot clamp.
+  // post-drag/monitor-change one-shot clamp — within the demo-b1 region.
+  // demo-b2 legitimately adds setters (roam zone placement, roam/park
+  // window adapters) in its marked boot block; it is stripped here so the
+  // count still guards the b1 design (menu open/close never moves the
+  // window — enforced above via the transitive closure).
+  const viewB1 = view.replace(/\/\/ --- demo-b2:[\s\S]*?\/\/ --- demo-b2 boot end ---/g, "");
   const fitBody = functionBody(view, "applyFixedWindowFit");
   assert.ok(fitBody, "boot-time applyFixedWindowFit exists");
   const clampBody = functionBody(view, "reClampWindow") ?? "";
   const nativesIn = (body) => body.match(/\b(setSize|setPosition)\s*\(/g)?.length ?? 0;
   assert.equal(
-    nativesIn(view),
+    nativesIn(viewB1),
     nativesIn(fitBody) + nativesIn(clampBody),
     "setSize/setPosition appear only in applyFixedWindowFit / reClampWindow"
   );

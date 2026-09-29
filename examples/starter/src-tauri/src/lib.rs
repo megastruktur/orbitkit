@@ -35,6 +35,10 @@ pub fn run() {
 
     builder = builder.setup(|app| {
         let app_handle = app.handle().clone();
+        // Demo-b2: "note" spawns a NEW popup instance per click (K11
+        // instanceKey: orbitkit-popup-notes-note-N). Settings stays a
+        // singleton (no instanceKey → idempotent show + focus).
+        let note_counter = std::sync::Arc::new(std::sync::atomic::AtomicU32::new(0));
         app.on_menu_action(move |action| {
             let action_id = action.id.clone();
             let app_clone = app_handle.clone();
@@ -48,12 +52,24 @@ pub fn run() {
                     eprintln!("[starter] Menu action: app.quit");
                     app_clone.exit(0);
                 }
-                // K11 popup ids stay unprefixed in the plugin config.
-                "app.notes" | "app.settings" => {
+                "app.notes" => {
+                    let n = note_counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+                    let instance = format!("note-{n}");
+                    log::info!("Menu action: notes (instance {instance})");
+                    eprintln!("[starter] Menu action: app.notes (instance {instance})");
                     let app_popup = app_clone.clone();
-                    let popup_id = action_id.trim_start_matches("app.").to_string();
                     let _ = app_clone.run_on_main_thread(move || {
-                        let _ = app_popup.orbitkit().open_popup(popup_id, None, None);
+                        let _ = app_popup
+                            .orbitkit()
+                            .open_popup("notes".to_string(), None, Some(instance));
+                    });
+                }
+                "app.settings" => {
+                    let app_popup = app_clone.clone();
+                    let _ = app_clone.run_on_main_thread(move || {
+                        let _ = app_popup
+                            .orbitkit()
+                            .open_popup("settings".to_string(), None, None);
                     });
                 }
                 // Demo-b1: timer mutes the planet into the sleep pool for 5s.

@@ -1,0 +1,8 @@
+Launching exec container for /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b2/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b2/examples/starter/src-tauri/target-linux/exec-app.log
+t+0s: 216 129 360 288
+t+4s: 300 174 360 288
+t+8s: 385 220 360 288
+t+12s: 470 265 360 288
+t+16s: 555 311 360 288
+t+20s: 639 356 360 288

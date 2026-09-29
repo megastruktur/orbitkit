@@ -1,26 +1,43 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
+    Badge,
+    Bubble,
     Mascot,
     RadialMenu,
     createDragGesture,
+    createMachine,
+    createPark,
+    createRoam,
     emitMenuAction,
     mascotMonitor,
+    onBadge,
     onMascotState,
+    onPark,
+    roamBounds,
+    setBadge,
     startMascotDrag,
     startPassthrough,
     type AnchorRect,
     type MascotStateName,
     type MenuConfig,
     type PassthroughController,
+    type ParkHandle,
     type RectEdges,
+    type RoamHandle,
   } from "@orbitkit/ui";
   import {
     getCurrentWindow,
     LogicalPosition,
     LogicalSize,
+    PhysicalPosition,
   } from "@tauri-apps/api/window";
   import { demoWindowFit, clampFixedWindow } from "../lib/windowFit";
+  import {
+    gatedMascotState,
+    nextBadgeCount,
+    parkMenuLabel,
+  } from "../lib/demoB2";
   import config from "../orbitkit.config";
 
   // --- demo-b1 wiring --------------------------------------------------------
@@ -51,6 +68,22 @@
 
   let menuOpen = $state<boolean>(false);
   let activeMenuConfig = $state<MenuConfig>(config.menu);
+
+  // --- demo-b2 wiring --------------------------------------------------------
+  const roamCfg = mascotWindowCfg?.roam;
+  /** Latest roam velocity (physical px/s); feeds K7 faceByVelocity mirroring. */
+  let velocityX = $state(0);
+  let bubbleVisible = $state(false);
+  let badgeCount = $state(0);
+  let parked = $state(false);
+  /** Fixed demo bubble copy; every show is a fresh Bubble instance. */
+  const BUBBLE_TEXT = "B2 demo: hello from the bubble!";
+  let roamHandle: RoamHandle | null = null;
+  let parkHandle: ParkHandle | null = null;
+  /** K9 monitor payload cache: roam zone + park corner read it synchronously. */
+  let monitorCache: Awaited<ReturnType<typeof mascotMonitor>> | null = null;
+  /** Mascot window size in physical px, cached once (fixed Design-B window). */
+  let physSize = { width: 0, height: 0 };
   /** K7 arc-anchor: mascot bounds in window coordinates (post-fit). */
   let anchorRect = $state<AnchorRect | null>(null);
   /** Work-area-clamp compensation translate (logical px); zero unless the
@@ -176,10 +209,33 @@
     // open menu; no setSize/setPosition on either path (no compositor
     // size/origin race, no mascot blink).
     if (!menuOpen) {
-      activeMenuConfig = config.menu;
+      // demo-b2: the park item label follows the parked state.
+      activeMenuConfig = withParkLabel(parked);
       menuOpen = true;
     } else {
       closeMenu(false);
+    }
+  }
+
+  /** demo-b2: menu copy with the park item label flipped to the live state. */
+  function withParkLabel(parkedNow: boolean): MenuConfig {
+    return {
+      ...config.menu,
+      items: config.menu.items.map((item) =>
+        item.id === "app.park"
+          ? { ...item, label: parkMenuLabel(parkedNow) }
+          : item,
+      ),
+    };
+  }
+
+  /** demo-b2: park/unpark toggle through the K8-gated park handle. */
+  async function togglePark(): Promise<void> {
+    if (!parkHandle) return;
+    if (parkHandle.parked) {
+      await parkHandle.unpark();
+    } else {
+      await parkHandle.park();
     }
   }
 
@@ -196,6 +252,21 @@
   async function handleSelect(id: string) {
     closeMenu(false);
     try {
+      // demo-b2: demo-side features first; the backend only logs these ids.
+      if (id === "app.park") {
+        await togglePark();
+      } else if (id === "app.bubble") {
+        if (parked && parkHandle) {
+          // B2.7: while parked the bubble is suppressed and counted into the
+          // badge (K8 park gate); the returned boolean is `false` here.
+          parkHandle.notify(BUBBLE_TEXT);
+        } else {
+          bubbleVisible = !bubbleVisible;
+        }
+      } else if (id === "app.badge") {
+        badgeCount = nextBadgeCount(badgeCount);
+        await setBadge(badgeCount);
+      }
       await emitMenuAction(id);
     } catch (err: unknown) {
       console.error("[MascotView] Failed to emit menu action:", err);
@@ -206,7 +277,11 @@
     closeMenu(false);
   }
 
-  const gesture = createDragGesture({
+  // demo-b1 fallback drag model (plain native drag + click-toggle). With the
+  // demo-b2 roam block configured, onMount swaps `gesture` for the roam drag
+  // binding: the same handler surface but pausing/resuming + re-basing roam
+  // around every drag. Handlers read `gesture` at call time.
+  let gesture = createDragGesture({
     isMenuOpen: () => menuOpen,
     closeMenuInstant: () => closeMenu(true),
     onDragStart: async () => {
@@ -232,8 +307,12 @@
 
   onMount(() => {
     const unlisteners: Array<() => void> = [];
+    // demo-b2: the roam/park boot must observe the POST-fit window (size and
+    // position), so the fit is captured as a promise and awaited below.
+    let fitPromise: Promise<void> = Promise.resolve();
     if (fitContentEnabled) {
-      void applyFixedWindowFit();
+      fitPromise = applyFixedWindowFit();
+      void fitPromise;
       const win = getCurrentWindow();
       // Post-drag / monitor-change one-shot re-clamp (Design B: clamped ONCE
       // at a settle point, never per menu toggle).
@@ -249,9 +328,137 @@
       passthrough.registerHitRegion(menuHitRegion);
     }
 
+    // --- demo-b2: roam + drag + park (async boot) ---------------------------
+  /**
+   * demo-b2: physical-px window adapter shared by roam and park. Coordinates
+   * are rounded to integers: Tauri's set_position rejects fractional
+   * physical px, which silently froze every roam step (r2 root cause).
+   */
+  function physWindowAdapter(): {
+    outerPosition: () => Promise<{ x: number; y: number }>;
+    setPosition: (pos: { x: number; y: number }) => Promise<void>;
+  } {
+    const win = getCurrentWindow();
+    return {
+      outerPosition: () => win.outerPosition(),
+      setPosition: (pos) =>
+        win.setPosition(
+          new PhysicalPosition(Math.round(pos.x), Math.round(pos.y)),
+        ),
+    };
+  }
+
+
+    void (async () => {
+      const win = getCurrentWindow();
+      // Read monitor + window size only AFTER the one-shot fit so the fixed
+      // window's real size (not the pre-fit default) constrains the roam
+      // zone and the park corner.
+      await fitPromise;
+      try {
+        const [monitor, size] = await Promise.all([mascotMonitor(), win.outerSize()]);
+        monitorCache = monitor;
+        physSize = { width: size.width, height: size.height };
+      } catch (err: unknown) {
+        console.error("[MascotView] demo-b2 monitor/size boot failed:", err);
+        return; // no monitor data → no roam zone, no park corner
+      }
+
+      if (roamCfg) {
+        // Place the window into the roam zone's corner origin BEFORE the
+        // loop starts: startRoam adopts the current position, and a position
+        // outside the zone (e.g. the boot spot in another corner) would be
+        // reflected across the screen by the first stepRoam tick.
+        try {
+          const zone = roamBounds(
+            monitorCache!.workArea,
+            monitorCache!.scaleFactor,
+            roamCfg,
+            physSize,
+          );
+          await win.setPosition(new PhysicalPosition(zone.x, zone.y));
+        } catch (err: unknown) {
+          console.error("[MascotView] demo-b2 roam placement failed:", err);
+        }
+        roamHandle = createRoam({
+          getWindow: physWindowAdapter,
+          monitor: () => ({
+            workArea: monitorCache!.workArea,
+            scaleFactor: monitorCache!.scaleFactor,
+          }),
+          roam: roamCfg,
+          windowSize: () => physSize,
+          onVelocity: (v) => {
+            velocityX = v.x;
+          },
+          onToggle: () => {
+            void toggleMenu();
+          },
+          onDragStart: async () => {
+            await startMascotDrag();
+          },
+        });
+        // Swap the fallback drag model for the roam drag binding: same
+        // handler surface, but roam pauses during drags and re-bases the
+        // zone around the drop point (K7/K10). The machine for park's K8
+        // surface shares the config states.
+        gesture = roamHandle.drag.handlers;
+        void win
+          .onScaleChanged(async () => {
+            try {
+              monitorCache = await mascotMonitor();
+            } catch {
+              // keep the previous cache on a failed refresh
+            }
+          })
+          .then((fn) => unlisteners.push(fn));
+      }
+
+      parkHandle = createPark({
+        roam: roamHandle?.roam ?? { pause() {}, resume() {} },
+        // Park's default pauses cursor polling AND forces the window
+        // non-interactive — the parked mascot could never be clicked again
+        // (no unpark, no gated bubble). The demo overrides the pause only:
+        // polling keeps running, the corner-parked mascot stays clickable,
+        // and unpark re-enables a paused controller no-op-safe.
+        passthrough: {
+          setPaused: (value: boolean) => {
+            if (!value) passthrough?.setPaused(false);
+          },
+        },
+        machine: createMachine(config.mascot.states ?? {}),
+        sleepState: "sleep",
+        corner: "bottom-right",
+        workArea: () => monitorCache?.workArea ?? { x: 0, y: 0, width: 0, height: 0 },
+        getWindow: physWindowAdapter,
+        windowSize: () => physSize,
+      });
+    })();
+    // --- demo-b2 boot end ---
+
+    // demo-b2: mirror park's machine forces onto the prop-driven Mascot and
+    // flip the park item label (park()/unpark() broadcast orbitkit://park).
+    void onPark((payload) => {
+      parked = payload.parked;
+      mascotState = parked ? "sleep" : "idle";
+    }).then((fn) => unlisteners.push(fn));
+
+    // demo-b2 r2: keep the local count in sync with orbitkit://badge so a
+    // parked bubble's park-counted badge is honoured by the next "badge +1"
+    // (park.ts counts on top of the last observed badge event).
+    void onBadge((payload) => {
+      badgeCount = payload.count;
+    }).then((fn) => unlisteners.push(fn));
+
     let unlisten: (() => void) | undefined;
     onMascotState((payload) => {
       if (payload && payload.state) {
+        // demo-b2 K8 gate: state requests are ignored while parked.
+        const next = gatedMascotState(parked, payload.state);
+        if (next === null) {
+          debugLog("[MascotView] state request ignored while parked:", payload.state);
+          return;
+        }
         mascotState = payload.state;
       }
     }).then((fn) => {
@@ -269,6 +476,8 @@
       if (unlisten) unlisten();
       passthrough?.stop();
       cancelSettle();
+      roamHandle?.roam.stop();
+      void parkHandle?.dispose();
     };
   });
 </script>
@@ -329,10 +538,22 @@
           gesture.onclick(e);
           debugLog("[MascotView:dom:click:done]", { menuOpenAfter: menuOpen });
         }}
-        onkeydown={gesture.onkeydown}
+        onkeydown={(e) => gesture.onkeydown?.(e)}
       >
-        <Mascot config={config.mascot} state={mascotState} />
+        <Mascot config={config.mascot} state={mascotState} velocityX={velocityX} />
       </div>
+    </div>
+
+    <!-- demo-b2: speech bubble (menu "bubble" toggles), anchored above the
+         mascot; badge (menu "badge +1") at the mascot's top-right. Both sit
+         inside .fit-shift so the clamp compensation applies. -->
+    {#if bubbleVisible}
+      <div class="bubble-anchor">
+        <Bubble text={BUBBLE_TEXT} ttlMs={4000} onexpire={() => (bubbleVisible = false)} />
+      </div>
+    {/if}
+    <div class="badge-anchor">
+      <Badge listen count={badgeCount} />
     </div>
   </div>
 
@@ -386,6 +607,22 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
+  }
+
+  /* demo-b2: bubble sits headGap above the mascot's top edge (mascot 96 px
+     tall → bottom 96 + 8). Left 0 at the fit-shift pin point (centre). */
+  .bubble-anchor {
+    position: absolute;
+    bottom: 104px;
+    left: 0;
+    transform: translateX(-50%);
+  }
+
+  /* demo-b2: badge pinned to the mascot's top-right corner (half-width 48). */
+  .badge-anchor {
+    position: absolute;
+    bottom: 84px;
+    left: 28px;
   }
 
   /* No hover/active scaling: the planet is an integer-upscaled sprite sheet and any

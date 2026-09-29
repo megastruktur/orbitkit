@@ -314,37 +314,128 @@ $script:PinYEff = $PinY + $ContentShift.Y
 $script:OriginXEff = $OriginX + $ContentShift.X
 $script:OriginYEff = $OriginY + $ContentShift.Y
 Write-Timeline "Startup contentShift = ($($ContentShift.X), $($ContentShift.Y)); effective pin = ($PinXEff, $PinYEff), arc origin = ($OriginXEff, $OriginYEff)"
+# r4: measured move-to-button-down latency of Click-At's phase sequence
+# (Move-Mouse-Smooth 12 x 15 ms + 80 ms + 80 ms ~= 350 ms).
+$script:ClickLatencyMs = 350
 
-function Get-Mascot-Point {
-    # Re-reads the live window rect: the mascot roams (~24 px/s), never cache.
-    # Local offset = gNew pin + startup contentShift (see geometry section).
-    $w = Get-Window-Info "^orbitkit-mascot$"
-    if (-not $w) {
-        Write-Error "Mascot window 'orbitkit-mascot' not found!"
-        exit 1
+function Get-Orbitkit-Window-Titles {
+    # Diagnostics: every visible top-level window title containing 'orbitkit'.
+    $script:okTitles = New-Object System.Collections.Generic.List[string]
+    $callback = [Win32+EnumWindowsProc]{
+        param($hWnd, $lParam)
+        if ([Win32]::IsWindowVisible($hWnd)) {
+            $sb = New-Object System.Text.StringBuilder 256
+            $len = [Win32]::GetWindowText($hWnd, $sb, $sb.Capacity)
+            if ($len -gt 0) {
+                $t = $sb.ToString()
+                if ($t -match "orbitkit") { $script:okTitles.Add($t) }
+            }
+        }
+        return $true
     }
-    $r = $w.Rect
+    [Win32]::EnumWindows($callback, [IntPtr]::Zero) | Out-Null
+    if ($script:okTitles.Count -eq 0) { return "(none)" }
+    return ($script:okTitles -join " | ")
+}
+
+function Get-App-Error-Tail {
+    # Diagnostics: last 30 lines of the app's stderr log (r4 primary instrument).
+    if (-not (Test-Path "app-err.log")) { return "(no app-err.log)" }
+    $lines = Get-Content "app-err.log" -Tail 30
+    if (@($lines).Count -eq 0) { return "(app-err.log empty)" }
+    return ($lines -join " `| ")
+}
+
+function Get-Mascot-Rect-Twice {
+    # Two rect reads 60 ms apart -> per-tick velocity in px/s (r4: instrument,
+    # don't guess — the roam moves the window ~24 px/s, so any click computed
+    # from a single read drifts by velocity * click latency).
+    $a = Get-Window-Info "^orbitkit-mascot$"
+    if (-not $a) { return $null }
+    Start-Sleep -Milliseconds 60
+    $b = Get-Window-Info "^orbitkit-mascot$"
+    if (-not $b) { return $null }
     return @{
-        X = [int]($r.Left + $script:PinXEff + $MascotSize / 2)
-        Y = [int]($r.Top + $script:PinYEff + $MascotSize / 2)
-        Rect = $r
+        Rect = $b.Rect
+        VX = ($b.Rect.Left - $a.Rect.Left) / 0.06
+        VY = ($b.Rect.Top - $a.Rect.Top) / 0.06
     }
 }
 
-function Get-Item-Point($id) {
-    $idx = $ItemIndex[$id]
-    if ($null -eq $idx) {
-        Write-Error "Menu item '$id' not present in starter config!"
-        exit 1
+function Get-Mascot-Predicted {
+    # Predicted window top-left at button-down: current rect + velocity *
+    # measured click latency (Move-Mouse-Smooth 12x15 ms + 80 ms + 80 ms
+    # ~= 350 ms). Bounded not-found retry: on each miss log (a) app process
+    # alive, (b) all visible window titles containing 'orbitkit', (c) the
+    # last 30 lines of app-err.log; only fail after the 5 s budget.
+    $deadline = (Get-Date).AddSeconds(5)
+    while ($true) {
+        $t = Get-Mascot-Rect-Twice
+        if ($t) {
+            $lead = $script:ClickLatencyMs / 1000.0
+            return @{
+                PredX = [int]($t.Rect.Left + $t.VX * $lead)
+                PredY = [int]($t.Rect.Top + $t.VY * $lead)
+                VX = [int]$t.VX
+                VY = [int]$t.VY
+                Rect = $t.Rect
+            }
+        }
+        $alive = $true
+        if ($appProc) { $alive = -not $appProc.HasExited }
+        $titles = Get-Orbitkit-Window-Titles
+        $errTail = Get-App-Error-Tail
+        Write-Timeline "Mascot window miss (retrying): app alive=$alive; orbitkit windows: $titles; app-err tail: $errTail"
+        if (-not $alive -or (Get-Date) -gt $deadline) {
+            Write-Error "Mascot window 'orbitkit-mascot' not found within retry budget (app alive=$alive; orbitkit windows: $titles)!"
+            exit 1
+        }
+        Start-Sleep -Milliseconds 250
     }
-    $angle = $StartDeg + $idx * $StepDeg
-    $rad = $angle * [Math]::PI / 180.0
-    $m = Get-Mascot-Point
+}
+
+function Click-Mascot-Anchored($localX, $localY, $label) {
+    # Velocity-predicted click at window-local ($localX, $localY) with
+    # post-move verification: re-read the rect once after the move and
+    # compare the settled cursor-to-anchor offset; if the error is > 6 px,
+    # re-aim with a fresh prediction (up to 3 attempts), then proceed anyway
+    # and log the achieved offset. Exactly ONE button press per call.
+    $offset = -1
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        $t = Get-Mascot-Predicted
+        $tx = [int]($t.PredX + $localX)
+        $ty = [int]($t.PredY + $localY)
+        $pt = New-Object POINT
+        [Win32]::GetCursorPos([ref]$pt) | Out-Null
+        Move-Mouse-Smooth $pt.X $pt.Y $tx $ty 12 15
+        $now = Get-Window-Info "^orbitkit-mascot$"
+        if ($now) {
+            $errX = ($now.Rect.Left + $localX) - $tx
+            $errY = ($now.Rect.Top + $localY) - $ty
+            $offset = [int][Math]::Sqrt($errX * $errX + $errY * $errY)
+        } else {
+            $offset = -1
+        }
+        Write-Timeline "$label attempt ${attempt}: aim ($tx, $ty), post-move offset ${offset} px (v=($($t.VX), $($t.VY)) px/s)"
+        if (($offset -ge 0 -and $offset -le 6) -or $offset -lt 0) { break }
+        if ($attempt -lt 3) { Start-Sleep -Milliseconds 60 }
+        else { Write-Timeline "$label proceeding after $attempt attempts with ${offset} px offset" }
+    }
+    Start-Sleep -Milliseconds 80
+    [Win32]::mouse_event(0x0002, 0, 0, 0, [UIntPtr]::Zero) # LEFTDOWN
+    Start-Sleep -Milliseconds 80
+    [Win32]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero) # LEFTUP
+    Start-Sleep -Milliseconds 150
+}
+
+function Get-Mascot-Point {
+    # Velocity-predicted mascot centre point (fresh read per call; roam moves
+    # the window ~24 px/s, never cache).
+    $t = Get-Mascot-Predicted
     return @{
-        X = [int]($m.Rect.Left + $script:OriginXEff + $Radius * [Math]::Cos($rad))
-        Y = [int]($m.Rect.Top + $script:OriginYEff + $Radius * [Math]::Sin($rad))
-        Angle = $angle
-        Rect = $m.Rect
+        X = $t.PredX + $script:PinXEff + $MascotSize / 2
+        Y = $t.PredY + $script:PinYEff + $MascotSize / 2
+        Rect = $t.Rect
     }
 }
 
@@ -359,9 +450,8 @@ function Log-Mascot-Rect($tag) {
 }
 
 function Open-Menu {
-    $mp = Get-Mascot-Point
-    Write-Timeline "Clicking mascot at ($($mp.X), $($mp.Y)) to open menu..."
-    Click-At $mp.X $mp.Y
+    Write-Timeline "Clicking mascot to open menu..."
+    Click-Mascot-Anchored ($script:PinXEff + $MascotSize / 2) ($script:PinYEff + $MascotSize / 2) "Open menu"
     Park-Pointer
     # spawn stagger: openMs 260 + stepMs 40 * 8 = 580 ms; settle before clicks
     Start-Sleep -Milliseconds 900
@@ -369,9 +459,17 @@ function Open-Menu {
 }
 
 function Click-Item($id) {
-    $p = Get-Item-Point $id
-    Write-Timeline "Clicking '$id' (angle $($p.Angle)) at ($($p.X), $($p.Y))..."
-    Click-At $p.X $p.Y
+    $idx = $ItemIndex[$id]
+    if ($null -eq $idx) {
+        Write-Error "Menu item '$id' not present in starter config!"
+        exit 1
+    }
+    $angle = $StartDeg + $idx * $StepDeg
+    $rad = $angle * [Math]::PI / 180.0
+    $localX = [int]($script:OriginXEff + $Radius * [Math]::Cos($rad))
+    $localY = [int]($script:OriginYEff + $Radius * [Math]::Sin($rad))
+    Write-Timeline "Clicking '$id' (angle $angle) at window-local ($localX, $localY)..."
+    Click-Mascot-Anchored $localX $localY "Click $id"
     Park-Pointer
 }
 

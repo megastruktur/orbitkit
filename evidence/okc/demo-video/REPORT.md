@@ -100,7 +100,10 @@ transparency/ghost checks are before the first menu open and after the click-awa
 
 - `scripts/ci/record-macos.sh` still duplicates numbered stills under unnumbered names
   (lines 282–285) and its upload list still references them — stale but functional; macOS is
-  explicitly out of scope for this task.
+  explicitly out of scope for this task. Since r3 the `video-macos` workflow job is removed, so
+  `record-macos.sh` is unreferenced in-repo until the port is scheduled.
+- The round-3/4 review file `okc_evidence/reviews/demo-video_r3.md` is absent from the worktree's plans
+  copy (same pattern as the r2 brief); round-4 execution proceeded on the brief's inline findings summary.
 
 ## Round 2 — Major fixed: startup contentShift ignored by click geometry
 
@@ -142,4 +145,40 @@ Badge (192, 594), Quit (342, 744), mascot centre (192, 804).
   source investigation confirmed (above). Fix kept strictly in the round-1 allowlist; if the missing r2 brief
   prescribes different acceptance criteria, coordinator to supply it.
 
-READY FOR REVIEW at 1ea628d (all functional changes; later commits add the R2 fix, this line, or docs only)
+## Round 3 (SUPERSEDED) → Round 4 (verified diagnosis, revert, instrumentation)
+
+Round 3 shipped a roam work-area clamp as the "root-cause fix" for run 36546923402. **That diagnosis was
+wrong and is retracted**: the review (r3 verdict FAIL) plus the coordinator's independent artifact
+verification showed:
+
+- The badge click point was **EXACT**: product formula origin = mascot rect centre-x, top − headGap (12) →
+  (615, 486); disc at −90° → (615, 336); the script clicked (615, 336). Drift ≈ 8 px over the ~350 ms click
+  latency vs a 22 px disc radius — the click was not the miss.
+- The pre-existing `roamBounds` **already** shrunk the zone to fit (`travelLimits` + `min()` on width/height);
+  the r3 "zone never shrunk" claim was false. The r2 geometry also held: the disc was clear of the popups.
+- What the artifacts DO show: `app.alert`, `app.notes` (note-1, note-2) emitted, **no `app.badge` line**, and
+  the mascot window **DESTROYED** (title gone from `EnumWindows`) ~2 s after the badge click, with **no
+  app-side error line**. Root cause unknown. The next run's instrumentation (per-click aim/offset logs, miss
+  diagnostics incl. `app-err.log` tail) is designed to decide it — we do not guess-fix.
+
+**Round 4 changes:**
+1. **Reverted** `packages/orbitkit/src/roam.ts` + `roam.test.ts` to the r2 state (`8d6f836`): the clamp change
+   was out of scope (no located product bug) and its premise was disproven.
+   `git diff 8d6f836..HEAD -- packages/orbitkit/src/roam.ts packages/orbitkit/src/roam.test.ts` is empty.
+2. **Kept + completed the script determinism work** (`record-windows.ps1`, finding 2):
+   - The fresh-rect wait is now a real **velocity prediction**: two rect reads 60 ms apart → per-tick
+     velocity; button-down lead time = measured 350 ms (12×15 ms move + 80 + 80); the click aims at
+     `predicted = current + v·latency`. After the move the rect is re-checked once: if the settled
+     cursor-to-anchor offset error is > 6 px, it re-aims with a fresh prediction (up to 3 attempts), then
+     proceeds anyway — and logs the achieved offset for **every** click (`<label> attempt N: aim (x, y),
+     post-move offset E px (v=(vx, vy) px/s)`). The r3 "≤ 2 px" claim was false and is dropped.
+   - The bounded not-found retry (5 s) stays and is now the **primary diagnostic instrument**: each miss logs
+     (a) app process alive, (b) all visible window titles containing `orbitkit`, (c) the last 30 lines of
+     `app-err.log`.
+3. **Workflow**: stays at the r3 state — `video-macos` job removed, `video-windows` unchanged.
+
+**Gates (r4)**: `git diff 8d6f836..HEAD -- <roam files>` empty; `pnpm -r test` 379/379 (roam suite back to the
+r2 set); `pnpm -r check` clean; Rust gate `OKC_RUST_GATE_OK` (67); `derive-geometry.mjs` exit 0; pwsh 7.4.6
+scriptblock parse → `PS-OK`. Evidence in `raw/checks.txt`.
+
+READY FOR REVIEW at 25d2167796172b9062a84fd90bc570fd29a038c3 (functional commit; the head commit adds only this sha line)

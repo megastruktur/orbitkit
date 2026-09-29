@@ -27,3 +27,35 @@ Source chain for the Major: crates/tauri-plugin-orbitkit/src/desktop.rs
   360x288 and title-bar click-away.
 demo-video-r2.md: absent (only demo-video.md in okc_briefs/) -> documented as
   Contract questions in REPORT.md.
+
+--- Round 3 (2026-09-29) ---
+$ pnpm -r test                       -> exit 0; 17 files, 384 tests passed
+$ pnpm --filter "@orbitkit/ui" exec vitest run src/roam.test.ts
+  -> 55/55 pass with the fix; with roam.ts stashed (pre-fix) the two new
+     step-target tests FAIL (mutation-sensitive):
+     - startRoam > r3: clamps every setPosition target... (stale zone)
+     - createRoam > r3: clamps step targets... when the monitor shrinks
+     The roamBounds/rebase zone-shrink tests pin behaviour the pre-fix code
+     already had via travelLimits; the explicit clampRectToArea is hardening.
+$ pnpm -r check                      -> exit 0 (tsc --noEmit clean)
+$ node evidence/okc/demo-video/raw/derive-geometry.mjs -> exit 0 (unchanged output)
+$ pwsh 7.4.6 (portable, /tmp/pwsh7) -NoProfile -Command
+  "[scriptblock]::Create((Get-Content -Raw scripts/ci/record-windows.ps1)) | Out-Null; 'PS-OK'"
+  -> PS-OK
+$ bash plans/orbitkit-cutecare-v02/okc_tools/rust_gate.sh
+  -> (result appended below after run)
+$ bash plans/orbitkit-cutecare-v02/okc_tools/rust_gate.sh
+  -> exit 0; OKC_RUST_GATE_OK (cargo test -p tauri-plugin-orbitkit --lib: 67 passed; clippy -D warnings clean)
+
+--- Round 4 (2026-09-29) ---
+$ git checkout 8d6f836 -- packages/orbitkit/src/roam.ts packages/orbitkit/src/roam.test.ts
+$ git diff 8d6f836..HEAD -- <roam files>  (after commit)
+  -> EMPTY (revert byte-identical to r2)
+$ pnpm -r test  -> exit 0; 17 files, 379 tests passed (roam suite back to r2 set)
+$ pnpm -r check -> exit 0
+$ bash plans/orbitkit-cutecare-v02/okc_tools/rust_gate.sh -> exit 0; OKC_RUST_GATE_OK (67)
+$ pwsh 7.4.6 -NoProfile -Command "[scriptblock]::Create((Get-Content -Raw
+  scripts/ci/record-windows.ps1)) | Out-Null; 'PS-OK'"  -> PS-OK (velocity-predicted
+  click core: 60 ms double-read velocity, 350 ms lead, post-move offset check
+  6 px / 3 attempts, per-click offset logs, 5 s miss retry with orbitkit titles
+  + app liveness + app-err.log tail 30)

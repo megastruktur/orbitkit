@@ -16,7 +16,7 @@
     "./assets/*": "./assets/*"
   },
   "scripts": {
-    "build": "svelte-package -i src -o dist && rm -f dist/*.test.*",
+    "build": "svelte-package -i src -o dist && find dist -name '*.test.*' -delete",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },

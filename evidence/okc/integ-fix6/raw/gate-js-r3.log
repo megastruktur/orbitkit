@@ -1,0 +1,47 @@
+# r3 JS gate: pnpm -r build && pnpm -r test && pnpm -r check
+# exit code: 0
+# vitest + starter node:test counts:
+      Tests  379 passed (379)
+# tests 30
+# pass 30
+
+ok 26 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.124283
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 27 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.062622
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+ok 28 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.094525
+  type: 'test'
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+ok 29 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.077872
+  type: 'test'
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+ok 30 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.181014
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 52.188494
+$ tsc --noEmit
+$ tsc --noEmit

@@ -2,7 +2,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { clearMocks, mockIPC, mockWindows } from "@tauri-apps/api/mocks";
 import { createMachine, hint as machineHint, tick } from "./mascotMachine";
 import { createPark, parkCornerPosition } from "./park";
-import type { ParkWindow } from "./park";
+import type { ParkWindow, ParkWindowSize } from "./park";
 import type { MascotStateDefinition } from "./config";
 import type { PhysicalPoint, PhysicalRect } from "./windowFit";
 
@@ -71,6 +71,7 @@ function setup(opts: {
   corner?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
   now?: () => number;
   states?: Record<string, MascotStateDefinition>;
+  windowSize?: ParkWindowSize;
 } = {}) {
   const roam = makeRoam();
   const passthrough = makePassthrough();
@@ -85,7 +86,7 @@ function setup(opts: {
     corner: opts.corner ?? "bottom-right",
     workArea: WORK,
     getWindow: () => win,
-    windowSize: SIZE,
+    windowSize: opts.windowSize ?? SIZE,
     showBubble,
     now: opts.now,
   });
@@ -151,6 +152,15 @@ describe("parkCornerPosition", () => {
   it("clamps an oversized window into the work area instead of an off-screen corner", () => {
     const oversized = { width: 900, height: 700 };
     expect(parkCornerPosition("bottom-right", work, oversized)).toEqual({ x: 100, y: 200 });
+  });
+
+  it("returns integer physical px even for a fractional window size", () => {
+    // Tauri's set_position silently fails on fractional physical px.
+    const fractional = { width: 95.5, height: 95.5 };
+    const pos = parkCornerPosition("bottom-right", WORK, fractional);
+    expect(Number.isInteger(pos.x)).toBe(true);
+    expect(Number.isInteger(pos.y)).toBe(true);
+    expect(pos).toEqual({ x: Math.round(1920 - 95.5), y: Math.round(1080 - 95.5) });
   });
 });
 
@@ -233,6 +243,32 @@ describe("createPark", () => {
     expect(passthrough.setPaused).toHaveBeenLastCalledWith(false);
     expect(machine.active).toBe("idle");
     expect(parksOf(bus.emitted)).toEqual([{ parked: true }, { parked: false }]);
+  });
+
+  it("park hands setPosition integer px for a fractional window size", async () => {
+    const { handle, setPosition } = setup({ windowSize: { width: 95.5, height: 95.5 } });
+
+    await handle.park();
+
+    const arg = setPosition.mock.calls[0][0];
+    expect(Number.isInteger(arg.x)).toBe(true);
+    expect(Number.isInteger(arg.y)).toBe(true);
+    expect(arg).toEqual({ x: 1825, y: 985 });
+  });
+
+  it("unpark hands setPosition integer px when the saved position is fractional", async () => {
+    const { handle, setPosition, roam } = setup({ start: { x: 500.5, y: 400.5 } });
+
+    await handle.park();
+    await handle.unpark();
+
+    const restore = setPosition.mock.calls[1][0];
+    expect(Number.isInteger(restore.x)).toBe(true);
+    expect(Number.isInteger(restore.y)).toBe(true);
+    expect(restore).toEqual({ x: 501, y: 401 });
+    // Roam adopts the same rounded point, so the loop never re-emits the
+    // fractional position through its own setPosition.
+    expect(roam.resume).toHaveBeenCalledWith({ x: 501, y: 401 });
   });
 
   it("double park applies the effects once", async () => {

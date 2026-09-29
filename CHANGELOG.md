@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `MENU_ITEM_ID_REGEX` widened to `^[a-z0-9][a-z0-9_.:-]{0,63}$` (K7, TS + Rust identical).
 - Radial menu items animate with per-item stagger (centre→edges on open, edges→centre on close); the mascot window keeps a single fixed size across open/close (no native resize, no mascot jump).
 - `@orbitkit/ui` and `tauri-plugin-orbitkit` versioned `0.2.0`.
+- **Breaking**: `close_popup` takes the window `label` (K11 `orbitkit-popup-{id}` or `orbitkit-popup-{id}-{instanceKey}`, as reported by `listPopups` and the `orbitkit://popup-shown {label}` event) — 0.1.0 took the popup `id`; on desktop a bare popup id returns `not_found`; the Android arm still accepts a bare id (it adds the `orbitkit-popup-` prefix). `open_popup` takes `{id, params?, instanceKey?}` (K11 label-based popups).
 
 ### Fixed
 

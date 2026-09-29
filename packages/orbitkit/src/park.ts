@@ -122,7 +122,11 @@ export function parkCornerPosition(
     height: windowSize.height,
   };
   const clamped = clampToWorkArea(target, workArea);
-  return { x: clamped.x, y: clamped.y };
+  // Tauri `set_position` accepts only integer physical px — a fractional
+  // coordinate makes the move silently fail (same class as the roam fix),
+  // so the handed point is rounded. Rounding after the K9 clamp can
+  // overshoot the work-area edge by at most 0.5 px.
+  return { x: Math.round(clamped.x), y: Math.round(clamped.y) };
 }
 
 /** Creates the park handle; see module docs. */
@@ -195,9 +199,10 @@ export function createPark(options: CreateParkOptions): ParkHandle {
       // Restore the position immediately (resume(at) only adopts it on the
       // next loop tick), then let roam adopt the same point — clamped into
       // the (untouched) zone — and re-aim from there: prior position AND
-      // zone are back.
-      await options.getWindow().setPosition(savedPosition);
-      options.roam.resume(savedPosition);
+      // zone are back. Rounded: set_position takes integer physical px only.
+      const restored = { x: Math.round(savedPosition.x), y: Math.round(savedPosition.y) };
+      await options.getWindow().setPosition(restored);
+      options.roam.resume(restored);
     } else {
       options.roam.resume();
     }

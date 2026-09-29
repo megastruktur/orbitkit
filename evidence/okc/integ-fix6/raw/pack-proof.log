@@ -1,0 +1,6 @@
+# pack proof: pnpm --filter @orbitkit/ui pack --pack-destination /tmp/okc-pack
+# tarball: orbitkit-ui-0.2.0.tgz
+# tar -tzf | grep -c '\.test\.'  ->  0  (was >=1: dist/mascot/sheets.test.js shipped before fix)
+# sha256:
+0fdca5935132c42a797c213baf0bff78e0b0855f4551fa5520b104098e4d808e  /tmp/okc-pack/orbitkit-ui-0.2.0.tgz
+# exit code: 0

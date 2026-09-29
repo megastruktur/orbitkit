@@ -88,13 +88,15 @@ snake_case ONLY (the spike's duplicated camelCase commands are removed).
 | `request_overlay_permission` | — | `()` | no-op | opens settings |
 | `show_overlay` | `{menu: MenuConfig, mascot?: {size:number}}` | `()` | shows mascot window | SAW overlay: mascot bubble + menu items from `menu` |
 | `hide_overlay` | — | `()` | hides mascot window | removes overlay |
-| `open_popup` | `{id: string}` | `()` | WebviewWindow from config popups[id], focus if open | lookup popup (error `not_found` if unknown), collapse menu, bring app to front, emit `orbitkit://popup-open` |
-| `close_popup` | `{id: string}` | `()` | close | emit `orbitkit://popup-close` |
+| `open_popup` | `{id: string, params?: Record<string,string>, instanceKey?: string}` | `()` | WebviewWindow `orbitkit-popup-{id}[-{instanceKey}]` from config popups[id], `{param}` URL-encoded substitution, show+focus+re-anchor, emit `orbitkit://popup-shown {label}` | lookup popup (error `not_found` if unknown), collapse menu, bring app to front, emit `orbitkit://popup-shown {label}` + legacy `orbitkit://popup-open` |
+| `close_popup` | `{label: string}` | `()` | close popup window by full label, emit `orbitkit://popup-closed {label}` | emit `orbitkit://popup-closed {label}` + legacy `orbitkit://popup-close {id}` |
+| `list_popups` | — | `string[]` | labels of open popup windows | error `unsupported` |
 | `set_mascot_state` | `{state: string}` | `()` | emits `orbitkit://mascot-state {state}` | updates overlay state |
 | `emit_menu_action` | `{id: string}` | `()` | emits menu-action (source webview) + Rust handlers | same |
 | `start_mascot_drag` | — | `()` | initiates native window dragging on `orbitkit-mascot` (`start_dragging`) | no-op |
+| `mascot_monitor` | — | `{workArea: PhysRect, scaleFactor: number}` | work area + scale of the monitor containing the mascot window centre (K9) | error `unsupported` |
 Bridge wrappers: `emitMenuAction(id)`, `startMascotDrag()`; also `onMascotState(cb) => unlisten`.
-Desktop window labels: `orbitkit-mascot` (url `index.html?orbitkit=mascot`), `orbitkit-popup-<id>`.
+Desktop window labels: `orbitkit-mascot` (url `index.html?orbitkit=mascot`), `orbitkit-popup-<id>[-<instanceKey>]`.
 Event (both platforms): `orbitkit://menu-action` payload `{ id: string, source: "webview" | "overlay" }`.
 Events (Android popups): `orbitkit://popup-open` payload `{ "id": string, "title": string, "url": string, "width": number, "height": number }` (from `windows.popups[id]`), `orbitkit://popup-close` payload `{ "id": string }`.
 Android native path: overlay tap -> Kotlin -> `OrbitkitJniBridge.onNativeAction(id)` (JNI, works while

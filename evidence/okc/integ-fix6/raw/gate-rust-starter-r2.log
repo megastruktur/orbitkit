@@ -1,0 +1,43 @@
+# r2 rust_gate.sh && starter_gate.sh
+# exit code: 0
+
+test desktop::tests::test_popup_events_and_list ... ok
+test placement::tests::bottom_edge_prefers_above ... ok
+test jni_bridge::tests::test_guarded_handles_emitter_panic_without_abort ... ok
+test placement::tests::center_second_monitor_uses_its_origin ... ok
+test placement::tests::contract_signature_place_popup_returns_pos ... ok
+test placement::tests::dpi_150_physical_pixels ... ok
+test mobile::tests::test_build_overlay_payload_mascot_config_camel_case_and_states ... ok
+test jni_bridge::tests::test_guarded_handles_handler_panic_without_abort ... ok
+test placement::tests::dpi_200_right_edge_flips ... ok
+test placement::tests::nothing_fits_clamps_inside_work_area ... ok
+test placement::tests::open_space_prefers_above_right ... ok
+test desktop::tests::test_open_popup_instance_keys_create_distinct_windows ... ok
+test jni_bridge::tests::test_process_native_action_emits_overlay_event_and_notifies_handler ... ok
+test placement::tests::pages_center_in_work_area ... ok
+test placement::tests::second_monitor_right_edge_flips ... ok
+test placement::tests::right_edge_flips_left ... ok
+test jni_bridge::tests::test_process_native_action_records_and_returns_json ... ok
+test placement::tests::second_monitor_left_of_primary ... ok
+test placement::tests::top_edge_rejects_above ... ok
+test placement::tests::side_candidate_bottom_aligns_with_anchor_bottom ... ok
+test tests::test_popup_label_default_and_instance_key ... ok
+test jni_bridge::tests::test_recorder_actions_through_jni ... ok
+test tests::test_popup_label_rejects_invalid_instance_keys ... ok
+test placement::tests::top_edge_small_popup_uses_side ... ok
+test tests::test_resolve_popup_url_app_relative ... ok
+test tests::test_lookup_popup_found_and_not_found ... ok
+test tests::test_resolve_popup_spec_defaults_and_overrides ... ok
+test tests::test_substitute_popup_params_unknown_placeholder_rejected ... ok
+test tests::test_resolve_popup_url_loopback ... ok
+test tests::test_substitute_popup_params_encodes_values ... ok
+test tests::test_resolve_popup_url_policy ... ok
+test tests::test_resolve_popup_url_rejects_scheme_relative_smuggles ... ok
+
+test result: ok. 67 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
+OKC_RUST_GATE_OK
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
+OKC_STARTER_GATE_OK

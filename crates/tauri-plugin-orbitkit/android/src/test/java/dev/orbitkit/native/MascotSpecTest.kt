@@ -12,29 +12,34 @@ import java.io.File
 
 class MascotSpecTest {
 
+    // Loads the FROZEN 0.1.0 starter config fixture, byte-identical to
+    // examples/starter/src/orbitkit.config.json @ 098f969. The live starter demo
+    // config was rewritten in 0.2.0 (kind "sheets", planet sprite, 9-item menu);
+    // these tests pin 0.1.0 content, so they must not read the live demo file.
     private fun loadConfigFile(): File {
         val userDir = File(System.getProperty("user.dir", "."))
         val candidates = listOf(
-            File("examples/starter/src/orbitkit.config.json"),
-            File("../../../examples/starter/src/orbitkit.config.json"),
-            File("../../../../examples/starter/src/orbitkit.config.json"),
-            File(userDir, "examples/starter/src/orbitkit.config.json"),
-            File(userDir, "../../../examples/starter/src/orbitkit.config.json"),
-            File(userDir, "../../../../examples/starter/src/orbitkit.config.json")
+            File("packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File("../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File("../../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "../../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json")
         )
         for (c in candidates) {
             if (c.exists()) return c
         }
         var dir: File? = userDir
         while (dir != null) {
-            val check = File(dir, "examples/starter/src/orbitkit.config.json")
+            val check = File(dir, "packages/orbitkit/src/test-fixtures/starter-0.1.0.json")
             if (check.exists()) return check
             dir = dir.parentFile
         }
-        fail("Required config file orbitkit.config.json not found in repo!")
+        fail("Required config file packages/orbitkit/src/test-fixtures/starter-0.1.0.json not found in repo!")
         throw AssertionError("Unreachable")
     }
 
+    // Pins 0.1.0 starter mascot spec (kind svg, size 96, 2 states) via frozen fixture.
     @Test
     fun testMascotSpecParseFromRealStarterConfig() {
         val file = loadConfigFile()
@@ -51,6 +56,7 @@ class MascotSpecTest {
         assertEquals(2, spec.states.size)
     }
 
+    // Pins 0.1.0 idle body colour #4f7cff via frozen fixture.
     @Test
     fun testSrcForIdleShowsBlueBody() {
         val file = loadConfigFile()
@@ -64,6 +70,7 @@ class MascotSpecTest {
         assertTrue("idle src must decode to SVG", decoded is DecodedIcon.Svg)
     }
 
+    // Pins 0.1.0 busy body colour #f59e0b via frozen fixture.
     @Test
     fun testSrcForBusyShowsAmberBody() {
         val file = loadConfigFile()

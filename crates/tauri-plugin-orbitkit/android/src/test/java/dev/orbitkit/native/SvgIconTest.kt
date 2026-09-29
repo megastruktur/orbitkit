@@ -36,26 +36,32 @@ class SvgIconTest {
         fail("Required icon file $name not found in repo!")
         throw AssertionError("Unreachable")
     }
+
+    // Loads the FROZEN 0.1.0 starter config fixture, byte-identical to
+    // examples/starter/src/orbitkit.config.json @ 098f969. The live starter demo
+    // config was rewritten in 0.2.0 (kind "sheets", planet sprite, 9-item menu);
+    // the FromConfig tests below pin 0.1.0 content, so they must not read the
+    // live demo file. (loadIconFile still reads live icons: unchanged in 0.2.0.)
     private fun loadConfigFile(): File {
         val userDir = File(System.getProperty("user.dir", "."))
         val candidates = listOf(
-            File("examples/starter/src/orbitkit.config.json"),
-            File("../../../examples/starter/src/orbitkit.config.json"),
-            File("../../../../examples/starter/src/orbitkit.config.json"),
-            File(userDir, "examples/starter/src/orbitkit.config.json"),
-            File(userDir, "../../../examples/starter/src/orbitkit.config.json"),
-            File(userDir, "../../../../examples/starter/src/orbitkit.config.json")
+            File("packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File("../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File("../../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "../../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json")
         )
         for (c in candidates) {
             if (c.exists()) return c
         }
         var dir: File? = userDir
         while (dir != null) {
-            val check = File(dir, "examples/starter/src/orbitkit.config.json")
+            val check = File(dir, "packages/orbitkit/src/test-fixtures/starter-0.1.0.json")
             if (check.exists()) return check
             dir = dir.parentFile
         }
-        fail("Required config file examples/starter/src/orbitkit.config.json not found in repo!")
+        fail("Required config file packages/orbitkit/src/test-fixtures/starter-0.1.0.json not found in repo!")
         throw AssertionError("Unreachable")
     }
 
@@ -443,6 +449,7 @@ class SvgIconTest {
         assertNull(SvgParser.parse(svgPathNegInfinity))
     }
 
+    // Pins 0.1.0 idle-mascot SVG (6 elements, #4f7cff body) via frozen fixture.
     @Test
     fun testIdleMascotFromConfigParsesCorrectElementsAndPaint() {
         val configFile = loadConfigFile()
@@ -503,6 +510,7 @@ class SvgIconTest {
         assertEquals("#10141a", pupilR.paint.fillHex)
     }
 
+    // Pins 0.1.0 busy-mascot amber body (#f59e0b) via frozen fixture.
     @Test
     fun testBusyMascotFromConfigGivesAmberBody() {
         val configFile = loadConfigFile()

@@ -118,17 +118,18 @@ class IconDecoderTest {
         assertNull(res)
     }
 
+    // Pins 0.1.0 menu icons (5 items, 24x24 SVG data URLs) via frozen fixture.
     @Test
     fun testStarterConfigIconsDecodeCleanly() {
         val userDir = File(System.getProperty("user.dir", "."))
         val candidates = listOf(
-            File("examples/starter/src/orbitkit.config.json"),
-            File("../../../examples/starter/src/orbitkit.config.json"),
-            File(userDir, "examples/starter/src/orbitkit.config.json"),
-            File(userDir, "../../../examples/starter/src/orbitkit.config.json")
+            File("packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File("../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "packages/orbitkit/src/test-fixtures/starter-0.1.0.json"),
+            File(userDir, "../../../packages/orbitkit/src/test-fixtures/starter-0.1.0.json")
         )
         val configFile = candidates.firstOrNull { it.exists() }
-        assertNotNull("starter orbitkit.config.json must exist", configFile)
+        assertNotNull("frozen starter-0.1.0.json fixture must exist", configFile)
 
         val json = JSONObject(configFile!!.readText(Charsets.UTF_8))
         val items = json.getJSONObject("menu").getJSONArray("items")

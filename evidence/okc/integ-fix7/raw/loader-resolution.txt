@@ -1,0 +1,19 @@
+REQUIRED MascotSpecTest.loadConfigFile | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit/android
+  -> candidates[1] resolved: /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/packages/orbitkit/src/test-fixtures/starter-0.1.0.json | exists=True
+  -> PASS
+REQUIRED SvgIconTest.loadConfigFile | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit/android
+  -> candidates[1] resolved: /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/packages/orbitkit/src/test-fixtures/starter-0.1.0.json | exists=True
+  -> PASS
+REQUIRED IconDecoderTest (testStarterConfigIconsDecodeCleanly) | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit/android
+  -> candidates[1] resolved: /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/packages/orbitkit/src/test-fixtures/starter-0.1.0.json | exists=True
+  -> PASS
+
+INFO MascotSpecTest.loadConfigFile | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit
+  -> upward-loop resolved: /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/packages/orbitkit/src/test-fixtures/starter-0.1.0.json | exists=True -> PASS
+INFO SvgIconTest.loadConfigFile | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit
+  -> upward-loop resolved: /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/packages/orbitkit/src/test-fixtures/starter-0.1.0.json | exists=True -> PASS
+INFO IconDecoderTest (testStarterConfigIconsDecodeCleanly) | user.dir=/home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix7/crates/tauri-plugin-orbitkit
+  -> None resolved: None | exists=False -> FAIL (pre-existing, not CI cwd)
+note: live examples/starter config exists=True (loaders no longer reference it)
+
+exit=0

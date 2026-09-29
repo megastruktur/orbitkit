@@ -1,0 +1,7 @@
+# Fixture byte-identity: git 098f969 examples/starter config vs frozen test fixture
+$ git show 098f969:examples/starter/src/orbitkit.config.json > /tmp/okc7-0.1.0.json
+$ cmp /tmp/okc7-0.1.0.json packages/orbitkit/src/test-fixtures/starter-0.1.0.json
+cmp_exit=0
+$ md5sum both
+3c365658cafa1231ef6ce326d0c225a2  /tmp/okc7-0.1.0.json
+3c365658cafa1231ef6ce326d0c225a2  packages/orbitkit/src/test-fixtures/starter-0.1.0.json

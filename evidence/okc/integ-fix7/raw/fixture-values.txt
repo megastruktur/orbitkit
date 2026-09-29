@@ -1,0 +1,26 @@
+PASS kind == svg (MascotKind.SVG)
+PASS size == 96
+PASS initialState == idle
+PASS top-level src starts with <svg (not fallback)
+PASS exactly 2 states
+PASS srcFor("idle") contains #4f7cff
+PASS srcFor("busy") contains #f59e0b
+PASS idle parses into exactly 6 elements
+PASS idle element order body/ring/eyes/pupils
+PASS idle[0] body fill #4f7cff, no stroke
+PASS idle[1] ring fill none, stroke #9db4ff, width 4, rotate(-20 80 80)
+PASS idle[2],[3] eyes #ffffff
+PASS idle[4],[5] pupils #10141a
+PASS busy parses into exactly 6 elements
+PASS busy[0] body fill #f59e0b
+PASS busy[1] ring stroke #fcd34d
+PASS menu has 5 items
+PASS icon Notes: base64 svg, viewBox 24x24, has commands
+PASS icon Timer: base64 svg, viewBox 24x24, has commands
+PASS icon Settings: base64 svg, viewBox 24x24, has commands
+PASS icon About: base64 svg, viewBox 24x24, has commands
+PASS icon Quit: base64 svg, viewBox 24x24, has commands
+
+22 checks, 0 failed
+
+exit=0

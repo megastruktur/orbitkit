@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/media/orbitkit-mascot.svg" alt="OrbitKit Mascot" width="128" height="128" />
+<img src="docs/media/orbitkit-mascot.gif" alt="OrbitKit Mascot" width="128" height="128" />
 
 # OrbitKit
 

@@ -1,0 +1,141 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix4/packages/orbitkit
+
+
+ Test Files  17 passed (17)
+      Tests  376 passed (376)
+   Start at  00:14:19
+   Duration  1.66s (environment 56%, transform 28%, tests 9%, import 7%)
+
+  Transform  transforming modules took 3.50s · 28% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             on CI this only helps when the cache directory is persisted between runs
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+$ node --test --experimental-strip-types tests/*.test.mjs
+TAP version 13
+# Subtest: mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 0.849139
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.278354
+  type: 'test'
+  ...
+# Subtest: every sheet the config references has width = 32 * frames, height = 32
+ok 3 - every sheet the config references has width = 32 * frames, height = 32
+  ---
+  duration_ms: 0.216363
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+ok 4 - menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.253736
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 5 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.063374
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 6 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.090617
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 7 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.121728
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 8 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.575465
+  type: 'test'
+  ...
+# Subtest: window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+ok 9 - window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+  ---
+  duration_ms: 0.322912
+  type: 'test'
+  ...
+# Subtest: Design B: no setSize/setPosition reachable from menu open/close
+ok 10 - Design B: no setSize/setPosition reachable from menu open/close
+  ---
+  duration_ms: 0.638759
+  type: 'test'
+  ...
+# Subtest: Design B: idle and open states share ONE fixed window rect
+ok 11 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 0.806426
+  type: 'test'
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+ok 12 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.12284
+  type: 'test'
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 13 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.071229
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+ok 14 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.090166
+  type: 'test'
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+ok 15 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.118712
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 16 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.064626
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+ok 17 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.089785
+  type: 'test'
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+ok 18 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.077622
+  type: 'test'
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+ok 19 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.185182
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 50.678418

@@ -510,6 +510,58 @@ describe("startRoam", () => {
     ctl.resume(); // still safe
     ctl.stop();
   });
+
+  it("hands setPosition only integer coordinates over a fractional-step run", async () => {
+    const h = fakeWindow({ x: 100.5, y: 100.5 });
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 250, // ~8.33 px per ~33.3 ms step ⇒ fractional handoffs
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.positions.length).toBeGreaterThan(10);
+    for (const p of h.positions) {
+      expect(Number.isInteger(p.x)).toBe(true);
+      expect(Number.isInteger(p.y)).toBe(true);
+    }
+    ctl.stop();
+  });
+
+  it("slow speed still accumulates movement (rounding must not stall)", async () => {
+    const h = fakeWindow({ x: 100, y: 100 });
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 5, // ~0.17 px per step: below the rounding threshold
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(h.positions.length).toBeGreaterThan(0);
+    const last = h.positions[h.positions.length - 1];
+    const moved = Math.hypot(last.x - 100, last.y - 100);
+    expect(moved).toBeGreaterThanOrEqual(15); // 5 px/s × 4 s = 20 px total
+    ctl.stop();
+  });
+
+  it("skips setPosition while the rounded position is unchanged", async () => {
+    const h = fakeWindow({ x: 100, y: 100 });
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 3, // ~0.1 px per step: the rounded point holds for many ticks
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(h.positions.length).toBeGreaterThan(0);
+    expect(h.positions.length).toBeLessThan(20); // ~60 ticks, not one send each
+    for (let i = 1; i < h.positions.length; i++) {
+      const prev = h.positions[i - 1];
+      const cur = h.positions[i];
+      expect(cur.x !== prev.x || cur.y !== prev.y).toBe(true);
+    }
+    ctl.stop();
+  });
 });
 
 describe("createRoamDrag", () => {
@@ -762,7 +814,11 @@ describe("createRoam", () => {
       h.positions[0].x - 3900,
       h.positions[0].y - 3900,
     );
-    expect(step).toBeCloseTo((200 * MIN_ROAM_INTERVAL_MS) / 1000, 0);
+    // 200 px/s × ~33.3 ms ≈ 6.67 px; rounding to integer physical px may
+    // shift each axis by up to 0.5 px (hypot error ≤ ~0.71 px).
+    const expected = (200 * MIN_ROAM_INTERVAL_MS) / 1000;
+    expect(step).toBeGreaterThanOrEqual(expected - 0.71);
+    expect(step).toBeLessThanOrEqual(expected + 0.71);
     h.handle.roam.stop();
   });
 

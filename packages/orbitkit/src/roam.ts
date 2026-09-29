@@ -47,7 +47,12 @@ export interface RoamState {
 export interface RoamWindow {
   /** Current window position in physical screen coordinates. */
   outerPosition(): Promise<PhysicalPoint>;
-  /** Moves the window (physical screen coordinates). */
+  /**
+   * Moves the window (physical screen coordinates). Both coordinates MUST be
+   * integers: Tauri's `set_position` takes an integer `PhysicalPosition` and
+   * rejects fractional px. Callers keep fractional position as internal roam
+   * state and hand `setPosition` only the rounded value.
+   */
   setPosition(pos: PhysicalPoint): Promise<void>;
 }
 
@@ -260,6 +265,9 @@ export interface RoamController {
  * Starts the roam loop for an existing window. Returns the controller
  * synchronously; the first position read happens asynchronously, and until it
  * resolves `pause`/`resume`/`stop` are honoured (the loop simply stays idle).
+ * Internal roam state stays fractional (so slow speeds still accumulate), but
+ * only INTEGER physical coordinates ever reach `setPosition` (rounded; a call
+ * is skipped while the rounded position is unchanged).
  * `setPosition` failures are logged once per failure streak and never stop
  * the loop.
  */
@@ -269,6 +277,7 @@ export function startRoam(options: StartRoamOptions): RoamController {
     options.intervalMs ?? MIN_ROAM_INTERVAL_MS,
   );
   let state: RoamState | null = null;
+  let lastSent: PhysicalPoint | null = null;
   let timer: number | null = null;
   let lastTick = 0;
   let paused = false;
@@ -282,16 +291,24 @@ export function startRoam(options: StartRoamOptions): RoamController {
     const dt = now - lastTick;
     lastTick = now;
     state = stepRoam(state, dt, options.bounds());
-    const pos = { x: state.x, y: state.y };
-    options
-      .getWindow()
-      .setPosition(pos)
-      .catch((err) => {
-        if (!setPositionErrorLogged) {
-          setPositionErrorLogged = true;
-          console.error("orbitkit: roam: setPosition failed", err);
-        }
-      });
+    // Internal state stays fractional so slow speeds still accumulate motion
+    // across steps; only the ROUNDED integer position reaches the window
+    // (Tauri `set_position` takes an integer `PhysicalPosition`), and only
+    // when it differs from the last one sent (no redundant native calls).
+    const x = Math.round(state.x);
+    const y = Math.round(state.y);
+    if (lastSent === null || x !== lastSent.x || y !== lastSent.y) {
+      lastSent = { x, y };
+      options
+        .getWindow()
+        .setPosition({ x, y })
+        .catch((err) => {
+          if (!setPositionErrorLogged) {
+            setPositionErrorLogged = true;
+            console.error("orbitkit: roam: setPosition failed", err);
+          }
+        });
+    }
     options.onVelocity?.({ x: state.vx, y: state.vy });
   }
 
@@ -314,6 +331,9 @@ export function startRoam(options: StartRoamOptions): RoamController {
       if (stopped) return;
       const v = aimRoamVelocity(pos, options.bounds(), options.speed);
       state = { x: pos.x, y: pos.y, vx: v.x, vy: v.y };
+      // The window is already (about) here; don't re-send it on the first
+      // tick when the rounded position is unchanged.
+      lastSent = { x: Math.round(pos.x), y: Math.round(pos.y) };
       arm();
     } catch (err) {
       if (!initErrorLogged) {
@@ -344,6 +364,10 @@ export function startRoam(options: StartRoamOptions): RoamController {
         };
         const v = aimRoamVelocity(p, b, options.speed);
         state = { x: p.x, y: p.y, vx: v.x, vy: v.y };
+        // The native drag already carried the window to `at`; treat the
+        // adopted (clamped) point as the last sent position so the first
+        // tick only sends once the rounded position actually changes.
+        lastSent = { x: Math.round(p.x), y: Math.round(p.y) };
       }
       arm();
     },

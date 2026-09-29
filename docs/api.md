@@ -267,7 +267,7 @@ Updates the mascot state across webviews and Android native overlay, emitting an
 Bubble-badge: broadcasts `orbitkit://badge { count }` (badge listeners, including the badge UI itself, update); `onBadge` subscribes to those events.
 
 #### `setParked(parked: boolean): Promise<void>` / `onPark(cb): Promise<UnlistenFn>`
-Park (do-not-disturb): broadcasts `orbitkit://park { parked }`; parked mascots stop roaming, polling, and passthrough, and re-show at a screen corner via `parkCornerPosition` on unpark. Roaming pauses while parked.
+Broadcast only: emits `orbitkit://park { parked }` to every listener (including the emitting webview); outside Tauri, resolves without emitting. It does not move the window and does not pause roam or passthrough — that lifecycle belongs to `createPark` (see Roam & park below).
 
 #### `startPassthrough(options): PassthroughController` / `registerHitRegion(...)` (K10)
 Opt-in click-through for the mascot window (`windows.mascotWindow.passthrough: true`):
@@ -282,7 +282,8 @@ Opt-in click-through for the mascot window (`windows.mascotWindow.passthrough: t
 
 #### Roam & park
 - `startRoam(options) → RoamController`, `createRoam(options) → RoamHandle`, `createRoamDrag(options)` — roam within a work-area-corner zone (`roamBounds`, `stepRoam`, `aimRoamVelocity`, `rebaseRoamBounds`); facing follows horizontal velocity; hands `setPosition` only integer physical px (fractional state preserved internally).
-- `parkCornerPosition(corner, workArea, windowSize) → PhysicalPoint` — window top-left for `corner` of `workArea`, clamped into the work area via `clampToWorkArea`; `createPark(options) → ParkHandle` drives the park/unpark lifecycle.
+- `parkCornerPosition(corner, workArea, windowSize) → PhysicalPoint` — window top-left for `corner` of `workArea`, clamped into the work area via `clampToWorkArea`.
+- `createPark(options) → ParkHandle` drives the park/unpark lifecycle: `park()` pauses roam + passthrough polling, moves the window into the configured work-area corner (`parkCornerPosition`, clamped via `clampToWorkArea`) and forces the configured `sleepState` on the mascot machine; `unpark()` restores the pre-park position (roam resumes from the saved point) and resumes passthrough. Both transitions emit `orbitkit://park { parked }`.
 
 #### Menu icon sanitization (K12)
 - `MenuItem.icon: { svg }` inline SVG is sanitized by an allowlist before render: tags `svg, g, path, circle, rect, line, polyline, polygon, ellipse`; attributes `d, viewBox, fill, stroke*, cx, cy, r, x, y, width, height, points, transform, opacity`. Script, `foreignObject`, `on*` handlers, and `href` are stripped; the result renders as a data-URL `<img>` (keeps K3-A3 icon safety).

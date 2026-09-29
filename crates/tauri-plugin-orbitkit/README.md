@@ -88,10 +88,12 @@ In `src-tauri/capabilities/default.json`:
 | `request_overlay_permission` | — | `()` | Requests overlay permission (opens settings on Android). |
 | `show_overlay` | `menu?, mascot?` | `()` | Displays mascot window or Android overlay. |
 | `hide_overlay` | — | `()` | Hides mascot window or removes Android overlay. |
-| `open_popup` | `id` | `()` | Opens/focuses popup window (desktop only). |
-| `close_popup` | `id` | `()` | Closes popup window (desktop only). |
+| `open_popup` | `id`, `params?`, `instanceKey?` | `()` | Creates/focuses popup window `orbitkit-popup-{id}[-{instanceKey}]` and emits `orbitkit://popup-shown {label}`; `{param}` URL-encoded substitution. On mobile: brings the in-app popup sheet to front. |
+| `close_popup` | `label` | `()` | Closes the popup window by full label and emits `orbitkit://popup-closed {label}`; a bare popup id (missing the `orbitkit-popup-` prefix) returns `not_found`. On mobile: still accepts a bare id (prefixes it) and emits `orbitkit://popup-closed {label}` + legacy `orbitkit://popup-close {id}`. |
+| `list_popups` | — | `string[]` | Labels of the open popup windows. Unsupported on mobile (`unsupported` error). |
 | `set_mascot_state` | `state` | `()` | Sets mascot state & emits `orbitkit://mascot-state`. |
 | `emit_menu_action` | `id` | `()` | Dispatches menu action & emits `orbitkit://menu-action`. |
+| `mascot_monitor` | — | `{ workArea, scaleFactor }` | Work area + scale factor of the monitor containing the mascot window centre. Unsupported on mobile (`unsupported` error). |
 
 ---
 

@@ -1,0 +1,179 @@
+# AC3 cross-check — generated 2026-09-29T01:40:10Z at 7f119a3ad066db930419644eb395f0bad472bb67
+
+## 1. Every packages/orbitkit/src/index.ts export -> docs/api.md line
+cmd: for each exported name, grep -n "<name>" docs/api.md
+
+ -> docs/api.md:1
+AnchorRect -> docs/api.md:69
+AppConfig -> docs/api.md:478
+Badge -> docs/api.md:131
+BadgeCallback -> MISSING
+BadgePayload -> docs/api.md:481
+Bubble -> docs/api.md:101
+ClampCompensation -> docs/api.md:477
+ClampResult -> docs/api.md:187
+CreateParkOptions -> docs/api.md:487
+CreateRoamOptions -> docs/api.md:486
+DEFAULT_ARC_HEAD_GAP -> docs/api.md:478
+DEFAULT_FACE_BY_VELOCITY -> docs/api.md:478
+DEFAULT_FIT_CONTENT -> docs/api.md:478
+DEFAULT_MASCOT_ANCHOR -> docs/api.md:478
+DEFAULT_MASCOT_SCALE -> docs/api.md:478
+DEFAULT_MASCOT_WINDOW_LABEL -> docs/api.md:478
+DEFAULT_MASCOT_WINDOW_URL -> docs/api.md:478
+DEFAULT_PASSTHROUGH -> docs/api.md:274
+DEFAULT_PASSTHROUGH_INTERVAL_MS -> docs/api.md:274
+DEFAULT_POPUP_ANCHOR -> docs/api.md:478
+DEFAULT_STAGGER -> docs/api.md:478
+DeepPartial -> docs/api.md:203
+FitWindowResult -> docs/api.md:186
+HitRegion -> docs/api.md:272
+ItemPosition -> docs/api.md:158
+LogicalRect -> docs/api.md:123
+MENU_ITEM_ID_REGEX -> docs/api.md:205
+MIN_PASSTHROUGH_INTERVAL_MS -> docs/api.md:274
+Mascot -> docs/api.md:11
+MascotAnchor -> docs/api.md:478
+MascotConfig -> docs/api.md:31
+MascotKind -> docs/api.md:488
+MascotMachine -> docs/api.md:280
+MascotMachineOptions -> docs/api.md:485
+MascotMachineSnapshot -> docs/api.md:280
+MascotMonitorPayload -> docs/api.md:260
+MascotPoolState -> docs/api.md:488
+MascotRnd -> docs/api.md:485
+MascotRoamConfig -> docs/api.md:488
+MascotRoamCorner -> docs/api.md:488
+MascotSheetDef -> docs/api.md:478
+MascotSpriteState -> docs/api.md:488
+MascotStateCallback -> MISSING
+MascotStateDefinition -> docs/api.md:488
+MascotStateName -> docs/api.md:32
+MascotStatePayload -> docs/api.md:316
+MascotWindowConfig -> docs/api.md:488
+MenuActionCallback -> MISSING
+MenuActionPayload -> docs/api.md:307
+MenuAnimation -> docs/api.md:488
+MenuArcConfig -> docs/api.md:488
+MenuArcPosition -> docs/api.md:488
+MenuConfig -> docs/api.md:64
+MenuItem -> docs/api.md:288
+MenuItemIconSvg -> docs/api.md:478
+MenuLayout -> docs/api.md:488
+MenuOrigin -> docs/api.md:69
+MenuStaggerConfig -> docs/api.md:478
+MenuStaggerSpec -> docs/api.md:480
+OpenPopupOptions -> docs/api.md:247
+OrbitKitConfig -> docs/api.md:202
+OrbitKitError -> docs/api.md:211
+OrbitKitErrorCode -> docs/api.md:481
+ParkCallback -> MISSING
+ParkCorner -> docs/api.md:487
+ParkHandle -> docs/api.md:285
+ParkPayload -> docs/api.md:481
+ParkWindow -> docs/api.md:487
+ParkWindowSize -> docs/api.md:487
+ParkWindowSizeSource -> docs/api.md:487
+PassthroughController -> docs/api.md:272
+PassthroughOptions -> docs/api.md:483
+PassthroughWindow -> docs/api.md:483
+PhysRect -> docs/api.md:191
+PhysicalPoint -> docs/api.md:285
+PhysicalPositionLike -> docs/api.md:483
+PhysicalRect -> docs/api.md:477
+PopupAnchor -> docs/api.md:488
+PopupCloseCallback -> MISSING
+PopupClosePayload -> docs/api.md:332
+PopupConfig -> docs/api.md:478
+PopupLifecycleCallback -> MISSING
+PopupLifecyclePayload -> docs/api.md:481
+PopupOpenCallback -> MISSING
+PopupOpenPayload -> docs/api.md:324
+PopupSheet -> docs/api.md:74
+RadialMenu -> docs/api.md:43
+RectEdges -> docs/api.md:483
+RoamController -> docs/api.md:284
+RoamDragBinding -> docs/api.md:486
+RoamDragOptions -> docs/api.md:486
+RoamHandle -> docs/api.md:284
+RoamState -> docs/api.md:486
+RoamWindow -> docs/api.md:486
+RoamWindowSize -> docs/api.md:486
+RoamWindowSizeSource -> docs/api.md:486
+ScaleChangeCallback -> MISSING
+ScaleChangePayload -> docs/api.md:481
+SheetGeometry -> docs/api.md:281
+ShowOverlayOptions -> docs/api.md:240
+StartRoamOptions -> docs/api.md:486
+ValidationResult -> docs/api.md:204
+WindowsConfig -> docs/api.md:478
+clampToWorkArea -> docs/api.md:187
+createMachine -> docs/api.md:280
+createPark -> docs/api.md:285
+defineConfig -> docs/api.md:202
+fitWindow -> docs/api.md:123
+frameAt -> docs/api.md:281
+hint -> docs/api.md:280
+isTauri -> docs/api.md:211
+layoutItems -> docs/api.md:158
+normalizeError -> docs/api.md:481
+parkCornerPosition -> docs/api.md:270
+rectContains -> docs/api.md:483
+resolveMenuAngles -> docs/api.md:181
+resolveMenuOrigin -> docs/api.md:69
+sanitizeMenuIconSvg -> docs/api.md:479
+sanitizeMenuIconToDataUrl -> docs/api.md:479
+sheetFrameStyle -> docs/api.md:281
+sheetGeometry -> docs/api.md:281
+startPassthrough -> docs/api.md:272
+tick -> docs/api.md:120
+toLogical -> docs/api.md:483
+validateConfig -> docs/api.md:204
+withDefaults -> docs/api.md:203
+TOTAL_EXPORTS=127 MISSING=8
+
+## 2. Every build.rs COMMAND -> docs/api.md command-table line
+overlay_permission -> docs/api.md:407
+request_overlay_permission -> docs/api.md:408
+show_overlay -> docs/api.md:409
+hide_overlay -> docs/api.md:410
+open_popup -> docs/api.md:293
+close_popup -> docs/api.md:293
+list_popups -> docs/api.md:292
+set_mascot_state -> docs/api.md:414
+emit_menu_action -> docs/api.md:415
+start_mascot_drag -> docs/api.md:416
+mascot_monitor -> docs/api.md:292
+
+## 3. Every event name -> docs/api.md event-table line
+orbitkit://menu-action -> docs/api.md:297
+orbitkit://mascot-state -> docs/api.md:264
+orbitkit://popup-shown -> docs/api.md:252
+orbitkit://popup-closed -> docs/api.md:255
+orbitkit://badge -> docs/api.md:134
+orbitkit://park -> docs/api.md:270
+orbitkit://popup-open -> docs/api.md:252
+orbitkit://popup-close -> docs/api.md:255
+
+## 4. unsupported claims in docs (must co-locate only with list_popups/mascot_monitor/mobile)
+docs/api.md:211:All bridge functions safely verify whether Tauri is available via `isTauri()`. When called outside a Tauri context (such as standard web browsers or Vitest), they safely no-op or throw an `OrbitKitError` with code `unsupported`.
+docs/api.md:460:    console.error("Code:", err.code); // "not_found" or "unsupported"
+docs/architecture.md:75:  - Error normalization: Normalizes backend errors into `OrbitKitError` with typed error codes (`permission_denied`, `unsupported`, `not_found`, `invalid_config`).
+rc=0 (1 = no stray unsupported claims)
+(the 3 remaining hits are generic error-code mentions, not command claims — OK)
+
+## 5. event table rows (section 4) for record
+411:| `open_popup` | `id: String`, `params?: Record<string,string>`, `instanceKey?: string` | `()` | Creates/focuses popup `WebviewWindow` (`orbitkit-popup-{id}[-{instanceKey}]`); `{param}` URL-encoded substitution, loopback/allowedOrigins URL policy, emits `orbitkit://popup-shown {label}` | Brings popup sheet to front; emits `orbitkit://popup-shown {label}` + legacy `orbitkit://popup-open` |
+412:| `close_popup` | `label: String` | `()` | Closes popup window by full label; emits `orbitkit://popup-closed {label}` | Emits `orbitkit://popup-closed {label}` + legacy `orbitkit://popup-close {id}` |
+414:| `set_mascot_state` | `state: String` | `()` | Emits `orbitkit://mascot-state` | Updates native overlay state & emits |
+427:| `orbitkit://menu-action` | `{ id: string, source: "webview" \| "overlay" }` | Webview click or Android overlay tap | Emitted whenever a menu action is triggered. |
+428:| `orbitkit://mascot-state` | `{ state: string }` | `set_mascot_state` call | Broadcast to all webviews when mascot state changes. |
+429:| `orbitkit://popup-shown` | `{ label: string }` | `open_popup` (create **and** re-show) | K11 popup window created or re-focused/re-anchored. |
+430:| `orbitkit://popup-closed` | `{ label: string }` | `close_popup` / window close | K11 popup window closed. |
+431:| `orbitkit://badge` | `{ count: number }` | `setBadge` | Unread-badge count broadcast. |
+432:| `orbitkit://park` | `{ parked: boolean }` | `setParked` | Park (do-not-disturb) state broadcast. |
+433:| `orbitkit://popup-open` / `orbitkit://popup-close` | `{ id, title, url, width, height }` / `{ id }` | Android PopupSheet flow | Legacy Android bottom-sheet events (`onPopupOpen` / `onPopupClose`). |
+434:| `orbitkit://menu-action` / `orbitkit://mascot-state` | see above | — | Also received by the Android native overlay. |
+
+## 6. re-run export check after callback-type fix
+TOTAL=127 MISSING=0 — ALL EXPORTS DOCUMENTED

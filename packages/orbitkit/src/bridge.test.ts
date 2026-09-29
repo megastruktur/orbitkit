@@ -5,20 +5,32 @@ import {
   emitMenuAction,
   hideOverlay,
   isTauri,
+  listPopups,
+  mascotMonitor,
   normalizeError,
+  onBadge,
   onMascotState,
   onMenuAction,
+  onPark,
   onPopupClose,
+  onPopupClosed,
   onPopupOpen,
+  onPopupShown,
+  onScaleChange,
   openPopup,
   OrbitKitError,
   overlayPermission,
   requestOverlayPermission,
+  setBadge,
   setMascotState,
+  setParked,
   showOverlay,
   startMascotDrag,
   type MenuConfig,
+  type PopupClosePayload,
+  type PopupLifecyclePayload,
   type PopupOpenPayload,
+  type ParkPayload,
 } from "./index";
 
 const sampleMenu: MenuConfig = {
@@ -181,7 +193,7 @@ describe("bridge", () => {
       expect(recordedCmd).toBe("plugin:orbitkit|hide_overlay");
     });
 
-    it("5. openPopup invokes plugin:orbitkit|open_popup with id payload", async () => {
+    it("5a. openPopup invokes plugin:orbitkit|open_popup with id payload (backward-compatible)", async () => {
       let recordedCmd = "";
       let recordedArgs: unknown = null;
 
@@ -196,7 +208,39 @@ describe("bridge", () => {
       expect(recordedArgs).toEqual({ id: "settings" });
     });
 
-    it("6. closePopup invokes plugin:orbitkit|close_popup with id payload", async () => {
+    it("5b. openPopup forwards params and instanceKey options", async () => {
+      let recordedArgs: unknown = null;
+
+      mockIPC((_cmd, args) => {
+        recordedArgs = args;
+        return null;
+      });
+
+      await openPopup("notes", {
+        params: { chat: "a b&c" },
+        instanceKey: "chat-1",
+      });
+      expect(recordedArgs).toEqual({
+        id: "notes",
+        params: { chat: "a b&c" },
+        instanceKey: "chat-1",
+      });
+    });
+
+    it("5c. openPopup omits option keys when no options given", async () => {
+      let recordedArgs: unknown = null;
+
+      mockIPC((_cmd, args) => {
+        recordedArgs = args;
+        return null;
+      });
+
+      await openPopup("notes", {});
+      expect(recordedArgs).toEqual({ id: "notes" });
+      expect(Object.keys(recordedArgs as object).sort()).toEqual(["id"]);
+    });
+
+    it("6. closePopup invokes plugin:orbitkit|close_popup with full label payload", async () => {
       let recordedCmd = "";
       let recordedArgs: unknown = null;
 
@@ -206,9 +250,25 @@ describe("bridge", () => {
         return null;
       });
 
-      await closePopup("palette");
+      await closePopup("orbitkit-popup-notes-chat-1");
       expect(recordedCmd).toBe("plugin:orbitkit|close_popup");
-      expect(recordedArgs).toEqual({ id: "palette" });
+      expect(recordedArgs).toEqual({ label: "orbitkit-popup-notes-chat-1" });
+    });
+
+    it("6b. listPopups invokes plugin:orbitkit|list_popups and returns labels", async () => {
+      let recordedCmd = "";
+
+      mockIPC((cmd) => {
+        recordedCmd = cmd;
+        if (cmd === "plugin:orbitkit|list_popups") {
+          return ["orbitkit-popup-a", "orbitkit-popup-b"];
+        }
+        return null;
+      });
+
+      const labels = await listPopups();
+      expect(recordedCmd).toBe("plugin:orbitkit|list_popups");
+      expect(labels).toEqual(["orbitkit-popup-a", "orbitkit-popup-b"]);
     });
 
     it("7. setMascotState invokes plugin:orbitkit|set_mascot_state with state payload", async () => {
@@ -258,6 +318,117 @@ describe("bridge", () => {
       });
 
       await expect(startMascotDrag()).rejects.toThrow(OrbitKitError);
+    });
+  });
+
+  describe("K9 mascot_monitor + scale-change", () => {
+    beforeEach(() => {
+      mockWindows("main");
+    });
+
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("11. mascotMonitor invokes plugin:orbitkit|mascot_monitor and returns payload", async () => {
+      let recordedCmd = "";
+      let recordedArgs: unknown = null;
+      mockIPC((cmd, args) => {
+        recordedCmd = cmd;
+        recordedArgs = args ?? null;
+        return {
+          workArea: { x: -1920, y: 0, width: 1920, height: 1080 },
+          scaleFactor: 1.5,
+        };
+      });
+
+      const payload = await mascotMonitor();
+
+      expect(recordedCmd).toBe("plugin:orbitkit|mascot_monitor");
+      expect(recordedArgs).toEqual({});
+      expect(payload).toEqual({
+        workArea: { x: -1920, y: 0, width: 1920, height: 1080 },
+        scaleFactor: 1.5,
+      });
+    });
+
+    it("12. mascotMonitor maps mobile 'unsupported' rejection to OrbitKitError", async () => {
+      mockIPC(() => {
+        throw {
+          code: "unsupported",
+          message: "mascot_monitor is not supported on this platform",
+        };
+      });
+
+      const err = await mascotMonitor().catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(OrbitKitError);
+      if (err instanceof OrbitKitError) {
+        expect(err.code).toBe("unsupported");
+      }
+    });
+
+    it("13. onScaleChange subscribes to tauri://scale-change on the current window and delivers payload", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      let listenTarget: unknown = null;
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          if ("target" in args) {
+            listenTarget = args.target;
+          }
+          return 202;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onScaleChange(callback);
+
+      expect(listenedEvent).toBe("tauri://scale-change");
+      // Scoped to the current window — not a global Any-target listen.
+      expect(listenTarget).toEqual({ kind: "Window", label: "main" });
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "tauri://scale-change",
+        payload: { scaleFactor: 2, size: { width: 2560, height: 1440 } },
+      });
+
+      expect(callback).toHaveBeenCalledWith({
+        scaleFactor: 2,
+        size: { width: 2560, height: 1440 },
+      });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("14. onScaleChange returns a no-op unlisten function outside Tauri without throwing", async () => {
+      clearTauriInternals();
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onScaleChange(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
     });
   });
 
@@ -367,7 +538,103 @@ describe("bridge", () => {
       expect(unlistened).toBe(true);
     });
 
-    it("subscribes to orbitkit://popup-open and delivers payload to callback", async () => {
+    it("subscribes to orbitkit://popup-shown and delivers label payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 103;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupShown(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-shown");
+      expect(eventHandlerId).not.toBeNull();
+
+      const payload: PopupLifecyclePayload = {
+        label: "orbitkit-popup-notes-chat-1",
+      };
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-shown",
+        payload,
+      });
+
+      expect(callback).toHaveBeenCalledWith(payload);
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("subscribes to orbitkit://popup-closed and delivers label payload to callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+
+      mockIPC((cmd, args) => {
+        if (
+          cmd === "plugin:event|listen" &&
+          args &&
+          typeof args === "object"
+        ) {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 104;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onPopupClosed(callback);
+
+      expect(listenedEvent).toBe("orbitkit://popup-closed");
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://popup-closed",
+        payload: { label: "orbitkit-popup-notes" },
+      });
+
+      expect(callback).toHaveBeenCalledWith({ label: "orbitkit-popup-notes" });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("subscribes to legacy orbitkit://popup-open (Android sheet) and delivers payload to callback", async () => {
       let eventHandlerId: number | null = null;
       let listenedEvent = "";
 
@@ -421,7 +688,7 @@ describe("bridge", () => {
       expect(unlistened).toBe(true);
     });
 
-    it("subscribes to orbitkit://popup-close and delivers payload to callback", async () => {
+    it("subscribes to legacy orbitkit://popup-close (Android sheet) and delivers payload to callback", async () => {
       let eventHandlerId: number | null = null;
       let listenedEvent = "";
 
@@ -448,12 +715,14 @@ describe("bridge", () => {
       expect(listenedEvent).toBe("orbitkit://popup-close");
       expect(eventHandlerId).not.toBeNull();
 
+      const payload: PopupClosePayload = { id: "notes" };
+
       triggerTauriCallback(eventHandlerId!, {
         event: "orbitkit://popup-close",
-        payload: { id: "notes" },
+        payload,
       });
 
-      expect(callback).toHaveBeenCalledWith({ id: "notes" });
+      expect(callback).toHaveBeenCalledWith(payload);
 
       let unlistened = false;
       mockIPC((cmd) => {
@@ -645,6 +914,242 @@ describe("bridge", () => {
       expect(typeof unlisten).toBe("function");
       expect(() => unlisten()).not.toThrow();
       expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onPopupShown returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupShown(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onBadge returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onBadge(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("onPopupClosed returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPopupClosed(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("setBadge resolves without emitting outside Tauri", async () => {
+      expect(isTauri()).toBe(false);
+      await expect(setBadge(3)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("orbitkit://badge (bubble-badge)", () => {
+    beforeEach(() => {
+      mockWindows("main");
+    });
+
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("setBadge emits orbitkit://badge with {count} payload", async () => {
+      let recordedCmd = "";
+      let recordedArgs: unknown = null;
+      mockIPC((cmd, args) => {
+        recordedCmd = cmd;
+        recordedArgs = args;
+        return null;
+      });
+
+      await setBadge(7);
+      expect(recordedCmd).toBe("plugin:event|emit");
+      expect(recordedArgs).toEqual({ event: "orbitkit://badge", payload: { count: 7 } });
+    });
+
+    it("onBadge subscribes to orbitkit://badge and delivers {count} to the callback", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      mockIPC((cmd, args) => {
+        if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 404;
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      const unlisten = await onBadge(callback);
+      expect(listenedEvent).toBe("orbitkit://badge");
+      expect(eventHandlerId).not.toBeNull();
+
+      triggerTauriCallback(eventHandlerId!, {
+        event: "orbitkit://badge",
+        payload: { count: 42 },
+      });
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith({ count: 42 });
+
+      let unlistened = false;
+      mockIPC((cmd) => {
+        if (cmd === "plugin:event|unlisten") {
+          unlistened = true;
+        }
+        return null;
+      });
+      unlisten();
+      expect(unlistened).toBe(true);
+    });
+
+    it("round-trips setBadge(count) → orbitkit://badge → onBadge handler", async () => {
+      let eventHandlerId: number | null = null;
+      let listenedEvent = "";
+      mockIPC((cmd, args) => {
+        if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+          if ("event" in args && typeof args.event === "string") {
+            listenedEvent = args.event;
+          }
+          if ("handler" in args && typeof args.handler === "number") {
+            eventHandlerId = args.handler;
+          }
+          return 77;
+        }
+        // Mocked transport: an emit redelivers to matching listeners only,
+        // including the emitting webview — that is the badge round trip.
+        if (cmd === "plugin:event|emit") {
+          const { event, payload } = args as { event: string; payload: unknown };
+          if (event === listenedEvent) {
+            triggerTauriCallback(eventHandlerId!, { event, payload });
+          }
+        }
+        return null;
+      });
+
+      const callback = vi.fn();
+      await onBadge(callback);
+      await setBadge(12);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith({ count: 12 });
+    });
+  });
+
+  describe("orbitkit://park (park)", () => {
+    afterEach(() => {
+      clearTauriInternals();
+    });
+
+    it("onPark returns a no-op unlisten function outside Tauri without throwing", async () => {
+      expect(isTauri()).toBe(false);
+      const cb = vi.fn();
+      const unlisten = await onPark(cb);
+      expect(typeof unlisten).toBe("function");
+      expect(() => unlisten()).not.toThrow();
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("setParked resolves without emitting outside Tauri", async () => {
+      expect(isTauri()).toBe(false);
+      await expect(setParked(true)).resolves.toBeUndefined();
+    });
+
+    describe("with Tauri mocks", () => {
+      beforeEach(() => {
+        mockWindows("main");
+      });
+
+      it("setParked emits orbitkit://park with {parked} payload", async () => {
+        let recordedCmd = "";
+        let recordedArgs: unknown = null;
+        mockIPC((cmd, args) => {
+          recordedCmd = cmd;
+          recordedArgs = args;
+          return null;
+        });
+
+        await setParked(true);
+        expect(recordedCmd).toBe("plugin:event|emit");
+        expect(recordedArgs).toEqual({ event: "orbitkit://park", payload: { parked: true } });
+      });
+
+      it("onPark subscribes to orbitkit://park and delivers {parked} to the callback", async () => {
+        let eventHandlerId: number | null = null;
+        let listenedEvent = "";
+        mockIPC((cmd, args) => {
+          if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+            if ("event" in args && typeof args.event === "string") {
+              listenedEvent = args.event;
+            }
+            if ("handler" in args && typeof args.handler === "number") {
+              eventHandlerId = args.handler;
+            }
+            return 88;
+          }
+          return null;
+        });
+
+        const callback = vi.fn();
+        const unlisten = await onPark(callback);
+        expect(listenedEvent).toBe("orbitkit://park");
+        expect(eventHandlerId).not.toBeNull();
+
+        triggerTauriCallback(eventHandlerId!, {
+          event: "orbitkit://park",
+          payload: { parked: false } satisfies ParkPayload,
+        });
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith({ parked: false });
+
+        let unlistened = false;
+        mockIPC((cmd) => {
+          if (cmd === "plugin:event|unlisten") {
+            unlistened = true;
+          }
+          return null;
+        });
+        unlisten();
+        expect(unlistened).toBe(true);
+      });
+
+      it("round-trips setParked(false) → orbitkit://park → onPark handler", async () => {
+        let eventHandlerId: number | null = null;
+        let listenedEvent = "";
+        mockIPC((cmd, args) => {
+          if (cmd === "plugin:event|listen" && args && typeof args === "object") {
+            if ("event" in args && typeof args.event === "string") {
+              listenedEvent = args.event;
+            }
+            if ("handler" in args && typeof args.handler === "number") {
+              eventHandlerId = args.handler;
+            }
+            return 89;
+          }
+          // Mocked transport: an emit redelivers to matching listeners only,
+          // including the emitting webview — that is the park round trip.
+          if (cmd === "plugin:event|emit") {
+            const { event, payload } = args as { event: string; payload: unknown };
+            if (event === listenedEvent) {
+              triggerTauriCallback(eventHandlerId!, { event, payload });
+            }
+          }
+          return null;
+        });
+
+        const callback = vi.fn();
+        await onPark(callback);
+        await setParked(false);
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith({ parked: false });
+      });
     });
   });
 });

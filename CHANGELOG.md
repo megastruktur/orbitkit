@@ -7,39 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.2.0] — 2026-09-29
 
 ### Added
 
-#### Frontend (`@orbitkit/ui`)
-- **Mascot Window Dragging & Gesture State Machine (P2 mascot-drag)**:
-  - Added `startMascotDrag()` bridge helper calling plugin `start_mascot_drag`.
-  - Added pure `createDragGesture` state machine disambiguating drag (> 4px threshold) vs click toggle, suppressing clicks after drag, instantly collapsing open menus when drag starts, and falling through to click on error.
-  - Integrated drag gesture into starter `MascotView.svelte` while preserving outside-click radial menu dismiss behavior and keyboard navigation.
-- **Menu Layout ("orbit" | "arc") (Contract Amendment K2-A1)**:
-  - Added optional `layout?: "orbit" | "arc"` and `arc?: { position?: "top" | "bottom" | "left" | "right", span?: number }` to `MenuConfig`.
-  - Added pure `resolveMenuAngles` helper exported from `@orbitkit/ui` (`./geometry.js`) resolving angles based on mascot side and arc span.
-  - Updated `<RadialMenu />` to automatically position items using resolved angles when `layout: "arc"`.
-  - Added runtime validation in `validateConfig` checking `menu.layout`, `menu.arc.position`, and `menu.arc.span` (30..300).
-  - Added optional `animation?: "spawn" | "none"` to `MenuConfig` with `"none"` disabling menu transitions.
-  - Canonical angle vectors codified in `arc-vectors.json`.
+- **Sprite-sheet mascot (`mascot.kind: "sheets"`, K7)** — pixel-art sheet definitions (`sheets: Record<string, { src, frameWidth, frameHeight, frames, fps, loop? }>`) with integer `scale` (pixelated upscale), `anchor` (`bottom-center` | `center`), `faceByVelocity` mirroring, and state pools (`states: { pool, priority?, ttlMs? }`) driven by the pure `createMachine`/`hint`/`tick` mascot machine.
+- **`menu.layout: "arc-anchor"` (K7)** — top-centred arc whose origin is resolved by `resolveMenuOrigin` at `menu.arc.headGap` px (default 12) above the mascot's top edge; per-item open/close stagger via `menu.stagger` (defaults 260/180/40 ms, centre→edges on open, edges→centre on close).
+- **Inline SVG menu icons (K7)** — `MenuItem.icon` accepts `{ svg: string }`, sanitized via `sanitizeMenuIconSvg`.
+- **Menu layout `"orbit" | "arc"` (K2-A1)** — optional `menu.layout: "arc"` with `menu.arc { position: "top" | "bottom" | "left" | "right", span 30..300 }`, pure `resolveMenuAngles` angle resolver (canonical vectors codified in `arc-vectors.json`), and `menu.animation: "spawn" | "none"` where `"none"` disables menu transitions; validated in `validateConfig` with a Rust config mirror.
+- **Window fit & monitor work area (K9)** — `fitWindow` / `clampToWorkArea` (with `compensation {dx,dy}`) and the `mascot_monitor` command returning `{ workArea, scaleFactor }` for the monitor containing the mascot window centre; opt-in `windows.mascotWindow.fitContent`.
+- **Click-through passthrough (K10)** — opt-in `windows.mascotWindow.passthrough` with `registerHitRegion`, ≤10 Hz cursor polling (default 150 ms), polling suspended while parked.
+- **Anchored, parameterised popups (K11)** — `openPopup(id, { params, instanceKey })` with `{param}` URL-encoded substitution, `instanceKey` multi-instance labels `orbitkit-popup-{id}[-{instanceKey}]`, idempotent show+focus+re-anchor, `anchor: "mascot" | "center"`, URL allow-list (`app.allowedOrigins`), Rust `place_popup` pure placement, and `orbitkit://popup-shown`/`popup-closed` events.
+- **Roam & drag-resume** — `startRoam`/`createRoam`/`createRoamDrag`: roaming inside a work-area corner zone, facing by horizontal velocity, drag pauses roaming and resumes around the drop point; hands setPosition only integer physical px.
+- **Android in-app popups (K4/K5)** — `open_popup`/`close_popup` on Android drive an in-app popup sheet: shared `lookup_popup` (unknown id → `not_found`), native `bringToFront` reorders the activity to front and collapses the overlay menu, and `orbitkit://popup-open`/`popup-close` events reach the in-app webview; desktop unchanged.
+- **Mascot window dragging & gesture state machine** — `startMascotDrag()` bridge helper calling the plugin `start_mascot_drag` command (native `window.start_dragging()` on desktop, no-op on mobile) and pure `createDragGesture` state machine disambiguating drag (> 4 px threshold) from click toggle, suppressing clicks during drag and collapsing open menus on drag start.
+- **Park / do-not-disturb** — `setParked`/`onPark` (`orbitkit://park`), park-to-corner placement via `parkCornerPosition`/`createPark`.
+- **Bubble & badge** — `<Bubble />` speech bubble and `<Badge />` unread-count components; `setBadge`/`onBadge` (`orbitkit://badge`).
+- Starter example covering the full B1+B2 demo surface (sheets mascot, arc-anchor menu, roam, drag-resume, note/settings popups with anchors, bubble, badge, park).
 
-#### Plugin (`tauri-plugin-orbitkit`)
-- **Mascot Window Dragging Command (P2 mascot-drag)**:
-  - Added `start_mascot_drag` command: initiates native window drag via `window.start_dragging()` on desktop (`orbitkit-mascot`), returns `not_found` if window absent, and no-ops on mobile.
-  - Added `allow-start-mascot-drag` permission to default permission set.
-- **Config Mirror & Angle Resolution (Contract Amendment K2-A1)**:
-  - Mirrored `layout` and `arc` fields in `MenuConfig` with camelCase serde serialization.
-  - Implemented `resolve_menu_angles` resolving start and end angles identical to frontend geometry.
-  - Added `animation` field with `"spawn"` default and validation.
-  - Added `validate()` on `MenuConfig` and `OrbitKitConfig` enforcing layout, position, span, and animation constraints.
-  - Unit tests validating against canonical `arc-vectors.json`.
+### Changed
 
-- **Android In-App Popups (Native/Rust Lifecycle)**:
-  - Implemented `open_popup` and `close_popup` on Android.
-  - Moved `lookup_popup` into shared code (`lib.rs`) and added `popup_open_payload` pure builder with unit tests.
-  - Added native Android `@Command fun bringToFront(invoke)` in `OrbitkitNativePlugin.kt` which reorders activity to front and collapses the overlay menu instantly without animation.
-  - Emitted `orbitkit://popup-open` with `{ id, title, url, width, height }` payload and `orbitkit://popup-close` with `{ id }` payload to the in-app webview.
+- `MENU_ITEM_ID_REGEX` widened to `^[a-z0-9][a-z0-9_.:-]{0,63}$` (K7, TS + Rust identical).
+- Radial menu items animate with per-item stagger (centre→edges on open, edges→centre on close); the mascot window keeps a single fixed size across open/close (no native resize, no mascot jump).
+- `@orbitkit/ui` and `tauri-plugin-orbitkit` versioned `0.2.0`.
+- **Breaking**: `close_popup` takes the window `label` (K11 `orbitkit-popup-{id}` or `orbitkit-popup-{id}-{instanceKey}`, as reported by `listPopups` and the `orbitkit://popup-shown {label}` event) — 0.1.0 took the popup `id`; on desktop a bare popup id returns `not_found`; the Android arm still accepts a bare id (it adds the `orbitkit-popup-` prefix). `open_popup` takes `{id, params?, instanceKey?}` (K11 label-based popups).
+
+### Fixed
+
+- Mascot window re-clamps at monitor edges after roam/drag without native resize flicker (Design B fixed-size window).
+- Roam `setPosition` rounding: only integer physical px are handed to the window; internal state stays fractional.
+
+### Known limitations
+
+- **Popup placement prefers above-RIGHT** (K11 contract text says above-LEFT). The CuteCare-port behaviour is documented in `docs/api.md` §1.2 and covered by unit tests.
+- **Mixed-DPI Windows placement**: popup placement on Windows may be off by the scale ratio (newly created popups vs. re-opened ones use different coordinate units).
+- **Coordinate-space switch**: macOS/Linux vs. Windows differ in where physical/logical coordinate spaces switch; there is no single authoritative unit source. This is documented in `docs/configuration.md` §2.1 but has **no unit test**.
+- **Roam re-clamp delay**: at very slow roam speeds, a drop outside the roam zone can take up to ~5 ticks (~170 ms) before the first re-clamp.
+- **Park vs. sleep race (narrow)**: a state hint arriving between the forced sleep and `parked = true` can replace the sleep state.
+- **App-relative popup URLs reject `:` anywhere in the string**, not only in the scheme position, so a path containing a colon (e.g. `index.html?a=b:c`) is rejected as `invalid_config`.
+
+---
 
 ## [0.1.0] - 2026-09-23
 

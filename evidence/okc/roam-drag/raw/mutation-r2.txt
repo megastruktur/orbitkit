@@ -1,0 +1,11 @@
+Round-2 mutation check: new tests run against 05a176f roam.ts (B1/B2 unfixed)
+\$ git show 05a176f:packages/orbitkit/src/roam.ts > src/roam.ts  # then full vitest run
+AGAINST BASE: passed 39 failed 6
+FAILS-ON-BASE:
+ - roamBounds shrinks the zone by the window size so the window stays visible
+ - roamBounds pins an oversized window at the safe-area origin
+ - roamBounds keeps the window inside the work area at every corner over 400 steps
+ - rebaseRoamBounds clamps the rebased zone by the window size near the edges
+ - startRoam resume(at) adopts the given position instead of snapping back
+ - createRoam re-bases the zone around the drop point (clamped) on drag release
+fixed roam.ts restored afterwards (cmp-verified); suite 45/45 green on fixed

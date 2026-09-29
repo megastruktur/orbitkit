@@ -1,0 +1,10 @@
+$ git show 2f73d78:packages/orbitkit/src/roam.ts
+fatal: path 'packages/orbitkit/src/roam.ts' exists on disk, but not in '2f73d78'
+EXIT=$? (128: path does not exist at base)
+
+=> every roam.test.ts case fails at base 2f73d78 (module absent);
+   all 40 are mutation-sensitive by construction.
+
+$ pnpm vitest run src/roam.test.ts at 0a54502
+Test Files  1 passed (1)
+Tests  40 passed (40)

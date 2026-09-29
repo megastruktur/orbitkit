@@ -1,0 +1,2 @@
+mutation pnpm -r check expected-fail: exit_code=1 (TS2578 in mutation-check-fails.txt)
+evidence/okc/integ-fix1/raw/mutation-check-fails.txt:2:src/mascotMachine.test.ts(6,1): error TS2578: Unused '@ts-expect-error' directive.

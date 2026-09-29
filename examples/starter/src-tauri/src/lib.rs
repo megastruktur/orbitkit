@@ -35,34 +35,60 @@ pub fn run() {
 
     builder = builder.setup(|app| {
         let app_handle = app.handle().clone();
+        // Demo-b2: "note" spawns a NEW popup instance per click (K11
+        // instanceKey: orbitkit-popup-notes-note-N). Settings stays a
+        // singleton (no instanceKey → idempotent show + focus).
+        let note_counter = std::sync::Arc::new(std::sync::atomic::AtomicU32::new(0));
         app.on_menu_action(move |action| {
             let action_id = action.id.clone();
             let app_clone = app_handle.clone();
             match action_id.as_str() {
-                "about" => {
+                "app.about" => {
                     log::info!("Menu action: about");
-                    eprintln!("[starter] Menu action: about");
+                    eprintln!("[starter] Menu action: app.about");
                 }
-                "quit" => {
+                "app.quit" => {
                     log::info!("Menu action: quit");
-                    eprintln!("[starter] Menu action: quit");
+                    eprintln!("[starter] Menu action: app.quit");
                     app_clone.exit(0);
                 }
-                "notes" | "settings" => {
+                "app.notes" => {
+                    let n = note_counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+                    let instance = format!("note-{n}");
+                    log::info!("Menu action: notes (instance {instance})");
+                    eprintln!("[starter] Menu action: app.notes (instance {instance})");
                     let app_popup = app_clone.clone();
                     let _ = app_clone.run_on_main_thread(move || {
-                        let _ = app_popup.orbitkit().open_popup(action_id);
+                        let _ = app_popup
+                            .orbitkit()
+                            .open_popup("notes".to_string(), None, Some(instance));
                     });
                 }
-                "timer" => {
+                "app.settings" => {
+                    let app_popup = app_clone.clone();
+                    let _ = app_clone.run_on_main_thread(move || {
+                        let _ = app_popup
+                            .orbitkit()
+                            .open_popup("settings".to_string(), None, None);
+                    });
+                }
+                // Demo-b1: timer mutes the planet into the sleep pool for 5s.
+                "app.timer" => {
                     log::info!("Menu action: timer");
-                    eprintln!("[starter] Menu action: timer (busy for 5s then idle)");
+                    eprintln!("[starter] Menu action: app.timer (sleep for 5s then idle)");
                     let app_clone_timer = app_clone.clone();
                     std::thread::spawn(move || {
-                        let _ = app_clone_timer.orbitkit().set_mascot_state("busy".to_string());
+                        let _ = app_clone_timer.orbitkit().set_mascot_state("sleep".to_string());
                         std::thread::sleep(std::time::Duration::from_secs(5));
                         let _ = app_clone_timer.orbitkit().set_mascot_state("idle".to_string());
                     });
+                }
+                // Demo-b1: alert pool has ttlMs=8000, so the mascot reverts to
+                // idle by itself when the state machine expires the state.
+                "app.alert" => {
+                    log::info!("Menu action: alert");
+                    eprintln!("[starter] Menu action: app.alert (alert state, ttl 8s)");
+                    let _ = app_clone.orbitkit().set_mascot_state("alert".to_string());
                 }
                 other => {
                     log::info!("Menu action: {}", other);

@@ -1,0 +1,164 @@
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+@sveltejs/package found the following issues while packaging your library:
+Avoid usage of `import.meta.env` in your code. It only works in apps bundled with Vite. Consider using packages like `esm-env` instead which works with all bundlers or without bundling.
+
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 155 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:  0.30 kB
+dist/assets/index-C5jZFdQp.css   20.69 kB │ gzip:  4.21 kB
+dist/assets/index-1uDPPnsf.js   122.90 kB │ gzip: 40.42 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/.pnpm/@tauri-apps+api@2.11.1/node_modules/@tauri-apps/api/window.js is dynamically imported by ../../packages/orbitkit/dist/passthrough.js but also statically imported by src/views/MascotView.svelte, ../../packages/orbitkit/dist/bridge.js, dynamic import will not move module into another chunk.
+
+✓ built in 637ms
+build-exit=0
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-b1-fix-flash/packages/orbitkit
+
+
+ Test Files  17 passed (17)
+      Tests  373 passed (373)
+   Start at  21:41:48
+   Duration  2.06s (environment 50%, transform 37%, tests 6%, import 6%)
+
+  Transform  transforming modules took 6.56s · 37% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             on CI this only helps when the cache directory is persisted between runs
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+$ node --test --experimental-strip-types tests/*.test.mjs
+TAP version 13
+# Subtest: mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets planet with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 0.868348
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.297862
+  type: 'test'
+  ...
+# Subtest: every sheet the config references has width = 32 * frames, height = 32
+ok 3 - every sheet the config references has width = 32 * frames, height = 32
+  ---
+  duration_ms: 0.218488
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+ok 4 - menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.259648
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 5 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.063574
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 6 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.081309
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 7 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.123612
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 8 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.219248
+  type: 'test'
+  ...
+# Subtest: window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+ok 9 - window-fit helper keeps the mascot screen-fixed (Design B fixed window)
+  ---
+  duration_ms: 0.730749
+  type: 'test'
+  ...
+# Subtest: Design B: no setSize/setPosition reachable from menu open/close
+ok 10 - Design B: no setSize/setPosition reachable from menu open/close
+  ---
+  duration_ms: 0.676513
+  type: 'test'
+  ...
+# Subtest: Design B: idle and open states share ONE fixed window rect
+ok 11 - Design B: idle and open states share ONE fixed window rect
+  ---
+  duration_ms: 0.836145
+  type: 'test'
+  ...
+# Subtest: fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+ok 12 - fixed fit keeps mascot screen-fixed with zero shift (no clamp)
+  ---
+  duration_ms: 0.128191
+  type: 'test'
+  ...
+# Subtest: fixed window satisfies the bottom-centre pin
+ok 13 - fixed window satisfies the bottom-centre pin
+  ---
+  duration_ms: 0.069586
+  type: 'test'
+  ...
+# Subtest: arc (with menuPad margin) fits inside the fixed window
+ok 14 - arc (with menuPad margin) fits inside the fixed window
+  ---
+  duration_ms: 0.087341
+  type: 'test'
+  ...
+# Subtest: work-area clamp shifts content 1:1 so mascot still stays put
+ok 15 - work-area clamp shifts content 1:1 so mascot still stays put
+  ---
+  duration_ms: 0.125656
+  type: 'test'
+  ...
+# Subtest: re-fit at the fixed rect is idempotent (no drift)
+ok 16 - re-fit at the fixed rect is idempotent (no drift)
+  ---
+  duration_ms: 0.062201
+  type: 'test'
+  ...
+# Subtest: clampFixedWindow is identity when the window is inside the work area
+ok 17 - clampFixedWindow is identity when the window is inside the work area
+  ---
+  duration_ms: 0.087932
+  type: 'test'
+  ...
+# Subtest: clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+ok 18 - clamp moves the WINDOW only: size — and with it the pinned mascot and the arc anchor — is untouched
+  ---
+  duration_ms: 0.077541
+  type: 'test'
+  ...
+# Subtest: clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+ok 19 - clamp is stateless: below-area, back-to-centre, left-edge sequence never moves the mascot locally
+  ---
+  duration_ms: 0.176765
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 56.776365
+test-exit=0
+$ tsc --noEmit
+$ tsc --noEmit
+check-exit=0

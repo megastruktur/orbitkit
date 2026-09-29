@@ -1,0 +1,1 @@
+67b77ef okc popups-dynamic: K11 dynamic popup windows (open/close/list, instanceKey, {param} encoding, URL scheme policy incl. scheme-relative smuggle rejection) + TS bridge (squash of megastruktur/okc-popups-dynamic @ 30e8cd7)

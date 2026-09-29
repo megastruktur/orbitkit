@@ -1,0 +1,95 @@
+{
+  "mascot": {
+    "kind": "sheets",
+    "src": "mascot.png",
+    "size": 64,
+    "initialState": "idle",
+    "sheets": {
+      "walk": {
+        "src": "walk.png",
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "frames": 6,
+        "fps": 10,
+        "loop": true
+      },
+      "cheer": {
+        "src": "cheer.png",
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "frames": 4,
+        "fps": 8
+      }
+    },
+    "scale": 2,
+    "anchor": "center",
+    "faceByVelocity": true,
+    "states": {
+      "idle": { "pool": ["walk"], "priority": 2, "ttlMs": 5000 },
+      "alert": { "pool": ["cheer", "walk"] }
+    }
+  },
+  "menu": {
+    "items": [
+      {
+        "id": "chat.new",
+        "label": "Chat",
+        "icon": { "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>" }
+      },
+      {
+        "id": "page.open:settings",
+        "label": "Settings",
+        "icon": "data:image/svg+xml;base64,PHN2Zy8+"
+      }
+    ],
+    "radius": 96,
+    "startAngle": -90,
+    "endAngle": 270,
+    "itemSize": 44,
+    "trigger": "click",
+    "layout": "arc-anchor",
+    "arc": { "position": "top", "span": 180, "headGap": 16 },
+    "stagger": { "openMs": 200, "closeMs": 120, "stepMs": 30 },
+    "animation": "spawn"
+  },
+  "windows": {
+    "mascotWindow": {
+      "transparent": true,
+      "alwaysOnTop": true,
+      "decorations": false,
+      "x": 100,
+      "y": 200,
+      "label": "my-mascot",
+      "url": "index.html?orbitkit=mascot",
+      "passthrough": true,
+      "fitContent": true,
+      "roam": {
+        "width": 64,
+        "height": 64,
+        "margin": 24,
+        "corner": "bottom-right",
+        "speed": 2.5
+      }
+    },
+    "popups": [
+      {
+        "id": "notes",
+        "url": "index.html?popup=notes&ref={ref}",
+        "title": "Notes",
+        "width": 360,
+        "height": 420,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "anchor": "mascot",
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "minWidth": 200,
+        "minHeight": 160
+      }
+    ]
+  },
+  "app": {
+    "allowedOrigins": ["https://example.com", "http://localhost:1420"]
+  }
+}

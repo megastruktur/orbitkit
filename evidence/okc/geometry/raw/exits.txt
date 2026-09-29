@@ -1,0 +1,27 @@
+command;exit_code
+== Round 1 ==
+pnpm install --frozen-lockfile;0
+pnpm -r build (final);0
+pnpm -r test (final);0  [168 baseline + 21 new = 189 passed]
+pnpm -r check (final);0 [first run TS2322 in test, fixed]
+OKC_RUST_GATE (run1);101 [E0422/E0425 missing test-mod imports -> fixed]
+OKC_RUST_GATE (run2);101 [clippy unused import super::* -> fixed]
+OKC_RUST_GATE (final);0 [31 passed; OKC_RUST_GATE_OK]
+mutation run (JS, deliberate bugs);vitest exit 1 [13 failed | 37 passed; see mutation-run.log]
+== Round 2 (review fixes) ==
+pnpm -r check;0
+pnpm -r build;0
+pnpm -r test;0 [189 passed; test 13 now asserts Window-scoped target]
+OKC_RUST_GATE (run1);101 [E0596 monitors not mut -> fixed]
+OKC_RUST_GATE (final);0 [33 passed; OKC_RUST_GATE_OK]
+OKC_RUST_GATE (selector mutated to old work-area semantics);101 [32 passed; 1 FAILED: test_monitor_for_point_selects_on_bounds_not_work_area -> proof the new test fails on old behaviour; see mutation-round2.log]
+OKC_RUST_GATE (after byte-identical restore, cmp-verified);0 [33 passed; OKC_RUST_GATE_OK]
+== Round 3 (review fixes: selection coordinate space) ==
+pnpm -r check;0
+pnpm -r build;0
+pnpm -r test;0 [189 passed; unchanged from round 2]
+OKC_RUST_GATE (r3 run1);101 [E0425 selector_inputs missing in tests mod + E0596 mut monitors -> fixed]
+OKC_RUST_GATE (r3 run2);101 [clippy unused import MonitorInfo in lib build -> fixed]
+OKC_RUST_GATE (r3 final);0 [36 passed; OKC_RUST_GATE_OK]
+OKC_RUST_GATE (division mutated away = old passthrough);101 [33 passed; 3 FAILED: macos_mixed_scale, linux_layout, primary_window(centre assert) -> raw/mutation-round3.log]
+OKC_RUST_GATE (after byte-identical restore, cmp-verified);0 [36 passed; OKC_RUST_GATE_OK]

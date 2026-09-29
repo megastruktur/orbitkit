@@ -110,6 +110,12 @@ fn test_lookup_popup_success() {
             height: 400.0,
             resizable: Some(true),
             always_on_top: Some(false),
+            anchor: None,
+            decorations: None,
+            transparent: None,
+            skip_taskbar: None,
+            min_width: None,
+            min_height: None,
         },
         PopupConfig {
             id: "settings".to_string(),
@@ -119,6 +125,12 @@ fn test_lookup_popup_success() {
             height: 250.0,
             resizable: None,
             always_on_top: None,
+            anchor: None,
+            decorations: None,
+            transparent: None,
+            skip_taskbar: None,
+            min_width: None,
+            min_height: None,
         },
     ];
 
@@ -140,6 +152,12 @@ fn test_lookup_popup_not_found_scenario_3() {
         height: 300.0,
         resizable: None,
         always_on_top: None,
+        anchor: None,
+        decorations: None,
+        transparent: None,
+        skip_taskbar: None,
+        min_width: None,
+        min_height: None,
     }];
 
     let result = lookup_popup(&popups, "unknown_popup_id");
@@ -187,6 +205,11 @@ fn test_resolve_mascot_window_custom() {
         decorations: true,
         x: Some(150.0),
         y: Some(250.0),
+        label: "orbitkit-mascot".to_string(),
+        url: "index.html?orbitkit=mascot".to_string(),
+        passthrough: false,
+        roam: None,
+        fit_content: false,
     };
     let resolved = resolve_mascot_window(Some(&config));
     assert!(!resolved.transparent);

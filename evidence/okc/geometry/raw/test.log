@@ -1,0 +1,11 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-geometry/packages/orbitkit
+
+
+ Test Files  9 passed (9)
+      Tests  189 passed (189)
+   Start at  15:30:40
+   Duration  1.34s (environment 51%, transform 29%, tests 13%, import 7%)
+

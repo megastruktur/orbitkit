@@ -1,0 +1,9 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix4/packages/orbitkit
+
+
+ Test Files  1 passed (1)
+      Tests  50 passed (50)
+   Start at  00:16:57
+   Duration  424ms (environment 75%, tests 11%, transform 11%, import 2%, worker 1%)
+

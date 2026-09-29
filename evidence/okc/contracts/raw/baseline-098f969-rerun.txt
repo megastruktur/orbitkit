@@ -1,0 +1,40 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-contracts/packages/orbitkit
+
+ ❯ src/RadialMenu.test.ts (21 tests | 1 failed | 20 skipped) 74ms
+   ❯ RadialMenu component (21)
+     × items not clickable while opening 72ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/RadialMenu.test.ts > RadialMenu component > items not clickable while opening
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "item-1",
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/RadialMenu.test.ts:673:26
+    671|     // Clicking while opening must not trigger onselect
+    672|     await fireEvent.click(firstItem);
+    673|     expect(onselect).not.toHaveBeenCalled();
+       |                          ^
+    674|
+    675|     // Finish open animation
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 skipped (21)
+   Start at  11:42:35
+   Duration  831ms (transform 45%, environment 35%, import 10%, tests 10%)
+
+EXIT=1

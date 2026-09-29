@@ -1,0 +1,40 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix4/packages/orbitkit
+
+ ❯ src/roam.test.ts (50 tests | 2 failed) 43ms
+   ❯ startRoam (11)
+     × slow speed still accumulates movement (rounding must not stall) 3ms
+     × skips setPosition while the rounded position is unchanged 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/roam.test.ts > startRoam > slow speed still accumulates movement (rounding must not stall)
+AssertionError: expected 0 to be greater than 0
+ ❯ src/roam.test.ts:540:32
+    538|     await settle();
+    539|     await vi.advanceTimersByTimeAsync(4000);
+    540|     expect(h.positions.length).toBeGreaterThan(0);
+       |                                ^
+    541|     const last = h.positions[h.positions.length - 1];
+    542|     const moved = Math.hypot(last.x - 100, last.y - 100);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/roam.test.ts > startRoam > skips setPosition while the rounded position is unchanged
+AssertionError: expected 0 to be greater than 0
+ ❯ src/roam.test.ts:556:32
+    554|     await settle();
+    555|     await vi.advanceTimersByTimeAsync(2000);
+    556|     expect(h.positions.length).toBeGreaterThan(0);
+       |                                ^
+    557|     expect(h.positions.length).toBeLessThan(20); // ~60 ticks, not one…
+    558|     for (let i = 1; i < h.positions.length; i++) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 48 passed (50)
+   Start at  00:16:40
+   Duration  525ms (environment 80%, tests 9%, transform 9%, import 2%, worker 1%)
+

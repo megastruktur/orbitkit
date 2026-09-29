@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+ok 1 - mascot is a kind=sheets Glim with idle/alert/sleep pools and TTL
+  ---
+  duration_ms: 1.39513
+  type: 'test'
+  ...
+# Subtest: sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+ok 2 - sheet PNGs exist as 128x32 strips (4 frames of 32x32, original art)
+  ---
+  duration_ms: 0.396085
+  type: 'test'
+  ...
+# Subtest: menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+ok 3 - menu is arc-anchor with 6 dotted-id items, {svg} icons and K7 stagger
+  ---
+  duration_ms: 0.272262
+  type: 'test'
+  ...
+# Subtest: mascot window opts into K10 passthrough and K9 fitContent
+ok 4 - mascot window opts into K10 passthrough and K9 fitContent
+  ---
+  duration_ms: 0.062061
+  type: 'test'
+  ...
+# Subtest: starter backend handles the dotted demo actions
+ok 5 - starter backend handles the dotted demo actions
+  ---
+  duration_ms: 0.090748
+  type: 'test'
+  ...
+# Subtest: capabilities grant the window setters the demo JS relies on
+ok 6 - capabilities grant the window setters the demo JS relies on
+  ---
+  duration_ms: 0.098242
+  type: 'test'
+  ...
+# Subtest: MascotView wires passthrough, fitContent and arc-anchor
+ok 7 - MascotView wires passthrough, fitContent and arc-anchor
+  ---
+  duration_ms: 0.116137
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 38.149312

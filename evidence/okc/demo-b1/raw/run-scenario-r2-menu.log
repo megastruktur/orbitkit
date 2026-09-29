@@ -1,0 +1,9 @@
+Launching scenario container for /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter...
+--> Application log: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux/scenario-app.log
+== pre-click geometry ==
+0x00400003  0 241  127  800  600  a3ba6d62edd2 orbitkit
+0x00400021  0 1036 679  144  96   a3ba6d62edd2 orbitkit-mascot
+== post-click geometry ==
+0x00400003  0 241  127  800  600  a3ba6d62edd2 orbitkit
+0x00400021  0 982  541  252  234  a3ba6d62edd2 orbitkit-mascot
+captured /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/evidence/okc/demo-b1/raw/out-r2-menu.png

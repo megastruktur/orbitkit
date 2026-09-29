@@ -1,0 +1,116 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-park/packages/orbitkit
+
+ ❯ src/park.test.ts (18 tests | 6 failed) 5022ms
+   ❯ createPark (16)
+     × park forces sleep even while a higher-priority TTL state is alive 3ms
+     × park forces sleep even when its priority is below the alive state 1ms
+     × handle.hint forwards requests when unparked and suppresses them while parked 1ms
+     × unpark restores the base state even when sleep has the higher priority 0ms
+     × overlapping unpark calls apply the restore once 5006ms
+     × notify counts on top of external badge updates observed while parked 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/park.test.ts > createPark > park forces sleep even while a higher-priority TTL state is alive
+AssertionError: expected 'walk' to be 'sleep' // Object.is equality
+
+Expected: "sleep"
+Received: "walk"
+
+ ❯ src/park.test.ts:320:28
+    318|     await handle.park();
+    319|
+    320|     expect(machine.active).toBe("sleep");
+       |                            ^
+    321|     expect(machine.since).toBe(5500);
+    322|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/park.test.ts > createPark > park forces sleep even when its priority is below the alive state
+AssertionError: expected 'walk' to be 'sleep' // Object.is equality
+
+Expected: "sleep"
+Received: "walk"
+
+ ❯ src/park.test.ts:339:28
+    337|     await handle.park();
+    338|
+    339|     expect(machine.active).toBe("sleep");
+       |                            ^
+    340|     expect(machine.since).toBe(5000);
+    341|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/park.test.ts > createPark > handle.hint forwards requests when unparked and suppresses them while parked
+TypeError: handle.hint is not a function
+ ❯ src/park.test.ts:346:12
+    344|     const { handle, machine } = setup({ now: () => 5000 });
+    345|
+    346|     handle.hint("walk", 100);
+       |            ^
+    347|     expect(machine.active).toBe("walk");
+    348|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/park.test.ts > createPark > unpark restores the base state even when sleep has the higher priority
+AssertionError: expected 'sleep' to be 'idle' // Object.is equality
+
+Expected: "idle"
+Received: "sleep"
+
+ ❯ src/park.test.ts:371:28
+    369|     await handle.unpark();
+    370|
+    371|     expect(machine.active).toBe("idle");
+       |                            ^
+    372|     expect(machine.since).toBe(5000);
+    373|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/park.test.ts > createPark > overlapping unpark calls apply the restore once
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/park.test.ts:375:3
+    373|   });
+    374|
+    375|   it("overlapping unpark calls apply the restore once", async () => {
+       |   ^
+    376|     mockWindows("main");
+    377|     mockEventBus();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/park.test.ts > createPark > notify counts on top of external badge updates observed while parked
+AssertionError: expected [ { count: 1 } ] to deeply equal [ { count: 11 } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "count": 11,
++     "count": 1,
+    },
+  ]
+
+ ❯ src/park.test.ts:407:35
+    405|     expect(handle.notify({ text: "late" })).toBe(false);
+    406|     expect(showBubble).not.toHaveBeenCalled();
+    407|     expect(badgesOf(bus.emitted)).toEqual([{ count: 11 }]);
+       |                                   ^
+    408|   });
+    409| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 12 passed (18)
+   Start at  19:37:30
+   Duration  5.43s (tests 94%, environment 5%, transform 1%)
+

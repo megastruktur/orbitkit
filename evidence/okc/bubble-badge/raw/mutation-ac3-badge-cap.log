@@ -1,0 +1,5 @@
+mutation: Badge 99+ cap removed (label = String(effective))
+vitest_exit=1
+suite success: False | failed: 1 | startTime: 1790615874361
+FAILED: Badge component caps the display at max (default 99 → '99+') while the aria-label keeps the raw count
+MUTATION_SENSITIVITY: VERIFIED

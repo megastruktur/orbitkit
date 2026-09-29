@@ -1,0 +1,10 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-contracts/packages/orbitkit
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 20 skipped (21)
+   Start at  11:42:58
+   Duration  966ms (transform 48%, environment 30%, import 11%, tests 11%)
+
+EXIT=0

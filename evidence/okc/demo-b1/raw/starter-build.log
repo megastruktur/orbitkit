@@ -1,0 +1,13 @@
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 148 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:  0.30 kB
+dist/assets/index-BB8vYx3k.css   20.63 kB │ gzip:  4.18 kB
+dist/assets/index-B-PPRavY.js   122.39 kB │ gzip: 40.33 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/.pnpm/@tauri-apps+api@2.11.1/node_modules/@tauri-apps/api/window.js is dynamically imported by ../../packages/orbitkit/dist/passthrough.js but also statically imported by src/views/MascotView.svelte, ../../packages/orbitkit/dist/bridge.js, dynamic import will not move module into another chunk.
+
+✓ built in 195ms

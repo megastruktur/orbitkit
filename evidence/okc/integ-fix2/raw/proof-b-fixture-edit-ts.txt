@@ -1,0 +1,54 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-integ-fix2/packages/orbitkit
+
+ ❯ src/config.test.ts (50 tests | 2 failed | 48 skipped) 11ms
+   ❯ compat: 0.1.0 starter config (AC3) (2)
+     × validates the starter config unchanged 8ms
+     × survives withDefaults round-trip validation 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/config.test.ts > compat: 0.1.0 starter config (AC3) > validates the starter config unchanged
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/config.test.ts:946:20
+    944|   it("validates the starter config unchanged", () => {
+    945|     const res = validateConfig(starterConfig);
+    946|     expect(res.ok).toBe(true);
+       |                    ^
+    947|   });
+    948|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/config.test.ts > compat: 0.1.0 starter config (AC3) > survives withDefaults round-trip validation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/config.test.ts:951:20
+    949|   it("survives withDefaults round-trip validation", () => {
+    950|     const res = validateConfig(withDefaults(starterConfig));
+    951|     expect(res.ok).toBe(true);
+       |                    ^
+    952|   });
+    953| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 48 skipped (50)
+   Start at  18:09:47
+   Duration  419ms (environment 78%, transform 14%, import 4%, tests 3%, worker 1%)
+

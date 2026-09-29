@@ -152,8 +152,10 @@ pub fn run() {
                     "notes" | "settings" => {
                         let app_popup = app_handle.clone();
                         let id = action.id.clone();
+                        // K11: open_popup(id, params, instance_key) — None/None
+                        // for a singleton; Some(instance_key) opens extra windows.
                         let _ = app_handle.run_on_main_thread(move || {
-                            let _ = app_popup.orbitkit().open_popup(id);
+                            let _ = app_popup.orbitkit().open_popup(id, None, None);
                         });
                     }
                     _ => {}

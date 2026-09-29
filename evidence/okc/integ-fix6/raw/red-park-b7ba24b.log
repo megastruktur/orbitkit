@@ -1,0 +1,96 @@
+# red proof: park fractional-px tests at base b7ba24be727bba00a373cb121e241c53462f284c (scratch ~/.cache/okc-fix6-red)
+# vitest exit code: 1 | failed: 3 (the 3 new Number.isInteger tests), passed: 18
+
+
+ RUN  v5.0.1 /home/megastruktur/.cache/okc-fix6-red/packages/orbitkit
+
+ ✓ src/park.test.ts > parkCornerPosition > places the window top-left at each work-area corner 1ms
+ ✓ src/park.test.ts > parkCornerPosition > clamps an oversized window into the work area instead of an off-screen corner 0ms
+ × src/park.test.ts > parkCornerPosition > returns integer physical px even for a fractional window size 3ms
+   → expected false to be true // Object.is equality
+ ✓ src/park.test.ts > createPark > exposes park/unpark/parked/notify/dispose and starts unparked 1ms
+ ✓ src/park.test.ts > createPark > park pauses roam + passthrough, hints sleep, moves to the clamped corner and emits parked:true 1ms
+ ✓ src/park.test.ts > createPark > sleep hint is sticky while parked: tick never expires it back to base 0ms
+ ✓ src/park.test.ts > createPark > notify while parked suppresses the bubble and counts it into the badge 0ms
+ ✓ src/park.test.ts > createPark > notify while unparked forwards to showBubble and never emits badge counts 0ms
+ ✓ src/park.test.ts > createPark > unpark resumes roam at the pre-park position, restores the machine state, unpauses passthrough and emits parked:false 1ms
+ × src/park.test.ts > createPark > park hands setPosition integer px for a fractional window size 1ms
+   → expected false to be true // Object.is equality
+ × src/park.test.ts > createPark > unpark hands setPosition integer px when the saved position is fractional 0ms
+   → expected false to be true // Object.is equality
+ ✓ src/park.test.ts > createPark > double park applies the effects once 0ms
+ ✓ src/park.test.ts > createPark > unpark without park is a no-op and double unpark applies once 0ms
+ ✓ src/park.test.ts > createPark > dispose unparks a parked handle and releases the badge subscription 1ms
+ ✓ src/park.test.ts > createPark > park forces sleep even when its priority is above the pre-park state 0ms
+ ✓ src/park.test.ts > createPark > park forces sleep even while a higher-priority TTL state is alive 0ms
+ ✓ src/park.test.ts > createPark > park forces sleep even when its priority is below the alive state 0ms
+ ✓ src/park.test.ts > createPark > handle.hint forwards requests when unparked and suppresses them while parked 0ms
+ ✓ src/park.test.ts > createPark > unpark restores the base state even when sleep has the higher priority 0ms
+ ✓ src/park.test.ts > createPark > overlapping unpark calls apply the restore once 0ms
+ ✓ src/park.test.ts > createPark > notify counts on top of external badge updates observed while parked 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/park.test.ts > parkCornerPosition > returns integer physical px even for a fractional window size
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/park.test.ts:161:37
+    159|     const fractional = { width: 95.5, height: 95.5 };
+    160|     const pos = parkCornerPosition("bottom-right", WORK, fractional);
+    161|     expect(Number.isInteger(pos.x)).toBe(true);
+       |                                     ^
+    162|     expect(Number.isInteger(pos.y)).toBe(true);
+    163|     expect(pos).toEqual({ x: Math.round(1920 - 95.5), y: Math.round(10…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/park.test.ts > createPark > park hands setPosition integer px for a fractional window size
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/park.test.ts:254:37
+    252|
+    253|     const arg = setPosition.mock.calls[0][0];
+    254|     expect(Number.isInteger(arg.x)).toBe(true);
+       |                                     ^
+    255|     expect(Number.isInteger(arg.y)).toBe(true);
+    256|     expect(arg).toEqual({ x: 1825, y: 985 });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/park.test.ts > createPark > unpark hands setPosition integer px when the saved position is fractional
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/park.test.ts:266:41
+    264|
+    265|     const restore = setPosition.mock.calls[1][0];
+    266|     expect(Number.isInteger(restore.x)).toBe(true);
+       |                                         ^
+    267|     expect(Number.isInteger(restore.y)).toBe(true);
+    268|     expect(restore).toEqual({ x: 501, y: 401 });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 18 passed (21)
+   Start at  02:47:57
+   Duration  419ms (environment 78%, transform 14%, import 4%, tests 4%, worker 1%)
+

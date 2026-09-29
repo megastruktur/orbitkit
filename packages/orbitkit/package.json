@@ -1,6 +1,6 @@
 {
   "name": "@orbitkit/ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -16,7 +16,7 @@
     "./assets/*": "./assets/*"
   },
   "scripts": {
-    "build": "svelte-package -i src -o dist && rm -f dist/*.test.*",
+    "build": "svelte-package -i src -o dist && find dist -name '*.test.*' -delete",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },

@@ -171,7 +171,7 @@ Desktop OrbitKit launches auxiliary popups into discrete Tauri `WebviewWindow` f
 | Touch Drag & Radial Expansion | Supported | Verified via native touch simulation |
 | Direct JNI Dispatch | Supported | Verified via `OrbitkitSurvivalJniTest` |
 | In-App Popups (`PopupSheet`) | Supported | Android in-app sheet via `orbitkit://popup-open` / `orbitkit://popup-close` |
-| Multi-Window Popups (`open_popup`) | Unsupported | Explicitly returns `ErrorCode::Unsupported` on Android (desktop only) |
+| Multi-Window Popups (`open_popup`) | Supported | Desktop creates native `WebviewWindow`s; on Android the in-app sheet is brought to front and `orbitkit://popup-shown` (+ legacy `orbitkit://popup-open`) is emitted (`list_popups`/`mascot_monitor` are `unsupported` on mobile) |
 | On-Device Physical Execution | **DEFERRED** | No physical device was connected during campaign CI; runbooks prepared and verified via automated test suites |
 
 ---

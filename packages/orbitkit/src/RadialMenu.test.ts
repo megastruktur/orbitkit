@@ -682,3 +682,305 @@ describe("RadialMenu component", () => {
     expect(onselect).toHaveBeenCalledWith("item-1");
   });
 });
+
+describe("K7 arc-anchor menu", () => {
+  const anchor = { x: 100, y: 200, width: 60, height: 80 };
+
+  function anchorItems(n: number): MenuConfig["items"] {
+    return Array.from({ length: n }, (_, i) => ({
+      id: `act-${i + 1}`,
+      label: `Act ${i + 1}`,
+    }));
+  }
+
+  it("centres the arc headGap above anchorRect: container shifted, items symmetric with centre pair", () => {
+    const config: MenuConfig = {
+      items: anchorItems(6),
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc-anchor",
+      arc: { headGap: 12 },
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    render(RadialMenu, {
+      props: {
+        config,
+        open: true,
+        anchorRect: anchor,
+        onselect: () => {},
+        onclose: () => {},
+      },
+    });
+
+    // Arc centre: (100 + 60/2, 200 - 12) = (130, 188)
+    const menu = screen.getByRole("menu");
+    expect(menu.style.transform).toBe("translate(130px, 188px)");
+
+    const items = screen.getAllByRole("menuitem");
+    expect(items).toHaveLength(6);
+
+    // Whole arc renders above the arc centre point
+    for (const item of items) {
+      expect(parseFloat(item.style.top)).toBeLessThanOrEqual(0);
+    }
+
+    // Mirror symmetry about the arc centre vertical (item positions are
+    // relative to the shifted container)
+    const xs = items.map((el) => parseFloat(el.style.left));
+    expect(xs[0] + xs[5]).toBeCloseTo(0, 5);
+    expect(xs[1] + xs[4]).toBeCloseTo(0, 5);
+    expect(xs[2] + xs[3]).toBeCloseTo(0, 5);
+
+    // Centre PAIR (indices 2 and 3) straddles the arc centre
+    expect(xs[2]).toBeLessThan(0);
+    expect(xs[3]).toBeGreaterThan(0);
+
+    const ys = items.map((el) => parseFloat(el.style.top));
+    expect(ys[2]).toBe(ys[3]);
+    expect(ys[2]).toBeLessThan(ys[1]);
+  });
+
+  it("ignores anchorRect for non-arc-anchor layouts", () => {
+    const config: MenuConfig = {
+      items: anchorItems(4),
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc",
+      arc: { position: "top", span: 180 },
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    render(RadialMenu, {
+      props: {
+        config,
+        open: true,
+        anchorRect: anchor,
+        onselect: () => {},
+        onclose: () => {},
+      },
+    });
+
+    expect(screen.getByRole("menu").style.transform).toBe("");
+  });
+
+  it("stagger delays run centre→edges with default stepMs 40 (5 items, no arc block)", async () => {
+    const config: MenuConfig = {
+      items: anchorItems(5),
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc-anchor",
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    render(RadialMenu, {
+      props: { config, open: true, onselect: () => {}, onclose: () => {} },
+    });
+
+    await flushDoubleRaf();
+
+    const items = screen.getAllByRole("menuitem");
+    expect(items[0].style.animationDelay).toBe("80ms");
+    expect(items[1].style.animationDelay).toBe("40ms");
+    expect(items[2].style.animationDelay).toBe("0ms");
+    expect(items[3].style.animationDelay).toBe("40ms");
+    expect(items[4].style.animationDelay).toBe("80ms");
+    expect(items[0].style.animation).toContain("260ms");
+    expect(items[0].style.getPropertyValue("--stagger-delay")).toBe("80ms");
+    expect(items[0].style.getPropertyValue("--stagger-duration")).toBe("260ms");
+    expect(items[2].style.getPropertyValue("--stagger-delay")).toBe("0ms");
+  });
+
+  it("honours configured stagger values (stepMs 10, openMs 100)", async () => {
+    const config: MenuConfig = {
+      items: anchorItems(5),
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc-anchor",
+      stagger: { openMs: 100, closeMs: 90, stepMs: 10 },
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    render(RadialMenu, {
+      props: { config, open: true, onselect: () => {}, onclose: () => {} },
+    });
+
+    await flushDoubleRaf();
+
+    const items = screen.getAllByRole("menuitem");
+    expect(items[0].style.animationDelay).toBe("20ms");
+    expect(items[1].style.animationDelay).toBe("10ms");
+    expect(items[2].style.animationDelay).toBe("0ms");
+    expect(items[3].style.animationDelay).toBe("10ms");
+    expect(items[4].style.animationDelay).toBe("20ms");
+    expect(items[0].style.animation).toContain("100ms");
+  });
+
+  it("items are not clickable until the open wave settles; the closing wave finishes before unmount", async () => {
+    const onselect = vi.fn();
+    const config: MenuConfig = {
+      items: anchorItems(5),
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc-anchor",
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    const { rerender } = render(RadialMenu, {
+      props: {
+        config,
+        open: true,
+        anchorRect: anchor,
+        onselect,
+        onclose: () => {},
+      },
+    });
+
+    // Centre item clicked mid-open wave: guard must hold
+    const centre = screen.getByRole("menuitem", { name: "Act 3" });
+    await fireEvent.click(centre);
+    expect(onselect).not.toHaveBeenCalled();
+
+    await openMenuComplete();
+    await fireEvent.click(centre);
+    expect(onselect).toHaveBeenCalledTimes(1);
+
+    // Close: reversed wave — edges first (0ms), centre last (80ms)
+    rerender({
+      config,
+      open: false,
+      anchorRect: anchor,
+      onselect,
+      onclose: () => {},
+    });
+
+    const items = screen.getAllByRole("menuitem");
+    expect(items[0].style.animationDelay).toBe("0ms");
+    expect(items[2].style.animationDelay).toBe("80ms");
+
+    // First-scheduled edge item finishing does NOT unmount the menu
+    await fireEvent.animationEnd(items[0]);
+    expect(screen.queryByRole("menu")).not.toBeNull();
+
+    // Centre item (last scheduled) finishing completes the close
+    await fireEvent.animationEnd(items[2]);
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("renders {svg} icons through the K12 sanitizer as data-URL images", () => {
+    const config: MenuConfig = {
+      items: [
+        {
+          id: "clean",
+          label: "Clean",
+          icon: {
+            svg: '<svg onload="alert(1)"><script>alert(2)</script>' +
+              '<foreignObject><body xmlns="http://www.w3.org/1999/xhtml"><p>t</p></body></foreignObject>' +
+              '<path d="M4 4h16" stroke="#fff" stroke-width="2"/>' +
+              '<circle cx="12" cy="12" r="3" href="javascript:alert(3)"/></svg>',
+          },
+        },
+      ],
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc",
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    const { container } = render(RadialMenu, {
+      props: { config, open: true, onselect: () => {}, onclose: () => {} },
+    });
+
+    const img = container.querySelector("img.orbitkit-radial-icon-img");
+    expect(img).not.toBeNull();
+    const src = img!.getAttribute("src");
+    const prefix = "data:image/svg+xml;charset=utf-8,";
+    expect(src?.startsWith(prefix)).toBe(true);
+
+    const decoded = decodeURIComponent(src!.slice(prefix.length));
+    expect(decoded).toContain("<path");
+    expect(decoded).toContain('d="M4 4h16"');
+    expect(decoded).toContain("<circle");
+    expect(decoded).not.toContain("<script");
+    expect(decoded).not.toContain("script");
+    expect(decoded).not.toContain("onload");
+    expect(decoded).not.toContain("href");
+    expect(decoded).not.toContain("foreignObject");
+    expect(decoded).not.toContain("<p>");
+    expect(decoded).not.toContain("<body");
+  });
+
+  it("renders nothing for unsanitizable {svg} icons", () => {
+    const config: MenuConfig = {
+      items: [{ id: "broken", label: "Broken", icon: { svg: "<svg><path</svg>" } }],
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc",
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    const { container } = render(RadialMenu, {
+      props: { config, open: true, onselect: () => {}, onclose: () => {} },
+    });
+
+    expect(container.querySelector("img.orbitkit-radial-icon-img")).toBeNull();
+  });
+
+  it("updates aria-label and title when an item label prop changes without reopening", () => {
+    const config: MenuConfig = {
+      items: [
+        { id: "notes", label: "Notes" },
+        { id: "quit", label: "Quit" },
+      ],
+      radius: 50,
+      startAngle: -180,
+      endAngle: 0,
+      layout: "arc",
+      animation: "none",
+      itemSize: 44,
+      trigger: "click",
+    };
+
+    const { rerender } = render(RadialMenu, {
+      props: { config, open: true, onselect: () => {}, onclose: () => {} },
+    });
+
+    const menuBefore = screen.getByRole("menu");
+    expect(screen.getByRole("menuitem", { name: "Notes" })).toBeDefined();
+
+    const changed: MenuConfig = {
+      ...config,
+      items: [
+        { id: "notes", label: "My Notes" },
+        { id: "quit", label: "Quit" },
+      ],
+    };
+    rerender({
+      config: changed,
+      open: true,
+      onselect: () => {},
+      onclose: () => {},
+    });
+
+    const renamed = screen.getByRole("menuitem", { name: "My Notes" });
+    expect(renamed.getAttribute("title")).toBe("My Notes");
+    expect(screen.queryByRole("menuitem", { name: "Notes" })).toBeNull();
+
+    // Same mounted menu node: the label change did not reopen the menu
+    expect(screen.getByRole("menu")).toBe(menuBefore);
+  });
+});

@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { listen, emit, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { MenuConfig } from "./config";
 
 export type OrbitKitErrorCode =
@@ -139,12 +140,40 @@ export async function hideOverlay(): Promise<void> {
   await callPlugin<void>("plugin:orbitkit|hide_overlay");
 }
 
-export async function openPopup(id: string): Promise<void> {
-  await callPlugin<void>("plugin:orbitkit|open_popup", { id });
+/** K11: options for `openPopup` beyond the popup config id. */
+export interface OpenPopupOptions {
+  /** K11: `{param}` placeholder values, substituted URL-encoded into the URL. */
+  params?: Record<string, string>;
+  /**
+   * K11: instance key for multiple windows of one popup kind. Must match
+   * `^[a-z0-9_-]{1,32}$`; label becomes `orbitkit-popup-{id}-{instanceKey}`.
+   */
+  instanceKey?: string;
 }
 
-export async function closePopup(id: string): Promise<void> {
-  await callPlugin<void>("plugin:orbitkit|close_popup", { id });
+/**
+ * K11: opens the configured popup `id`. Idempotent — an already-open label is
+ * shown + focused instead of duplicated. `openPopup(id)` stays valid.
+ */
+export async function openPopup(id: string, options?: OpenPopupOptions): Promise<void> {
+  const args: Record<string, unknown> = { id };
+  if (options?.params !== undefined) {
+    args.params = options.params;
+  }
+  if (options?.instanceKey !== undefined) {
+    args.instanceKey = options.instanceKey;
+  }
+  await callPlugin<void>("plugin:orbitkit|open_popup", args);
+}
+
+/** K11: closes the popup window by full label (e.g. `orbitkit-popup-notes`). */
+export async function closePopup(label: string): Promise<void> {
+  await callPlugin<void>("plugin:orbitkit|close_popup", { label });
+}
+
+/** K11: labels of all currently open OrbitKit popup windows. */
+export async function listPopups(): Promise<string[]> {
+  return await callPlugin<string[]>("plugin:orbitkit|list_popups");
 }
 
 export async function setMascotState(state: string): Promise<void> {
@@ -204,6 +233,11 @@ export async function onMascotState(
   }
 }
 
+/**
+ * Legacy payload of the Android `orbitkit://popup-open` event (emitted by the
+ * native Kotlin layer and the mobile plugin arm). Superseded on desktop by
+ * `orbitkit://popup-shown` / `PopupLifecyclePayload` (K11).
+ */
 export type PopupOpenPayload = {
   id: string;
   title: string;
@@ -214,6 +248,10 @@ export type PopupOpenPayload = {
 
 export type PopupOpenCallback = (payload: PopupOpenPayload) => void;
 
+/**
+ * Legacy: subscribes to the Android `orbitkit://popup-open` sheet event.
+ * Desktop popups use `onPopupShown` (K11).
+ */
 export async function onPopupOpen(
   cb: PopupOpenCallback
 ): Promise<UnlistenFn> {
@@ -229,12 +267,17 @@ export async function onPopupOpen(
   }
 }
 
+/** Legacy payload of the Android `orbitkit://popup-close` event. */
 export type PopupClosePayload = {
   id: string;
 };
 
 export type PopupCloseCallback = (payload: PopupClosePayload) => void;
 
+/**
+ * Legacy: subscribes to the Android `orbitkit://popup-close` sheet event.
+ * Desktop popups use `onPopupClosed` (K11).
+ */
 export async function onPopupClose(
   cb: PopupCloseCallback
 ): Promise<UnlistenFn> {
@@ -245,6 +288,178 @@ export async function onPopupClose(
     return await listen<PopupClosePayload>("orbitkit://popup-close", (event) => {
       cb(event.payload);
     });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** K11: payload of `orbitkit://popup-shown` / `orbitkit://popup-closed`. */
+export type PopupLifecyclePayload = {
+  /** Full window label, e.g. `orbitkit-popup-notes` or
+   * `orbitkit-popup-notes-chat-1`. */
+  label: string;
+};
+
+export type PopupLifecycleCallback = (payload: PopupLifecyclePayload) => void;
+
+/** K11: subscribes to `orbitkit://popup-shown` (create and re-show). */
+export async function onPopupShown(
+  cb: PopupLifecycleCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<PopupLifecyclePayload>(
+      "orbitkit://popup-shown",
+      (event) => {
+        cb(event.payload);
+      }
+    );
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** K11: subscribes to `orbitkit://popup-closed`. */
+export async function onPopupClosed(
+  cb: PopupLifecycleCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<PopupLifecyclePayload>(
+      "orbitkit://popup-closed",
+      (event) => {
+        cb(event.payload);
+      }
+    );
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** Physical-pixel rectangle in global screen space (K9). */
+export type PhysRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/** Payload of the `mascot_monitor` command (K9). */
+export type MascotMonitorPayload = {
+  workArea: PhysRect;
+  scaleFactor: number;
+};
+
+/**
+ * Returns work area + scale factor of the monitor containing the mascot window
+ * centre (K9). Unsupported on mobile (rejects with `OrbitKitError` code
+ * `"unsupported"`).
+ */
+export async function mascotMonitor(): Promise<MascotMonitorPayload> {
+  return callPlugin<MascotMonitorPayload>("plugin:orbitkit|mascot_monitor");
+}
+
+/** Payload of the `tauri://scale-change` window event. */
+export type ScaleChangePayload = {
+  scaleFactor: number;
+  size: { width: number; height: number };
+};
+
+export type ScaleChangeCallback = (payload: ScaleChangePayload) => void;
+
+/** Subscribes to this window's `tauri://scale-change`; returns an unlisten function. */
+export async function onScaleChange(
+  cb: ScaleChangeCallback
+): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await getCurrentWindow().onScaleChanged((event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** Payload of the `orbitkit://badge` event: current unread-badge count. */
+export type BadgePayload = {
+  count: number;
+};
+
+export type BadgeCallback = (payload: BadgePayload) => void;
+
+/**
+ * Subscribes to `orbitkit://badge` count events; returns an unlisten function.
+ * Outside Tauri, resolves to a no-op unlisten without subscribing.
+ */
+export async function onBadge(cb: BadgeCallback): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<BadgePayload>("orbitkit://badge", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/**
+ * Emits `orbitkit://badge {count}` (broadcast to every listener, including the
+ * emitting webview). Outside Tauri, resolves without emitting.
+ */
+export async function setBadge(count: number): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  try {
+    await emit("orbitkit://badge", { count });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/** Payload of the `orbitkit://park` event: park (do-not-disturb) mode state. */
+export type ParkPayload = {
+  parked: boolean;
+};
+
+export type ParkCallback = (payload: ParkPayload) => void;
+
+/**
+ * Subscribes to `orbitkit://park` state events; returns an unlisten function.
+ * Outside Tauri, resolves to a no-op unlisten without subscribing.
+ */
+export async function onPark(cb: ParkCallback): Promise<UnlistenFn> {
+  if (!isTauri()) {
+    return () => {};
+  }
+  try {
+    return await listen<ParkPayload>("orbitkit://park", (event) => {
+      cb(event.payload);
+    });
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/**
+ * Emits `orbitkit://park {parked}` (broadcast to every listener, including the
+ * emitting webview). Outside Tauri, resolves without emitting.
+ */
+export async function setParked(parked: boolean): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  try {
+    await emit("orbitkit://park", { parked });
   } catch (err) {
     throw normalizeError(err);
   }

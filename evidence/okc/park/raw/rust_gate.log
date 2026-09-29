@@ -1,0 +1,57 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running unittests src/lib.rs (target-linux/debug/deps/tauri_plugin_orbitkit-9ab4a598c2ad22a3)
+
+running 48 tests
+test config::tests::test_k2_minimal_config_defaults ... ok
+test config::tests::test_k7_defaults_applied_on_deserialize ... ok
+test config::tests::test_canonical_vectors_against_arc_vectors_json ... ok
+test config::tests::test_k7_validate_rejects_invalid ... ok
+test config::tests::test_menu_config_validation ... ok
+test config::tests::test_menu_item_id_validation ... ok
+test config::tests::test_menu_animation_serde_defaults_and_roundtrip ... ok
+test config::tests::test_resolve_menu_angles_positions_and_defaults ... ok
+test config::tests::test_menu_layout_arc_serde_roundtrip ... ok
+test desktop::tests::test_monitor_for_point_edges_and_boundaries ... ok
+test config::tests::test_k2_config_serde_roundtrip ... ok
+test desktop::tests::test_monitor_for_point_first_match_wins_on_overlap ... ok
+test desktop::tests::test_monitor_for_point_outside_returns_none ... ok
+test desktop::tests::test_monitor_for_point_selects_monitor_containing_point ... ok
+test desktop::tests::test_monitor_for_point_selects_on_bounds_not_work_area ... ok
+test config::tests::test_starter_config_compat_k7 ... ok
+test desktop::tests::test_phys_rect_contains_excludes_right_bottom_edges ... ok
+test config::tests::test_k7_full_fixture_roundtrip ... ok
+test desktop::tests::test_selector_inputs_logical_space_linux_layout ... ok
+test desktop::tests::test_selector_inputs_logical_space_macos_mixed_scale ... ok
+test desktop::tests::test_selector_inputs_logical_space_primary_window ... ok
+test desktop::tests::test_selector_inputs_physical_space_passthrough ... ok
+test error::tests::test_error_serialization ... ok
+test error::tests::test_reject_code_mapping ... ok
+test jni_bridge::tests::test_build_menu_action_payload ... ok
+test jni_bridge::tests::test_emit_overlay_menu_action_calls_registered_emitter ... ok
+test desktop::tests::test_open_popup_rejects_invalid_requests ... ok
+test jni_bridge::tests::test_event_emitter_reentrancy_no_deadlock ... ok
+test jni_bridge::tests::test_log_fmt_and_safe_cstring ... ok
+test jni_bridge::tests::test_guarded_handles_emitter_panic_without_abort ... ok
+test jni_bridge::tests::test_guarded_handles_handler_panic_without_abort ... ok
+test tests::test_popup_label_rejects_invalid_instance_keys ... ok
+test tests::test_lookup_popup_found_and_not_found ... ok
+test tests::test_popup_label_default_and_instance_key ... ok
+test desktop::tests::test_open_popup_creates_window_idempotently ... ok
+test jni_bridge::tests::test_process_native_action_emits_overlay_event_and_notifies_handler ... ok
+test tests::test_resolve_popup_spec_defaults_and_overrides ... ok
+test mobile::tests::test_build_overlay_payload_mascot_config_camel_case_and_states ... ok
+test jni_bridge::tests::test_process_native_action_records_and_returns_json ... ok
+test tests::test_substitute_popup_params_encodes_values ... ok
+test tests::test_substitute_popup_params_unknown_placeholder_rejected ... ok
+test desktop::tests::test_open_popup_instance_keys_create_distinct_windows ... ok
+test desktop::tests::test_popup_events_and_list ... ok
+test tests::test_resolve_popup_url_policy ... ok
+test jni_bridge::tests::test_recorder_actions_through_jni ... ok
+test tests::test_resolve_popup_url_rejects_scheme_relative_smuggles ... ok
+test tests::test_resolve_popup_url_app_relative ... ok
+test tests::test_resolve_popup_url_loopback ... ok
+
+test result: ok. 48 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+OKC_RUST_GATE_OK

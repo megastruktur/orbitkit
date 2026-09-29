@@ -10,9 +10,11 @@ Default permissions for OrbitKit plugin
 - `allow-hide-overlay`
 - `allow-open-popup`
 - `allow-close-popup`
+- `allow-list-popups`
 - `allow-set-mascot-state`
 - `allow-emit-menu-action`
 - `allow-start-mascot-drag`
+- `allow-mascot-monitor`
 
 ## Permission Table
 
@@ -97,6 +99,58 @@ Enables the hide_overlay command without any pre-configured scope.
 <td>
 
 Denies the hide_overlay command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:allow-list-popups`
+
+</td>
+<td>
+
+Enables the list_popups command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:deny-list-popups`
+
+</td>
+<td>
+
+Denies the list_popups command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:allow-mascot-monitor`
+
+</td>
+<td>
+
+Enables the mascot_monitor command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`orbitkit:deny-mascot-monitor`
+
+</td>
+<td>
+
+Denies the mascot_monitor command without any pre-configured scope.
 
 </td>
 </tr>

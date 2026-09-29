@@ -1,7 +1,8 @@
+use std::collections::HashMap;
 use tauri::{command, AppHandle, Runtime};
 use crate::config::MenuConfig;
 use crate::error::Result;
-use crate::{OrbitkitExt, OverlayPermissionResponse, ShowOverlayMascotArgs};
+use crate::{MascotMonitorResponse, OrbitkitExt, OverlayPermissionResponse, ShowOverlayMascotArgs};
 
 #[command]
 pub(crate) async fn overlay_permission<R: Runtime>(
@@ -37,16 +38,23 @@ pub(crate) async fn hide_overlay<R: Runtime>(
 pub(crate) async fn open_popup<R: Runtime>(
     app: AppHandle<R>,
     id: String,
+    params: Option<HashMap<String, String>>,
+    instance_key: Option<String>,
 ) -> Result<()> {
-    app.orbitkit().open_popup(id)
+    app.orbitkit().open_popup(id, params, instance_key)
 }
 
 #[command]
 pub(crate) async fn close_popup<R: Runtime>(
     app: AppHandle<R>,
-    id: String,
+    label: String,
 ) -> Result<()> {
-    app.orbitkit().close_popup(id)
+    app.orbitkit().close_popup(label)
+}
+
+#[command]
+pub(crate) async fn list_popups<R: Runtime>(app: AppHandle<R>) -> Result<Vec<String>> {
+    app.orbitkit().list_popups()
 }
 
 #[command]
@@ -70,4 +78,11 @@ pub(crate) async fn start_mascot_drag<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<()> {
     app.orbitkit().start_mascot_drag()
+}
+
+#[command]
+pub(crate) async fn mascot_monitor<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<MascotMonitorResponse> {
+    app.orbitkit().mascot_monitor()
 }

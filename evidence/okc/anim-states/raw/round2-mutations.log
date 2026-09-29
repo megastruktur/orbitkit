@@ -1,0 +1,30 @@
+# Round 2 mutation evidence (all runs on restored code afterwards: 14/14 machine tests pass)
+
+## F1 mutation — remove `expireIfDue(machine, now);` from `hint()` (old behaviour)
+
+Command: `pnpm vitest run src/mascotMachine.test.ts -t "dead ttl state before|fresh ttl when"`
+Result: success=false, failed=2, passed=0
+
+FAILED mascotMachine (K8) expires a dead ttl state before applying a lower-priority hint
+FAILED mascotMachine (K8) starts a fresh ttl when a state is re-hinted after its expiry
+   AssertionError: expected { state: 'idle', sheet: 'small-a' } to deeply equal { state: 'walk', sheet: 'walk' }
+   AssertionError: expected { state: 'idle', sheet: 'small-a' } to deeply equal { state: 'alert', sheet: 'jump' }
+(all other tests in the file: skipped by the -t filter)
+
+## F2 mutation — add `import "@tauri-apps/api/core";` to mascotMachine.ts
+
+Command: `pnpm vitest run src/mascotMachine.test.ts`
+Result: success=false, failed=1, passed=13
+Note: run after clearing vite's transform cache (`node_modules/.vite`) — the cache
+keys on mtime with second granularity, so a same-second rewrite can serve stale
+`?raw` content. Real edits and clean CI runs always bust it.
+
+FAIL mascotMachine (K8) loads in node without window and imports no Tauri modules
+    AssertionError: expected 'import "@tauri-apps/api/core";\nimpor…' not to match /@tauri-apps/
+
+## Reduced-motion carry-over mutation (round 1, unchanged) — remove `if (isReducedMotion) return;`
+
+Command: `pnpm vitest run src/Mascot.test.ts -t "freezes on frame 0"`
+Result: success=false, failed=1
+FAIL Mascot kind=sheets (K7) freezes on frame 0 under reduced motion even as time passes
+    AssertionError: expected '-96px' to be '0px'

@@ -53,7 +53,7 @@ OrbitKit bridges desktop windowing and Android system overlays through a unified
 | **Radial Menu** | Svelte 5 component (`RadialMenu.svelte`) rendered inside the webview | Native Android canvas view drawing arc items and handling touch hits |
 | **Menu Action Dispatch** | Emitted to Rust handlers (`on_menu_action`) & webviews via `orbitkit://menu-action` | Dispatched to Rust via direct JNI (`OrbitkitJniBridge.onNativeAction`) & Tauri event |
 | **Suspended Execution** | Process stays active; webview remains live | WebView may be suspended in background; direct JNI ensures actions still process |
-| **Popups** | Native `WebviewWindow` instances (`orbitkit-popup-<id>`) | Main app activity / webview (`open_popup` returns `unsupported` on mobile) |
+| **Popups** | Native `WebviewWindow` instances (`orbitkit-popup-<id>[-<instanceKey>]`) | Main app activity / webview (`open_popup` drives the in-app sheet via `bringToFront` + `orbitkit://popup-shown`; `list_popups`/`mascot_monitor` return `unsupported` on mobile) |
 | **Permissions** | No runtime permissions required | Requires `SYSTEM_ALERT_WINDOW` permission |
 
 ---

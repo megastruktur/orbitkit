@@ -1,0 +1,16 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-geometry/packages/orbitkit
+
+
+ Test Files  12 passed (12)
+      Tests  256 passed (256)
+   Start at  15:48:59
+   Duration  1.78s (environment 47%, transform 35%, tests 11%, import 6%)
+
+  Transform  transforming modules took 2.90s · 35% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             on CI this only helps when the cache directory is persisted between runs
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

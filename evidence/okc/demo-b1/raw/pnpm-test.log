@@ -1,0 +1,11 @@
+Scope: 2 of 3 workspace projects
+$ vitest run
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/packages/orbitkit
+
+
+ Test Files  13 passed (13)
+      Tests  276 passed (276)
+   Start at  17:47:28
+   Duration  1.49s (environment 61%, transform 21%, tests 12%, import 6%)
+

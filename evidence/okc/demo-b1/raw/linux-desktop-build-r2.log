@@ -1,0 +1,43 @@
+Launching build container for /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter...
+=== Running in-container build for: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter ===
+Repository root: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1
+--> Installing dependencies at repo root...
+Scope: all 3 workspace projects
+? Verifying lockfile against supply-chain policies (177 entries)...
+Update available! 12.4.1 → 12.6.0.
+Changelog: https://pnpm.io/v/12.6.0
+To update, run: pnpm self-update
+✓ Lockfile passes supply-chain policies (177 entries in 687ms)
+Lockfile is up to date, resolution step is skipped
+Done in 719ms using pnpm v12.4.1
+--> Building workspace packages...
+$ svelte-package -i src -o dist && rm -f dist/*.test.*
+src -> dist
+@sveltejs/package found the following issues while packaging your library:
+Avoid usage of `import.meta.env` in your code. It only works in apps bundled with Vite. Consider using packages like `esm-env` instead which works with all bundlers or without bundling.
+
+--> Building Tauri desktop application (debug, no-bundle)...
+--> CARGO_TARGET_DIR=/home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux
+$ tauri build --debug --no-bundle
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "dev.orbitkit.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+     Running beforeBuildCommand `pnpm build`
+$ vite build
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 153 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:  0.30 kB
+dist/assets/index-CK4-iusP.css   20.69 kB │ gzip:  4.22 kB
+dist/assets/index-C-wDad7I.js   122.37 kB │ gzip: 40.30 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/.pnpm/@tauri-apps+api@2.11.1/node_modules/@tauri-apps/api/window.js is dynamically imported by ../../packages/orbitkit/dist/passthrough.js but also statically imported by src/views/MascotView.svelte, ../../packages/orbitkit/dist/bridge.js, dynamic import will not move module into another chunk.
+
+✓ built in 254ms
+   Compiling starter v0.1.0 (/home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.55s
+       Built application at: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux/debug/starter
+=== Build successful ===
+Binary: /home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux/debug/starter
+/home/megastruktur/orca/workspaces/orbitkit/okc-demo-b1/examples/starter/src-tauri/target-linux/debug/starter: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=54ee058ba62cf50df04ffd7e24461d8ded78b5a7, with debug_info, not stripped

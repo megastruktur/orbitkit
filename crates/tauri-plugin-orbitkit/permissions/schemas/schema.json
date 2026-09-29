@@ -331,6 +331,30 @@
           "markdownDescription": "Denies the hide_overlay command without any pre-configured scope."
         },
         {
+          "description": "Enables the list_popups command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-popups",
+          "markdownDescription": "Enables the list_popups command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_popups command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-popups",
+          "markdownDescription": "Denies the list_popups command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the mascot_monitor command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-mascot-monitor",
+          "markdownDescription": "Enables the mascot_monitor command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the mascot_monitor command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-mascot-monitor",
+          "markdownDescription": "Denies the mascot_monitor command without any pre-configured scope."
+        },
+        {
           "description": "Enables the open_popup command without any pre-configured scope.",
           "type": "string",
           "const": "allow-open-popup",
@@ -403,10 +427,10 @@
           "markdownDescription": "Denies the start_mascot_drag command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for OrbitKit plugin\n#### This default permission set includes:\n\n- `allow-overlay-permission`\n- `allow-request-overlay-permission`\n- `allow-show-overlay`\n- `allow-hide-overlay`\n- `allow-open-popup`\n- `allow-close-popup`\n- `allow-set-mascot-state`\n- `allow-emit-menu-action`\n- `allow-start-mascot-drag`",
+          "description": "Default permissions for OrbitKit plugin\n#### This default permission set includes:\n\n- `allow-overlay-permission`\n- `allow-request-overlay-permission`\n- `allow-show-overlay`\n- `allow-hide-overlay`\n- `allow-open-popup`\n- `allow-close-popup`\n- `allow-list-popups`\n- `allow-set-mascot-state`\n- `allow-emit-menu-action`\n- `allow-start-mascot-drag`\n- `allow-mascot-monitor`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Default permissions for OrbitKit plugin\n#### This default permission set includes:\n\n- `allow-overlay-permission`\n- `allow-request-overlay-permission`\n- `allow-show-overlay`\n- `allow-hide-overlay`\n- `allow-open-popup`\n- `allow-close-popup`\n- `allow-set-mascot-state`\n- `allow-emit-menu-action`\n- `allow-start-mascot-drag`"
+          "markdownDescription": "Default permissions for OrbitKit plugin\n#### This default permission set includes:\n\n- `allow-overlay-permission`\n- `allow-request-overlay-permission`\n- `allow-show-overlay`\n- `allow-hide-overlay`\n- `allow-open-popup`\n- `allow-close-popup`\n- `allow-list-popups`\n- `allow-set-mascot-state`\n- `allow-emit-menu-action`\n- `allow-start-mascot-drag`\n- `allow-mascot-monitor`"
         }
       ]
     }

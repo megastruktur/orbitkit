@@ -285,3 +285,35 @@ README `<sub>` line now also says "one 0.65 s drag-capture artifact cut"; alt te
 **Gates:** docs-only change; `pnpm -r test` re-run below. `git diff --name-only main..HEAD` = README.md, docs/media/demo-desktop.gif, evidence/okc/demo-video/REPORT.md.
 
 READY FOR REVIEW at b2b96eb22b3ce8096211e1828fb920100f65130b
+
+
+## GIF v8
+
+Supersedes the v7 GIF of this branch (review r1: FAIL). v7 ended with the Notes popup still open (final frame mid-close), and my v7 section wrongly claimed "app and Notes gone" for that frame. v8 extends the source end so the whole quit sequence is shown.
+
+**Source:** Desktop Video run 36577656122, commit c33ea3f (windows-latest; app exit 0, all 6 menu actions fired, drag OK, size 360x288 held). `video-windows.mp4` sha256 `43a8fd42b6281d8bea9d766b5678d5a0dbdd0684141e83ac1ff84c9992e2b7fa`, 1024x768@30, 39.73 s.
+
+**Committed GIF (coordinator-encoded, byte-identical):** `docs/media/demo-desktop.gif`, sha256 `e1fb960d3bc2cdf4cc1d8742fb8cd7dd5cf20c48d95c9f25812ee1213a5152b6` (checked on the candidate before copy and on the destination after copy), 1 117 035 bytes, 800x600, 12 fps, 251 frames (counted by frame extraction, n=0..250), 20.91 s. I did not re-encode.
+
+**Recipe (coordinator, in `transcripter-worker-1`; I did not run the encode):** source 7.6..39.6 s (v7: ..39.0; Notes closes ~39.1 s, app exits ~39.4 s, source ends 39.73 s); drag-capture artifact span cut, absolute source 33.60-34.20 s (0.6 s), i.e. input-relative trim 0..26.0 + 26.6..(end; 31.4 in v7, exact v8 end supplied by the coordinator) via trim+concat (not select) - same drag-capture artifact class as the previous run; 1.5x speed-up; fps=12; scale 800x600 (4:3); palettegen stats_mode=diff max_colors=64 + paletteuse dither=none diff_mode=rectangle.
+
+**Coordinator checks on v8:** junction clean, no outline; last frames' top-right white is a 1 px column only (Notes gone); first frame painted.
+
+**My visual verification (frames extracted in the container; I viewed each image described here):**
+- n=0: OrbitKit Starter window fully painted, log "Overlay displayed", mascot at bottom right; no white flash.
+- n=244: main window, Notes popup (top right) and badge present, radial menu open with the power (Quit) disc at the bottom of the arc.
+- n=245: main window and mascot gone; the Notes popup ("Quick Notes") is still on screen over the terminal.
+- n=246..250 (viewed 247, 248, 249, 250; 246 seen in the sheet): only the terminal window and the Windows desktop/taskbar; no OrbitKit window, no Notes popup, no mascot. So the GIF ends on 4+ clean frames after quit (n=245 is the last frame with any app window).
+- Cut junction n=205..216 (all 12 viewed): mascot is at the lower right of the app window in n=205, 206, 207 and steps up and slightly left at n=208 (expected drag-continuity step from the cut); stable at that position n=209..216. Notes popup and badge are continuous. No thin white 360x288 outline in any of these frames.
+- Mascot bottom (v7 pre-drag check, frames 20/70/120/150 at 1.5x zoom, before the v8 swap; the first 208 frames are the same recipe range): full round body with ring and eyes above the taskbar, not flat-cut. I did not repeat the zoom crops on v8 pixels.
+- Contact sheet of every 27th frame was viewed on v7 only; not repeated for v8.
+
+**Known source behavior (not an encode artifact, not hidden):** each of two Notes popups opens unpainted for one frame each. In v8, n=102 and n=130 are a solid white "Notes" popup (about 250x340, top right) followed by the painted "Quick Notes" popup on the next frame; n=101 additionally shows a faint thin rectangle outline near the popup position just before the first white frame (popup window being created). These frames come from the source recording (real webview paint latency) and are kept. They are NOT the 360x288 drag-capture outline. Earlier wording "no ghost frames seen" and "0 white-outline artifact frames" refers only to the 360x288 outline class.
+
+**README:** `<sub>` line cites run 36577656122, commit `c33ea3f`, 1.5x speed-up, 12 fps (still correct for v8; the artifact cut is documented here). Alt text unchanged from v7 (still matches the flow).
+
+**Gates:** docs+binary diff. `pnpm -r test` was run in round 1 on this tree (vitest 379/379, node:test 32/32); not re-run in rounds 2-3 since no code changed. build/check not run.
+
+Scope: `git diff --name-only c33ea3f..HEAD` = README.md, docs/media/demo-desktop.gif, evidence/okc/demo-video/REPORT.md. Round 2 accidentally committed a copy of the reviewer file `REVIEW_r1.md` at the repo root (outside the allowlist); round 3 removed it with `git rm`.
+
+READY FOR REVIEW at 4eaad7cb96ec28b162c4dd47201f3da1b96e732f

@@ -162,4 +162,4 @@ popup exists).
   The peer went offline (SSH timeouts) near the end of the session; run-5 frame extraction
   was done locally with pyav instead.
 
-READY FOR REVIEW at 953bd5e
+READY FOR REVIEW at dc19469 (953bd5e + round-2-post parity fix; verdict history in criterion 5)

@@ -58,12 +58,22 @@ test("mascot state requests are gated while parked (K8)", () => {
   assert.equal(gatedMascotState(false, "sleep"), "sleep", "unparked: request passes");
 });
 
-test("mascot window is STATIC by default: no roam block (opt-in only)", () => {
-  assert.equal(config.mascot.faceByVelocity, true, "faceByVelocity kept for roam-enabled consumers (velocity stays 0 while static)");
-  assert.equal(
-    Object.prototype.hasOwnProperty.call(config.windows.mascotWindow, "roam"),
-    false,
-    "default starter config must NOT opt into roam — static, draggable mascot",
+test("starter demo opts into horizontal roam (task okv_demo-and-video)", () => {
+  // Since okv_demo-and-video the starter showcases the canvas renderer plus
+  // 1D horizontal roaming (floor pet): the roam block is back with
+  // `axis: "horizontal"`, so `vy` stays pinned to 0 while the window glides.
+  const roam = config.windows.mascotWindow.roam;
+  assert.ok(roam, "starter config must enable windows.mascotWindow.roam");
+  assert.equal(roam.axis, "horizontal", "roam axis must be horizontal");
+  assert.equal(config.mascot.renderer, "canvas", "sheets renderer must be canvas");
+  assert.equal(config.mascot.faceByVelocity, true);
+  assert.ok(Number.isFinite(roam.speed) && roam.speed > 0, "roam.speed must be positive");
+  for (const key of ["width", "height", "margin"]) {
+    assert.ok(Number.isFinite(roam[key]) && roam[key] > 0, `roam.${key} must be positive`);
+  }
+  assert.ok(
+    ["bottom-right", "bottom-left", "top-right", "top-left"].includes(roam.corner),
+    "roam.corner must be a known corner",
   );
 });
 

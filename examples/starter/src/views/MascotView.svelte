@@ -71,6 +71,12 @@
 
   // --- demo-b2 wiring --------------------------------------------------------
   const roamCfg = mascotWindowCfg?.roam;
+  // okv_demo-and-video: one boot line proves which engines the demo resolved
+  // (canvas sheet renderer, roam axis) — forwarded to log_telemetry in debug
+  // builds so peer validation logs show the wiring actually took effect.
+  debugLog(
+    `[MascotView] boot: renderer=${config.mascot.renderer ?? "css"} kind=${config.mascot.kind} roamAxis=${roamCfg?.axis ?? "off"} roamSpeed=${roamCfg?.speed ?? 0}`,
+  );
   /** Latest roam velocity (physical px/s); feeds K7 faceByVelocity mirroring. */
   let velocityX = $state(0);
   let bubbleVisible = $state(false);

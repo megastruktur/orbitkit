@@ -1,6 +1,7 @@
 {
   "mascot": {
     "kind": "sheets",
+    "renderer": "canvas",
     "src": "/sheets/glim-idle.png",
     "size": 96,
     "initialState": "idle",
@@ -129,7 +130,15 @@
       "alwaysOnTop": true,
       "decorations": false,
       "passthrough": true,
-      "fitContent": true
+      "fitContent": true,
+      "roam": {
+        "width": 1600,
+        "height": 200,
+        "margin": 24,
+        "corner": "bottom-right",
+        "speed": 32,
+        "axis": "horizontal"
+      }
     },
     "popups": [
       {

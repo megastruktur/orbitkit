@@ -21,6 +21,12 @@
 #   and centres each disc with translate(-50%, -50%)).
 # - B1: menu open/close never resizes or moves the window (fixed surface);
 #   we log window rects before/after a toggle so the video reviewer can verify.
+# - r4 (okv_demo-and-video): menus are TOGGLE-closed by clicking the mascot
+#   again — never click away / take focus from the overlay, or the next
+#   overlay click may be consumed as the window-activation click and never
+#   delivered to the webview (macOS deterministic, Windows flaky). Notes and
+#   Quit use converging (Open-Menu, Click-Item) pair retries with the
+#   observable outcome (window count / app exit) as feedback.
 # - Flow: idle 2s -> menu open/close -> Alert -> Notes x2 -> Badge x2 ->
 #   drag ~200 px -> Quit (exit 0). Stills keep the 01..04 names.
 $ErrorActionPreference = "Continue"
@@ -561,17 +567,11 @@ function Click-Item($id) {
     Park-Pointer
 }
 
-function Close-Menu-By-Clicking-Away {
-    # Click the main window's TITLE BAR centre: deterministic focus change
-    # (no interactive controls on the title strip), so the overlay window
-    # blurs and the menu closes (the passthrough-mode close signal).
-    $awayX = [int]($script:MainRect.Left + $script:MainRect.Width / 2)
-    $awayY = $script:MainRect.Top + 12
-    Write-Timeline "Clicking away on main window title bar at ($awayX, $awayY) to close menu..."
-    Click-At $awayX $awayY
-    Start-Sleep -Milliseconds 800
-    Log-Mascot-Rect "Menu closed"
-}
+# okv_demo-and-video r4: Close-Menu-By-Clicking-Away was removed — clicking
+# the main window's title bar takes key status from the overlay and the next
+# overlay click can be consumed as the window-activation click without the
+# webview ever seeing it (macOS deterministic, Windows flaky). Menus are
+# toggle-closed by clicking the mascot again (see the Step 3 note).
 
 # Start ffmpeg recorder
 $videoPath = Join-Path $PWD "video-windows.mp4"
@@ -702,43 +702,65 @@ try {
     Start-Sleep -Milliseconds 600
     Capture-Still "03-menu-open.png"
     Log-Mascot-Rect "Step 3: before close"
-    Close-Menu-By-Clicking-Away
+    # okv_demo-and-video r4: close by clicking the mascot again (menu toggle)
+    # instead of the title bar. A focus change away from the overlay makes the
+    # NEXT overlay click the window-activation click, which the webview may
+    # never deliver (mac deterministic, Windows flaky — runs 36733228980 /
+    # 36734942689 / 36737264388). Keeping the overlay focused is the fix; the
+    # 0.1.0 macOS run used mascot-toggle closes for the same reason.
+    Write-Timeline "Step 3: Clicking mascot to toggle-close the menu..."
+    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
+    Park-Pointer
     Start-Sleep -Milliseconds 700
+    Log-Mascot-Rect "Step 3: menu closed"
 
     # Step 4 (brief step 4): open menu, click Alert (~3 s alert animation,
-    # alert pool ttlMs=8000 reverts to idle on its own)
+    # alert pool ttlMs=8000 reverts to idle on its own); r4: toggle-close so
+    # the overlay keeps key status (see Step 3 note).
     Write-Timeline "Step 4: Alert..."
     Open-Menu
     Click-Item "app.alert"
+    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
+    Park-Pointer
     Start-Sleep -Milliseconds 3500
 
-    # Step 5 (brief step 5): open menu, click Notes twice -> two Notes windows
+    # Step 5 (brief step 5): open menu, click Notes twice -> two Notes windows.
+    # r4: each popup is an (Open-Menu, Click-Item) PAIR retried on the
+    # observable window count — a popup steals focus when it opens, and the
+    # next pair converges from either menu state (activation-eaten open ->
+    # next pair delivers; delivered open over an open menu -> next pair opens).
     Write-Timeline "Step 5: Notes x2..."
-    Open-Menu
-    Click-Item "app.notes"
-    if (-not (Wait-For-Window-Count "^Notes$" 1 15)) {
-        Write-Error "First Notes popup window not found!"
-        exit 1
+    foreach ($notesTarget in 1, 2) {
+        $notesDone = $false
+        for ($notesAttempt = 1; $notesAttempt -le 3 -and -not $notesDone; $notesAttempt++) {
+            if ((Count-Windows "^Notes$") -ge $notesTarget) { $notesDone = $true; break }
+            Write-Timeline "Step 5: Notes #$notesTarget attempt $notesAttempt (count $(Count-Windows '^Notes$'))"
+            Open-Menu
+            Click-Item "app.notes"
+            $notesDone = Wait-For-Window-Count "^Notes$" $notesTarget 8
+        }
+        if (-not $notesDone) {
+            Write-Error "Notes popup $notesTarget not found after 3 attempts!"
+            exit 1
+        }
+        Write-Timeline "Step 5: Notes window count reached $notesTarget (count $(Count-Windows '^Notes$'))"
+        Start-Sleep -Milliseconds 1000
     }
-    Write-Timeline "Step 5: first Notes window up (count $(Count-Windows '^Notes$'))"
-    Start-Sleep -Milliseconds 1000
-    Open-Menu
-    Click-Item "app.notes"
-    if (-not (Wait-For-Window-Count "^Notes$" 2 15)) {
-        Write-Error "Second Notes popup window not found!"
-        exit 1
-    }
-    Write-Timeline "Step 5: second Notes window up (count $(Count-Windows '^Notes$'))"
     Start-Sleep -Milliseconds 1200
     Capture-Still "04-notes-popup.png"
 
     # Step 6 (brief step 6): open menu, click Badge +1 twice -> badge shows 2
+    # (r4: toggle-close after each, overlay keeps key status)
     Write-Timeline "Step 6: Badge +1 x2..."
     Open-Menu
     Click-Item "app.badge"
+    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
+    Park-Pointer
     Start-Sleep -Milliseconds 1000
     Open-Menu
     Click-Item "app.badge"
+    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
+    Park-Pointer
     Start-Sleep -Milliseconds 1500
 
     # Step 7 (brief step 7): drag planet ~200 px. The window follows the
@@ -791,16 +813,17 @@ try {
     }
     Write-Timeline "Step 7: post-drag size OK ${WinW}x${WinH}; $(@($dragHist).Count) rect change(s) logged"
 
-    # Step 8 (brief step 8): open menu, click Quit -> app exits with code 0
+    # Step 8 (brief step 8): open menu, click Quit -> app exits with code 0.
+    # r4: same converging (Open-Menu, Click-Item) pair retry as Notes — the
+    # app exit is the observable feedback.
     Write-Timeline "Step 8: Quit..."
-    Open-Menu
     # r5: fresh rect + derived local point right before the click (the size
     # was asserted above; Click-Mascot-Anchored re-reads the rect itself).
     $qIdx = $ItemIndex["app.quit"]
     if ($null -ne $qIdx) {
         $qRad = ($StartDeg + $qIdx * $StepDeg) * [Math]::PI / 180.0
-        $qLX = [int]($script:OriginXEff + $Radius * [Math]::Cos($qRad))
-        $qLY = [int]($script:OriginYEff + $Radius * [Math]::Sin($qRad))
+        $qLX = [int]($OriginXEff + $Radius * [Math]::Cos($qRad))
+        $qLY = [int]($OriginYEff + $Radius * [Math]::Sin($qRad))
         $qw = Get-Window-Info "^orbitkit-mascot$"
         if ($qw) {
             Write-Timeline "Step 8: fresh mascot rect ($($qw.Rect.Left),$($qw.Rect.Top)) $($qw.Rect.Width)x$($qw.Rect.Height); quit local ($qLX, $qLY) -> screen ($($qw.Rect.Left + $qLX), $($qw.Rect.Top + $qLY))"
@@ -814,9 +837,17 @@ try {
             Write-Timeline "Step 8: fresh mascot rect: window not found"
         }
     }
-    Click-Item "app.quit"
-    Write-Timeline "Step 8: Waiting for app process to exit..."
-    $exitedCleanly = $appProc.WaitForExit(6000)
+    $exitedCleanly = $false
+    for ($quitAttempt = 1; $quitAttempt -le 3 -and -not $exitedCleanly; $quitAttempt++) {
+        Write-Timeline "Step 8: quit attempt $quitAttempt"
+        Open-Menu
+        Click-Item "app.quit"
+        Write-Timeline "Step 8: Waiting for app process to exit..."
+        $exitedCleanly = $appProc.WaitForExit(6000)
+        if (-not $exitedCleanly) {
+            Write-Timeline "Step 8: app still running after attempt $quitAttempt; retrying quit pair"
+        }
+    }
     Write-Timeline "Step 8: app-err.log 'Menu action: app.quit' present: $(Test-App-Err-Log 'Menu action: app.quit')"
     if ($exitedCleanly) {
         Write-Timeline "Step 8: App exited with code $($appProc.ExitCode)"

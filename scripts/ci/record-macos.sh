@@ -24,11 +24,14 @@
 #   for synthetic input, screencapture -x for stills, ffmpeg avfoundation for
 #   the recording (clean FIFO "q" shutdown).
 #
-# Flow: idle 2s -> roam watch (axis proof in timeline) -> menu open/close ->
-# Alert -> Notes x2 -> Badge x2 -> drag ~200 px (best effort on macOS:
-# synthetic Quartz drags do not drive AppKit's native window move; the
-# runtime re-query logs the outcome and continues, same as the 0.1.0 run) ->
-# Quit (exit 0). Stills keep the 01..04 names.
+# Flow: idle 2s -> static watch (0 movements expected) -> menu open/close ->
+# Alert -> Badge x2 -> drag ~200 px (best effort on macOS: synthetic Quartz
+# drags do not drive AppKit's native window move; the runtime re-query logs
+# the outcome and continues, same as the 0.1.0 run) -> Notes x2 (popup opens
+# steal focus; (open, item) pair retries converge on the window count) ->
+# Quit (exit 0; same pair retry on app exit). Menus are TOGGLE-closed by
+# clicking the mascot again — never click away from the overlay (see the
+# Step 3 note). Stills keep the 01..04 names.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -504,7 +507,16 @@ sleep 1.5
 # outcome and continue — the drag does not change window focus).
 write_timeline "Step 6: drag..."
 if rv=$(rect_velocity); then
-    read -r sx sy _w _h _vx _vy <<< "$rv"
+    read -r ax ay vw vh vx vy <<< "$rv"
+    # Drag from the MASCOT CENTRE (a hit region), never the window corner:
+    # a pointer-down outside the hit regions passes through (K10) and
+    # whatever is beneath (desktop) takes key status — the run 4 blur that
+    # turned every later click into an eaten activation click. Mirrors the
+    # proven Get-Mascot-Point in record-windows.ps1.
+    pred_x=$(( ax + vx * CLICK_LATENCY_S_MS / 1000 ))
+    pred_y=$(( ay + vy * CLICK_LATENCY_S_MS / 1000 ))
+    sx=$(( pred_x + PIN_X_EFF + MASCOT_SIZE / 2 ))
+    sy=$(( pred_y + PIN_Y_EFF + MASCOT_SIZE / 2 ))
     DRAG_MARGIN=40
     waL=$SCR_X; waT=$SCR_Y; waR=$(( SCR_X + SCR_W )); waB=$(( SCR_Y + SCR_H ))
     drag_end_x=$(( sx + 200 )); drag_end_y=$(( sy - 80 ))

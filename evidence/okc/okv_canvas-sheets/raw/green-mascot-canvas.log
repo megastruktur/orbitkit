@@ -1,0 +1,44 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okv-canvas-sheets/packages/orbitkit
+
+stderr | src/Mascot.test.ts > Mascot kind=sheets (K7) > resets the frame to 0 when the sheet changes mid-animation
+rerender({ props: { ... } }) deprecated, use rerender({ ... }) instead
+
+ ✓ src/Mascot.test.ts > Mascot Component > renders a button with orbitkit-mascot class, type=button, and aria-label 17ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders inline svg kind as an img element with data:image/svg+xml src and no inline svg in DOM 2ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders svg URL kind as an img element with correct src 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders image kind as an img element with initial src 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > swaps image src when state changes 2ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders sprite kind with background-image and animation vars 4ms
+ ✓ src/Mascot.test.ts > Mascot Component > swaps sprite animation vars and background-position-y on state change 3ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders svg markup into img src and prevents DOM injection of script/tags 2ms
+ ✓ src/Mascot.test.ts > Mascot Component > renders svg markup with event handlers and links as img data URL without DOM attributes 2ms
+ ✓ src/Mascot.test.ts > Mascot Component > safely handles all gate and remediation payloads with zero DOM injection 11ms
+ ✓ src/Mascot.test.ts > Mascot Component > swaps svg src when state changes 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > fires onclick handler when clicked 2ms
+ ✓ src/Mascot.test.ts > Mascot Component > does not call onclick on Enter keydown and fires exactly once on native activation 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > fires onpointerdown handler on pointer interaction 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > sets data-state attribute according to config and state prop 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > adds reduced-motion class and disables animations when reducedMotion prop is set 1ms
+ ✓ src/Mascot.test.ts > Mascot Component > applies width, height, and CSS variable from config size 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > renders the named sheet with scaled frame geometry 3ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > falls back to the first sheet with console.error for an unknown sheet name 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > never clips a sheets frame: the root is overflow visible for every sheet 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > leaves non-sheets overflow to the stylesheet so a consumer class can override it 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > sizes the root box to the active frame, not the config size square 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > keeps the bottom edge constant when swapping between sheets of different heights 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > mirrors only while faceByVelocity and vx < 0, retaining facing at vx == 0 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > never mirrors when faceByVelocity is off 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > freezes on frame 0 under reduced motion even as time passes 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > hard-swaps frames over time via frameAt without reduced motion 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > resets the frame to 0 when the sheet changes mid-animation 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets (K7) > resolves the sheet via the K8 state machine and returns to idle after ttl 3ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > renders a positioned aria-hidden canvas with the active frame geometry 2ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > scales the canvas backing store by devicePixelRatio 1ms
+ ✓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > keeps the CSS div renderer by default and for renderer=css 2ms
+
+ Test Files  1 passed (1)
+      Tests  32 passed (32)
+   Start at  13:27:38
+   Duration  924ms (transform 43%, environment 38%, import 10%, tests 10%)
+

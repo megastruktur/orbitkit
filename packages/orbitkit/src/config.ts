@@ -54,6 +54,12 @@ export interface MascotConfig {
   anchor?: MascotAnchor;
   /** K7 (kind="sheets"): mirror sheet horizontally when vx < 0, default false. */
   faceByVelocity?: boolean;
+  /**
+   * kind="sheets" render engine: "css" (default) draws the active frame as a
+   * background-position div; "canvas" blits it with integer `drawImage` calls
+   * on a device-pixel-ratio-scaled `<canvas>`.
+   */
+  renderer?: "canvas" | "css";
 }
 
 export interface MenuItem {

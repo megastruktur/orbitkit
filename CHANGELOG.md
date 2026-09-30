@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **`Mascot` (`kind: "sheets"`) clipped frames wider/taller than `size`** — the `overflow: hidden` root was a fixed `size`×`size` square; it now wraps the active frame (`frameWidth/Height × scale`), so wide run/jump strips render whole and the hit box follows the pose. `--mascot-size` still reflects `size`.
-- **`Mascot` (`kind: "sheets"`) root no longer clips** — `overflow: visible` for sheets, set inline and by `.orbitkit-mascot--sheets` (so neither a consumer class nor a consumer `style` prop restores clipping); fractional-DPI rounding can no longer shave an edge column off a frame. Other kinds keep the stylesheet `overflow: hidden` (no longer inlined, so a class can override it).
+- **`Mascot` (`kind: "sheets"`) root no longer clips** — `overflow: visible` for sheets, set inline and by `.orbitkit-mascot--sheets` (so neither a consumer class nor a consumer `style` prop restores clipping); fractional-DPI rounding can no longer shave an edge column off a frame. Other kinds keep the stylesheet `overflow: hidden`, overridable by a class.
 - **`sheetGeometry` snaps fractional `frameWidth`/`frameHeight` to whole pixels** (minimum 1; non-finite → 1) — off-grid frame steps bled a neighbouring frame's column in or cut an edge one.
 - **`RadialMenu` ignores `::after` pseudo-element `transitionend`/`animationend`** when sequencing the open/close wave.
 

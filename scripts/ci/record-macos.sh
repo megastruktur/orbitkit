@@ -296,8 +296,10 @@ REC_PID=$!
 sleep 2
 park_pointer
 
-# Launch app (VITE_ORBITKIT_DEBUG is baked at build time by the workflow; the
-# runtime console forward + MascotView boot line land in app.log).
+# Launch app (the workflow bakes VITE_ORBITKIT_DEBUG=1 into the frontend
+# build; when driving this script manually, export the same env BEFORE the
+# tauri build — the runtime console forward + MascotView boot line then land
+# in app-err.log via log_telemetry).
 APP_BIN="target/debug/starter"
 if [ ! -f "$APP_BIN" ]; then
     echo "Error: Binary not found at $APP_BIN" >&2

@@ -43,6 +43,8 @@ jobs:
 
       - name: Build starter desktop app
         run: pnpm --filter starter tauri build --debug --no-bundle
+        env:
+          VITE_ORBITKIT_DEBUG: "1"
 
       - name: Record desktop flow
         shell: pwsh
@@ -78,5 +80,8 @@ jobs:
 # scope allowlist. The SHOWCASE video is the WINDOWS worker recording
 # (coordinator directive); the ported script + findings stay in
 # scripts/ci/record-macos.sh and evidence/okv/demo-and-video/REPORT.md for
-# whoever picks the product fix up. VITE_ORBITKIT_DEBUG=1 on the windows
-# build bakes the runtime telemetry (MascotView boot line) into app.log.
+# whoever picks the product fix up. The video-windows build bakes
+# VITE_ORBITKIT_DEBUG=1 (step env above): the app then forwards console.* →
+# log_telemetry (Rust eprintln) → app-err.log, carrying the MascotView boot
+# line (renderer + roam axis) as runtime wiring evidence in the recording
+# artifacts.

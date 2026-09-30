@@ -1,11 +1,18 @@
 # Supplementary: opt-in horizontal roam exercised live on dark-desire (superseded commit 10a84dd)
 
+> **Provenance:** RE-TYPED reconstruction, not a byte-for-byte capture. The original tool
+> output lived only in the agent session transcript of 2026-09-30 (~17:53 local on the peer);
+> the values below were transcribed verbatim from that transcript by the task agent
+> (okv_demo-and-video session, same day) after dark-desire went offline. Numbers, order and
+> wording of the log lines are unchanged; readers needing machine-original output should
+> re-run the procedure (recipe: `orbitkit-desktop-video-recording` skill).
+
 Before the coordinator directive ("roaming MUST NOT be the default"), commit 10a84dd
 shipped a temporary starter config with `windows.mascotWindow.roam = { width 1600,
 height 200, margin 24, corner bottom-right, speed 32, axis horizontal }`. The build was
 deployed to the macOS peer (~/Downloads/okv-demo-10a84dd, VITE_ORBITKIT_DEBUG=1) and
-launched in the GUI session (pid 67215, 2026-09-30 ~17:53 local). Verbatim session
-transcript (tool output; fish-free bash -lc remote shell):
+launched in the GUI session (pid 67215, 2026-09-30 ~17:53 local). Sample block (see the
+provenance note above):
 
     ## app-err.log (full)
     [telemetry] [console.log] [MascotView] boot: renderer=canvas kind=sheets roamAxis=horizontal roamSpeed=32

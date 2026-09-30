@@ -3,7 +3,8 @@
 - Branch: `megastruktur/okv-demo-and-video`; base `73f3d27` (task 2 integration tip)
 - Functional commits: `10a84dd` (canvas demo wiring + record-macos.sh 0.2.0 port + workflow job),
   `d33da11` (**coordinator directive**: roam must NOT be default; showcase video = Windows worker),
-  `a7912b4` (macOS click-settle fix + evidence artifacts)
+  `a7912b4` (macOS click-settle fix + evidence artifacts), `cfb57f9` (never-blur flow: toggle-closes,
+  mascot-centre drag, converging pair retries), `f870e16` (ps1 toggle-closes + pair retries)
 - Scope touched: `examples/starter/**`, `scripts/ci/**`, `evidence/okv/demo-and-video/**`,
   plus `.github/workflows/desktop-video.yml` (re-add `video-macos` job — **user-approved scope
   expansion**, required because dark-desire screen capture is TCC-blocked over SSH and the job
@@ -13,11 +14,11 @@
 
 | # | Criterion | Result |
 |---|---|---|
-| 1 | `examples/starter` runs and showcases the **canvas-rendered** mascot | PASS — `renderer: "canvas"` shipped in `src/orbitkit.config.json`; runtime proof: boot telemetry `renderer=canvas kind=sheets` in the GH recording (`app-err-windows.log`) and on dark-desire (`raw/dark-desire-proof-d33da11.txt`); visual proof in `03-menu-open.png` / video frames (pixel-art sheets mascot + 9-disc arc menu) |
-| 2 | Verified on macOS peer `dark-desire` (Aqua WindowServer session) | PASS — built (`BUILD_OK`) and launched in the GUI session on `d33da11`; 12 Hz window sampling: 360x288 mascot window **frozen** at (4714,1128) for 12 s (static default), boot line `renderer=canvas kind=sheets roamAxis=off roamSpeed=0`; see `raw/dark-desire-proof-d33da11.txt` |
-| 3 | Showcase video recorded via screen capture on macOS… **AMENDED**: coordinator directive (user interjection): "record the video inside Github workers (windows)" + "while recording disable the roaming; roaming MUST NOT be the default" | PASS as amended — showcase artifact is the **Windows worker** recording (`video-windows.mp4`, GH run 36733228980 job `video-windows` SUCCESS, head `d33da11`); roaming disabled: starter ships without a `roam` block (static-by-default pin restored in `tests/demo-b2.test.mjs`), and the recording shows a constant window rect (618,432) 360x288 until the scripted drag |
+| 1 | `examples/starter` runs and showcases the **canvas-rendered** mascot | PASS — `renderer: "canvas"` shipped in `src/orbitkit.config.json`; runtime wiring proof: boot telemetry `renderer=canvas kind=sheets` on dark-desire (`raw/dark-desire-proof-d33da11.txt`); visual proof in the GH recording (`03-menu-open.png`, video frames: pixel-art sheets mascot + 9-disc arc menu). Note: the run-2 windows build did NOT bake `VITE_ORBITKIT_DEBUG` (fixed in the workflow afterwards), so `app-err-windows.log` carries the Rust `Menu action:` lines but no boot line |
+| 2 | Verified on macOS peer `dark-desire` (Aqua WindowServer session) | PASS — built (`BUILD_OK`) and launched in the GUI session on `d33da11`; 1 Hz window sampling over 12 s (12 samples): 360x288 mascot window **frozen** at (4714,1128) (static default), boot line `renderer=canvas kind=sheets roamAxis=off roamSpeed=0`; see `raw/dark-desire-proof-d33da11.txt` |
+| 3 | Showcase video recorded via screen capture on macOS… **AMENDED**: coordinator directive (user interjection): "record the video inside Github workers (windows)" + "while recording disable the roaming; roaming MUST NOT be the default" | PASS as amended — showcase artifact is the **Windows worker** recording (`video-windows.mp4`, GH run 36733228980 job `video-windows` SUCCESS, head `d33da11`; re-confirmed SUCCESS on run 36738526701 with the hardened driver); roaming disabled: starter ships without a `roam` block (static-by-default pin restored in `tests/demo-b2.test.mjs`), and the recording shows a constant window rect (618,432) 360x288 until the scripted drag |
 | 4 | Video artifact committed to `evidence/` | PASS — `evidence/okv/demo-and-video/video-windows.mp4` (1.8 MB, 1024x768@30, 1110 frames / 40.27 s, sha256 `024de98252913716ed41268234a8b7c4b8efe85fe710b84f1fa790002ba11b27`) + `timeline-windows.txt` + 4 stills + `app-err-windows.log` |
-| 5 | Inquisitor review | PENDING — this report is the review input |
+| 5 | Inquisitor review | Round 1: FIX (4 documentation/config corrections — debug-bake contract, evidence attribution, numeric mismatches, transcript provenance). All applied in the review-fix commit; round 2 below |
 
 ## What the showcase video contains (verified frame-by-frame via extracted frames, `raw/vw_*.png`)
 
@@ -46,12 +47,13 @@ roaming MUST NOT be the default. Implemented:
      928** across 12 samples — `axis: "horizontal"` lock holding live on macOS
      (`raw/dark-desire-proof-10a84dd-roam.md`).
 
-## Gates (local, at a7912b4 tree; logs in `raw/gate-*.log`)
+## Gates (local; logs in `raw/gate-*.log`, taken at the d33da11 test tree — later commits touch scripts/evidence only, test-tree-equivalent)
 
 - `pnpm install --frozen-lockfile` OK
 - `pnpm -r build` — exit 0
-- `pnpm -r test` — vitest 17 files **402/402**; starter node tests **32/32** (incl. the new
-  canvas-renderer contract test and the restored static-by-default test)
+- `pnpm -r test` — vitest 17 files **402/402**; starter node tests **33/33**
+  (incl. the new canvas-renderer contract test and the restored
+  static-by-default test)
 - `pnpm -r check` — exit 0
 
 ## GH Actions runs

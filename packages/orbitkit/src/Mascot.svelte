@@ -243,7 +243,7 @@
 
 <button
   type="button"
-  class="orbitkit-mascot {isReducedMotion ? 'reduced-motion orbitkit-mascot--reduced-motion' : ''} {customClass}"
+  class="orbitkit-mascot {config?.kind === 'sheets' ? 'orbitkit-mascot--sheets' : ''} {isReducedMotion ? 'reduced-motion orbitkit-mascot--reduced-motion' : ''} {customClass}"
   data-state={machineDriven && machineState ? machineState : currentState}
   aria-label={effectiveAriaLabel}
   style={rootStyle}
@@ -304,6 +304,13 @@
     position: relative;
     box-sizing: border-box;
     line-height: 0;
+  }
+
+  /* kind="sheets": the root already wraps the active frame; never clip it
+     (fractional DPI rounding must not shave the leading pixel column off a
+     forward-leaning run frame). */
+  .orbitkit-mascot--sheets {
+    overflow: visible;
   }
 
   .orbitkit-mascot:focus-visible {

@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **`Mascot` (`kind: "sheets"`) clipped frames wider/taller than `size`** — the `overflow: hidden` root was a fixed `size`×`size` square; it now wraps the active frame (`frameWidth/Height × scale`), so wide run/jump strips render whole and the hit box follows the pose. `--mascot-size` still reflects `size`.
+- **`Mascot` (`kind: "sheets"`) root no longer clips** — `overflow: visible` for sheets (the root already wraps the frame); fractional-DPI rounding can no longer shave an edge column off a frame.
+
+### Changed
+
+- **`RadialMenu` items are icon-only when an icon renders** — the label no longer squeezes into the circle (it overflowed at 44 px); it stays as `aria-label` and `title` (hover tooltip). Items without a renderable icon (none, or unsanitizable `{svg}`) still draw the label.
 
 ## [0.2.0] — 2026-09-29
 

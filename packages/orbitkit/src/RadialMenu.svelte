@@ -403,6 +403,10 @@
         onanimationend={(e) => finishItemAnimation(e, i)}
         ontransitionend={(e) => finishItemAnimation(e, i)}
       >
+        <!-- Icon-only circle when an icon renders: a label squeezed into a
+             44px circle overflowed/crammed. The label stays on the button
+             as aria-label (screen readers) and title (hover tooltip); it is
+             drawn inside only when there is no renderable icon. -->
         {#if icon}
           {#if icon.kind === "img"}
             <img src={icon.src} alt="" class="orbitkit-radial-icon-img" />
@@ -411,8 +415,9 @@
               >{icon.text}</span
             >
           {/if}
+        {:else}
+          <span class="orbitkit-radial-label">{item.label}</span>
         {/if}
-        <span class="orbitkit-radial-label">{item.label}</span>
       </button>
     {/each}
   </div>
@@ -470,10 +475,8 @@
   .orbitkit-radial-item {
     position: absolute;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: rgba(26, 32, 44, 0.95);
@@ -523,6 +526,7 @@
     width: 50%;
     height: 50%;
     object-fit: contain;
+    display: block;
     pointer-events: none;
   }
 

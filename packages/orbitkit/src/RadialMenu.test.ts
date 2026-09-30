@@ -70,10 +70,28 @@ describe("RadialMenu component", () => {
     const items = screen.getAllByRole("menuitem");
     expect(items).toHaveLength(4);
 
-    expect(screen.getByText("First")).toBeDefined();
-    expect(screen.getByText("Second")).toBeDefined();
-    expect(screen.getByText("Disabled")).toBeDefined();
-    expect(screen.getByText("Fourth")).toBeDefined();
+    // Every item is reachable by its label (aria-label) and shows it on
+    // hover (title), icon or not.
+    for (const name of ["First", "Second", "Disabled", "Fourth"]) {
+      const item = screen.getByRole("menuitem", { name });
+      expect(item.getAttribute("title")).toBe(name);
+    }
+  });
+
+  it("draws icon-only circles; the label text is drawn only without an icon", () => {
+    const { container } = render(RadialMenu, {
+      props: { config: sampleConfig, open: true, onselect: vi.fn(), onclose: vi.fn() },
+    });
+    const labelOf = (id: string) =>
+      container
+        .querySelector(`[data-orbitkit-radial-item="${id}"]`)
+        ?.querySelector(".orbitkit-radial-label");
+    // Emoji, URL and relative-path icons: no crammed label inside.
+    expect(labelOf("item-1")).toBeNull();
+    expect(labelOf("item-2")).toBeNull();
+    expect(labelOf("item-4")).toBeNull();
+    // No icon: the label is the only content, so it stays.
+    expect(labelOf("item-3")?.textContent).toBe("Disabled");
   });
 
   it("closed renders nothing interactive in DOM", () => {
@@ -922,7 +940,7 @@ describe("K7 arc-anchor menu", () => {
     expect(decoded).not.toContain("<body");
   });
 
-  it("renders nothing for unsanitizable {svg} icons", () => {
+  it("renders no image for unsanitizable {svg} icons and falls back to the label", () => {
     const config: MenuConfig = {
       items: [{ id: "broken", label: "Broken", icon: { svg: "<svg><path</svg>" } }],
       radius: 50,
@@ -938,6 +956,8 @@ describe("K7 arc-anchor menu", () => {
     });
 
     expect(container.querySelector("img.orbitkit-radial-icon-img")).toBeNull();
+    // An empty circle would be unidentifiable: the label is drawn instead.
+    expect(container.querySelector(".orbitkit-radial-label")?.textContent).toBe("Broken");
   });
 
   it("updates aria-label and title when an item label prop changes without reopening", () => {

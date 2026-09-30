@@ -24,11 +24,14 @@
 
 - t≈6 s: overlay auto-shows; mascot window reaches the derived fixed 360x288 (Design-B fit).
 - t≈10 s: radial menu open — 9 discs, centre-first stagger, canvas-rendered sheets mascot.
-- Menu close (title-bar blur), `app.alert`, `app.notes` x2 (window count 1 -> 2; Rust spawns
-  `orbitkit-popup-notes-note-N`), `app.badge` x2 (red "1" badge visible at t=38 s), drag
+- Menu close (run-2 driver used the title-bar blur close; the shipped driver
+  now mascot-toggles — see Failure analysis), `app.alert`, `app.notes` x2
+  (window count 1 -> 2; Rust spawns `orbitkit-popup-notes-note-N`),
+  `app.badge` — TWO clicks, ONE registered action + the red "1" badge visible
+  at t=38 s (second click eaten; see Failure analysis) — drag
   ~(798,672)->(663,525) with size held 360x288, `app.quit` -> **app exit code 0**.
-- `app-err-windows.log`: all menu actions fired (`app.alert`, `app.notes` x2, `app.badge`,
-  `app.quit`); every scripted click achieved **0 px** post-move offset (velocity-predicted aims).
+- `app-err-windows.log`: alert, notes x2, badge (one), quit; every scripted
+  click achieved **0 px** post-move offset (velocity-predicted aims).
 - Static proof inside the recording: window rect constant (618,432) 360x288 from boot until the
   scripted drag — **no roaming** (`timeline-windows.txt`).
 
@@ -64,11 +67,14 @@ roaming MUST NOT be the default. Implemented:
 | 36733228980 | d33da11 | **SUCCESS** (showcase artifact) | FAIL | mac: clicks lost after the title-bar close |
 | 36734942689 | a7912b4 | FAIL (Notes #1) | FAIL (Notes #1) | same close-then-click loss; the 400 ms settle was not the mechanism |
 | 36737264388 | cfb57f9 | FAIL (Notes #2) | FAIL (Notes x6) | mac drag started at the window corner — a passthrough region |
-| 36738526701 | f870e16 | **SUCCESS** (hardened flow) | FAIL (Notes #2) | mac reached Notes #1; #2 blocked by the product issue below |
+| 36738526701 | f870e16 | SUCCESS — but only `app.notes` x2 + `app.quit` fired (alert/badge clicks lost to the toggle-parity + eaten-click class; artifact inspected) | FAIL (Notes #2) | mac reached Notes #1; #2 blocked by the product issue below |
 
-**Final disposition:** the showcase artifact is the Windows worker recording — green in
-run 2 (36733228980, stored + frame-verified here) and again in run 5 (36738526701) with the
-hardened driver. The `video-macos` job is removed again (r3 parity): the port is correct and
+**Final disposition:** the showcase artifact is the **run-2 Windows recording**
+(36733228980, stored + frame-verified here): it is the only artifact whose app-side log
+shows the full action set (alert, notes x2, badge, quit). Run 5 re-proved the driver green
+(exit 0, notes x2, quit) but its video misses the alert/badge beats — its flow still contained
+the post-item toggle parity defect removed in the review-fix commit (see Failure analysis,
+fix 3'). The `video-macos` job is removed again (r3 parity): the port is correct and
 kept in `scripts/ci/record-macos.sh`, but the remaining macOS blocker is product-level
 (see Failure analysis) and `crates/**` is outside this task's scope allowlist.
 
@@ -86,9 +92,13 @@ Evidence trail:
   after the title-bar close never reached the DOM.
 - run 3 (a7912b4): a 400 ms move→click settle did NOT change anything → the
   150 ms passthrough poll race was NOT the mechanism.
-- run 4 (cfb57f9): with toggle-closes the overlay kept key status and Alert +
-  Badge x2 **all delivered** (`Menu action: app.alert/app.badge` in
-  `app-err.log`) — but the scripted drag started at the window's top-left
+- run 4 (cfb57f9): with toggle-closes the overlay kept key status and Alert
+  plus ONE Badge action delivered (`Menu action: app.alert`,
+  `Menu action: app.badge` — one line — in `app-err.log`) — but the
+  post-item "toggle-close" clicks RE-OPEN the menu (`handleSelect` already
+  closes it on every item click, MascotView.svelte), so each following pair
+  entered mismatched and badge #2 was silently lost; the scripted drag then
+  started at the window's top-left
   corner (618,420), a K10 **passthrough region**; that click-through to the
   desktop took key status again and all six Notes attempts were eaten.
 - run 4 (windows): Notes #1 opened, #2 lost — same semantics, flaky; run 2
@@ -105,11 +115,22 @@ Fixes shipped in f870e16 (both scripts, `scripts/ci/**` in scope):
    visible-window count) and Quit (feedback: app exit) — from either menu
    state a pair either hits or flips the state, so two pairs always suffice;
    retries also absorb an activation-eaten click.
+3'. **No post-item toggle-closes** (review-fix commit): `handleSelect` already
+   closes the menu on every item click (MascotView.svelte), so a "toggle"
+   after an item RE-OPENS it — proven by run-4 mac telemetry (`menuOpenBefore:
+   false -> menuOpenAfter: true` right after `app.alert`) — and the next pair
+   enters mismatched, silently dropping actions (run 5 Windows: alert/badge
+   lost; run-4 mac: badge #2 lost). Every (open, item) pair now enters with
+   the menu closed: open -> item fires + closes, deterministic. Only Step 3
+   (a plain open/close showcase, no item clicked) toggles.
 
-Result (run 5, f870e16): **Windows SUCCESS end-to-end** (Alert, Notes x2,
-Badge x2, drag, Quit exit 0 — `timeline.txt` in the artifact). macOS got
-further than ever — Alert, Badge x2 AND Notes #1 all delivered
-(`Menu action: app.notes (instance note-1)`) — but the second popup
+Result (run 5, f870e16): driver SUCCESS — but the artifact shows only
+`app.notes` x2 + `app.quit` fired (alert and both badge clicks lost to the
+then-present parity defect + eaten-click class; artifact inspected), so its
+video is NOT used as the showcase. macOS got
+further than ever — Alert, ONE Badge action and Notes #1 all delivered
+(`Menu action: app.alert`, `Menu action: app.badge` — one line —
+`Menu action: app.notes (instance note-1)`) — but the second popup
 interaction still fails with a NEW signature: after note-1 opens, overlay
 clicks produce only `window:blur`/`window:focus` pairs and ZERO DOM events
 (6 pairs attempted), and the note-1 popup that was visible at t=46 s is gone
@@ -134,6 +155,11 @@ popup exists).
 - `scripts/demo/desktop-demo.sh` (Linux Xvfb) hard-codes 1280x800 coordinates — stale for
   Design-B; unused here (out of scope).
 - dark-desire TCC: screen capture over SSH remains blocked ("could not create image from
-  display"); macOS recording therefore runs on the GH worker (user-approved).
+  display"); macOS recording therefore runs on the GH worker (user-approved). Three TCC-hung
+  avfoundation ffmpeg probes survived their `timeout` wrappers and were `pkill`ed; peer
+  housekeeping also removed the stale okc FINAL smoke starter (PID 546, up since Tue) when
+  `pkill -x starter` ran — intentional cleanup of this repo's own leftover, disclosed here.
+  The peer went offline (SSH timeouts) near the end of the session; run-5 frame extraction
+  was done locally with pyav instead.
 
 READY FOR REVIEW at 953bd5e

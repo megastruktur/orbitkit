@@ -715,12 +715,14 @@ try {
     Log-Mascot-Rect "Step 3: menu closed"
 
     # Step 4 (brief step 4): open menu, click Alert (~3 s alert animation,
-    # alert pool ttlMs=8000 reverts to idle on its own); r4: toggle-close so
-    # the overlay keeps key status (see Step 3 note).
+    # alert pool ttlMs=8000 reverts to idle on its own); r6: NO post-item
+    # toggle — handleSelect already closes the menu on every item click, so
+    # a toggle here RE-OPENS it and the next pair enters mismatched (run
+    # 36738526701 lost badge #2 this way). Only Step 3 (no item clicked)
+    # toggles.
     Write-Timeline "Step 4: Alert..."
     Open-Menu
     Click-Item "app.alert"
-    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
     Park-Pointer
     Start-Sleep -Milliseconds 3500
 
@@ -750,16 +752,15 @@ try {
     Capture-Still "04-notes-popup.png"
 
     # Step 6 (brief step 6): open menu, click Badge +1 twice -> badge shows 2
-    # (r4: toggle-close after each, overlay keeps key status)
+    # (r6: no post-item toggles — see Step 4 note; the pair (open, item) is
+    # deterministic because handleSelect closes the menu on item clicks)
     Write-Timeline "Step 6: Badge +1 x2..."
     Open-Menu
     Click-Item "app.badge"
-    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
     Park-Pointer
     Start-Sleep -Milliseconds 1000
     Open-Menu
     Click-Item "app.badge"
-    Click-Mascot-Anchored ($PinXEff + $MascotSize / 2) ($PinYEff + $MascotSize / 2) "Close menu (toggle)"
     Park-Pointer
     Start-Sleep -Milliseconds 1500
 

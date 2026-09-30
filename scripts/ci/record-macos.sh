@@ -481,13 +481,15 @@ function open_menu() {
 }
 
 # Step 4: Alert (~3 s animation; alert pool ttlMs 8000 self-reverts).
-# Toggle-close after every item keeps the overlay focused: a focus change
-# away from the overlay makes the NEXT overlay click the activation click,
-# which the webview never delivers (see the Step 3 note).
+# NO post-item toggle-close: handleSelect already closes the menu on every
+# item click (MascotView.svelte), so a "toggle" here RE-OPENS it and the
+# next (Open-Menu, item) pair enters closed->closed-mismatched, silently
+# dropping actions (run 36738526701 lost badge #2 exactly this way). Every
+# pair below therefore enters with the menu closed: open -> item fires +
+# closes, deterministic. Only Step 3 (no item clicked) toggles.
 write_timeline "Step 4: Alert..."
 open_menu
 click_item "app.alert"
-click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
 park_pointer
 sleep 3.5
 
@@ -495,12 +497,10 @@ sleep 3.5
 write_timeline "Step 5: Badge +1 x2..."
 open_menu
 click_item "app.badge"
-click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
 park_pointer
 sleep 1
 open_menu
 click_item "app.badge"
-click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
 park_pointer
 sleep 1.5
 

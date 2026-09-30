@@ -442,12 +442,17 @@ sleep 0.6
 capture_still "03-menu-open.png"
 log_mascot_rect "Step 3: before close"
 
-# Close by clicking the main window's title bar centre (deterministic focus
-# change -> overlay blur -> menu close).
-AWAY_X=$(( MAIN_X + MAIN_W / 2 ))
-AWAY_Y=$(( MAIN_Y + 12 ))
-write_timeline "Step 3: clicking main title bar at ($AWAY_X, $AWAY_Y) to close menu..."
-click_at "$AWAY_X" "$AWAY_Y"
+# Close by clicking the mascot again (menu toggle). NEVER click away on
+# macOS: a focus change away from the overlay makes the next overlay click
+# the window-activation click, which the webview never delivers as a DOM
+# event (run 36734942689 telemetry: exactly one pointerdown for the whole
+# session; the alert click after the title-bar close was lost on macOS, and
+# the same close-then-click pattern flaked on Windows in the same run).
+# While the overlay keeps key status every click delivers — the 0.1.0 macOS
+# run used mascot-toggle closes for exactly this reason.
+write_timeline "Step 3: clicking mascot again at local ($CX_LOCAL, $CY_LOCAL) to toggle-close the menu..."
+click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
+park_pointer
 sleep 0.7
 log_mascot_rect "Step 3: menu closed"
 
@@ -470,47 +475,34 @@ function open_menu() {
     log_mascot_rect "Menu open"
 }
 
-# Step 4: Alert (~3 s animation; alert pool ttlMs 8000 self-reverts)
+# Step 4: Alert (~3 s animation; alert pool ttlMs 8000 self-reverts).
+# Toggle-close after every item keeps the overlay focused: a focus change
+# away from the overlay makes the NEXT overlay click the activation click,
+# which the webview never delivers (see the Step 3 note).
 write_timeline "Step 4: Alert..."
 open_menu
 click_item "app.alert"
+click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
+park_pointer
 sleep 3.5
 
-# Step 5: Notes x2 -> two Notes windows
-write_timeline "Step 5: Notes x2..."
-open_menu
-click_item "app.notes"
-notes_deadline=$((SECONDS + 15))
-until [ "$(win_count "Notes")" -ge 1 ]; do
-    [ $SECONDS -ge $notes_deadline ] && { echo "Error: first Notes popup not found" >&2; exit 1; }
-    sleep 0.25
-done
-write_timeline "Step 5: first Notes window up (count $(win_count Notes))"
-sleep 1
-open_menu
-click_item "app.notes"
-notes_deadline=$((SECONDS + 15))
-until [ "$(win_count "Notes")" -ge 2 ]; do
-    [ $SECONDS -ge $notes_deadline ] && { echo "Error: second Notes popup not found" >&2; exit 1; }
-    sleep 0.25
-done
-write_timeline "Step 5: second Notes window up (count $(win_count Notes))"
-sleep 1.2
-capture_still "04-notes-popup.png"
-
-# Step 6: Badge +1 x2 -> badge shows 2
-write_timeline "Step 6: Badge +1 x2..."
+# Step 5: Badge +1 x2 -> badge shows 2
+write_timeline "Step 5: Badge +1 x2..."
 open_menu
 click_item "app.badge"
+click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
+park_pointer
 sleep 1
 open_menu
 click_item "app.badge"
+click_mascot_anchored "$CX_LOCAL" "$CY_LOCAL" "Close menu (toggle)"
+park_pointer
 sleep 1.5
 
-# Step 7: drag planet ~200 px (best effort on macOS: synthetic Quartz events
+# Step 6: drag planet ~200 px (best effort on macOS: synthetic Quartz events
 # do not drive AppKit's native window move, so the rect may stay put; log the
-# outcome and continue — the roam keeps the video lively regardless).
-write_timeline "Step 7: drag..."
+# outcome and continue — the drag does not change window focus).
+write_timeline "Step 6: drag..."
 if rv=$(rect_velocity); then
     read -r sx sy _w _h _vx _vy <<< "$rv"
     DRAG_MARGIN=40
@@ -523,15 +515,15 @@ if rv=$(rect_velocity); then
         vlen=$(python3 -c "import math; print(max(1, round(math.hypot($vxs, $vys))))")
         drag_end_x=$(python3 -c "print(round($sx + $vxs / $vlen * min(200, $vlen)))")
         drag_end_y=$(python3 -c "print(round($sy + $vys / $vlen * min(200, $vlen)))")
-        write_timeline "Step 7: preferred end out of inset; dragging toward centre instead"
+        write_timeline "Step 6: preferred end out of inset; dragging toward centre instead"
     fi
     # Clamp into the inset rectangle (sequential ifs; bash 3.2 has no min()).
     if [ "$drag_end_x" -gt $(( waR - DRAG_MARGIN )) ]; then drag_end_x=$(( waR - DRAG_MARGIN )); fi
     if [ "$drag_end_x" -lt $(( waL + DRAG_MARGIN )) ]; then drag_end_x=$(( waL + DRAG_MARGIN )); fi
     if [ "$drag_end_y" -lt $(( waT + DRAG_MARGIN )) ]; then drag_end_y=$(( waT + DRAG_MARGIN )); fi
     if [ "$drag_end_y" -gt $(( waB - DRAG_MARGIN )) ]; then drag_end_y=$(( waB - DRAG_MARGIN )); fi
-    write_timeline "Step 7: drag from ($sx, $sy) to ($drag_end_x, $drag_end_y) (start re-read; mac synthetic drag may not move the window — logging outcome)"
-    log_mascot_rect "Step 7: drag start"
+    write_timeline "Step 6: drag from ($sx, $sy) to ($drag_end_x, $drag_end_y) (start re-read; mac synthetic drag may not move the window — logging outcome)"
+    log_mascot_rect "Step 6: drag start"
     "$TALK" m:"$sx","$sy"
     sleep 0.4
     "$TALK" dd:"$sx","$sy"
@@ -546,26 +538,67 @@ if rv=$(rect_velocity); then
     sleep 0.1
     "$TALK" du:"$drag_end_x","$drag_end_y"
     sleep 2
-    log_mascot_rect "Step 7: after drop"
+    log_mascot_rect "Step 6: after drop"
 else
-    write_timeline "Step 7: mascot rect unavailable; skipping drag"
+    write_timeline "Step 6: mascot rect unavailable; skipping drag"
 fi
 
-# Step 8: Quit -> app exits with code 0
+# Step 7: Notes x2 -> two Notes windows. A Notes popup STEALS focus when it
+# opens, so the next open-menu click may be consumed as the activation click
+# and the item click then lands on a closed menu (both lost). Each retry is
+# an (open-menu, item) PAIR, which converges from either menu state within
+# two pairs: delivered+open -> item hits; eaten -> next pair delivers.
+write_timeline "Step 7: Notes x2..."
+notes_attempts=0
+notes_target=1
+while [ "$notes_target" -le 2 ]; do
+    expected=$(( notes_target ))
+    got="$(win_count "Notes")"
+    if [ "${got:-0}" -ge "$expected" ]; then
+        write_timeline "Step 7: Notes window count reached $expected"
+        notes_target=$(( notes_target + 1 ))
+        continue
+    fi
+    notes_attempts=$(( notes_attempts + 1 ))
+    if [ "$notes_attempts" -gt 6 ]; then
+        echo "Error: Notes popup $expected not found after 6 attempts" >&2
+        exit 1
+    fi
+    write_timeline "Step 7: attempt $notes_attempts for Notes #$expected (current count ${got:-0})"
+    open_menu
+    click_item "app.notes"
+    notes_deadline=$((SECONDS + 8))
+    until [ "$(win_count "Notes")" -ge "$expected" ]; do
+        if [ $SECONDS -ge $notes_deadline ]; then
+            write_timeline "Step 7: Notes #$expected not up after attempt $notes_attempts; retrying"
+            break
+        fi
+        sleep 0.25
+    done
+done
+sleep 1.2
+capture_still "04-notes-popup.png"
+
+# Step 8: Quit -> app exits with code 0. Same converging (open, item) pair
+# retry: the app exit is the observable feedback.
 write_timeline "Step 8: Quit..."
-open_menu
-click_item "app.quit"
-write_timeline "Step 8: Waiting for app process to exit..."
 app_exited=0
-for _ in 1 2 3 4 5 6; do
-    if ! kill -0 "$APP_PID" 2>/dev/null; then app_exited=1; break; fi
-    sleep 1
+for quit_attempt in 1 2 3; do
+    open_menu
+    click_item "app.quit"
+    write_timeline "Step 8: Waiting for app process to exit (attempt $quit_attempt)..."
+    for _ in 1 2 3 4 5 6; do
+        if ! kill -0 "$APP_PID" 2>/dev/null; then app_exited=1; break; fi
+        sleep 1
+    done
+    [ "$app_exited" -eq 1 ] && break
+    write_timeline "Step 8: app still running after attempt $quit_attempt; retrying quit pair"
 done
 if [ "$app_exited" -eq 1 ]; then
     wait "$APP_PID" 2>/dev/null
     write_timeline "Step 8: App exited with code $?"
 else
-    write_timeline "Step 8: App did not quit within 6s, terminating..."
+    write_timeline "Step 8: App did not quit within the retry budget, terminating..."
     kill -TERM "$APP_PID" 2>/dev/null || kill -9 "$APP_PID" 2>/dev/null || true
     FAIL=1
     echo "Error: App did not quit from menu!" >&2

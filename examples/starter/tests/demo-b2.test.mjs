@@ -59,12 +59,23 @@ test("mascot state requests are gated while parked (K8)", () => {
 });
 
 test("mascot window is STATIC by default: no roam block (opt-in only)", () => {
-  assert.equal(config.mascot.faceByVelocity, true, "faceByVelocity kept for roam-enabled consumers (velocity stays 0 while static)");
+  // Roaming is an opt-in library feature (`windows.mascotWindow.roam`); the
+  // bouncing default made the mascot hard to click and MUST NOT be the
+  // starter default (coordinator directive, okv_demo-and-video: recordings
+  // and the shipped demo stay static; the dark-desire validation exercised
+  // roam with a temporary opt-in config instead).
   assert.equal(
     Object.prototype.hasOwnProperty.call(config.windows.mascotWindow, "roam"),
     false,
     "default starter config must NOT opt into roam — static, draggable mascot",
   );
+});
+
+test("starter demo renders sheets via the canvas engine (task okv_demo-and-video)", () => {
+  // okv_demo-and-video: the showcase exercises the HTML5 <canvas> sheet
+  // renderer end to end (okv_canvas-sheets integration).
+  assert.equal(config.mascot.renderer, "canvas", "sheets renderer must be canvas");
+  assert.equal(config.mascot.faceByVelocity, true);
 });
 
 test("popups are anchored: notes to the mascot, settings centred", () => {

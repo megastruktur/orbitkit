@@ -592,3 +592,126 @@ describe("Mascot kind=sheets (K7)", () => {
     }
   });
 });
+
+describe("Mascot kind=sheets renderer=canvas", () => {
+  const baseSheetsConfig: MascotConfig = {
+    kind: "sheets",
+    src: "mascot.png",
+    size: 32,
+    scale: 2,
+    anchor: "bottom-center",
+    faceByVelocity: true,
+    sheets: {
+      small: {
+        src: "small.png",
+        frameWidth: 16,
+        frameHeight: 12,
+        frames: 4,
+        fps: 2,
+        loop: true,
+      },
+      tall: {
+        src: "tall.png",
+        frameWidth: 16,
+        frameHeight: 18,
+        frames: 2,
+        fps: 1,
+      },
+    },
+  };
+  const canvasSheetsConfig: MascotConfig = {
+    ...baseSheetsConfig,
+    renderer: "canvas",
+  };
+
+  const canvasEl = (container: HTMLElement) =>
+    container.querySelector("canvas.orbitkit-mascot-canvas") as HTMLCanvasElement | null;
+
+  it("renders a positioned aria-hidden canvas with the active frame geometry", () => {
+    const { container } = render(Mascot, {
+      props: { config: canvasSheetsConfig, sheet: "tall" },
+    });
+
+    const canvas = canvasEl(container);
+    expect(canvas).toBeTruthy();
+    expect(canvas!.getAttribute("aria-hidden")).toBe("true");
+    // Logical CSS size = frame × scale (16×2 wide, 18×2 tall frame).
+    expect(canvas!.style.width).toBe("32px");
+    expect(canvas!.style.height).toBe("36px");
+    // Same placement contract as the CSS renderer (bottom-center anchor).
+    expect(canvas!.style.position).toBe("absolute");
+    expect(canvas!.style.bottom).toBe("0px");
+    // Canvas mode replaces the CSS background div entirely.
+    expect(container.querySelector("div.orbitkit-mascot-sheet")).toBeNull();
+  });
+
+  it("scales the canvas backing store by devicePixelRatio", () => {
+    vi.stubGlobal("devicePixelRatio", 2);
+    try {
+      const { container } = render(Mascot, {
+        props: { config: canvasSheetsConfig, sheet: "tall" },
+      });
+
+      const canvas = canvasEl(container);
+      expect(canvas).toBeTruthy();
+      // CSS stays logical (32×36); the bitmap is physical (×2).
+      expect(canvas!.style.width).toBe("32px");
+      expect(canvas!.style.height).toBe("36px");
+      expect(canvas!.width).toBe(64);
+      expect(canvas!.height).toBe(72);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("keeps the CSS div renderer by default and for renderer=css", () => {
+    for (const config of [
+      { ...baseSheetsConfig, renderer: undefined },
+      { ...baseSheetsConfig, renderer: "css" as const },
+    ]) {
+      const { container, unmount } = render(Mascot, {
+        props: { config, sheet: "tall" },
+      });
+      expect(canvasEl(container)).toBeNull();
+      const div = container.querySelector("div.orbitkit-mascot-sheet") as HTMLElement;
+      expect(div).toBeTruthy();
+      expect(div.style.backgroundImage).toContain('url("tall.png")');
+      unmount();
+    }
+  });
+
+  it("re-scales the bitmap when devicePixelRatio changes at runtime", async () => {
+    // jsdom has no matchMedia; stub one so the component's resolution-query
+    // listener can be driven directly.
+    const changeListeners = new Set<() => void>();
+    vi.stubGlobal("devicePixelRatio", 1);
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      media: query,
+      matches: false,
+      addEventListener: (_type: string, cb: () => void) => changeListeners.add(cb),
+      removeEventListener: (_type: string, cb: () => void) => changeListeners.delete(cb),
+    }));
+    try {
+      const { container } = render(Mascot, {
+        props: { config: canvasSheetsConfig, sheet: "tall" },
+      });
+      const canvas = canvasEl(container)!;
+      expect(canvas.width).toBe(32);
+
+      // Zoom / monitor move: dpr flips while the canvas is live. The bitmap
+      // must follow (32×36 logical → 64×72 physical) without a geometry
+      // change, or the next blit clips the frame into the stale backing store.
+      vi.stubGlobal("devicePixelRatio", 2);
+      expect(changeListeners.size).toBeGreaterThan(0);
+      for (const cb of [...changeListeners]) cb();
+      await tick();
+
+      expect(canvas.width).toBe(64);
+      expect(canvas.height).toBe(72);
+      expect(canvas.style.width).toBe("32px"); // CSS stays logical
+      expect(canvas.style.height).toBe("36px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});

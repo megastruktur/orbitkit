@@ -243,6 +243,88 @@
       : "",
   );
 
+  // Canvas engine (renderer: "canvas"): the bitmap is sized in PHYSICAL px
+  // (logical frame size × devicePixelRatio) while the CSS size stays logical,
+  // so integer sheet pixels land on device pixels and stay crisp. dpr is
+  // reactive state (see below) so bitmap sizing and blit scaling can never
+  // desync after a zoom / monitor move.
+  let dpr = $state(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 0);
+  // The `(resolution: Ndppx)` query matches exactly the current dpr; when dpr
+  // changes it stops matching, the change event re-reads the fresh value, and
+  // re-running the effect re-arms the query with it.
+  $effect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const sync = () => {
+      dpr = window.devicePixelRatio || 1;
+    };
+    sync();
+    const mq = window.matchMedia(`(resolution: ${dpr}dppx)`);
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  });
+
+  const sheetCanvasPixel = $derived.by(() => {
+    if (config?.kind !== "sheets" || config?.renderer !== "canvas" || !sheetGeo || !dpr) {
+      return null;
+    }
+    return {
+      w: Math.max(1, Math.round(sheetGeo.width * dpr)),
+      h: Math.max(1, Math.round(sheetGeo.height * dpr)),
+    };
+  });
+
+  let sheetCanvasEl: HTMLCanvasElement | null = $state(null);
+
+  // Canvas blit: load the sheet image, then hard-swap the active frame with
+  // an integer drawImage (sx = frame * frameWidth, sy = 0). The context is
+  // normalized per draw: template width/height reassignment resets the
+  // context, but Svelte skips no-op property sets — an unchanged size across
+  // frames keeps the previous transform, so setTransform clears it and
+  // clearRect ghosts the previous frame out (transparent PNG frames).
+  $effect(() => {
+    if (config?.kind !== "sheets" || config?.renderer !== "canvas") return;
+    const canvas = sheetCanvasEl;
+    const def = sheetDef;
+    const geo = sheetGeo;
+    if (!canvas || !def || !geo || !sheetCanvasPixel) return;
+    // Read the reactive dpr here (not inside the async onload) so a dpr flip
+    // re-runs this effect — same source as the bitmap size above.
+    const ratio = dpr;
+    const frame = sheetFrame;
+    const mirrored = sheetMirrored;
+    let disposed = false;
+    const blit = (img: HTMLImageElement) => {
+      if (disposed) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return; // no 2D context available (non-browser DOM)
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(ratio, ratio);
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, geo.width, geo.height);
+      if (mirrored) {
+        ctx.translate(geo.width, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(
+        img,
+        frame * geo.frameWidth,
+        0,
+        geo.frameWidth,
+        geo.frameHeight,
+        0,
+        0,
+        geo.width,
+        geo.height,
+      );
+    };
+    const img = new Image();
+    img.onload = () => blit(img);
+    img.src = def.src;
+    return () => {
+      disposed = true;
+    };
+  });
+
 </script>
 
 <button
@@ -275,6 +357,15 @@
       style={spriteMetrics.style}
       role="presentation"
     ></div>
+  {:else if config?.kind === "sheets" && config?.renderer === "canvas" && sheetCanvasPixel}
+    <canvas
+      bind:this={sheetCanvasEl}
+      class="orbitkit-mascot-sheet orbitkit-mascot-canvas"
+      aria-hidden="true"
+      width={sheetCanvasPixel.w}
+      height={sheetCanvasPixel.h}
+      style={sheetGeo?.style}
+    ></canvas>
   {:else if config?.kind === "sheets" && sheetStyle}
     <div
       class="orbitkit-mascot-sheet"

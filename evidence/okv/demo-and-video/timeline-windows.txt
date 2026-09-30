@@ -1,0 +1,77 @@
+[2026-09-30 15:03:07.344] Starting OrbitKit Desktop Video Recording (Windows, 0.2.0 starter)
+[2026-09-30 15:03:07.888] Screen bounds: 1024x768
+[2026-09-30 15:03:34.246] Geometry: mascot=96 window=360x288 pin=(132,192) origin=(180,180) radius=150 items=9 step=22.5
+[2026-09-30 15:03:34.252] Monitor 1024x768; work area (0,0) 1024x720
+[2026-09-30 15:03:34.258] Pre-fit mascot window model: 404x404 at (596, 340)
+[2026-09-30 15:03:34.266] Startup contentShift = (0, 0); effective pin = (132, 192), arc origin = (180, 180)
+[2026-09-30 15:03:34.283] Started screen recorder (PID 8776)
+[2026-09-30 15:03:36.529] Launched starter app with -WindowStyle Hidden (PID 8000)
+[2026-09-30 15:03:36.530] Step 1: Waiting for main window...
+[2026-09-30 15:03:37.252] Step 1: Main window ready at (78, 78) size 816x639; holding 2 s idle while the overlay auto-shows
+[2026-09-30 15:03:39.920] Captured still: 01-main.png
+[2026-09-30 15:03:39.921] Step 2: Waiting for mascot overlay window (auto-show)...
+[2026-09-30 15:03:40.287] Step 2: captured pre-fit mascot window 404x404 at (596, 340)
+[2026-09-30 15:03:40.574] Step 2: mascot window 360x288 == derived 360x288; shift (0, 0); effective pin (132, 192), origin (180, 180)
+[2026-09-30 15:03:40.576] Step 2: post-fit ground truth: window (618,432)-(978,720) inside work area; app applied clamp delta = (0, 24) [observed pre-fit -> observed final]; model content shift = (0, 0) (y capped at capY=0)
+[2026-09-30 15:03:42.321] Captured still: 02-overlay.png
+[2026-09-30 15:03:42.326] Step 2: mascot overlay ready rect: (618,432) 360x288
+[2026-09-30 15:03:42.327] Step 3: Opening radial menu...
+[2026-09-30 15:03:42.328] Clicking mascot to open menu...
+[2026-09-30 15:03:42.629] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:44.090] Menu open rect: (618,432) 360x288
+[2026-09-30 15:03:44.776] Captured still: 03-menu-open.png
+[2026-09-30 15:03:44.779] Step 3: before close rect: (618,432) 360x288
+[2026-09-30 15:03:44.782] Clicking away on main window title bar at (486, 90) to close menu...
+[2026-09-30 15:03:46.189] Menu closed rect: (618,432) 360x288
+[2026-09-30 15:03:46.898] Step 4: Alert...
+[2026-09-30 15:03:46.900] Clicking mascot to open menu...
+[2026-09-30 15:03:47.168] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:48.623] Menu open rect: (618,432) 360x288
+[2026-09-30 15:03:48.630] Clicking 'app.alert' (angle -112.5) at window-local (123, 41)...
+[2026-09-30 15:03:48.905] Click app.alert attempt 1: aim (741, 473), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:52.905] Step 5: Notes x2...
+[2026-09-30 15:03:52.906] Clicking mascot to open menu...
+[2026-09-30 15:03:53.174] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:54.590] Menu open rect: (618,432) 360x288
+[2026-09-30 15:03:54.591] Clicking 'app.notes' (angle -180) at window-local (30, 180)...
+[2026-09-30 15:03:54.875] Click app.notes attempt 1: aim (648, 612), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:55.427] Step 5: first Notes window up (count 1)
+[2026-09-30 15:03:56.436] Clicking mascot to open menu...
+[2026-09-30 15:03:56.706] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:58.170] Menu open rect: (618,432) 360x288
+[2026-09-30 15:03:58.172] Clicking 'app.notes' (angle -180) at window-local (30, 180)...
+[2026-09-30 15:03:58.437] Click app.notes attempt 1: aim (648, 612), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:03:59.037] Step 5: second Notes window up (count 2)
+[2026-09-30 15:04:00.302] Captured still: 04-notes-popup.png
+[2026-09-30 15:04:00.305] Step 6: Badge +1 x2...
+[2026-09-30 15:04:00.306] Clicking mascot to open menu...
+[2026-09-30 15:04:00.580] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:02.013] Menu open rect: (618,432) 360x288
+[2026-09-30 15:04:02.015] Clicking 'app.badge' (angle -90) at window-local (180, 30)...
+[2026-09-30 15:04:02.295] Click app.badge attempt 1: aim (798, 462), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:03.842] Clicking mascot to open menu...
+[2026-09-30 15:04:04.127] Open menu attempt 1: aim (798, 672), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:05.576] Menu open rect: (618,432) 360x288
+[2026-09-30 15:04:05.577] Clicking 'app.badge' (angle -90) at window-local (180, 30)...
+[2026-09-30 15:04:05.840] Click app.badge attempt 1: aim (798, 462), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:07.971] Step 7: drag geometry (toward work-area centre): start (798, 672) end (663, 525); end margins to work area L=663 R=361 T=525 B=195 (min required 150); work area (0,0)-(1024,720)
+[2026-09-30 15:04:07.974] Step 7: drag start rect: (618,432) 360x288
+[2026-09-30 15:04:07.983] Rect watch: t+1ms (618,432) 360x288
+[2026-09-30 15:04:09.165] Rect watch: t+1184ms (492,295) 360x288
+[2026-09-30 15:04:11.721] Step 7: after drop (settle re-clamp done) rect: (492,295) 360x288
+[2026-09-30 15:04:11.724] Step 7: post-drag size OK 360x288; 2 rect change(s) logged
+[2026-09-30 15:04:11.725] Step 8: Quit...
+[2026-09-30 15:04:11.726] Clicking mascot to open menu...
+[2026-09-30 15:04:11.984] Open menu attempt 1: aim (672, 535), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:13.435] Menu open rect: (492,295) 360x288
+[2026-09-30 15:04:13.440] Step 8: fresh mascot rect (492,295) 360x288; quit local (330, 180) -> screen (822, 475)
+[2026-09-30 15:04:13.442] Clicking 'app.quit' (angle 0) at window-local (330, 180)...
+[2026-09-30 15:04:13.700] Click app.quit attempt 1: aim (822, 475), post-move offset 0 px (v=(0, 0) px/s)
+[2026-09-30 15:04:14.224] Step 8: Waiting for app process to exit...
+[2026-09-30 15:04:14.245] Step 8: app-err.log 'Menu action: app.quit' present: True
+[2026-09-30 15:04:14.248] Step 8: App exited with code 0
+[2026-09-30 15:04:14.249] Stopping screen recorder...
+[2026-09-30 15:04:15.500] Screen recorder finished
+[2026-09-30 15:04:15.501] === Output Verification ===
+[2026-09-30 15:04:15.507] Video file: D:\a\orbitkit\orbitkit\video-windows.mp4 (1820940 bytes)
+[2026-09-30 15:04:15.591] Completed OrbitKit Desktop Video Recording (Windows)

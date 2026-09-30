@@ -1,0 +1,5 @@
+$ svelte-package -i src -o dist && find dist -name '*.test.*' -delete
+src -> dist
+@sveltejs/package found the following issues while packaging your library:
+Avoid usage of `import.meta.env` in your code. It only works in apps bundled with Vite. Consider using packages like `esm-env` instead which works with all bundlers or without bundling.
+

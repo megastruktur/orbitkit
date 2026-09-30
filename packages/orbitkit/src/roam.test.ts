@@ -299,6 +299,52 @@ describe("aimRoamVelocity", () => {
     expect(aimRoamVelocity({ x: 0, y: 0 }, BOUNDS, 0)).toEqual({ x: 0, y: 0 });
     expect(aimRoamVelocity({ x: 0, y: 0 }, BOUNDS, -5)).toEqual({ x: 0, y: 0 });
   });
+
+  it("locks to the X axis for axis: 'horizontal'", () => {
+    expect(aimRoamVelocity({ x: 0, y: 0 }, BOUNDS, 100, "horizontal")).toEqual(
+      { x: 100, y: 0 },
+    );
+    // Left of centre heads left; the vertical offset is ignored entirely.
+    expect(
+      aimRoamVelocity({ x: 2000, y: 500 }, BOUNDS, 100, "horizontal"),
+    ).toEqual({ x: -100, y: 0 });
+    expect(
+      aimRoamVelocity({ x: 0, y: 5000 }, BOUNDS, 100, "horizontal"),
+    ).toEqual({ x: 100, y: 0 });
+  });
+
+  it("locks to the Y axis for axis: 'vertical'", () => {
+    expect(aimRoamVelocity({ x: 0, y: 0 }, BOUNDS, 100, "vertical")).toEqual({
+      x: 0,
+      y: 100,
+    });
+    // Below centre heads up; the horizontal offset is ignored entirely.
+    expect(
+      aimRoamVelocity({ x: 500, y: 2000 }, BOUNDS, 100, "vertical"),
+    ).toEqual({ x: 0, y: -100 });
+    expect(
+      aimRoamVelocity({ x: 5000, y: 0 }, BOUNDS, 100, "vertical"),
+    ).toEqual({ x: 0, y: 100 });
+  });
+
+  it("falls back to an axis lock on degenerate bounds", () => {
+    // A zero-height zone cannot move vertically ⇒ horizontal lock.
+    expect(
+      aimRoamVelocity(
+        { x: 0, y: 300 },
+        { x: 0, y: 500, width: 1000, height: 0 },
+        100,
+      ),
+    ).toEqual({ x: 100, y: 0 });
+    // A zero-width zone cannot move horizontally ⇒ vertical lock.
+    expect(
+      aimRoamVelocity(
+        { x: 300, y: 0 },
+        { x: 500, y: 0, width: 0, height: 1000 },
+        100,
+      ),
+    ).toEqual({ x: 0, y: 100 });
+  });
 });
 
 describe("startRoam", () => {
@@ -623,6 +669,93 @@ describe("startRoam", () => {
       const prev = h.positions[i - 1];
       const cur = h.positions[i];
       expect(cur.x !== prev.x || cur.y !== prev.y).toBe(true);
+    }
+    ctl.stop();
+  });
+
+  it("axis 'horizontal' keeps the window y frozen and vy zero across steps", async () => {
+    const h = fakeWindow({ x: 1000, y: 1500 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 100,
+      axis: "horizontal",
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.positions.length).toBeGreaterThan(5);
+    for (const p of h.positions) expect(p.y).toBe(1500);
+    expect(h.current.y).toBe(1500);
+    for (const v of velocities) expect(v.y).toBe(0);
+    expect(h.current.x).not.toBe(1000); // still roams along x
+    ctl.stop();
+  });
+
+  it("axis 'horizontal' keeps vy zero through resume(at, heading)", async () => {
+    const h = fakeWindow({ x: 1000, y: 1500 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 60,
+      axis: "horizontal",
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    ctl.pause();
+    velocities.length = 0;
+    h.positions.length = 0;
+    // A heading with a vertical component must not unlock the axis.
+    ctl.resume({ x: 1000, y: 3000 }, { x: -1, y: 4 });
+    await vi.advanceTimersByTimeAsync(500);
+    expect(velocities.length).toBeGreaterThan(0);
+    for (const v of velocities) expect(v.y).toBe(0);
+    expect(velocities[velocities.length - 1].x).toBeLessThan(0);
+    for (const p of h.positions) expect(p.y).toBe(3000);
+    expect(h.current.y).toBe(3000);
+    ctl.stop();
+  });
+
+  it("axis 'vertical' keeps the window x frozen and vx zero across steps", async () => {
+    const h = fakeWindow({ x: 1500, y: 1000 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 100,
+      axis: "vertical",
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.positions.length).toBeGreaterThan(5);
+    for (const p of h.positions) expect(p.x).toBe(1500);
+    expect(h.current.x).toBe(1500);
+    for (const v of velocities) expect(v.x).toBe(0);
+    expect(h.current.y).not.toBe(1000); // still roams along y
+    ctl.stop();
+  });
+
+  it("explicit axis '2d' roams in both axes", async () => {
+    const h = fakeWindow({ x: 1000, y: 1000 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 100,
+      axis: "2d",
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(500);
+    expect(h.positions.length).toBeGreaterThan(0);
+    expect(h.positions[0].x).toBeGreaterThan(1000);
+    expect(h.positions[0].y).toBeGreaterThan(1000);
+    for (const v of velocities) {
+      expect(v.x).not.toBe(0);
+      expect(v.y).not.toBe(0);
     }
     ctl.stop();
   });
@@ -987,5 +1120,31 @@ describe("createRoam", () => {
     expect(h.handle.roam.paused).toBe(false);
     expect(h.handle.bounds()).toBe(before);
     h.handle.roam.stop();
+  });
+
+  it("forwards roam.axis to the loop: horizontal keeps the window y frozen", async () => {
+    let pos = { x: 2000, y: 3500 };
+    const positions: PhysicalPoint[] = [];
+    const velocities: PhysicalPoint[] = [];
+    const win = {
+      outerPosition: async () => ({ ...pos }),
+      setPosition: async (p: PhysicalPoint) => {
+        pos = { ...p };
+        positions.push({ ...p });
+      },
+    };
+    const handle = createRoam({
+      getWindow: () => win,
+      monitor: () => ({ workArea: WORK_AREA, scaleFactor: 2 }),
+      roam: { ...ROAM_CFG, axis: "horizontal" },
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(positions.length).toBeGreaterThan(5);
+    for (const p of positions) expect(p.y).toBe(3500);
+    for (const v of velocities) expect(v.y).toBe(0);
+    expect(pos.x).not.toBe(2000); // still roams along x
+    handle.roam.stop();
   });
 });

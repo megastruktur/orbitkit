@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`Mascot` (`kind: "sheets"`) canvas renderer** — opt-in `renderer: "canvas"` blits the active sheet frame with an integer `drawImage` (`sx = frame * frameWidth`) onto a `<canvas aria-hidden="true">` whose bitmap is scaled by `devicePixelRatio` (CSS size stays logical), with `imageSmoothingEnabled = false` for crisp pixel-art upscale and `faceByVelocity` mirroring via `translate`/`scale(-1, 1)`. Default `renderer: "css"` keeps the existing background-position div rendering untouched.
 - **`RoamController.resume(at?, heading?)`** — optional direction vector: the loop walks at `speed` along `heading` instead of aiming at the zone centre, so a host scheduler can choose the walk direction (and with `faceByVelocity`, the facing). A zero heading falls back to the centre aim.
+- **Roam axis lock (`roam.axis: MascotRoamAxis`)** — `"2d"` (default) roams and bounces in both axes, `"horizontal"` pins the motion to the X axis (`vy = 0` for the loop's whole life — floor pets), `"vertical"` pins it to the Y axis (`vx = 0` — wall crawlers). Accepted on `MascotRoamConfig.axis` (forwarded by `createRoam`) and `StartRoamOptions.axis`; `aimRoamVelocity` takes the axis as a 4th argument and forces the matching lock on a degenerate zone (zero height ⇒ horizontal, zero width ⇒ vertical). `resume(at, heading)` keeps the locked component at 0.
 
 ### Fixed
 

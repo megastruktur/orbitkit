@@ -1,0 +1,15 @@
+# green run — full suite @ impl (roam axis lock)
+files-passed=17 total=402 passed=402 failed=0
+tsc --noEmit: 0 errors
+pnpm build (svelte-package): clean (pre-existing import.meta.env note from RadialMenu.svelte)
+
+New axis tests:
+PASS  aimRoamVelocity locks to the X axis for axis: 'horizontal'
+PASS  aimRoamVelocity locks to the Y axis for axis: 'vertical'
+PASS  aimRoamVelocity falls back to an axis lock on degenerate bounds
+PASS  startRoam axis 'horizontal' keeps the window y frozen and vy zero across steps
+PASS  startRoam axis 'horizontal' keeps vy zero through resume(at, heading)
+PASS  startRoam axis 'vertical' keeps the window x frozen and vx zero across steps
+PASS  startRoam explicit axis '2d' roams in both axes
+PASS  createRoam forwards roam.axis to the loop: horizontal keeps the window y frozen
+post-restore proof: full run @ HEAD 424b05e (startTime 2026-09-30T14:23:59Z, after commit 14:22:12Z): files=17 total=402 passed=402 failed=0; "createRoam forwards roam.axis..." PASSED. Raw JSON: packages/orbitkit/.vitest/json/post-restore.json (gitignored).

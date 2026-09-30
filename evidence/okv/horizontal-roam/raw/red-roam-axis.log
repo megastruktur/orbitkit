@@ -1,0 +1,63 @@
+# red run — roam.test.ts @ base bd9dee6 (before implementation)
+total=60 passed=54 failed=6
+
+PASS  roamBounds anchors the zone inset by margin at the config corner
+PASS  roamBounds converts logical config px to physical px with the monitor scale
+PASS  roamBounds clamps a zone larger than the safe area into the work area
+PASS  roamBounds falls back to scale 1 for a non-positive or non-finite scale
+PASS  roamBounds shrinks the zone by the window size so the window stays visible
+PASS  roamBounds pins an oversized window at the safe-area origin
+PASS  roamBounds keeps the window inside the work area at every corner over 400 steps
+PASS  rebaseRoamBounds centres the zone on the drop point
+PASS  rebaseRoamBounds clamps the zone into the work area at every edge
+PASS  rebaseRoamBounds keeps the margin safe area during rebase
+PASS  rebaseRoamBounds honours the physical drop point at scale 2
+PASS  rebaseRoamBounds clamps the rebased zone by the window size near the edges
+PASS  stepRoam moves linearly inside the zone without flipping
+PASS  stepRoam flips and reflects at the left edge
+PASS  stepRoam flips and reflects at the right edge
+PASS  stepRoam flips and reflects at the top edge
+PASS  stepRoam flips and reflects at the bottom edge
+PASS  stepRoam caps dt at MAX_STEP_MS so a stalled tab cannot teleport
+PASS  stepRoam treats negative dt as no motion
+PASS  stepRoam pins degenerate axes instead of producing NaN
+PASS  stepRoam does not mutate the input state
+PASS  aimRoamVelocity aims at the zone centre with the requested speed
+PASS  aimRoamVelocity heads right when already centred
+PASS  aimRoamVelocity rests on non-positive speed
+FAIL  aimRoamVelocity locks to the X axis for axis: 'horizontal'
+FAIL  aimRoamVelocity locks to the Y axis for axis: 'vertical'
+FAIL  aimRoamVelocity falls back to an axis lock on degenerate bounds
+PASS  startRoam steps at most 30 times per second (default and clamped intervals)
+PASS  startRoam moves towards the zone centre and reports the velocity
+PASS  startRoam resume(at) adopts the given position instead of snapping back
+PASS  startRoam resume(at) clamps an out-of-zone drop before stepping
+PASS  startRoam resume(at, heading) walks along the heading at speed, not towards the centre
+PASS  startRoam resume(undefined, heading) re-aims in place from the current position
+PASS  startRoam a zero heading falls back to aiming at the zone centre
+PASS  startRoam pause freezes stepping; resume continues without a dt jump
+PASS  startRoam stop halts the loop permanently
+PASS  startRoam keeps stepping when setPosition rejects, logging once per streak
+PASS  startRoam stays idle and logs once when the initial position read fails
+PASS  startRoam hands setPosition only integer coordinates over a fractional-step run
+PASS  startRoam slow speed still accumulates movement (rounding must not stall)
+PASS  startRoam skips setPosition while the rounded position is unchanged
+FAIL  startRoam axis 'horizontal' keeps the window y frozen and vy zero across steps
+FAIL  startRoam axis 'horizontal' keeps vy zero through resume(at, heading)
+FAIL  startRoam axis 'vertical' keeps the window x frozen and vx zero across steps
+PASS  startRoam explicit axis '2d' roams in both axes
+PASS  createRoamDrag click below threshold only toggles the menu; nothing moves
+PASS  createRoamDrag crossing the threshold pauses roam before native drag starts
+PASS  createRoamDrag release rebases around the drop point, then resumes roam
+PASS  createRoamDrag suppresses the trailing click after a drag (no toggle)
+PASS  createRoamDrag a swallowed trailing click still leaves roam running; next click toggles
+PASS  createRoamDrag a window focus change during drag releases it (lost pointerup)
+PASS  createRoamDrag pointercancel during drag releases it
+PASS  createRoamDrag a rejected native drag start behaves like a click
+PASS  createRoamDrag a throwing native drag start behaves like a click
+PASS  createRoamDrag a failed drop-point read still resumes roam in the previous zone
+PASS  createRoamDrag a drag racing the rebase is never resumed by a stale release
+PASS  createRoam starts in the config corner with speed scaled to physical px/s
+PASS  createRoam re-bases the zone around the drop point (clamped) on drag release
+PASS  createRoam honours a live windowSize getter for the initial AND re-based zones
+PASS  createRoam a click (≤ threshold) never pauses roam nor rebases

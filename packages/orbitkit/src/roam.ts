@@ -18,12 +18,17 @@
  * point (clamped into the work area) and resumes roam. A click
  * (≤ threshold) only toggles the menu — the window never moves.
  *
+ * `axis` (`MascotRoamAxis`) constrains the motion: `"2d"` (default) roams
+ * and bounces in both axes, `"horizontal"` pins `vy = 0` (floor pets),
+ * `"vertical"` pins `vx = 0` (wall crawlers); a degenerate zone forces the
+ * matching lock in `aimRoamVelocity`.
+ *
  * The module never imports `@tauri-apps/api`; the Tauri `Window` surface is
  * injected, so tests run on plain fakes (same pattern as `passthrough.ts`).
  */
 
 import type { PhysicalPoint, PhysicalRect } from "./windowFit.js";
-import type { MascotRoamConfig } from "./config.js";
+import type { MascotRoamAxis, MascotRoamConfig } from "./config.js";
 import {
   createDragGesture,
   type DragGestureHandlers,
@@ -212,19 +217,33 @@ export function stepRoam(
 
 /**
  * Velocity aimed from `from` towards the centre of `bounds` at `speed` px/s.
- * Already-centred points head right (`{x: speed, y: 0}`); non-positive or
- * non-finite speed yields rest.
+ * `axis` constrains the result: `"horizontal"` locks the motion to the X
+ * axis (`y = 0`, full `speed` towards the centre's side — floor pets),
+ * `"vertical"` locks it to the Y axis (`x = 0` — wall crawlers), and
+ * `"2d"` (default) keeps the full 2D vector. A degenerate zone forces the
+ * matching lock regardless of `axis` (zero height ⇒ horizontal, zero width
+ * ⇒ vertical). Already-centred points head right (or down for a centred
+ * `"vertical"` aim); non-positive or non-finite speed yields rest.
  */
 export function aimRoamVelocity(
   from: PhysicalPoint,
   bounds: PhysicalRect,
   speed: number,
+  axis: MascotRoamAxis = "2d",
 ): PhysicalPoint {
   if (!Number.isFinite(speed) || speed <= 0) {
     return { x: 0, y: 0 };
   }
   const dx = bounds.x + bounds.width / 2 - from.x;
   const dy = bounds.y + bounds.height / 2 - from.y;
+  // Axis locks (explicit, or forced by a degenerate zone) always travel at
+  // the full `speed` along the single free axis.
+  if (axis === "horizontal" || !(bounds.height > 0)) {
+    return { x: dx < 0 ? -speed : speed, y: 0 };
+  }
+  if (axis === "vertical" || !(bounds.width > 0)) {
+    return { x: 0, y: dy < 0 ? -speed : speed };
+  }
   const len = Math.hypot(dx, dy);
   if (!(len > 1e-9)) {
     return { x: speed, y: 0 };
@@ -239,6 +258,13 @@ export interface StartRoamOptions {
   bounds: () => PhysicalRect;
   /** Roam speed in px/s, in the same (physical) space as `bounds`. */
   speed: number;
+  /**
+   * Motion constraint, default `"2d"`: `"horizontal"` locks the motion to
+   * the X axis (`vy` pinned to 0 — floor pets), `"vertical"` locks it to the
+   * Y axis (`vx` pinned to 0 — wall crawlers). The lock holds at
+   * initialisation, on every step and across `resume(at, heading)`.
+   */
+  axis?: MascotRoamAxis;
   /** Receives the current velocity after every step (for `faceByVelocity`). */
   onVelocity?: (velocity: PhysicalPoint) => void;
   /** Step interval in ms; clamped up to `MIN_ROAM_INTERVAL_MS` (≤30 Hz). */
@@ -273,12 +299,27 @@ export interface RoamController {
  * is skipped while the rounded position is unchanged).
  * `setPosition` failures are logged once per failure streak and never stop
  * the loop.
+ * `axis` pins one velocity component to 0 for the loop's whole life
+ * (`"horizontal"` ⇒ `vy = 0`, `"vertical"` ⇒ `vx = 0`; default `"2d"`),
+ * across init, every step and every `resume(at, heading)`.
  */
 export function startRoam(options: StartRoamOptions): RoamController {
   const interval = Math.max(
     MIN_ROAM_INTERVAL_MS,
     options.intervalMs ?? MIN_ROAM_INTERVAL_MS,
   );
+  // Axis lock: `"horizontal"` freezes y (floor pets), `"vertical"` freezes x
+  // (wall crawlers). Re-applied after every state change (init, step,
+  // resume) so no heading or re-aim can reintroduce the locked component.
+  const axis = options.axis ?? "2d";
+  function lockAxis(s: RoamState): RoamState {
+    if (axis === "horizontal") {
+      s.vy = 0;
+    } else if (axis === "vertical") {
+      s.vx = 0;
+    }
+    return s;
+  }
   let state: RoamState | null = null;
   let lastSent: PhysicalPoint | null = null;
   let timer: number | null = null;
@@ -293,7 +334,7 @@ export function startRoam(options: StartRoamOptions): RoamController {
     const now = Date.now();
     const dt = now - lastTick;
     lastTick = now;
-    state = stepRoam(state, dt, options.bounds());
+    state = lockAxis(stepRoam(state, dt, options.bounds()));
     // Internal state stays fractional so slow speeds still accumulate motion
     // across steps; only the ROUNDED integer position reaches the window
     // (Tauri `set_position` takes an integer `PhysicalPosition`), and only
@@ -332,8 +373,8 @@ export function startRoam(options: StartRoamOptions): RoamController {
     try {
       const pos = await options.getWindow().outerPosition();
       if (stopped) return;
-      const v = aimRoamVelocity(pos, options.bounds(), options.speed);
-      state = { x: pos.x, y: pos.y, vx: v.x, vy: v.y };
+      const v = aimRoamVelocity(pos, options.bounds(), options.speed, axis);
+      state = lockAxis({ x: pos.x, y: pos.y, vx: v.x, vy: v.y });
       // The window is already (about) here; don't re-send it on the first
       // tick when the rounded position is unchanged.
       lastSent = { x: Math.round(pos.x), y: Math.round(pos.y) };
@@ -374,8 +415,8 @@ export function startRoam(options: StartRoamOptions): RoamController {
             ? Number.isFinite(options.speed) && options.speed > 0
               ? { x: (hx / len) * options.speed, y: (hy / len) * options.speed }
               : { x: 0, y: 0 }
-            : aimRoamVelocity(p, b, options.speed);
-        state = { x: p.x, y: p.y, vx: v.x, vy: v.y };
+            : aimRoamVelocity(p, b, options.speed, axis);
+        state = lockAxis({ x: p.x, y: p.y, vx: v.x, vy: v.y });
         // The native drag already carried the window to `at`; treat the
         // adopted (clamped) point as the last sent position so the first
         // tick only sends once the rounded position actually changes.
@@ -598,6 +639,7 @@ export function createRoam(options: CreateRoamOptions): RoamHandle {
     getWindow: options.getWindow,
     bounds: () => bounds,
     speed: options.roam.speed * normalScale(monitor.scaleFactor),
+    axis: options.roam.axis,
     onVelocity: options.onVelocity,
     intervalMs: options.intervalMs,
   });

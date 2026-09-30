@@ -1,0 +1,58 @@
+
+ RUN  v5.0.1 /home/megastruktur/orca/workspaces/orbitkit/okv-canvas-sheets/packages/orbitkit
+
+ ↓ src/Mascot.test.ts > Mascot Component > renders a button with orbitkit-mascot class, type=button, and aria-label
+ ↓ src/Mascot.test.ts > Mascot Component > renders inline svg kind as an img element with data:image/svg+xml src and no inline svg in DOM
+ ↓ src/Mascot.test.ts > Mascot Component > renders svg URL kind as an img element with correct src
+ ↓ src/Mascot.test.ts > Mascot Component > renders image kind as an img element with initial src
+ ↓ src/Mascot.test.ts > Mascot Component > swaps image src when state changes
+ ↓ src/Mascot.test.ts > Mascot Component > renders sprite kind with background-image and animation vars
+ ↓ src/Mascot.test.ts > Mascot Component > swaps sprite animation vars and background-position-y on state change
+ ↓ src/Mascot.test.ts > Mascot Component > renders svg markup into img src and prevents DOM injection of script/tags
+ ↓ src/Mascot.test.ts > Mascot Component > renders svg markup with event handlers and links as img data URL without DOM attributes
+ ↓ src/Mascot.test.ts > Mascot Component > safely handles all gate and remediation payloads with zero DOM injection
+ ↓ src/Mascot.test.ts > Mascot Component > swaps svg src when state changes
+ ↓ src/Mascot.test.ts > Mascot Component > fires onclick handler when clicked
+ ↓ src/Mascot.test.ts > Mascot Component > does not call onclick on Enter keydown and fires exactly once on native activation
+ ↓ src/Mascot.test.ts > Mascot Component > fires onpointerdown handler on pointer interaction
+ ↓ src/Mascot.test.ts > Mascot Component > sets data-state attribute according to config and state prop
+ ↓ src/Mascot.test.ts > Mascot Component > adds reduced-motion class and disables animations when reducedMotion prop is set
+ ↓ src/Mascot.test.ts > Mascot Component > applies width, height, and CSS variable from config size
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > renders the named sheet with scaled frame geometry
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > falls back to the first sheet with console.error for an unknown sheet name
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > never clips a sheets frame: the root is overflow visible for every sheet
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > leaves non-sheets overflow to the stylesheet so a consumer class can override it
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > sizes the root box to the active frame, not the config size square
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > keeps the bottom edge constant when swapping between sheets of different heights
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > mirrors only while faceByVelocity and vx < 0, retaining facing at vx == 0
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > never mirrors when faceByVelocity is off
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > freezes on frame 0 under reduced motion even as time passes
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > hard-swaps frames over time via frameAt without reduced motion
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > resets the frame to 0 when the sheet changes mid-animation
+ ↓ src/Mascot.test.ts > Mascot kind=sheets (K7) > resolves the sheet via the K8 state machine and returns to idle after ttl
+ ↓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > renders a positioned aria-hidden canvas with the active frame geometry
+ ↓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > scales the canvas backing store by devicePixelRatio
+ ↓ src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > keeps the CSS div renderer by default and for renderer=css
+ × src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > re-scales the bitmap when devicePixelRatio changes at runtime 46ms
+   → expected 0 to be greater than 0
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/Mascot.test.ts > Mascot kind=sheets renderer=canvas > re-scales the bitmap when devicePixelRatio changes at runtime
+AssertionError: expected 0 to be greater than 0
+ ❯ src/Mascot.test.ts:705:36
+    703|       // change, or the next blit clips the frame into the stale backi…
+    704|       vi.stubGlobal("devicePixelRatio", 2);
+    705|       expect(changeListeners.size).toBeGreaterThan(0);
+       |                                    ^
+    706|       for (const cb of [...changeListeners]) cb();
+    707|       await tick();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 32 skipped (33)
+   Start at  13:41:14
+   Duration  836ms (transform 47%, environment 35%, import 11%, tests 6%)
+

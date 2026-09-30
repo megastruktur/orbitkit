@@ -1,0 +1,6 @@
+[starter] Menu action: app.alert (alert state, ttl 8s)
+[starter] Menu action: app.notes (instance note-1)
+[starter] Menu action: app.notes (instance note-2)
+[starter] Menu action: app.badge
+[starter] Menu action: app.quit
+[0930/150413.954:ERROR:ui\gfx\win\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412

@@ -43,6 +43,8 @@ jobs:
 
       - name: Build starter desktop app
         run: pnpm --filter starter tauri build --debug --no-bundle
+        env:
+          VITE_ORBITKIT_DEBUG: "1"
 
       - name: Record desktop flow
         shell: pwsh
@@ -65,6 +67,21 @@ jobs:
             timeline.txt
           retention-days: 14
 
-# r3: the video-macos job was removed — record-macos.sh is still the 0.1.0
-# hard-coded flow (no roam/contentShift handling) and fails on 0.2.0; porting
-# it is out of scope for now (see evidence/okc/demo-video/REPORT.md).
+# r3 removed the video-macos job; okv_demo-and-video re-added it and ported
+# record-macos.sh to the 0.2.0 starter (auto-show overlay, demoWindowFit
+# geometry, toggle-closes, mascot-centre drag, converging pair retries).
+# Runs 36733228980/36734942689/36737264388/36738526701: the port is correct
+# (clicks 1..N deliver while the overlay keeps key status — Alert and Badge
+# actions fired), but on the current macOS runner the SECOND popup
+# interaction still dies: after the first Notes popup opens, overlay clicks
+# stop being delivered (zero DOM events) and the popup ends up hidden behind
+# the main window — a plugin/webview z-order & focus lifecycle issue in
+# crates/tauri-plugin-orbitkit territory, outside the okv_demo-and-video
+# scope allowlist. The SHOWCASE video is the WINDOWS worker recording
+# (coordinator directive); the ported script + findings stay in
+# scripts/ci/record-macos.sh and evidence/okv/demo-and-video/REPORT.md for
+# whoever picks the product fix up. The video-windows build bakes
+# VITE_ORBITKIT_DEBUG=1 (step env above): the app then forwards console.* →
+# log_telemetry (Rust eprintln) → app-err.log, carrying the MascotView boot
+# line (renderer + roam axis) as runtime wiring evidence in the recording
+# artifacts.

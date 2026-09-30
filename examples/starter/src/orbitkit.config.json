@@ -1,6 +1,7 @@
 {
   "mascot": {
     "kind": "sheets",
+    "renderer": "canvas",
     "src": "/sheets/glim-idle.png",
     "size": 96,
     "initialState": "idle",

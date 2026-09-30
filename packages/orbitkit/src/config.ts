@@ -132,12 +132,21 @@ export type MascotRoamCorner =
   | "top-right"
   | "top-left";
 
+/**
+ * K7: roam motion constraint. `"2d"` (default) roams and bounces in both
+ * axes; `"horizontal"` locks the motion to the X axis (`vy = 0`, floor
+ * pets); `"vertical"` locks it to the Y axis (`vx = 0`, wall crawlers).
+ */
+export type MascotRoamAxis = "2d" | "horizontal" | "vertical";
+
 export interface MascotRoamConfig {
   width: number;
   height: number;
   margin: number;
   corner: MascotRoamCorner;
   speed: number;
+  /** Motion constraint, default `"2d"`. */
+  axis?: MascotRoamAxis;
 }
 
 export interface MascotWindowConfig {

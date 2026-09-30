@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`RoamController.resume(at?, heading?)`** — optional direction vector: the loop walks at `speed` along `heading` instead of aiming at the zone centre, so a host scheduler can choose the walk direction (and with `faceByVelocity`, the facing). A zero heading falls back to the centre aim.
+
+### Fixed
+
+- **`Mascot` (`kind: "sheets"`) clipped frames wider/taller than `size`** — the `overflow: hidden` root was a fixed `size`×`size` square; it now wraps the active frame (`frameWidth/Height × scale`), so wide run/jump strips render whole and the hit box follows the pose. `--mascot-size` still reflects `size`.
+
 ## [0.2.0] — 2026-09-29
 
 ### Added

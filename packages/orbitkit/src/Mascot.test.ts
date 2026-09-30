@@ -419,6 +419,29 @@ describe("Mascot kind=sheets (K7)", () => {
     }
   });
 
+  it("sizes the clipping root box to the active frame, not the config size square", async () => {
+    // Root is overflow:hidden; a fixed 32px square cut the 32×36 "tall"
+    // frame (and any frame wider than `size`). The box must follow the pose.
+    const wide: MascotConfig = {
+      ...sheetsConfig,
+      sheets: {
+        ...sheetsConfig.sheets,
+        run: { src: "run.png", frameWidth: 19, frameHeight: 13, frames: 8, fps: 12 },
+      },
+    };
+    const { container, rerender } = render(Mascot, {
+      props: { config: wide, sheet: "small" },
+    });
+    const button = container.querySelector("button") as HTMLElement;
+    expect(button.style.width).toBe("32px"); // 16 × 2
+    expect(button.style.height).toBe("24px"); // 12 × 2
+
+    await rerender({ config: wide, sheet: "run" });
+    expect(button.style.width).toBe("38px"); // 19 × 2 > size 32
+    expect(button.style.height).toBe("26px");
+    expect(button.style.getPropertyValue("--mascot-size")).toBe("32px");
+  });
+
   it("keeps the bottom edge constant when swapping between sheets of different heights", async () => {
     const { container, rerender } = render(Mascot, {
       props: { config: sheetsConfig, sheet: "small" },

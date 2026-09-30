@@ -252,9 +252,12 @@ export interface RoamController {
    * Resumes stepping; the pause gap is never accumulated as dt. With `at`
    * (e.g. the drag drop point) the loop adopts that position — clamped into
    * the current zone — and re-aims the velocity into it, instead of snapping
-   * back to the stale pre-pause position.
+   * back to the stale pre-pause position. With `heading` (any non-zero
+   * direction vector, e.g. `{x: -1, y: 0}` for "walk left") the velocity is
+   * `speed` along that direction instead of aimed at the zone centre, so a
+   * scheduler can choose where the mascot walks (and thus which way it faces).
    */
-  resume(at?: PhysicalPoint): void;
+  resume(at?: PhysicalPoint, heading?: PhysicalPoint): void;
   /** Permanently stops the loop. */
   stop(): void;
   readonly paused: boolean;
@@ -351,23 +354,32 @@ export function startRoam(options: StartRoamOptions): RoamController {
       paused = true;
       disarm();
     },
-    resume(at?: PhysicalPoint) {
+    resume(at?: PhysicalPoint, heading?: PhysicalPoint) {
       if (stopped) return;
       paused = false;
-      if (state !== null && at) {
+      if (state !== null && (at || heading)) {
         // Clamp into the current zone first: a drop can sit outside it
         // (half off-screen); the loop must start from a valid point.
         const b = options.bounds();
+        const from = at ?? { x: state.x, y: state.y };
         const p = {
-          x: Math.min(Math.max(at.x, b.x), b.x + b.width),
-          y: Math.min(Math.max(at.y, b.y), b.y + b.height),
+          x: Math.min(Math.max(from.x, b.x), b.x + b.width),
+          y: Math.min(Math.max(from.y, b.y), b.y + b.height),
         };
-        const v = aimRoamVelocity(p, b, options.speed);
+        const hx = heading?.x ?? 0;
+        const hy = heading?.y ?? 0;
+        const len = Math.hypot(hx, hy);
+        const v =
+          Number.isFinite(len) && len > 1e-9
+            ? Number.isFinite(options.speed) && options.speed > 0
+              ? { x: (hx / len) * options.speed, y: (hy / len) * options.speed }
+              : { x: 0, y: 0 }
+            : aimRoamVelocity(p, b, options.speed);
         state = { x: p.x, y: p.y, vx: v.x, vy: v.y };
         // The native drag already carried the window to `at`; treat the
         // adopted (clamped) point as the last sent position so the first
         // tick only sends once the rounded position actually changes.
-        lastSent = { x: Math.round(p.x), y: Math.round(p.y) };
+        if (at) lastSent = { x: Math.round(p.x), y: Math.round(p.y) };
       }
       arm();
     },

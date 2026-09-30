@@ -424,6 +424,70 @@ describe("startRoam", () => {
     ctl.stop();
   });
 
+  it("resume(at, heading) walks along the heading at speed, not towards the centre", async () => {
+    // (1000, 2000) is left of the ZONE centre (2000, 2000): an aimed resume
+    // would head +x; heading {-1, 0} must walk left instead.
+    const h = fakeWindow({ x: 1000, y: 2000 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 60,
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    ctl.pause();
+    velocities.length = 0;
+    h.positions.length = 0;
+    ctl.resume({ x: 1000, y: 2000 }, { x: -5, y: 0 });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(velocities[0]).toEqual({ x: -60, y: 0 });
+    const last = h.positions[h.positions.length - 1];
+    expect(last.x).toBeLessThan(1000 - 50); // ~60 px in 1 s
+    expect(last.y).toBe(2000);
+    ctl.stop();
+  });
+
+  it("resume(undefined, heading) re-aims in place from the current position", async () => {
+    const h = fakeWindow({ x: 1000, y: 2000 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 60,
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    await vi.advanceTimersByTimeAsync(500); // heading +x towards the centre
+    const before = h.current;
+    velocities.length = 0;
+    ctl.resume(undefined, { x: -1, y: 0 });
+    await vi.advanceTimersByTimeAsync(500);
+    expect(velocities[velocities.length - 1].x).toBeLessThan(0);
+    // No teleport: the first post-resume step starts next to `before`.
+    expect(h.current.x).toBeLessThan(before.x);
+    expect(before.x - h.current.x).toBeLessThan(40);
+    ctl.stop();
+  });
+
+  it("a zero heading falls back to aiming at the zone centre", async () => {
+    const h = fakeWindow({ x: 1000, y: 2000 });
+    const velocities: PhysicalPoint[] = [];
+    const ctl = startRoam({
+      getWindow: () => h.win,
+      bounds: () => ZONE,
+      speed: 60,
+      onVelocity: (v) => velocities.push(v),
+    });
+    await settle();
+    ctl.pause();
+    velocities.length = 0;
+    ctl.resume({ x: 1000, y: 2000 }, { x: 0, y: 0 });
+    await vi.advanceTimersByTimeAsync(100);
+    expect(velocities[0].x).toBeCloseTo(60);
+    ctl.stop();
+  });
+
   it("pause freezes stepping; resume continues without a dt jump", async () => {
     const h = fakeWindow({ x: 2000, y: 2000 });
     const ctl = startRoam({

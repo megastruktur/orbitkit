@@ -1,0 +1,19 @@
+# okv_demo-and-video dark-desire live validation of d33da11 (shipped default: static + canvas) — 2026-09-30T15:11:25Z
+# app: ~/Downloads/okv-demo-d33da11/target/debug/starter pid=81486 (VITE_ORBITKIT_DEBUG=1 build)
+
+## app-err.log (full)
+[telemetry] [console.log] [MascotView] boot: renderer=canvas kind=sheets roamAxis=off roamSpeed=0
+
+## window sample (get_window --pid 81486), 1 Hz / 12 s; screen 0 0 5120 1440
+t=1s |4714 1128 360 288 |2160 233 800 600 
+t=2s |4714 1128 360 288 |2160 233 800 600 
+t=3s |4714 1128 360 288 |2160 233 800 600 
+t=4s |4714 1128 360 288 |2160 233 800 600 
+t=5s |4714 1128 360 288 |2160 233 800 600 
+t=6s |4714 1128 360 288 |2160 233 800 600 
+t=7s |4714 1128 360 288 |2160 233 800 600 
+t=8s |4714 1128 360 288 |2160 233 800 600 
+t=9s |4714 1128 360 288 |2160 233 800 600 
+t=10s |4714 1128 360 288 |2160 233 800 600 
+t=11s |4714 1128 360 288 |2160 233 800 600 
+t=12s |4714 1128 360 288 |2160 233 800 600 

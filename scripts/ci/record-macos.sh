@@ -107,6 +107,13 @@ function rect_velocity() {
 # Predicted-velocity click at mascot-window-local (lx, ly). Post-move
 # verification with fresh rect read; > 6 px error re-aims (up to 3 attempts),
 # then proceeds and logs the achieved offset. Exactly ONE click per call.
+#
+# macOS passthrough race: K10 toggles ignore_cursor_events by POLLING the OS
+# cursor every 150 ms (DEFAULT_PASSTHROUGH_INTERVAL_MS). A click that lands
+# within one poll cycle of the move can arrive while the window still
+# ignores cursor events and fall through (run 36733228980: menu clicks #2+
+# never reached the DOM). Settle >= 2 poll cycles between the move and the
+# click so the hit-region flip is guaranteed to have run.
 CLICK_LATENCY_S_MS=200
 function click_mascot_anchored() {
     local lx="$1" ly="$2" label="$3"
@@ -145,7 +152,8 @@ function click_mascot_anchored() {
         fi
         tx=$(( fx + lx )); ty=$(( fy + ly ))
     fi
-    sleep 0.08
+    # >= 2 passthrough poll cycles after the move (see CLICK_SETTLE_MS above).
+    sleep 0.4
     "$TALK" c:"$tx","$ty"
     sleep 0.15
 }
@@ -525,7 +533,7 @@ if rv=$(rect_velocity); then
     write_timeline "Step 7: drag from ($sx, $sy) to ($drag_end_x, $drag_end_y) (start re-read; mac synthetic drag may not move the window — logging outcome)"
     log_mascot_rect "Step 7: drag start"
     "$TALK" m:"$sx","$sy"
-    sleep 0.1
+    sleep 0.4
     "$TALK" dd:"$sx","$sy"
     sleep 0.1
     steps=15

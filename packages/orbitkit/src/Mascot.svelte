@@ -137,7 +137,8 @@
   const rootStyle = $derived.by(() => {
     const w = sheetGeo ? sheetGeo.width : mascotSize;
     const h = sheetGeo ? sheetGeo.height : mascotSize;
-    return `width: ${w}px; height: ${h}px; --mascot-size: ${mascotSize}px;`;
+    const ov = config?.kind === "sheets" ? "visible" : "hidden";
+    return `width: ${w}px; height: ${h}px; --mascot-size: ${mascotSize}px; overflow: ${ov};`;
   });
 
   // SVG resolution (K3-A3: markup is encoded as data: URL and rendered exclusively in <img>)

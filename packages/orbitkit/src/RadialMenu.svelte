@@ -415,8 +415,6 @@
               >{icon.text}</span
             >
           {/if}
-        {:else}
-          <span class="orbitkit-radial-label">{item.label}</span>
         {/if}
       </button>
     {/each}

@@ -78,7 +78,7 @@ describe("RadialMenu component", () => {
     }
   });
 
-  it("draws icon-only circles; the label text is drawn only without an icon", () => {
+  it("draws icon-only circles; buttons carry title and aria-label", () => {
     const { container } = render(RadialMenu, {
       props: { config: sampleConfig, open: true, onselect: vi.fn(), onclose: vi.fn() },
     });
@@ -86,12 +86,10 @@ describe("RadialMenu component", () => {
       container
         .querySelector(`[data-orbitkit-radial-item="${id}"]`)
         ?.querySelector(".orbitkit-radial-label");
-    // Emoji, URL and relative-path icons: no crammed label inside.
     expect(labelOf("item-1")).toBeNull();
     expect(labelOf("item-2")).toBeNull();
+    expect(labelOf("item-3")).toBeNull();
     expect(labelOf("item-4")).toBeNull();
-    // No icon: the label is the only content, so it stays.
-    expect(labelOf("item-3")?.textContent).toBe("Disabled");
   });
 
   it("closed renders nothing interactive in DOM", () => {
@@ -956,8 +954,7 @@ describe("K7 arc-anchor menu", () => {
     });
 
     expect(container.querySelector("img.orbitkit-radial-icon-img")).toBeNull();
-    // An empty circle would be unidentifiable: the label is drawn instead.
-    expect(container.querySelector(".orbitkit-radial-label")?.textContent).toBe("Broken");
+    expect(container.querySelector(".orbitkit-radial-label")).toBeNull();
   });
 
   it("updates aria-label and title when an item label prop changes without reopening", () => {

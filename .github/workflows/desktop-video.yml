@@ -67,10 +67,14 @@ jobs:
 
 # r3 removed the video-macos job while record-macos.sh was still the 0.1.0
 # hard-coded flow. okv_demo-and-video ports the script to the 0.2.0 starter
-# (auto-show overlay, demoWindowFit geometry, velocity-predicted clicks for
-# the horizontal-roam demo) and re-adds the job. VITE_ORBITKIT_DEBUG=1 is
-# baked into the frontend build so app.log carries the runtime telemetry
-# (MascotView boot line: renderer + roam axis) as recording evidence.
+# (auto-show overlay, demoWindowFit geometry, velocity-predicted clicks; the
+# starter ships STATIC — roaming is opt-in and disabled in the shipped demo
+# per coordinator directive). VITE_ORBITKIT_DEBUG=1 is baked into the
+# frontend build so app.log carries the runtime telemetry (MascotView boot
+# line: renderer + roam axis) as recording evidence.
+# Coordinator directive (okv_demo-and-video): the SHOWCASE video artifact is
+# the WINDOWS worker recording (video-windows job below); video-macos is a
+# supplementary macOS capture.
   video-macos:
     name: video-macos
     runs-on: macos-latest

@@ -12,11 +12,14 @@
 #   window centre is NOT the mascot: every click point is derived from the
 #   real orbitkit.config.json + windowFit/arc-anchor math and the window rect
 #   is re-read from the OS right before every click.
-# - Since okv_demo-and-video the starter config opts into HORIZONTAL roam
-#   (axis "horizontal": vy pinned 0, floor pet). The window moves all the
-#   time, so every click uses velocity prediction (two rect reads 60 ms apart
-#   -> px/s -> predicted button-down position) with post-move verification
-#   and re-aim, mirroring the proven record-windows.ps1 r4/r5 approach.
+# - Since the coordinator directive for okv_demo-and-video the starter ships
+#   STATIC (no `windows.mascotWindow.roam` block — roaming is an opt-in
+#   library feature and must not be default, and recordings show the static
+#   mascot). The rect only changes on drags/one-shot re-clamps, but every
+#   click still uses velocity prediction (two rect reads 60 ms apart ->
+#   px/s -> predicted button-down position) with post-move verification,
+#   mirroring the proven record-windows.ps1 r4/r5 approach, so a consumer
+#   config with roam would be handled correctly too.
 # - Tooling: precompiled Swift helper (CGWindowListCopyWindowInfo), cliclick
 #   for synthetic input, screencapture -x for stills, ffmpeg avfoundation for
 #   the recording (clean FIFO "q" shutdown).
@@ -392,32 +395,32 @@ sleep 1.5
 capture_still "02-overlay.png"
 log_mascot_rect "Step 2: mascot overlay ready"
 
-# Step 2b (okv showcase): ROAM AXIS PROOF. With `axis: "horizontal"` the
-# window x must change while y stays frozen. Sample the rect for 4 s and log
-# every change — the timeline is the automated 1D-motion evidence.
-write_timeline "Step 2b: Roam watch (4 s) — expecting x changes with y frozen (axis horizontal)..."
+# Step 2b: STATIC-BY-DEFAULT PROOF. Roaming is opt-in and the starter demo
+# does NOT opt in (coordinator directive: roaming must not be the default
+# behaviour, and recordings show the static mascot). Sample the rect for 4 s:
+# zero rect changes is the expected, asserted outcome.
+write_timeline "Step 2b: Static watch (4 s) — expecting NO window movement (roam is opt-in, starter ships static)..."
 LAST_ROAM=""
 roam_samples=0
-roam_moves=0
-roam_y_changes=0
+roam_changes=0
 watch_start=$SECONDS
 while [ $(( SECONDS - watch_start )) -lt 4 ]; do
     if geom=$(win_rect "orbitkit-mascot"); then
         roam_samples=$((roam_samples + 1))
-        if [ "$geom" != "$LAST_ROAM" ]; then
-            write_timeline "Roam watch: t+$(( SECONDS - watch_start ))s ($geom)"
-            if [ -n "$LAST_ROAM" ]; then
-                read -r _lx _ly _lw _lh <<< "$LAST_ROAM"
-                read -r nx ny _nw _nh <<< "$geom"
-                [ "$nx" != "$_lx" ] && roam_moves=$((roam_moves + 1))
-                [ "$ny" != "$_ly" ] && roam_y_changes=$((roam_y_changes + 1))
-            fi
-            LAST_ROAM="$geom"
+        if [ -n "$LAST_ROAM" ] && [ "$geom" != "$LAST_ROAM" ]; then
+            write_timeline "Static watch: UNEXPECTED movement t+$(( SECONDS - watch_start ))s $LAST_ROAM -> $geom"
+            roam_changes=$((roam_changes + 1))
         fi
+        LAST_ROAM="$geom"
     fi
     sleep 0.2
 done
-write_timeline "Step 2b: roam watch done ($roam_samples samples, $roam_moves x-moves, $roam_y_changes y-changes; expect y-changes == 0 for axis horizontal); app.log boot line records renderer/axis wiring"
+if [ "$roam_changes" -ne 0 ]; then
+    write_timeline "Step 2b: FAIL mascot moved $roam_changes time(s) without roam config — default must be static!"
+    FAIL=1
+else
+    write_timeline "Step 2b: static watch OK ($roam_samples samples, 0 movements; renderer/axis wiring recorded by the app.log boot line)"
+fi
 
 # Step 3: click planet -> arc menu opens (centre-first stagger)
 write_timeline "Step 3: Opening radial menu..."

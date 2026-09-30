@@ -249,8 +249,10 @@
     }
   }
 
-  function finishItemAnimation(e: Event, index: number) {
-    if (e.target !== e.currentTarget) return;
+  function finishItemAnimation(e: AnimationEvent | TransitionEvent, index: number) {
+    // Only the item's own open/close motion counts: descendants and the
+    // ::after tooltip fade dispatch on/through the button too.
+    if (e.target !== e.currentTarget || e.pseudoElement) return;
     if (animPhase === "closing") {
       // The closing wave must finish before the menu unmounts: only the item
       // (or centre pair) scheduled last may complete the close.
@@ -378,6 +380,7 @@
     {#each config.items as item, i (item.id)}
       {@const pos = positions[i] ?? { x: 0, y: 0, angle: 0 }}
       {@const icon = icons[i]}
+      {@const tipRad = (pos.angle * Math.PI) / 180}
       {@const animStyle = getItemAnimationStyle(
         i,
         config.items.length,
@@ -397,16 +400,17 @@
         aria-disabled={item.disabled}
         aria-label={item.label}
         title={item.label}
-        style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px;{animStyle ? ` ${animStyle};` : ''}"
+        style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px; --orbitkit-radial-tip-x: {Math.cos(tipRad).toFixed(3)}; --orbitkit-radial-tip-y: {Math.sin(tipRad).toFixed(3)};{animStyle ? ` ${animStyle};` : ''}"
         onclick={() => handleItemClick(item.id, item.disabled)}
         onmouseenter={() => handleItemMouseEnter(item.id, item.disabled)}
         onanimationend={(e) => finishItemAnimation(e, i)}
         ontransitionend={(e) => finishItemAnimation(e, i)}
       >
-        <!-- Icon-only circle when an icon renders: a label squeezed into a
-             44px circle overflowed/crammed. The label stays on the button
-             as aria-label (screen readers) and title (hover tooltip); it is
-             drawn inside only when there is no renderable icon. -->
+        <!-- Icon only: a label squeezed into a 44px circle overflowed. The
+             label is the button's aria-label (screen readers) and title, and
+             the ::after tooltip (content: attr(aria-label)) shows it on
+             hover/focus-visible just outside the circle, pointing away from
+             the menu centre. -->
         {#if icon}
           {#if icon.kind === "img"}
             <img src={icon.src} alt="" class="orbitkit-radial-icon-img" />
@@ -528,15 +532,43 @@
     pointer-events: none;
   }
 
-  .orbitkit-radial-label {
-    font-size: 9px;
+  /* Label tooltip: anchored `gap` outside the circle along the item's
+     outward direction (--orbitkit-radial-tip-x/y = cos/sin of its angle,
+     set inline), and shifted by the same unit vector × 50% of its own size
+     so its near side — not its centre — touches the anchor point. */
+  .orbitkit-radial-item::after {
+    --orbitkit-radial-tip-gap: 6px;
+    content: attr(aria-label);
+    position: absolute;
+    left: calc(50% + var(--orbitkit-radial-tip-x, 0) * (50% + var(--orbitkit-radial-tip-gap)));
+    top: calc(50% + var(--orbitkit-radial-tip-y, -1) * (50% + var(--orbitkit-radial-tip-gap)));
+    transform: translate(
+      calc(-50% + var(--orbitkit-radial-tip-x, 0) * 50%),
+      calc(-50% + var(--orbitkit-radial-tip-y, -1) * 50%)
+    );
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(26, 32, 44, 0.95);
+    color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-size: 12px;
     font-weight: 500;
-    line-height: 1.1;
-    max-width: 90%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.3;
     white-space: nowrap;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+
+  .orbitkit-radial-item:hover::after,
+  .orbitkit-radial-item:focus-visible::after {
+    opacity: 1;
+  }
+
+  /* Lift the active item so its tooltip paints over later siblings. */
+  .orbitkit-radial-item:hover,
+  .orbitkit-radial-item:focus-visible {
+    z-index: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -546,6 +578,9 @@
     }
     .orbitkit-radial-item {
       animation: none !important;
+      transition: none !important;
+    }
+    .orbitkit-radial-item::after {
       transition: none !important;
     }
     .orbitkit-radial-item:hover:not(:disabled),

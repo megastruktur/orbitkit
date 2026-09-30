@@ -78,18 +78,42 @@ describe("RadialMenu component", () => {
     }
   });
 
-  it("draws icon-only circles; buttons carry title and aria-label", () => {
+  it("draws icon-only circles: the label is never text inside the button", () => {
     const { container } = render(RadialMenu, {
       props: { config: sampleConfig, open: true, onselect: vi.fn(), onclose: vi.fn() },
     });
-    const labelOf = (id: string) =>
-      container
-        .querySelector(`[data-orbitkit-radial-item="${id}"]`)
-        ?.querySelector(".orbitkit-radial-label");
-    expect(labelOf("item-1")).toBeNull();
-    expect(labelOf("item-2")).toBeNull();
-    expect(labelOf("item-3")).toBeNull();
-    expect(labelOf("item-4")).toBeNull();
+    const item = (id: string) =>
+      container.querySelector(`[data-orbitkit-radial-item="${id}"]`) as HTMLElement;
+    // Emoji: the glyph is the only text.
+    expect(item("item-1").textContent?.trim()).toBe("⭐");
+    // URL / path icons: a lone decorative <img>, no text.
+    for (const id of ["item-2", "item-4"]) {
+      expect(item(id).children).toHaveLength(1);
+      expect(item(id).firstElementChild?.tagName).toBe("IMG");
+      expect(item(id).firstElementChild?.getAttribute("alt")).toBe("");
+      expect(item(id).textContent?.trim()).toBe("");
+    }
+    // No icon: still no crammed label; the tooltip/aria-label identify it.
+    expect(item("item-3").children).toHaveLength(0);
+    expect(item("item-3").textContent?.trim()).toBe("");
+  });
+
+  it("points each item's hover/focus tooltip outward from the menu centre", () => {
+    // sampleConfig: 4 items at -90°, 0°, 90°, 180° (up, right, down, left).
+    const { container } = render(RadialMenu, {
+      props: { config: sampleConfig, open: true, onselect: vi.fn(), onclose: vi.fn() },
+    });
+    const tip = (id: string) => {
+      const el = container.querySelector(`[data-orbitkit-radial-item="${id}"]`) as HTMLElement;
+      return [
+        Number(el.style.getPropertyValue("--orbitkit-radial-tip-x")),
+        Number(el.style.getPropertyValue("--orbitkit-radial-tip-y")),
+      ];
+    };
+    expect(tip("item-1")).toEqual([0, -1]);
+    expect(tip("item-2")).toEqual([1, 0]);
+    expect(tip("item-3")).toEqual([0, 1]);
+    expect(tip("item-4")).toEqual([-1, 0]);
   });
 
   it("closed renders nothing interactive in DOM", () => {
@@ -467,6 +491,24 @@ describe("RadialMenu component", () => {
 
     // Last item ending (item 0) unmounts menu
     await fireEvent.animationEnd(items[0]);
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("ignores the tooltip's ::after transitionend while closing", async () => {
+    const { rerender } = render(RadialMenu, {
+      props: { config: sampleConfig, open: true, onselect: () => {}, onclose: () => {} },
+    });
+    await openMenuComplete();
+    rerender({ config: sampleConfig, open: false, onselect: () => {}, onclose: () => {} });
+    const items = screen.getAllByRole("menuitem");
+
+    // Item 0 closes last; its tooltip fading out must not end the close wave.
+    const tooltipFade = new Event("transitionend");
+    Object.defineProperty(tooltipFade, "pseudoElement", { value: "::after" });
+    await fireEvent(items[0], tooltipFade);
+    expect(screen.queryByRole("menu")).not.toBeNull();
+
+    await fireEvent.transitionEnd(items[0]);
     expect(screen.queryByRole("menu")).toBeNull();
   });
   it("dispatches a bubbling animationend from item 0 and asserts the menu stays mounted", async () => {
@@ -938,7 +980,7 @@ describe("K7 arc-anchor menu", () => {
     expect(decoded).not.toContain("<body");
   });
 
-  it("renders no image for unsanitizable {svg} icons and falls back to the label", () => {
+  it("renders an empty, still-labelled circle for unsanitizable {svg} icons", () => {
     const config: MenuConfig = {
       items: [{ id: "broken", label: "Broken", icon: { svg: "<svg><path</svg>" } }],
       radius: 50,
@@ -954,7 +996,9 @@ describe("K7 arc-anchor menu", () => {
     });
 
     expect(container.querySelector("img.orbitkit-radial-icon-img")).toBeNull();
-    expect(container.querySelector(".orbitkit-radial-label")).toBeNull();
+    const item = screen.getByRole("menuitem", { name: "Broken" });
+    expect(item.textContent?.trim()).toBe("");
+    expect(item.getAttribute("title")).toBe("Broken");
   });
 
   it("updates aria-label and title when an item label prop changes without reopening", () => {

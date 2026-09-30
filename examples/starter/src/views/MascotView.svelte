@@ -650,7 +650,7 @@
     pointer-events: auto;
   }
 
-  /* Radial item discs: glass disc (#0E1433 @ 85%), cyan 1.5px ring, icon centred, hover/focus glow; tooltip = label (title attr) on desktop */
+  /* Radial item discs: glass disc (#0E1433 @ 85%), cyan 1.5px ring, icon centred, hover/focus glow; the label is the library's hover/focus tooltip */
   :global(.orbitkit-radial-item) {
     background: rgba(14, 20, 51, 0.85) !important;
     border: 1.5px solid #38bdf8 !important;
@@ -689,9 +689,5 @@
     display: block !important;
     margin: 0 auto !important;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
-  }
-
-  :global(.orbitkit-radial-label) {
-    display: none !important; /* Hide text label; tooltip provided by title={item.label} */
   }
 </style>

@@ -136,4 +136,4 @@ popup exists).
 - dark-desire TCC: screen capture over SSH remains blocked ("could not create image from
   display"); macOS recording therefore runs on the GH worker (user-approved).
 
-READY FOR REVIEW at f870e16
+READY FOR REVIEW at 953bd5e

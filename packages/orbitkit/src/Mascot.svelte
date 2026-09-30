@@ -130,15 +130,18 @@
 
   // Resolved size. kind="sheets": the root box wraps the ACTIVE frame
   // (frameWidth/Height × scale) — frames differ per sheet (a run strip is
-  // wider than a sit strip) and the root clips (overflow: hidden), so a
-  // fixed `size` square cut wide/tall frames. The box (= hit area) follows
-  // the pose; bottom-center keeps the feet on the same baseline.
+  // wider than a sit strip), so a fixed `size` square cut wide/tall frames.
+  // The box (= hit area) follows the pose; bottom-center keeps the feet on
+  // the same baseline. Sheets never clip: `overflow: visible` is set inline
+  // (beats consumer classes) and by `.orbitkit-mascot--sheets` (survives a
+  // consumer `style` prop, which replaces this inline style). Other kinds
+  // keep the stylesheet's `overflow: hidden`, overridable by a class.
   const mascotSize = $derived(config?.size ?? 96);
   const rootStyle = $derived.by(() => {
     const w = sheetGeo ? sheetGeo.width : mascotSize;
     const h = sheetGeo ? sheetGeo.height : mascotSize;
-    const ov = config?.kind === "sheets" ? "visible" : "hidden";
-    return `width: ${w}px; height: ${h}px; --mascot-size: ${mascotSize}px; overflow: ${ov};`;
+    const ov = config?.kind === "sheets" ? " overflow: visible;" : "";
+    return `width: ${w}px; height: ${h}px; --mascot-size: ${mascotSize}px;${ov}`;
   });
 
   // SVG resolution (K3-A3: markup is encoded as data: URL and rendered exclusively in <img>)

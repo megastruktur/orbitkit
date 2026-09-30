@@ -53,8 +53,15 @@ export function sheetGeometry(
       ? Math.max(1, Math.floor(scale))
       : 1;
   const resolvedAnchor: MascotAnchor = anchor === "center" ? "center" : "bottom-center";
-  const frameWidth = Math.max(1, sheet.frameWidth);
-  const frameHeight = Math.max(1, sheet.frameHeight);
+  // Whole sheet pixels: a fractional frame size puts every frame boundary
+  // (background-size / background-position-x) off the pixel grid, so the
+  // renderer bleeds a neighbouring frame's column in or shaves an edge one.
+  const frameWidth = Number.isFinite(sheet.frameWidth)
+    ? Math.max(1, Math.round(sheet.frameWidth))
+    : 1;
+  const frameHeight = Number.isFinite(sheet.frameHeight)
+    ? Math.max(1, Math.round(sheet.frameHeight))
+    : 1;
   const width = frameWidth * s;
   const height = frameHeight * s;
 

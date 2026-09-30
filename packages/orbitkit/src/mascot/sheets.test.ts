@@ -87,6 +87,21 @@ describe("sheetGeometry", () => {
     expect(sheetGeometry(walk, -3).scale).toBe(1);
     expect(sheetGeometry(walk).scale).toBe(1);
   });
+
+  it("snaps fractional frame sizes to whole pixels so frame boundaries stay on the grid", () => {
+    // Unrounded, 19.4px × 2 = 38.8px steps: every frame boundary would land
+    // mid-pixel and an edge column would be bled in or shaved off.
+    const geo = sheetGeometry({ ...walk, frameWidth: 19.4, frameHeight: 12.6 }, 2);
+    expect(geo).toMatchObject({ frameWidth: 19, frameHeight: 13, width: 38, height: 26 });
+    const style = sheetFrameStyle(walk, geo, 1, false);
+    expect(style).toContain("background-size: 152px 26px");
+    expect(style).toContain("background-position-x: -38px");
+  });
+
+  it("guards degenerate frame sizes to 1px", () => {
+    const geo = sheetGeometry({ ...walk, frameWidth: Number.NaN, frameHeight: 0 }, 1);
+    expect(geo).toMatchObject({ frameWidth: 1, frameHeight: 1 });
+  });
 });
 
 describe("sheetFrameStyle", () => {

@@ -419,9 +419,32 @@ describe("Mascot kind=sheets (K7)", () => {
     }
   });
 
-  it("sizes the clipping root box to the active frame, not the config size square", async () => {
-    // Root is overflow:hidden; a fixed 32px square cut the 32×36 "tall"
-    // frame (and any frame wider than `size`). The box must follow the pose.
+  it("never clips a sheets frame: the root is overflow visible for every sheet", async () => {
+    // A forward-leaning run frame touches the box edge; any clipping (fixed
+    // square, or overflow:hidden + fractional-DPI rounding) shaves its front.
+    const { container, rerender } = render(Mascot, {
+      props: { config: sheetsConfig, sheet: "small" },
+    });
+    const button = container.querySelector("button") as HTMLElement;
+    expect(button.classList.contains("orbitkit-mascot--sheets")).toBe(true);
+    expect(button.style.overflow).toBe("visible");
+
+    await rerender({ config: sheetsConfig, sheet: "tall" });
+    expect(button.style.overflow).toBe("visible");
+  });
+
+  it("leaves non-sheets overflow to the stylesheet so a consumer class can override it", () => {
+    const { container } = render(Mascot, {
+      props: { config: { kind: "svg", src: "mascot.svg", size: 96 } },
+    });
+    const button = container.querySelector("button") as HTMLElement;
+    expect(button.classList.contains("orbitkit-mascot--sheets")).toBe(false);
+    expect(button.style.overflow).toBe("");
+  });
+
+  it("sizes the root box to the active frame, not the config size square", async () => {
+    // A fixed 32px square cut the 32×36 "tall" frame (and any frame wider
+    // than `size`). The box must follow the pose.
     const wide: MascotConfig = {
       ...sheetsConfig,
       sheets: {

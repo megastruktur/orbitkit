@@ -59,20 +59,69 @@ roaming MUST NOT be the default. Implemented:
 | Run | Head | video-windows | video-macos | Note |
 |---|---|---|---|---|
 | 36732463908 | 10a84dd | cancelled | cancelled | recorded the roaming config; cancelled after directive |
-| 36733228980 | d33da11 | **SUCCESS** (showcase artifact) | FAIL | mac: clicks #2+ fell through (see below) |
-| 36734942689 | a7912b4 | rerun | rerun | verifies the click-settle fix |
+| 36733228980 | d33da11 | **SUCCESS** (showcase artifact) | FAIL | mac: clicks lost after the title-bar close |
+| 36734942689 | a7912b4 | FAIL (Notes #1) | FAIL (Notes #1) | same close-then-click loss; the 400 ms settle was not the mechanism |
+| 36737264388 | cfb57f9 | FAIL (Notes #2) | FAIL (Notes x6) | mac drag started at the window corner — a passthrough region |
+| 36738526701 | f870e16 | **SUCCESS** (hardened flow) | FAIL (Notes #2) | mac reached Notes #1; #2 blocked by the product issue below |
 
-## video-macos failure analysis and fix (a7912b4)
+**Final disposition:** the showcase artifact is the Windows worker recording — green in
+run 2 (36733228980, stored + frame-verified here) and again in run 5 (36738526701) with the
+hardened driver. The `video-macos` job is removed again (r3 parity): the port is correct and
+kept in `scripts/ci/record-macos.sh`, but the remaining macOS blocker is product-level
+(see Failure analysis) and `crates/**` is outside this task's scope allowlist.
 
-Run 36733228980 `video-macos` failed "first Notes popup not found" after a flawless start
-(geometry derived 360x288, pre-fit 404x404 observed, static watch 11 samples / 0 movements,
-first menu click 0 px offset, menu visually open in frame t=18 s). App telemetry
-(`app-err.log` in the uploaded artifact) shows exactly ONE `pointerdown` — clicks #2+ never
-reached the DOM. Root cause: K10 passthrough toggles `ignore_cursor_events` by **polling** the
-OS cursor every 150 ms (`DEFAULT_PASSTHROUGH_INTERVAL_MS`); a click that lands within one poll
-cycle of the move can arrive while the window still ignores cursor events. Fix: settle 400 ms
-(≥ 2 poll cycles) between the move and the click / drag pointer-down in `record-macos.sh`.
-The Windows driver is unaffected (proven SUCCESS run) and was not modified.
+## Failure analysis (runs 2–5) — final root cause
+
+Unified mechanism, proven by app-side telemetry (`MascotView` DOM logs + Rust
+`[starter] Menu action:` lines in `app-err.log`):
+
+> **After any focus change away from the overlay, the next click ON the overlay
+> is consumed as the window-activation click; the webview never delivers it as
+> a DOM event.** macOS does this deterministically; Windows does it flakily.
+
+Evidence trail:
+- run 2 (mac): exactly one `pointerdown` in the whole session; the alert click
+  after the title-bar close never reached the DOM.
+- run 3 (a7912b4): a 400 ms move→click settle did NOT change anything → the
+  150 ms passthrough poll race was NOT the mechanism.
+- run 4 (cfb57f9): with toggle-closes the overlay kept key status and Alert +
+  Badge x2 **all delivered** (`Menu action: app.alert/app.badge` in
+  `app-err.log`) — but the scripted drag started at the window's top-left
+  corner (618,420), a K10 **passthrough region**; that click-through to the
+  desktop took key status again and all six Notes attempts were eaten.
+- run 4 (windows): Notes #1 opened, #2 lost — same semantics, flaky; run 2
+  with the identical build/script had passed, so Windows tolerance varies.
+
+Fixes shipped in f870e16 (both scripts, `scripts/ci/**` in scope):
+1. **Never take focus from the overlay**: menus are toggle-closed by clicking
+   the mascot again (`onToggle -> toggleMenu`, verified in MascotView.svelte);
+   the ps1's `Close-Menu-By-Clicking-Away` is removed.
+2. **Drag from the mascot centre** (a hit region), never the window corner —
+   the bash port had used the raw window top-left where the ps1 uses
+   `Get-Mascot-Point`.
+3. **Converging (Open-Menu, Click-Item) pair retries** for Notes (feedback:
+   visible-window count) and Quit (feedback: app exit) — from either menu
+   state a pair either hits or flips the state, so two pairs always suffice;
+   retries also absorb an activation-eaten click.
+
+Result (run 5, f870e16): **Windows SUCCESS end-to-end** (Alert, Notes x2,
+Badge x2, drag, Quit exit 0 — `timeline.txt` in the artifact). macOS got
+further than ever — Alert, Badge x2 AND Notes #1 all delivered
+(`Menu action: app.notes (instance note-1)`) — but the second popup
+interaction still fails with a NEW signature: after note-1 opens, overlay
+clicks produce only `window:blur`/`window:focus` pairs and ZERO DOM events
+(6 pairs attempted), and the note-1 popup that was visible at t=46 s is gone
+from view at t=50 s (behind the opaque main window — CGWindowList still
+counts it). That is popup/window z-order + focus lifecycle behaviour inside
+the plugin (notes popups are created by `crates/tauri-plugin-orbitkit`
+`open_popup`, non-alwaysOnTop) and/or WKWebView on the current macOS runner —
+NOT script-reachable: every reachable script lever (toggle-closes, hit-region
+drags, pair retries with observable feedback) is in place and working.
+Handoff for a follow-up task with `crates/**` scope:
+`scripts/ci/record-macos.sh` is ready and drives the flow to Notes #1;
+investigate popup z-order/focus on macOS (popup #1 hidden behind the main
+window after the first overlay click; overlay clicks undelivered while a
+popup exists).
 
 ## Out-of-scope findings
 
@@ -85,4 +134,4 @@ The Windows driver is unaffected (proven SUCCESS run) and was not modified.
 - dark-desire TCC: screen capture over SSH remains blocked ("could not create image from
   display"); macOS recording therefore runs on the GH worker (user-approved).
 
-READY FOR REVIEW at a7912b4
+READY FOR REVIEW at f870e16

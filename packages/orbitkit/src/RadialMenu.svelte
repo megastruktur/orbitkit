@@ -92,6 +92,61 @@
 
   let icons = $derived(config.items.map((item) => resolveIcon(item.icon)));
 
+  // K14 hovered-item caption: ONE label mirror inside the container. Keyboard
+  // focus wins over hover; disabled items never set it; empty when neither;
+  // tracking resets the moment the menu closes.
+  let captionHoverId = $state<string | null>(null);
+  let captionFocusId = $state<string | null>(null);
+
+  let captionOn = $derived(config.caption === true);
+
+  let captionText = $derived.by(() => {
+    if (!captionOn) return "";
+    // Keyboard-first: a focused enabled item beats a hovered one.
+    for (const id of [captionFocusId, captionHoverId]) {
+      if (!id) continue;
+      const item = config.items.find((it) => it.id === id);
+      if (item && !item.disabled) return item.label;
+    }
+    return "";
+  });
+
+  // K14: pure-CSS placement — bottom-centre for a top arc, top-centre for a
+  // bottom arc, plain centred otherwise (arc-anchor is always a top arc).
+  let captionArcClass = $derived.by(() => {
+    if (!captionOn) return "";
+    const pos = config.layout === "arc-anchor" ? "top" : config.arc?.position;
+    if (pos === "top") return "orbitkit-caption-arc-top";
+    if (pos === "bottom") return "orbitkit-caption-arc-bottom";
+    return "orbitkit-caption-center";
+  });
+
+  function handleCaptionPointerEnter(itemId: string, disabled?: boolean) {
+    // Disabled items are not caption sources; the previous label survives
+    // until the pointer leaves the menu container.
+    if (!captionOn || disabled) return;
+    captionHoverId = itemId;
+  }
+
+  function handleCaptionPointerLeave() {
+    captionHoverId = null;
+  }
+
+  function handleCaptionFocusIn(e: FocusEvent) {
+    if (!captionOn) return;
+    const id = (e.target as HTMLElement | null)?.getAttribute?.(
+      "data-orbitkit-radial-item"
+    );
+    if (!id) return;
+    const item = config.items.find((it) => it.id === id);
+    if (!item || item.disabled) return;
+    captionFocusId = id;
+  }
+
+  function handleCaptionFocusOut() {
+    captionFocusId = null;
+  }
+
   function checkReducedMotion(): boolean {
     if (typeof window === "undefined" || !window.matchMedia) {
       return false;
@@ -191,6 +246,10 @@
           });
         }
       } else {
+        // K14: caption tracking dies with the menu — no stale label on the
+        // closing frame or on the next open.
+        captionHoverId = null;
+        captionFocusId = null;
         if (!isMounted) {
           animPhase = "closed";
           return;
@@ -376,6 +435,10 @@
     role="menu"
     tabindex="-1"
     aria-label={label ?? "Radial Menu"}
+    data-caption={captionOn ? captionText : undefined}
+    onpointerleave={handleCaptionPointerLeave}
+    onfocusin={handleCaptionFocusIn}
+    onfocusout={handleCaptionFocusOut}
   >
     {#each config.items as item, i (item.id)}
       {@const pos = positions[i] ?? { x: 0, y: 0, angle: 0 }}
@@ -403,6 +466,7 @@
         style="left: {pos.x}px; top: {pos.y}px; width: {itemSize}px; height: {itemSize}px; --orbitkit-radial-tip-x: {Math.cos(tipRad).toFixed(3)}; --orbitkit-radial-tip-y: {Math.sin(tipRad).toFixed(3)};{animStyle ? ` ${animStyle};` : ''}"
         onclick={() => handleItemClick(item.id, item.disabled)}
         onmouseenter={() => handleItemMouseEnter(item.id, item.disabled)}
+        onpointerenter={() => handleCaptionPointerEnter(item.id, item.disabled)}
         onanimationend={(e) => finishItemAnimation(e, i)}
         ontransitionend={(e) => finishItemAnimation(e, i)}
       >
@@ -422,6 +486,16 @@
         {/if}
       </button>
     {/each}
+    {#if captionOn}
+      <!-- K14: the ONE caption mirror. The span stays empty in the DOM — the
+           visible text comes from data-caption via CSS content, and
+           aria-hidden keeps it out of role=menu content semantics. -->
+      <span
+        class="orbitkit-caption {captionArcClass}"
+        aria-hidden="true"
+        data-caption={captionText}
+      ></span>
+    {/if}
   </div>
 {/if}
 
@@ -569,6 +643,51 @@
   .orbitkit-radial-item:hover,
   .orbitkit-radial-item:focus-visible {
     z-index: 1;
+  }
+
+  /* K14: the single caption label — same dark-slate surface as the items.
+     Consumer-overridable via .orbitkit-caption; position variants only move
+     it (pure CSS, never rendered outside the container). Base placement is
+     dead-centre. */
+  .orbitkit-caption {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(26, 32, 44, 0.95);
+    color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* K14: the visible text is attr(data-caption) — the span itself stays
+     empty so the caption contributes no text content to role=menu. */
+  .orbitkit-caption::after {
+    content: attr(data-caption);
+  }
+
+  /* Top arc: caption below the chord (bottom-centre); bottom arc: mirrored
+     above it (top-centre). The 8px offset clears the chord/item rings. */
+  .orbitkit-caption-arc-top {
+    transform: translate(-50%, 8px);
+  }
+
+  .orbitkit-caption-arc-bottom {
+    transform: translate(-50%, calc(-100% - 8px));
+  }
+
+  /* K14: caption on ⇒ the per-item ::after tooltips are suppressed. The
+     container's data-caption attribute (always present when the feature is
+     on, empty string included) is the CSS flag. */
+  .orbitkit-radial-menu[data-caption] .orbitkit-radial-item::after {
+    content: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

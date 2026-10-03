@@ -1,0 +1,89 @@
+120 matches in 7 files:
+
+docs/api.md:64:...rigger, and the optional `caption` flag (see the hovered-item caption note below...
+docs/api.md:71:**Hovered-item caption (`config.caption`):**
+docs/api.md:73:With `caption: true` in the menu config, the menu container renders exactly one
+docs/api.md:74:additional child `<span class="orbitkit-caption" aria-hidden="true">` (excluded
+docs/api.md:78:caption, and the caption is empty when nothing is hovered or focused — it also
+docs/api.md:79:clears as soon as the menu closes. The text is supplied by the `data-caption`
+docs/api.md:80:...tribute and rendered with CSS (`content: attr(data-caption)`); while the caption
+docs/api.md:85:...n restyle it via the `.orbitkit-caption` class (dark-slate defaults matching the
+docs/api.md:86:item styling). Default `caption: false`: omitting it keeps the rendered menu DOM
+docs/api.md:220:... `passthrough: false`, `fitContent: false`, `caption: false`, `anchor: "none"`).
+docs/configuration.md:100:| `caption` | `boolean` | `false` | No | Hovered-item caption. When `true`, the ...
+docs/configuration.md:120:... by default, or in the single container caption when `menu.caption` is `true`. |
+docs/configuration.md:209:- `menu.caption`: `false`
+docs/configuration.md:238:8. `menu.caption`, when present, is a boolean.
+packages/orbitkit/README.md:22:... an optional hovered-item caption (`caption: true`): a single label mirror insid...
+packages/orbitkit/README.md:62:caption: true
+packages/orbitkit/src/RadialMenu.svelte:95:// K14 hovered-item caption: ONE label mirror inside the container. Keyboard
+packages/orbitkit/src/RadialMenu.svelte:98:let captionHoverId = $state<string | null>(null);
+packages/orbitkit/src/RadialMenu.svelte:99:let captionFocusId = $state<string | null>(null);
+packages/orbitkit/src/RadialMenu.svelte:101:let captionOn = $derived(config.caption === true);
+packages/orbitkit/src/RadialMenu.svelte:103:let captionText = $derived.by(() => {
+packages/orbitkit/src/RadialMenu.svelte:104:if (!captionOn) return "";
+packages/orbitkit/src/RadialMenu.svelte:106:for (const id of [captionFocusId, captionHoverId]) {
+packages/orbitkit/src/RadialMenu.svelte:116:let captionArcClass = $derived.by(() => {
+packages/orbitkit/src/RadialMenu.svelte:117:if (!captionOn) return "";
+packages/orbitkit/src/RadialMenu.svelte:119:if (pos === "top") return "orbitkit-caption-arc-top";
+packages/orbitkit/src/RadialMenu.svelte:120:if (pos === "bottom") return "orbitkit-caption-arc-bottom";
+packages/orbitkit/src/RadialMenu.svelte:121:return "orbitkit-caption-center";
+packages/orbitkit/src/RadialMenu.svelte:125:// Disabled items are not caption sources; the previous label survives
+packages/orbitkit/src/RadialMenu.svelte:127:if (!captionOn || disabled) return;
+packages/orbitkit/src/RadialMenu.svelte:128:captionHoverId = itemId;
+packages/orbitkit/src/RadialMenu.svelte:132:captionHoverId = null;
+packages/orbitkit/src/RadialMenu.svelte:136:if (!captionOn) return;
+packages/orbitkit/src/RadialMenu.svelte:143:captionFocusId = id;
+packages/orbitkit/src/RadialMenu.svelte:147:captionFocusId = null;
+packages/orbitkit/src/RadialMenu.svelte:249:// K14: caption tracking dies with the menu — no stale label on the
+packages/orbitkit/src/RadialMenu.svelte:251:captionHoverId = null;
+packages/orbitkit/src/RadialMenu.svelte:252:captionFocusId = null;
+packages/orbitkit/src/RadialMenu.svelte:438:data-caption={captionOn ? captionText : undefined}
+packages/orbitkit/src/RadialMenu.svelte:489:{#if captionOn}
+packages/orbitkit/src/RadialMenu.svelte:490:<!-- K14: the ONE caption mirror. The span stays empty in the DOM — the
+packages/orbitkit/src/RadialMenu.test.ts:1049:describe("K14 caption (hovered-item label mirror)", () => {
+packages/orbitkit/src/RadialMenu.test.ts:1050:const captionConfig: MenuConfig = { ...sampleConfig, caption: true };
+packages/orbitkit/src/RadialMenu.test.ts:1053:...captionConfig,
+packages/orbitkit/src/RadialMenu.test.ts:1059:...captionConfig,
+packages/orbitkit/src/RadialMenu.test.ts:1065:...captionConfig,
+packages/orbitkit/src/RadialMenu.test.ts:1076:it("caption absent: no caption element, no data-caption attribute (byte-identica...
+packages/orbitkit/src/RadialMenu.test.ts:1080:expect(menu.hasAttribute("data-caption")).toBe(false);
+packages/orbitkit/src/RadialMenu.test.ts:1081:expect(menu.querySelectorAll(".orbitkit-caption")).toHaveLength(0);
+packages/orbitkit/src/RadialMenu.test.ts:1084:it("caption on: exactly one aria-hidden .orbitkit-caption span and an empty data...
+packages/orbitkit/src/RadialMenu.test.ts:1085:renderMenu(captionConfig);
+packages/orbitkit/src/RadialMenu.test.ts:1088:const captions = menu.querySelectorAll(".orbitkit-caption");
+packages/orbitkit/src/RadialMenu.test.ts:1089:expect(captions).toHaveLength(1);
+packages/orbitkit/src/RadialMenu.test.ts:1090:expect(captions[0].getAttribute("aria-hidden")).toBe("true");
+packages/orbitkit/src/RadialMenu.test.ts:1091:// Empty string keeps the attribute present: [data-caption] on the
+packages/orbitkit/src/RadialMenu.test.ts:1094:expect(menu.getAttribute("data-caption")).toBe("");
+packages/orbitkit/src/RadialMenu.test.ts:1097:...an enabled item sets data-caption to its label; pointer leave empties it", async...
+packages/orbitkit/src/RadialMenu.test.ts:1098:renderMenu(captionConfig);
+packages/orbitkit/src/RadialMenu.test.ts:1102:expect(menu.getAttribute("data-caption")).toBe("Second");
+packages/orbitkit/src/RadialMenu.test.ts:1107:expect(menu.getAttribute("data-caption")).toBe("");
+packages/orbitkit/src/RadialMenu.test.ts:1110:..."keyboard focus sets data-caption and wins over a simultaneous hover", async () ...
+packages/orbitkit/src/RadialMenu.test.ts:1111:renderMenu(captionConfig);
+packages/orbitkit/src/RadialMenu.test.ts:1115:expect(menu.getAttribute("data-caption")).toBe("First");
+packages/orbitkit/src/RadialMenu.test.ts:1120:expect(menu.getAttribute("data-caption")).toBe("Fourth");
+packages/orbitkit/src/RadialMenu.test.ts:1123:it("focus out empties the caption", async () => {
+packages/orbitkit/src/RadialMenu.test.ts:1124:renderMenu(captionConfig);
+packages/orbitkit/src/config.test.ts:996:describe("K14 caption config", () => {
+packages/orbitkit/src/config.test.ts:997:it("withDefaults defaults caption to false (back-compat)", () => {
+packages/orbitkit/src/config.test.ts:1002:expect(def.menu.caption).toBe(false);
+packages/orbitkit/src/config.test.ts:1005:it("withDefaults preserves an explicit caption", () => {
+packages/orbitkit/src/config.test.ts:1008:menu: { items: [{ id: "act", label: "Act" }], caption: true },
+packages/orbitkit/src/config.test.ts:1010:expect(def.menu.caption).toBe(true);
+packages/orbitkit/src/config.test.ts:1013:it("validates caption true and false without new errors", () => {
+packages/orbitkit/src/config.test.ts:1014:for (const caption of [false, true]) {
+packages/orbitkit/src/config.test.ts:1017:menu: { ...k7Base.menu, caption },
+packages/orbitkit/src/config.test.ts:1023:it("rejects a non-boolean caption", () => {
+packages/orbitkit/src/config.test.ts:1026:menu: { ...k7Base.menu, caption: "yes" as unknown as boolean },
+packages/orbitkit/src/config.test.ts:1030:expect(res.errors.some((e) => e.includes("menu.caption"))).toBe(true);
+packages/orbitkit/src/config.ts:108:* K14: hovered-item caption. When true the container renders exactly ONE
+packages/orbitkit/src/config.ts:109:* `.orbitkit-caption` span mirroring the hovered/keyboard-focused enabled
+packages/orbitkit/src/config.ts:113:caption?: boolean;
+packages/orbitkit/src/config.ts:289:// K14: caption defaults off — absent input keeps the menu DOM unchanged.
+packages/orbitkit/src/config.ts:290:caption: menuInput?.caption ?? false,
+packages/orbitkit/src/config.ts:599:// K14: caption flag
+packages/orbitkit/src/config.ts:600:if (menu.caption !== undefined && typeof menu.caption !== "boolean") {
+packages/orbitkit/src/config.ts:601:errors.push("menu.caption: must be a boolean");
+[+34 more]

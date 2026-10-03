@@ -992,3 +992,42 @@ describe("K7 full fixture (AC4)", () => {
     expect(fixture.app?.allowedOrigins).toEqual(["https://example.com", "http://localhost:1420"]);
   });
 });
+
+describe("K14 caption config", () => {
+  it("withDefaults defaults caption to false (back-compat)", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: { items: [{ id: "act", label: "Act" }] },
+    });
+    expect(def.menu.caption).toBe(false);
+  });
+
+  it("withDefaults preserves an explicit caption", () => {
+    const def = withDefaults({
+      mascot: { kind: "svg", src: "<svg></svg>" },
+      menu: { items: [{ id: "act", label: "Act" }], caption: true },
+    });
+    expect(def.menu.caption).toBe(true);
+  });
+
+  it("validates caption true and false without new errors", () => {
+    for (const caption of [false, true]) {
+      const res = validateConfig({
+        ...k7Base,
+        menu: { ...k7Base.menu, caption },
+      });
+      expect(res.ok).toBe(true);
+    }
+  });
+
+  it("rejects a non-boolean caption", () => {
+    const res = validateConfig({
+      ...k7Base,
+      menu: { ...k7Base.menu, caption: "yes" as unknown as boolean },
+    });
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.errors.some((e) => e.includes("menu.caption"))).toBe(true);
+    }
+  });
+});

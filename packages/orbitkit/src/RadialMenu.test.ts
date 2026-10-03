@@ -1045,3 +1045,128 @@ describe("K7 arc-anchor menu", () => {
     expect(screen.getByRole("menu")).toBe(menuBefore);
   });
 });
+
+describe("K14 caption (hovered-item label mirror)", () => {
+  const captionConfig: MenuConfig = { ...sampleConfig, caption: true };
+
+  const arcTopConfig: MenuConfig = {
+    ...captionConfig,
+    layout: "arc",
+    arc: { position: "top", span: 180 },
+  };
+
+  const arcBottomConfig: MenuConfig = {
+    ...captionConfig,
+    layout: "arc",
+    arc: { position: "bottom", span: 180 },
+  };
+
+  const arcAnchorConfig: MenuConfig = {
+    ...captionConfig,
+    layout: "arc-anchor",
+    arc: { headGap: 12 },
+  };
+
+  function renderMenu(config: MenuConfig) {
+    return render(RadialMenu, {
+      props: { config, open: true, onselect: vi.fn(), onclose: vi.fn() },
+    });
+  }
+
+  it("caption absent: no caption element, no data-caption attribute (byte-identical DOM)", () => {
+    renderMenu(sampleConfig);
+
+    const menu = screen.getByRole("menu");
+    expect(menu.hasAttribute("data-caption")).toBe(false);
+    expect(menu.querySelectorAll(".orbitkit-caption")).toHaveLength(0);
+  });
+
+  it("caption on: exactly one aria-hidden .orbitkit-caption span and an empty data-caption at rest", () => {
+    renderMenu(captionConfig);
+
+    const menu = screen.getByRole("menu");
+    const captions = menu.querySelectorAll(".orbitkit-caption");
+    expect(captions).toHaveLength(1);
+    expect(captions[0].getAttribute("aria-hidden")).toBe("true");
+    // Empty string keeps the attribute present: [data-caption] on the
+    // container is the CSS flag that suppresses the per-item ::after
+    // tooltips while the feature is on (K14).
+    expect(menu.getAttribute("data-caption")).toBe("");
+  });
+
+  it("hovering an enabled item sets data-caption to its label; pointer leave empties it", async () => {
+    renderMenu(captionConfig);
+
+    const menu = screen.getByRole("menu");
+    await fireEvent.pointerEnter(screen.getByRole("menuitem", { name: "Second" }));
+    expect(menu.getAttribute("data-caption")).toBe("Second");
+
+    // pointerleave does not bubble: it must be dispatched on the menu
+    // container itself, exactly like a real exit from the menu region.
+    await fireEvent.pointerLeave(menu);
+    expect(menu.getAttribute("data-caption")).toBe("");
+  });
+
+  it("keyboard focus sets data-caption and wins over a simultaneous hover", async () => {
+    renderMenu(captionConfig);
+
+    const menu = screen.getByRole("menu");
+    await fireEvent.pointerEnter(screen.getByRole("menuitem", { name: "First" }));
+    expect(menu.getAttribute("data-caption")).toBe("First");
+
+    // fireEvent wraps the dispatch in act, flushing Svelte's template
+    // effects before the assertion (raw .focus() flushes a microtask later).
+    await fireEvent.focusIn(screen.getByRole("menuitem", { name: "Fourth" }));
+    expect(menu.getAttribute("data-caption")).toBe("Fourth");
+  });
+
+  it("focus out empties the caption", async () => {
+    renderMenu(captionConfig);
+
+    const menu = screen.getByRole("menu");
+    await fireEvent.focusIn(screen.getByRole("menuitem", { name: "Second" }));
+    expect(menu.getAttribute("data-caption")).toBe("Second");
+    await fireEvent.focusOut(screen.getByRole("menuitem", { name: "Second" }));
+    expect(menu.getAttribute("data-caption")).toBe("");
+  });
+
+  it("hovering a disabled item never changes the caption", async () => {
+    renderMenu(captionConfig);
+
+    const menu = screen.getByRole("menu");
+    await fireEvent.pointerEnter(screen.getByRole("menuitem", { name: "First" }));
+    expect(menu.getAttribute("data-caption")).toBe("First");
+
+    await fireEvent.pointerEnter(screen.getByRole("menuitem", { name: "Disabled" }));
+    expect(menu.getAttribute("data-caption")).toBe("First");
+  });
+
+  it("closing the menu clears the caption at once; reopening starts empty", async () => {
+    const { rerender } = renderMenu(captionConfig);
+
+    await fireEvent.pointerEnter(screen.getByRole("menuitem", { name: "First" }));
+    expect(screen.getByRole("menu").getAttribute("data-caption")).toBe("First");
+
+    await rerender({ open: false });
+    expect(screen.getByRole("menu").getAttribute("data-caption")).toBe("");
+
+    await rerender({ open: true });
+    expect(screen.getByRole("menu").getAttribute("data-caption")).toBe("");
+  });
+
+  it("position class follows the arc: top → arc-top, bottom → arc-bottom, otherwise centred", () => {
+    // arc-anchor is a top arc by geometry (K7), so it takes the same class.
+    const cases: Array<[MenuConfig, string]> = [
+      [arcTopConfig, "orbitkit-caption-arc-top"],
+      [arcBottomConfig, "orbitkit-caption-arc-bottom"],
+      [arcAnchorConfig, "orbitkit-caption-arc-top"],
+      [captionConfig, "orbitkit-caption-center"],
+    ];
+    for (const [config, expected] of cases) {
+      const { container } = renderMenu(config);
+      const caption = container.querySelector(".orbitkit-caption");
+      expect(caption).not.toBeNull();
+      expect(caption!.classList.contains(expected)).toBe(true);
+    }
+  });
+});

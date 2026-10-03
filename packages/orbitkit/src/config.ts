@@ -104,6 +104,13 @@ export interface MenuConfig {
   animation?: MenuAnimation;
   /** K7: defaults 260/180/40. */
   stagger?: MenuStaggerConfig;
+  /**
+   * K14: hovered-item caption. When true the container renders exactly ONE
+   * `.orbitkit-caption` span mirroring the hovered/keyboard-focused enabled
+   * item's label and suppresses the per-item ::after tooltips. Default
+   * false — absent keeps the rendered DOM byte-identical.
+   */
+  caption?: boolean;
 }
 
 export type PopupAnchor = "mascot" | "center" | "none";
@@ -279,6 +286,8 @@ export function withDefaults(c: DeepPartial<OrbitKitConfig>): OrbitKitConfig {
       closeMs: menuInput?.stagger?.closeMs ?? DEFAULT_STAGGER.closeMs,
       stepMs: menuInput?.stagger?.stepMs ?? DEFAULT_STAGGER.stepMs,
     },
+    // K14: caption defaults off — absent input keeps the menu DOM unchanged.
+    caption: menuInput?.caption ?? false,
     ...(menuInput?.layout !== undefined ? { layout: menuInput.layout as MenuConfig["layout"] } : {}),
     ...(arc !== undefined ? { arc } : {}),
   };
@@ -585,6 +594,11 @@ export function validateConfig(c: unknown): ValidationResult {
 
     if (menu.animation !== undefined && menu.animation !== "spawn" && menu.animation !== "none") {
       errors.push("menu.animation: must be one of spawn, none");
+    }
+
+    // K14: caption flag
+    if (menu.caption !== undefined && typeof menu.caption !== "boolean") {
+      errors.push("menu.caption: must be a boolean");
     }
   }
 

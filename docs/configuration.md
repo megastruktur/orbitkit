@@ -97,6 +97,7 @@ Configures the radial or arc action menu that appears around the mascot.
 | `arc` | `MenuArcConfig` | `{ position: "top", span: 180 }` | No | Configures arc side, span, and `headGap`. |
 | `animation` | `"spawn" \| "none"` | `"spawn"` | No | Animation behavior: `"spawn"` (grow from/collapse into mascot) or `"none"` (instant show/hide; more may be added). |
 | `stagger` | `MenuStaggerConfig` | `{ openMs: 260, closeMs: 180, stepMs: 40 }` | No | K7 per-item open/close stagger: `openMs`/`closeMs` total wave duration, `stepMs` per-item delay. Order centre→edges on open, reversed (edges→centre) on close. |
+| `caption` | `boolean` | `false` | No | Hovered-item caption. When `true`, the menu container renders exactly one additional child `<span class="orbitkit-caption" aria-hidden="true">` (excluded from the `role="menu"` content semantics) whose visible text mirrors the label of the item currently hovered (pointer) or keyboard-focused: keyboard focus wins over a simultaneous hover, moving the pointer onto a disabled item does not change the caption, and the caption is empty when nothing is hovered or focused (it also clears as soon as the menu closes). The text is supplied by the `data-caption` attribute and rendered with CSS (`content: attr(data-caption)`); while the caption is on, the per-item `::after` tooltips are suppressed so labels never appear twice. The span sits inside the container at the arc's inner centre — bottom-centre for `arc.position: "top"`, top-centre for `"bottom"`, plain centred for other layouts — using pure CSS only, and is never rendered outside the container bounds. Consumers can restyle it via the `.orbitkit-caption` class (dark-slate defaults matching the item styling). `false` (or omitted) keeps the rendered menu DOM byte-identical. Must be a boolean. |
 
 > **Note on `layout: "arc-anchor"` (K7):**
 > Same top-centred arc angles as `layout: "arc"` with `position: "top"`, but the arc's centre point is placed in window coordinates via `resolveMenuOrigin(anchorRect, headGap)`: horizontally centred on the mascot, `headGap` px (from `menu.arc.headGap`, default 12) above the mascot's **top edge** (not its centre).
@@ -116,7 +117,7 @@ Configures the radial or arc action menu that appears around the mascot.
 | Field | Type | Required | Validation & Description |
 |---|---|---|---|
 | `id` | `string` | **Yes** | Must match `MENU_ITEM_ID_REGEX`: `^[a-z0-9][a-z0-9_.:-]{0,63}$` (K7 — dots, colons, hyphens allowed; identical in TS and Rust). Unique across all items. |
-| `label` | `string` | **Yes** | Non-empty string. Displayed in tooltips and accessibility labels. |
+| `label` | `string` | **Yes** | Non-empty string. Displayed in accessibility labels (`aria-label` and `title`) and shown on hover or keyboard focus — as a per-item `::after` tooltip by default, or in the single container caption when `menu.caption` is `true`. |
 | `icon` | `string \| { svg: string }` | No | Emoji character (e.g. `"📝"`), image/SVG URL, **or** K7 inline-SVG object `{ svg: "<svg …/></svg>" }` (sanitized via `sanitizeMenuIconSvg` (K12 allowlist), rendered as a data-URL `<img>` sized at 50% of `menu.itemSize`). |
 | `disabled`| `boolean` | No | When `true`, item is visually dimmed and non-interactive. |
 
@@ -205,6 +206,7 @@ Applies default values to omitted optional fields:
 - `menu.itemSize`: `44`
 - `menu.trigger`: `"click"`
 - `menu.animation`: `"spawn"`
+- `menu.caption`: `false`
 - `menu.stagger`: `{ openMs: 260, closeMs: 180, stepMs: 40 }` (K7 `DEFAULT_STAGGER`)
 - `menu.arc.headGap`: `12` (K7 `DEFAULT_ARC_HEAD_GAP`, when `arc`/`arc-anchor` present)
 - `mascot.scale`: `1` (K7 `DEFAULT_MASCOT_SCALE`)
@@ -233,6 +235,7 @@ Validation guarantees:
 5. Every `menu.items[i].id` is unique and matches `MENU_ITEM_ID_REGEX`: `^[a-z0-9][a-z0-9_.:-]{0,63}$` (K7).
 6. Every `windows.popups[i].id` is unique and non-empty.
 7. Geometry fields (`radius`, `width`, `height`, etc.) are positive numbers.
+8. `menu.caption`, when present, is a boolean.
 
 ---
 

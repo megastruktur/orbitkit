@@ -61,13 +61,30 @@ Svelte 5 component rendering a circular or arc menu arranged geometrically aroun
 
 | Prop | Type | Description |
 |---|---|---|
-| `config` | `MenuConfig` | Menu configuration containing items, radius, startAngle, endAngle, trigger. |
+| `config` | `MenuConfig` | Menu configuration containing items, radius, startAngle, endAngle, trigger, and the optional `caption` flag (see the hovered-item caption note below). |
 | `open` | `boolean` | Controls visibility of the radial menu. |
 | `onselect` | `(id: string) => void` | Invoked when an enabled menu item is clicked or hovered (depending on `trigger`). |
 | `onclose` | `() => void` | Invoked when user presses Escape or clicks outside the menu. |
 | `label` | `string` | Optional accessible label for the menu container. |
 | `anchorRect` | `AnchorRect \| null` | K7 `layout: "arc-anchor"`: mascot window bounds the arc hovers above — the arc centre is resolved via `resolveMenuOrigin(anchorRect, headGap)`; without it arc-anchor falls back to window-centred geometry. |
 
+**Hovered-item caption (`config.caption`):**
+
+With `caption: true` in the menu config, the menu container renders exactly one
+additional child `<span class="orbitkit-caption" aria-hidden="true">` (excluded
+from the `role="menu"` content semantics) whose visible text mirrors the label of
+the item currently hovered (pointer) or keyboard-focused: keyboard focus wins over
+a simultaneous hover, moving the pointer onto a disabled item does not change the
+caption, and the caption is empty when nothing is hovered or focused — it also
+clears as soon as the menu closes. The text is supplied by the `data-caption`
+attribute and rendered with CSS (`content: attr(data-caption)`); while the caption
+is on, the per-item `::after` tooltips are suppressed so labels never appear twice.
+The span sits inside the container at the arc's inner centre — bottom-centre for
+`arc.position: "top"`, top-centre for `"bottom"`, plain centred for other layouts —
+using pure CSS only, and is never rendered outside the container bounds. Consumers
+can restyle it via the `.orbitkit-caption` class (dark-slate defaults matching the
+item styling). Default `caption: false`: omitting it keeps the rendered menu DOM
+byte-identical.
 
 ---
 
@@ -200,7 +217,7 @@ const positions: ItemPosition[] = layoutItems(5, 96, -90, 270);
 ### 1.3 Configuration Utilities
 
 - `defineConfig(c: OrbitKitConfig): OrbitKitConfig`: Identity type helper.
-- `withDefaults(c: DeepPartial<OrbitKitConfig>): OrbitKitConfig`: Fills in default values for optional properties (now including the K7 defaults: `scale: 1`, `anchor: "bottom-center"`, `faceByVelocity: false`, `arc.headGap: 12`, `stagger: { openMs: 260, closeMs: 180, stepMs: 40 }`, `passthrough: false`, `fitContent: false`, `anchor: "none"`).
+- `withDefaults(c: DeepPartial<OrbitKitConfig>): OrbitKitConfig`: Fills in default values for optional properties (now including the K7 defaults: `scale: 1`, `anchor: "bottom-center"`, `faceByVelocity: false`, `arc.headGap: 12`, `stagger: { openMs: 260, closeMs: 180, stepMs: 40 }`, `passthrough: false`, `fitContent: false`, `caption: false`, `anchor: "none"`).
 - `validateConfig(c: unknown): ValidationResult`: Validates input and returns `{ ok: true, config }` or `{ ok: false, errors: string[] }`.
 - `MENU_ITEM_ID_REGEX`: Regular expression `^[a-z0-9][a-z0-9_.:-]{0,63}$` (K7; identical in TS and Rust `config.rs`).
 

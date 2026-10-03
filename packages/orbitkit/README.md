@@ -19,7 +19,7 @@ pnpm add @orbitkit/ui
 ## Features
 
 - **`<Mascot />`**: Svelte 5 component supporting SVG markup (securely sandboxed via `<img>` data URLs per K3-A3), static image assets, and animated CSS sprite sheets.
-- **`<RadialMenu />`**: Svelte 5 radial action menu positioned along mathematical arcs with click or hover triggers.
+- **`<RadialMenu />`**: Svelte 5 radial action menu positioned along mathematical arcs with click or hover triggers, and an optional hovered-item caption (`caption: true`): a single label mirror inside the menu container that tracks the hovered or keyboard-focused item and replaces the per-item hover tooltips.
 - **`layoutItems` & `ItemPosition`**: Pure geometry function calculating circular and arc item coordinates.
 - **Typed Config**: `defineConfig`, `validateConfig`, and `withDefaults` enforcing the K2 schema.
 - **Typed IPC Bridge**: Non-Tauri safe wrappers around Tauri v2 commands (`showOverlay`, `hideOverlay`, `openPopup`, `closePopup`, `setMascotState`, `emitMenuAction`, `overlayPermission`, `requestOverlayPermission`).
@@ -58,7 +58,8 @@ pnpm add @orbitkit/ui
       startAngle: -90,
       endAngle: 270,
       itemSize: 44,
-      trigger: "click"
+      trigger: "click",
+      caption: true
     },
     windows: {
       popups: [

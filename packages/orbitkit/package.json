@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepare": "pnpm build",
-    "build": "svelte-package -i src -o dist && find dist -name '*.test.*' -delete",
+    "build": "svelte-package -i src -o dist && node scripts/clean-dist.mjs dist",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },

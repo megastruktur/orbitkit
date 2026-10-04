@@ -112,12 +112,15 @@
   });
 
   // K14: pure-CSS placement — bottom-centre for a top arc, top-centre for a
-  // bottom arc, plain centred otherwise (arc-anchor is always a top arc).
+  // bottom arc, left/right for horizontal arcs, plain centred otherwise
+  // (arc-anchor is always a top arc).
   let captionArcClass = $derived.by(() => {
     if (!captionOn) return "";
     const pos = config.layout === "arc-anchor" ? "top" : config.arc?.position;
     if (pos === "top") return "orbitkit-caption-arc-top";
     if (pos === "bottom") return "orbitkit-caption-arc-bottom";
+    if (pos === "left") return "orbitkit-caption-arc-left";
+    if (pos === "right") return "orbitkit-caption-arc-right";
     return "orbitkit-caption-center";
   });
 
@@ -554,9 +557,9 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(26, 32, 44, 0.95);
-    color: #e2e8f0;
+    border: 1px solid var(--orbitkit-item-border, rgba(255, 255, 255, 0.18));
+    background: var(--orbitkit-item-bg, rgba(26, 32, 44, 0.95));
+    color: var(--orbitkit-item-color, #e2e8f0);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     cursor: pointer;
     user-select: none;
@@ -577,9 +580,9 @@
 
   .orbitkit-radial-item:hover:not(:disabled),
   .orbitkit-radial-item:focus-visible:not(:disabled) {
-    background: rgba(45, 55, 72, 1);
-    border-color: rgba(99, 179, 237, 0.8);
-    box-shadow: 0 0 10px rgba(99, 179, 237, 0.5);
+    background: var(--orbitkit-item-hover-bg, rgba(45, 55, 72, 1));
+    border-color: var(--orbitkit-item-hover-border, rgba(99, 179, 237, 0.8));
+    box-shadow: 0 0 10px var(--orbitkit-item-hover-glow, rgba(99, 179, 237, 0.5));
     transform: translate(-50%, -50%) scale(1.08);
     outline: none;
   }
@@ -656,8 +659,8 @@
     transform: translate(-50%, -50%);
     padding: 3px 8px;
     border-radius: 6px;
-    background: rgba(26, 32, 44, 0.95);
-    color: #e2e8f0;
+    background: var(--orbitkit-caption-bg, rgba(26, 32, 44, 0.95));
+    color: var(--orbitkit-caption-color, #e2e8f0);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     font-size: 12px;
     font-weight: 500;
@@ -681,6 +684,17 @@
 
   .orbitkit-caption-arc-bottom {
     transform: translate(-50%, calc(-100% - 8px));
+  }
+
+  /* Horizontal arcs: captions sit cleanly beside the items without colliding
+     with the mascot. Left arc items fan left → caption to the right;
+     right arc items fan right → caption to the left. */
+  .orbitkit-caption-arc-left {
+    transform: translate(calc(100% + 16px), -50%);
+  }
+
+  .orbitkit-caption-arc-right {
+    transform: translate(calc(-100% - 16px), -50%);
   }
 
   /* K14: caption on ⇒ the per-item ::after tooltips are suppressed. The

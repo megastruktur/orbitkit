@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import { tick } from "svelte";
+import type { Snippet } from "svelte";
 import Mascot from "./Mascot.svelte";
 import type { MascotConfig } from "./config";
 
@@ -355,6 +356,34 @@ describe("Mascot Component", () => {
     expect(button.style.width).toBe("120px");
     expect(button.style.height).toBe("120px");
     expect(button.style.getPropertyValue("--mascot-size")).toBe("120px");
+  });
+
+  // Test 16: Children snippet slot renders content inside the mascot button
+  it("renders children snippet inside the orbitkit-mascot button", async () => {
+    // Svelte 5 snippets receive an anchor node that @render passes.
+    // We insert our test content immediately before that anchor.
+    // @render passes a comment-node anchor; ChildNode is the DOM interface that has .before()
+    const childSnippet = (anchor: ChildNode) => {
+      const el = document.createElement("span");
+      el.className = "test-child-snippet";
+      el.textContent = "child content";
+      anchor.before(el);
+    };
+
+    const { container } = render(Mascot, {
+      props: {
+        config: inlineSvgConfig,
+        children: childSnippet as unknown as Snippet,
+      },
+    });
+
+    await tick();
+
+    const button = container.querySelector("button.orbitkit-mascot");
+    expect(button).toBeTruthy();
+    const child = button?.querySelector(".test-child-snippet");
+    expect(child).toBeTruthy();
+    expect(child?.textContent).toBe("child content");
   });
 });
 

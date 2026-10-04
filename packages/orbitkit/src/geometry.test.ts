@@ -285,4 +285,36 @@ describe("resolveMenuOrigin (K7 arc-anchor)", () => {
     expect(points[2].y).toBeLessThan(points[1].y);
     expect(points[0].y).toBe(0);
   });
+
+  it("positions the arc origin to the left of the mascot for position=left", () => {
+    // mascot centre y = 200 + 40 = 240; arc origin x = 100 - 12 = 88
+    const origin = resolveMenuOrigin(
+      { x: 100, y: 200, width: 60, height: 80, position: "left" },
+      12
+    );
+    expect(origin).toEqual({ x: 88, y: 240 });
+  });
+
+  it("positions the arc origin to the right of the mascot for position=right", () => {
+    // mascot centre y = 200 + 40 = 240; arc origin x = 100 + 60 + 12 = 172
+    const origin = resolveMenuOrigin(
+      { x: 100, y: 200, width: 60, height: 80, position: "right" },
+      12
+    );
+    expect(origin).toEqual({ x: 172, y: 240 });
+  });
+
+  it("positions the arc origin below the mascot for position=bottom", () => {
+    // mascot centre x = 100 + 30 = 130; arc origin y = 200 + 80 + 12 = 292
+    const origin = resolveMenuOrigin(
+      { x: 100, y: 200, width: 60, height: 80, position: "bottom" },
+      12
+    );
+    expect(origin).toEqual({ x: 130, y: 292 });
+  });
+
+  it("defaults to top position when position is omitted", () => {
+    const origin = resolveMenuOrigin({ x: 100, y: 200, width: 60, height: 80 }, 12);
+    expect(origin).toEqual({ x: 130, y: 188 });
+  });
 });

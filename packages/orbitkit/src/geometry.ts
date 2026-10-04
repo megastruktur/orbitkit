@@ -154,12 +154,15 @@ export function resolveMenuAngles(
   };
 }
 
-/** K7: mascot bounds in window coordinates (RadialMenu `anchorRect` prop). */
+/** K7: mascot bounds in window coordinates (RadialMenu `anchorRect` prop).
+ *  `position` optionally hints whether the arc is anchored to the left or right
+ *  side of the viewport so resolveMenuOrigin can shift the arc centre accordingly. */
 export interface AnchorRect {
   x: number;
   y: number;
   width: number;
   height: number;
+  position?: "top" | "bottom" | "left" | "right";
 }
 
 /** K7 arc-anchor: window-coordinate origin of the arc's centre point. */
@@ -170,7 +173,8 @@ export interface MenuOrigin {
 
 /**
  * K7 layout "arc-anchor": the arc's centre point sits horizontally centred on
- * the mascot bounds and `headGap` px above the mascot's top edge.
+ * the mascot bounds and `headGap` px above the mascot's top edge (for top
+ * position) or to the left/right of the mascot bounds (for left/right positions).
  * Items are positioned relative to this origin, so the component shifts the
  * menu container by the returned offset. `headGap` comes from
  * `menu.arc.headGap` (config default 12).
@@ -182,8 +186,24 @@ export function resolveMenuOrigin(
   if (!anchorRect) {
     return { x: 0, y: 0 };
   }
-  return {
-    x: anchorRect.x + anchorRect.width / 2,
-    y: anchorRect.y - headGap,
-  };
+
+  const pos = anchorRect.position ?? "top";
+  const cx = anchorRect.x + anchorRect.width / 2;
+  const cy = anchorRect.y + anchorRect.height / 2;
+
+  switch (pos) {
+    case "left":
+      // Arc centred to the left of the mascot, at its vertical midpoint.
+      return { x: anchorRect.x - headGap, y: cy };
+    case "right":
+      // Arc centred to the right of the mascot, at its vertical midpoint.
+      return { x: anchorRect.x + anchorRect.width + headGap, y: cy };
+    case "bottom":
+      // Arc centred below the mascot, at its horizontal midpoint.
+      return { x: cx, y: anchorRect.y + anchorRect.height + headGap };
+    case "top":
+    default:
+      // Arc centred above the mascot, at its horizontal midpoint.
+      return { x: cx, y: anchorRect.y - headGap };
+  }
 }

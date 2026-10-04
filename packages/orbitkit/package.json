@@ -16,6 +16,7 @@
     "./assets/*": "./assets/*"
   },
   "scripts": {
+    "prepare": "pnpm build",
     "build": "svelte-package -i src -o dist && find dist -name '*.test.*' -delete",
     "check": "tsc --noEmit",
     "test": "vitest run"

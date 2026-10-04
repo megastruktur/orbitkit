@@ -19,6 +19,7 @@
     ariaLabel?: string;
     reducedMotion?: boolean;
     class?: string;
+    children?: import("svelte").Snippet;
   }
 
   let {
@@ -33,6 +34,7 @@
     ariaLabel,
     reducedMotion = false,
     class: customClass = "",
+    children,
     ...restProps
   }: Props & Record<string, any> = $props();
 
@@ -373,6 +375,7 @@
       role="presentation"
     ></div>
   {/if}
+  {#if children}{@render children()}{/if}
 </button>
 
 <style>

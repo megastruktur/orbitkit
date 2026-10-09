@@ -1061,6 +1061,18 @@ describe("K14 caption (hovered-item label mirror)", () => {
     arc: { position: "bottom", span: 180 },
   };
 
+  const arcLeftConfig: MenuConfig = {
+    ...captionConfig,
+    layout: "arc",
+    arc: { position: "left", span: 180 },
+  };
+
+  const arcRightConfig: MenuConfig = {
+    ...captionConfig,
+    layout: "arc",
+    arc: { position: "right", span: 180 },
+  };
+
   const arcAnchorConfig: MenuConfig = {
     ...captionConfig,
     layout: "arc-anchor",
@@ -1159,6 +1171,8 @@ describe("K14 caption (hovered-item label mirror)", () => {
     const cases: Array<[MenuConfig, string]> = [
       [arcTopConfig, "orbitkit-caption-arc-top"],
       [arcBottomConfig, "orbitkit-caption-arc-bottom"],
+      [arcLeftConfig, "orbitkit-caption-arc-left"],
+      [arcRightConfig, "orbitkit-caption-arc-right"],
       [arcAnchorConfig, "orbitkit-caption-arc-top"],
       [captionConfig, "orbitkit-caption-center"],
     ];

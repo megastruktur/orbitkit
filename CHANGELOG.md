@@ -9,11 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.3.0] — 2026-10-09
+
 ### Added
 
 - **`Mascot` (`kind: "sheets"`) canvas renderer** — opt-in `renderer: "canvas"` blits the active sheet frame with an integer `drawImage` (`sx = frame * frameWidth`) onto a `<canvas aria-hidden="true">` whose bitmap is scaled by `devicePixelRatio` (CSS size stays logical), with `imageSmoothingEnabled = false` for crisp pixel-art upscale and `faceByVelocity` mirroring via `translate`/`scale(-1, 1)`. Default `renderer: "css"` keeps the existing background-position div rendering untouched.
 - **`RoamController.resume(at?, heading?)`** — optional direction vector: the loop walks at `speed` along `heading` instead of aiming at the zone centre, so a host scheduler can choose the walk direction (and with `faceByVelocity`, the facing). A zero heading falls back to the centre aim.
 - **Roam axis lock (`roam.axis: MascotRoamAxis`)** — `"2d"` (default) roams and bounces in both axes, `"horizontal"` pins the motion to the X axis (`vy = 0` for the loop's whole life — floor pets), `"vertical"` pins it to the Y axis (`vx = 0` — wall crawlers). Accepted on `MascotRoamConfig.axis` (forwarded by `createRoam`) and `StartRoamOptions.axis`; `aimRoamVelocity` takes the axis as a 4th argument and forces the matching lock on a degenerate zone (zero height ⇒ horizontal, zero width ⇒ vertical). `resume(at, heading)` keeps the locked component at 0.
+- **`menu.trigger: "right-click"`** — the radial/arc menu opens on the right mouse button (default stays `"click"`; `"hover"` unchanged). The `MenuTrigger` union grows to `"click" | "hover" | "right-click"`; the Rust `MenuTrigger` mirror moved to `#[serde(rename_all = "kebab-case")]` so `RightClick` serializes as `"right-click"` while the historical `"click"`/`"hover"` spellings are byte-identical. Drag-gesture disambiguation treats the right button the same as the left (drag vs. click-toggle threshold).
+- **Hovered-item caption (K14, `menu.caption: boolean`)** — when `true`, the menu container renders exactly ONE `.orbitkit-caption` span mirroring the hovered/keyboard-focused enabled item's label and suppresses the per-item `::after` tooltips. Default `false` — absent keeps the rendered DOM byte-identical. Documented in `docs/api.md` / `docs/configuration.md`.
+- **CSS theming tokens for radial items and captions** — item background/border/color/hover states and the caption are styled through custom properties (`--orbitkit-item-bg`, `--orbitkit-item-border`, `--orbitkit-item-color`, `--orbitkit-item-hover-*`, `--orbitkit-caption-bg/color`) with the previous visuals as fallback defaults, so hosts can re-theme the menu without overriding component CSS.
+- **Horizontal arc captions & origin (K14 follow-up)** — `AnchorRect.position` ("top" | "bottom" | "left" | "right") now steers `resolveMenuOrigin`: left/right arcs anchor beside the mascot's vertical midpoint and captions get `orbitkit-caption-arc-left/-right` placement so they sit beside the items instead of colliding with the mascot.
+- **`<Mascot />` `children` snippet slot** — hosts can render extra overlay elements (badges, effects) inside the mascot root, inheriting its positioning.
+- **`prepare` script on `@orbitkit/ui`** (`"prepare": "pnpm build"`) — installing the package from a git URL builds `dist/` automatically.
+- **Canvas sheets demo (starter)** — the starter demo renders the sheets mascot through the canvas engine and ships an updated showcase video.
 
 ### Fixed
 
@@ -24,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`@orbitkit/ui` → `0.3.0`, `tauri-plugin-orbitkit` → `0.3.0`** — packages versioned in lockstep for the 0.3.0 release.
 - **`RadialMenu` items are icon-only** — the label is never drawn inside the 44 px circle (it overflowed); it stays as `aria-label` and `title`, and a styled tooltip (`::after`, `content: attr(aria-label)`) shows it on `:hover` / `:focus-visible`, placed just outside the circle along the item's outward direction (`--orbitkit-radial-tip-x/y`, set inline). Items without a renderable icon draw an empty circle. The `.orbitkit-radial-label` class is gone.
 
 ## [0.2.0] — 2026-09-29

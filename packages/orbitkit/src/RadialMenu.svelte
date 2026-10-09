@@ -686,15 +686,17 @@
     transform: translate(-50%, calc(-100% - 8px));
   }
 
-  /* Horizontal arcs: captions sit cleanly beside the items without colliding
-     with the mascot. Left arc items fan left → caption to the right;
-     right arc items fan right → caption to the left. */
+  /* Horizontal arcs: the caption is centred on the arc origin (dead centre),
+     same placement as the base .orbitkit-caption — the pill grows
+     symmetrically in both directions, so its centre never moves when the
+     hovered item (and thus the label width) changes. The classes stay as a
+     public styling hook for consumers. */
   .orbitkit-caption-arc-left {
-    transform: translate(calc(100% + 16px), -50%);
+    transform: translate(-50%, -50%);
   }
 
   .orbitkit-caption-arc-right {
-    transform: translate(calc(-100% - 16px), -50%);
+    transform: translate(-50%, -50%);
   }
 
   /* K14: caption on ⇒ the per-item ::after tooltips are suppressed. The

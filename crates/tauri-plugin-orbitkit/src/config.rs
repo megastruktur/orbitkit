@@ -171,11 +171,15 @@ impl Default for MascotConfig {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
-#[serde(rename_all = "lowercase")]
+// kebab-case: single-word variants keep the historical lowercase spellings
+// ("click"/"hover"); `RightClick` serializes as "right-click", matching the
+// TS `MenuConfig["trigger"]` union in packages/orbitkit/src/config.ts.
+#[serde(rename_all = "kebab-case")]
 pub enum MenuTrigger {
     #[default]
     Click,
     Hover,
+    RightClick,
 }
 
 /// K7: menu item icon — URL/data-URL string or inline SVG object.
@@ -691,6 +695,46 @@ mod tests {
 
         assert_eq!(min_parsed.windows.mascot_window, None);
         assert!(min_parsed.windows.popups.is_empty());
+    }
+
+    #[test]
+    fn test_menu_trigger_right_click_parses() {
+        // The transcripter injects the webview config through
+        // `serde_json::from_str::<OrbitKitConfig>`; the "right-click" spelling
+        // added in TS (`MenuConfig["trigger"]`) MUST parse or the app won't boot.
+        let json = r#"{
+            "mascot": { "kind": "svg", "src": "<svg>rc</svg>" },
+            "menu": {
+                "items": [{ "id": "act-1", "label": "Act 1" }],
+                "trigger": "right-click"
+            },
+            "windows": { "popups": [] }
+        }"#;
+        let parsed: OrbitKitConfig = serde_json::from_str(json).expect("right-click trigger parses");
+        assert_eq!(parsed.menu.trigger, MenuTrigger::RightClick);
+
+        // Serialized form matches the TS union spelling.
+        let serialized = serde_json::to_string(&parsed.menu).expect("serialize menu");
+        assert!(serialized.contains(r#""trigger":"right-click""#));
+
+        // kebab-case rename must not drift the historical spellings.
+        assert_eq!(serde_json::to_string(&MenuTrigger::Click).unwrap(), r#""click""#);
+        assert_eq!(serde_json::to_string(&MenuTrigger::Hover).unwrap(), r#""hover""#);
+        assert_eq!(
+            serde_json::to_string(&MenuTrigger::RightClick).unwrap(),
+            r#""right-click""#
+        );
+
+        // Unknown trigger strings still fail to parse.
+        let bad = r#"{
+            "mascot": { "kind": "svg", "src": "<svg>bad</svg>" },
+            "menu": {
+                "items": [{ "id": "act-1", "label": "Act 1" }],
+                "trigger": "double-click"
+            },
+            "windows": { "popups": [] }
+        }"#;
+        assert!(serde_json::from_str::<OrbitKitConfig>(bad).is_err());
     }
 
     #[derive(Debug, Deserialize)]

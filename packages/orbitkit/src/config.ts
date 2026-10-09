@@ -98,7 +98,7 @@ export interface MenuConfig {
   startAngle: number;
   endAngle: number;
   itemSize?: number;
-  trigger?: "click" | "hover";
+  trigger?: "click" | "hover" | "right-click";
   layout?: MenuLayout;
   arc?: MenuArcConfig;
   animation?: MenuAnimation;
@@ -531,8 +531,13 @@ export function validateConfig(c: unknown): ValidationResult {
       errors.push("menu.itemSize: must be a positive number");
     }
 
-    if (menu.trigger !== undefined && menu.trigger !== "click" && menu.trigger !== "hover") {
-      errors.push("menu.trigger: must be 'click' or 'hover'");
+    if (
+      menu.trigger !== undefined &&
+      menu.trigger !== "click" &&
+      menu.trigger !== "hover" &&
+      menu.trigger !== "right-click"
+    ) {
+      errors.push("menu.trigger: must be 'click', 'hover', or 'right-click'");
     }
 
     if (

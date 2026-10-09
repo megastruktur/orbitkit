@@ -365,6 +365,37 @@ describe("validateConfig", () => {
     }
   });
 
+  it("accepts menu.trigger 'right-click'", () => {
+    const res = validateConfig({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        trigger: "right-click",
+      },
+    });
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.config.menu.trigger).toBe("right-click");
+    }
+  });
+
+  it("withDefaults passes menu.trigger 'right-click' through and keeps 'click' default", () => {
+    const rightClick = withDefaults({
+      ...validBaseConfig,
+      menu: {
+        ...validBaseConfig.menu,
+        trigger: "right-click",
+      },
+    });
+    expect(rightClick.menu.trigger).toBe("right-click");
+
+    const defaulted = withDefaults({
+      ...validBaseConfig,
+      menu: { ...validBaseConfig.menu, trigger: undefined },
+    });
+    expect(defaulted.menu.trigger).toBe("click");
+  });
+
   it("validates menu geometry: radius, startAngle, endAngle", () => {
     const invalidGeoRes = validateConfig({
       ...validBaseConfig,

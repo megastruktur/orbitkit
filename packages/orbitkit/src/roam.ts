@@ -560,6 +560,7 @@ export function createRoamDrag(options: RoamDragOptions): RoamDragBinding {
       gesture.onclick(e);
       endDrag();
     },
+    oncontextmenu: (e) => gesture.oncontextmenu(e),
     onkeydown: (e) => gesture.onkeydown(e),
     onfocus: () => {
       gesture.onfocus();

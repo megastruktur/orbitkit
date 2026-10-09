@@ -270,3 +270,105 @@ describe("createDragGesture", () => {
     }
   });
 });
+
+describe("createDragGesture openButton", () => {
+  it("openButton='right': right pointerdown sets pending, click toggles", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle, openButton: "right" });
+
+    gesture.onpointerdown({ button: 2, clientX: 100, clientY: 100 });
+    expect(gesture.isPending).toBe(true);
+
+    gesture.onpointerup({ button: 2 });
+    gesture.onclick();
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("openButton='right': left click does not toggle but left drag still works", () => {
+    const onToggle = vi.fn();
+    const onDragStart = vi.fn();
+    const gesture = createDragGesture({ onToggle, onDragStart, openButton: "right" });
+
+    // Left press-and-move crosses the threshold: native drag runs.
+    gesture.onpointerdown({ button: 0, clientX: 100, clientY: 100 });
+    expect(gesture.isPending).toBe(true);
+    gesture.onpointermove({ clientX: 110, clientY: 110 });
+    expect(onDragStart).toHaveBeenCalledTimes(1);
+    gesture.onpointerup({ button: 0 });
+
+    // Terminating left click is suppressed by the drag flag AND must not toggle.
+    gesture.onclick();
+    expect(onToggle).not.toHaveBeenCalled();
+    expect(gesture.isDragged).toBe(false);
+
+    // A clean left click (no drag) must not toggle either.
+    gesture.onpointerdown({ button: 0, clientX: 100, clientY: 100 });
+    gesture.onpointerup({ button: 0 });
+    gesture.onclick();
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it("openButton='right': right drag suppresses the toggle", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle, openButton: "right" });
+
+    gesture.onpointerdown({ button: 2, clientX: 100, clientY: 100 });
+    gesture.onpointermove({ clientX: 120, clientY: 100 });
+    expect(gesture.isDragged).toBe(true);
+    gesture.onpointerup({ button: 2 });
+
+    gesture.onclick();
+    expect(onToggle).not.toHaveBeenCalled();
+    expect(gesture.isDragged).toBe(false);
+  });
+
+  it("openButton='right': contextmenu is suppressed and toggles", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle, openButton: "right" });
+    const preventDefault = vi.fn();
+
+    gesture.oncontextmenu({ preventDefault });
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("openButton='right': contextmenu after a right drag suppresses without toggling", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle, openButton: "right" });
+    const preventDefault = vi.fn();
+
+    gesture.onpointerdown({ button: 2, clientX: 100, clientY: 100 });
+    gesture.onpointermove({ clientX: 120, clientY: 100 });
+    gesture.onpointerup({ button: 2 });
+
+    gesture.oncontextmenu({ preventDefault });
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(onToggle).not.toHaveBeenCalled();
+    expect(gesture.isDragged).toBe(false);
+  });
+
+  it("openButton='right': middle button is ignored, keyboard still toggles", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle, openButton: "right" });
+
+    gesture.onpointerdown({ button: 1, clientX: 50, clientY: 50 });
+    expect(gesture.isPending).toBe(false);
+
+    gesture.onkeydown({ key: "Enter", preventDefault: vi.fn() });
+    gesture.onkeydown({ key: " ", preventDefault: vi.fn() });
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
+
+  it("default openButton (left): right press stays ignored and contextmenu untouched", () => {
+    const onToggle = vi.fn();
+    const gesture = createDragGesture({ onToggle });
+    const preventDefault = vi.fn();
+
+    gesture.onpointerdown({ button: 2, clientX: 50, clientY: 50 });
+    expect(gesture.isPending).toBe(false);
+
+    gesture.oncontextmenu({ preventDefault });
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+});

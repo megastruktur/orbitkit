@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/svelte";
 import { clearMocks, mockIPC, mockWindows } from "@tauri-apps/api/mocks";
+import { compile } from "svelte/compiler";
 import PopupSheet from "./PopupSheet.svelte";
+import popupSheetSource from "./PopupSheet.svelte?raw";
 import type { PopupOpenPayload } from "./bridge";
 import MockNotes from "./test-fixtures/MockNotes.svelte";
 import MockSettings from "./test-fixtures/MockSettings.svelte";
@@ -467,5 +469,37 @@ describe("PopupSheet component", () => {
     expect(document.activeElement).toBe(actionBtn);
 
     document.body.removeChild(outsideBtn);
+  });
+
+  it("13. exposes --orbitkit-sheet CSS custom property hooks with existing look as fallbacks", async () => {
+    render(PopupSheet, { props: defaultProps });
+
+    emitOpen({
+      id: "notes",
+      title: "Themed Popup",
+      url: "index.html?popup=notes",
+      width: 320,
+      height: 400,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeDefined();
+    });
+
+    // Sheet behavior preserved: dialog renders with its title.
+    expect(screen.getByText("Themed Popup")).toBeDefined();
+
+    // Vitest stubs emitted style modules (test.css defaults to false), so the
+    // compiled CSS never reaches document.head here. Inspect the real Svelte
+    // compiler output instead — the CSS Svelte actually ships for the sheet.
+    const { css } = compile(popupSheetSource, { generate: "client" });
+    const cssText = css?.code ?? "";
+
+    expect(cssText).toContain("--orbitkit-sheet-bg");
+    expect(cssText).toContain("--orbitkit-sheet-border");
+
+    // Existing appearance preserved as var() fallbacks.
+    expect(cssText).toMatch(/--orbitkit-sheet-bg,\s*rgba\(14,\s*20,\s*51,\s*0\.92\)/);
+    expect(cssText).toMatch(/--orbitkit-sheet-border,\s*1\.5px\s*solid\s*#38bdf8/);
   });
 });

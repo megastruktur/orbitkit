@@ -275,7 +275,7 @@
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(7, 11, 26, 0.75);
+    background: var(--orbitkit-sheet-backdrop-bg, rgba(7, 11, 26, 0.75));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -287,17 +287,15 @@
 
   .orbitkit-popup-sheet-card {
     position: relative;
-    background: rgba(14, 20, 51, 0.92);
-    border: 1.5px solid #38bdf8;
-    border-radius: 16px;
-    box-shadow:
-      0 0 0 1px rgba(56, 189, 248, 0.25),
-      0 20px 40px rgba(0, 0, 0, 0.7);
+    background: var(--orbitkit-sheet-bg, rgba(14, 20, 51, 0.92));
+    border: var(--orbitkit-sheet-border, 1.5px solid #38bdf8);
+    border-radius: var(--orbitkit-sheet-radius, 16px);
+    box-shadow: var(--orbitkit-sheet-shadow, 0 0 0 1px rgba(56, 189, 248, 0.25), 0 20px 40px rgba(0, 0, 0, 0.7));
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    color: #e6f6ff;
+    color: var(--orbitkit-sheet-color, #e6f6ff);
     outline: none;
   }
 
@@ -306,8 +304,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
-    background: rgba(14, 20, 51, 0.95);
+    border-bottom: 1px solid var(--orbitkit-sheet-header-border, rgba(56, 189, 248, 0.2));
+    background: var(--orbitkit-sheet-header-bg, rgba(14, 20, 51, 0.95));
     flex-shrink: 0;
   }
 
@@ -315,15 +313,15 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: #e6f6ff;
+    color: var(--orbitkit-sheet-title-color, #e6f6ff);
     letter-spacing: 0.01em;
   }
 
   .orbitkit-popup-sheet-close {
     background: transparent;
-    border: 1px solid rgba(56, 189, 248, 0.25);
-    color: #9fb3d9;
-    border-radius: 8px;
+    border: 1px solid var(--orbitkit-sheet-close-border, rgba(56, 189, 248, 0.25));
+    color: var(--orbitkit-sheet-close-color, #9fb3d9);
+    border-radius: var(--orbitkit-sheet-close-radius, 8px);
     width: 32px;
     height: 32px;
     display: flex;
@@ -340,13 +338,13 @@
   }
 
   .orbitkit-popup-sheet-close:hover {
-    background: rgba(56, 189, 248, 0.15);
-    color: #e6f6ff;
-    border-color: #38bdf8;
+    background: var(--orbitkit-sheet-close-hover-bg, rgba(56, 189, 248, 0.15));
+    color: var(--orbitkit-sheet-close-hover-color, #e6f6ff);
+    border-color: var(--orbitkit-sheet-close-hover-border, #38bdf8);
   }
 
   .orbitkit-popup-sheet-close:focus-visible {
-    outline: 2px solid #38bdf8;
+    outline: 2px solid var(--orbitkit-sheet-focus-color, #38bdf8);
     outline-offset: 2px;
   }
 

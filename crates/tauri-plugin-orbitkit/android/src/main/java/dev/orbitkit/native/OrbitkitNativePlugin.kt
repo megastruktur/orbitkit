@@ -606,8 +606,8 @@ class OrbitkitNativePlugin(private val activity: Activity) : Plugin(activity) {
                     alpha = 1.0f
                     background = GradientDrawable().apply {
                         shape = GradientDrawable.OVAL
-                        setColor(Color.argb((255 * 0.85f).toInt(), 0x0E, 0x14, 0x33))
-                        setStroke(Math.max(1, dpToPx(ctx, 1.5f)), Color.parseColor("#38BDF8"))
+                        setColor(Color.argb((255 * 0.92f).toInt(), 0x17, 0x13, 0x11))
+                        setStroke(Math.max(1, dpToPx(ctx, 1.5f)), Color.parseColor("#D7A747"))
                     }
                     setOnClickListener {
                         handleAction(item.id, item.disabled)
